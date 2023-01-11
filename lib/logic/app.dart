@@ -5,7 +5,6 @@ import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:karma_coin/logic/auth.dart';
-// import 'package:desktop_window/desktop_window.dart';
 import 'package:karma_coin/logic/settings.dart';
 import 'package:karma_coin/common/platform_info.dart';
 
@@ -106,12 +105,4 @@ class AppLogic {
     }
     SystemChrome.setPreferredOrientations(orientations);
   }
-
-/*
-  Future<T?> showFullscreenDialogRoute<T>(BuildContext context, Widget child,
-      {bool transparent = false}) async {
-    return await Navigator.of(context).push<T>(
-        //PageRoutes.dialog<T>(child, duration: $styles.times.pageTransition),
-        );
-  }*/
 }
