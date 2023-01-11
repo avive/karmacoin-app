@@ -2,7 +2,7 @@
 
 export 'dart:math';
 
-export 'package:collection/collection.dart';
+// export 'package:collection/collection.dart';
 export 'package:flutter/material.dart';
 export 'package:flutter/services.dart';
 export 'package:get_it/get_it.dart';

@@ -6,7 +6,8 @@ import 'dart:convert';
 
 import '../services/api/api.pbgrpc.dart';
 
-/// Local karmaCoin account logic
+/// Local karmaCoin account logic. We seperate between authentication and account.
+/// Account information includes user's name, accountId and private signing key.
 class AccountLogic {
   final _secureStorage = const FlutterSecureStorage();
   final ApiServiceClient _apiServiceClient;
@@ -21,14 +22,17 @@ class AccountLogic {
     encryptedSharedPreferences: true,
   );
 
-  // User's id key pair
+  /// User's id key pair - locally stored. Should be generated after a succesfull
+  /// user auth interaction for that user
   ed.KeyPair? _keyPair;
 
-  // True if user signed up (NewUser transaction on chain)
+  // True if user signed up to KarmaCoin (NewUser transaction on chain)
   bool _signedUp = false;
 
-  // User name on-chain
+  // User name on-chain, if one was set. Not the user's reqested user-name.
   String? _userName;
+
+  // todo: add support to secure channel for production api usage
 
   AccountLogic()
       : _apiServiceClient = ApiServiceClient(
@@ -49,20 +53,21 @@ class AccountLogic {
     String? publicKeyData =
         await _secureStorage.read(key: _publicKeyKey, aOptions: _aOptions);
 
-    if (privateKeyData == null || publicKeyData == null) {
-      return;
+    if (privateKeyData != null && publicKeyData != null) {
+      _setKeyPair(ed.KeyPair(ed.PrivateKey(base64.decode(privateKeyData)),
+          ed.PublicKey(base64.decode(publicKeyData))));
+    } else {
+      debugPrint('no account keyPair in local store');
     }
 
-    _setKeyPair(ed.KeyPair(ed.PrivateKey(base64.decode(privateKeyData)),
-        ed.PublicKey(base64.decode(publicKeyData))));
-
-    // load user sign-up state
+    // load user signed-up state
 
     _userName =
         await _secureStorage.read(key: _user_name_key, aOptions: _aOptions);
 
     var signedUpData = await _secureStorage.read(
         key: _user_signed_up_key, aOptions: _aOptions);
+
     if (signedUpData != null) {
       _signedUp = signedUpData.toLowerCase() == 'true';
     }
@@ -77,24 +82,30 @@ class AccountLogic {
     return _keyPair != null;
   }
 
+  /// returns true if and only if the local user is signed to KarmaCoin
   bool isSignedUp() {
     return _signedUp;
   }
 
+  /// Returns the locally stored user's key-pair if it was previosuly stored
   ed.KeyPair? getKeyPair() {
     return _keyPair;
   }
 
+  /// Gets the user's user-name that is on-chain. Not the requested user name.
   String? getUserName() {
     return _userName;
   }
 
+  /// Set the canonical (onchain) user name for the local user
   Future<void> setUserName(String userName) async {
     _userName = userName;
     await _secureStorage.write(
         key: _user_name_key, value: userName, aOptions: _aOptions);
   }
 
+  /// Set if the local user is gined up or not. User is sinedup when
+  /// its new user transaction is on the chain.
   Future<void> setSignedUp(bool signedUp) async {
     _signedUp = signedUp;
     await _secureStorage.write(

@@ -13,13 +13,14 @@ class SettingsLogic with ThrottledSaveLoadMixin {
     ..addListener(scheduleSave);
   late final currentLocale = ValueNotifier<String?>(null)
     ..addListener(scheduleSave);
-
   late final apiHostName = ValueNotifier<String>('127.0.0.1')
     ..addListener(scheduleSave);
-
   late final apiHostPort = ValueNotifier<int>(8099)..addListener(scheduleSave);
-
   late final apiSecureConnection = ValueNotifier<bool>(false)
+    ..addListener(scheduleSave);
+
+  // requested user name entered by the user. For the canonical user-name, check AccountLogic
+  late final requestedUserName = ValueNotifier<String>('')
     ..addListener(scheduleSave);
 
   // final bool useBlurs = !PlatformInfo.isAndroid;
@@ -33,6 +34,7 @@ class SettingsLogic with ThrottledSaveLoadMixin {
     apiHostName.value = value['apiHostName'] ?? '127.0.0.1';
     apiHostPort.value = value['apiHostPort'] ?? 5088;
     apiSecureConnection.value = value['apiSecureConnection'] ?? false;
+    requestedUserName.value = value['requestedUserName'] ?? '127.0.0.1';
   }
 
   @override
@@ -44,6 +46,7 @@ class SettingsLogic with ThrottledSaveLoadMixin {
       'apiHostName': apiHostName.value,
       'apiHostPort': apiHostPort.value,
       'apiSecureConnection': apiSecureConnection.value,
+      'requestedUserName': requestedUserName.value,
     };
   }
 }

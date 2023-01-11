@@ -9,6 +9,7 @@ void main() async {
 
   registerSingletons();
   runApp(KarmaCoinApp());
+
   await appLogic.bootstrap();
 
   // Remove splash screen when bootstrap is complete

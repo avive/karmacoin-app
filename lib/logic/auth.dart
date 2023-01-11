@@ -3,7 +3,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class AuthData {
   final String phoneNumber;
   final String userId;
-
   AuthData(this.phoneNumber, this.userId);
 }
 

@@ -16,7 +16,6 @@ mixin ThrottledSaveLoadMixin {
   }
 
   Future<void> save() async {
-    debugPrint('Saving...');
     try {
       await _file.save(toJson());
     } on Exception catch (e) {
