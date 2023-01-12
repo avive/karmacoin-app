@@ -19,12 +19,14 @@ class AuthData {
   AuthData(this.phoneNumber, this.userId);
 }
 
+class AuthStoreKeys {
+  static String phoneNumber = 'phone_number';
+  static String userId = 'user_id';
+}
+
 /// User authentication logic
 class AuthLogic implements AuthLogicInterface {
   final _secureStorage = const FlutterSecureStorage();
-
-  static const String _phoneNumberKey = "phone_number_key";
-  static const String _userIdKey = "user_id_key";
 
   static const _aOptions = AndroidOptions(
     encryptedSharedPreferences: true,
@@ -35,11 +37,11 @@ class AuthLogic implements AuthLogicInterface {
   /// Init auth logic - load prev saved auth data from local secure storage
   @override
   Future<void> load() async {
-    var phoneNumber =
-        await _secureStorage.read(key: _phoneNumberKey, aOptions: _aOptions);
+    var phoneNumber = await _secureStorage.read(
+        key: AuthStoreKeys.phoneNumber, aOptions: _aOptions);
 
-    var userId =
-        await _secureStorage.read(key: _userIdKey, aOptions: _aOptions);
+    var userId = await _secureStorage.read(
+        key: AuthStoreKeys.userId, aOptions: _aOptions);
 
     if (userId != null && phoneNumber != null) {
       authData = AuthData(phoneNumber, userId);
@@ -56,10 +58,12 @@ class AuthLogic implements AuthLogicInterface {
   Future<void> set(AuthData data) async {
     // store the data in secure storage
     await _secureStorage.write(
-        key: _phoneNumberKey, value: data.phoneNumber, aOptions: _aOptions);
+        key: AuthStoreKeys.phoneNumber,
+        value: data.phoneNumber,
+        aOptions: _aOptions);
 
     await _secureStorage.write(
-        key: _userIdKey, value: data.userId, aOptions: _aOptions);
+        key: AuthStoreKeys.userId, value: data.userId, aOptions: _aOptions);
 
     // store data in memory
     authData = data;
@@ -68,8 +72,9 @@ class AuthLogic implements AuthLogicInterface {
   /// Clear auth data
   @override
   Future<void> clear() async {
-    await _secureStorage.delete(key: _phoneNumberKey, aOptions: _aOptions);
-    await _secureStorage.delete(key: _userIdKey, aOptions: _aOptions);
+    await _secureStorage.delete(
+        key: AuthStoreKeys.phoneNumber, aOptions: _aOptions);
+    await _secureStorage.delete(key: AuthStoreKeys.userId, aOptions: _aOptions);
     authData = null;
   }
 }

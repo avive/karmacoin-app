@@ -3,7 +3,7 @@ import 'package:karma_coin/common_libs.dart';
 /// Shared paths / urls used across the app
 class ScreenPaths {
   static String splash = '/splash';
-  static String intro = '/';
+  static String welcome = '/';
   static String home = '/home';
   static String settings = '/settings';
 }
@@ -12,9 +12,9 @@ class ScreenPaths {
 final GoRouter appRouter = GoRouter(
   routes: <RouteBase>[
     GoRoute(
-      path: ScreenPaths.intro,
+      path: ScreenPaths.welcome,
       builder: (BuildContext context, GoRouterState state) {
-        return const MyHomePage(title: 'Karma Coin');
+        return const WelcomeScreen(title: 'Karma Coin');
       },
     ),
     GoRoute(
@@ -25,7 +25,7 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: ScreenPaths.settings,
       builder: (BuildContext context, GoRouterState state) {
-        return const MyHomePage(title: 'Settings');
+        return const WelcomeScreen(title: 'Settings');
       },
     ),
   ],

@@ -34,17 +34,18 @@ abstract class AccountLogicInterface {
   Future<void> clear();
 }
 
+class AccountStoreKeys {
+  static String privateKey = 'private_key';
+  static String publicKey = 'public_key';
+  static String userSignedUp = 'user_signed_up';
+  static String userName = 'user_name';
+}
+
 /// Local karmaCoin account logic. We seperate between authentication and account.
 /// Account information includes user's name, accountId and private signing key.
 class AccountLogic implements AccountLogicInterface {
   final _secureStorage = const FlutterSecureStorage();
   final ApiServiceClient _apiServiceClient;
-
-  static const String _privateKeyKey = "account_private_key";
-  static const String _publicKeyKey = "account_public_key";
-
-  static const String _userSignedUpKey = "user_signed_up_key";
-  static const String _userNameKey = "user_name_key";
 
   static const _aOptions = AndroidOptions(
     encryptedSharedPreferences: true,
@@ -76,11 +77,11 @@ class AccountLogic implements AccountLogicInterface {
   @override
   Future<void> load() async {
     // load prev persisted keypair from secure store
-    String? privateKeyData =
-        await _secureStorage.read(key: _privateKeyKey, aOptions: _aOptions);
+    String? privateKeyData = await _secureStorage.read(
+        key: AccountStoreKeys.privateKey, aOptions: _aOptions);
 
-    String? publicKeyData =
-        await _secureStorage.read(key: _publicKeyKey, aOptions: _aOptions);
+    String? publicKeyData = await _secureStorage.read(
+        key: AccountStoreKeys.publicKey, aOptions: _aOptions);
 
     if (privateKeyData != null && publicKeyData != null) {
       _setKeyPair(ed.KeyPair(ed.PrivateKey(base64.decode(privateKeyData)),
@@ -91,11 +92,11 @@ class AccountLogic implements AccountLogicInterface {
 
     // load user signed-up state
 
-    _userName =
-        await _secureStorage.read(key: _userNameKey, aOptions: _aOptions);
+    _userName = await _secureStorage.read(
+        key: AccountStoreKeys.userName, aOptions: _aOptions);
 
-    var signedUpData =
-        await _secureStorage.read(key: _userSignedUpKey, aOptions: _aOptions);
+    var signedUpData = await _secureStorage.read(
+        key: AccountStoreKeys.userSignedUp, aOptions: _aOptions);
 
     if (signedUpData != null) {
       _signedUp = signedUpData.toLowerCase() == 'true';
@@ -136,7 +137,7 @@ class AccountLogic implements AccountLogicInterface {
   Future<void> setUserName(String userName) async {
     _userName = userName;
     await _secureStorage.write(
-        key: _userNameKey, value: userName, aOptions: _aOptions);
+        key: AccountStoreKeys.userName, value: userName, aOptions: _aOptions);
   }
 
   /// Set if the local user is gined up or not. User is sinedup when
@@ -145,7 +146,9 @@ class AccountLogic implements AccountLogicInterface {
   Future<void> setSignedUp(bool signedUp) async {
     _signedUp = signedUp;
     await _secureStorage.write(
-        key: _userSignedUpKey, value: signedUp.toString(), aOptions: _aOptions);
+        key: AccountStoreKeys.userSignedUp,
+        value: signedUp.toString(),
+        aOptions: _aOptions);
   }
 
   /// Set a new keypair
@@ -155,10 +158,14 @@ class AccountLogic implements AccountLogicInterface {
 
     // store the data in secure storage
     await _secureStorage.write(
-        key: _privateKeyKey, value: privateKeyData, aOptions: _aOptions);
+        key: AccountStoreKeys.privateKey,
+        value: privateKeyData,
+        aOptions: _aOptions);
 
     await _secureStorage.write(
-        key: _publicKeyKey, value: publicKeyData, aOptions: _aOptions);
+        key: AccountStoreKeys.publicKey,
+        value: publicKeyData,
+        aOptions: _aOptions);
 
     // store data in memory
     _keyPair = keyPair;
@@ -166,8 +173,10 @@ class AccountLogic implements AccountLogicInterface {
 
   /// Clear all account data
   Future<void> clear() async {
-    await _secureStorage.delete(key: _privateKeyKey, aOptions: _aOptions);
-    await _secureStorage.delete(key: _publicKeyKey, aOptions: _aOptions);
+    await _secureStorage.delete(
+        key: AccountStoreKeys.privateKey, aOptions: _aOptions);
+    await _secureStorage.delete(
+        key: AccountStoreKeys.publicKey, aOptions: _aOptions);
     _userName = null;
     _signedUp = false;
     _keyPair = null;
