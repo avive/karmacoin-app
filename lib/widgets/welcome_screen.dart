@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:karma_coin/common_libs.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -52,7 +51,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 await authLogic.clear();
                 const snackBar = SnackBar(content: Text('Logged out'));
                 if (!mounted) return;
-
                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
               },
               style: ElevatedButton.styleFrom(

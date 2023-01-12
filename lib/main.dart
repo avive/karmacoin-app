@@ -3,11 +3,18 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:karma_coin/router.dart';
 import 'logic/app.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   AppLogic.registerSingletons();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(KarmaCoinApp());
   await appLogic.bootstrap();
   FlutterNativeSplash.remove();
