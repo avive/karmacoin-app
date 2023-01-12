@@ -1,12 +1,26 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+abstract class AuthLogicInterface {
+  /// Init auth logic - load prev saved auth data from local secure storage
+  Future<void> load();
+
+  bool isUserAuthenticated();
+
+  /// Set auth data
+  Future<void> set(AuthData data);
+
+  /// Clear auth data
+  Future<void> clear();
+}
+
 class AuthData {
   final String phoneNumber;
   final String userId;
   AuthData(this.phoneNumber, this.userId);
 }
 
-class AuthLogic {
+/// User authentication logic
+class AuthLogic implements AuthLogicInterface {
   final _secureStorage = const FlutterSecureStorage();
 
   static const String _phoneNumberKey = "phone_number_key";
@@ -19,6 +33,7 @@ class AuthLogic {
   AuthData? authData;
 
   /// Init auth logic - load prev saved auth data from local secure storage
+  @override
   Future<void> load() async {
     var phoneNumber =
         await _secureStorage.read(key: _phoneNumberKey, aOptions: _aOptions);
@@ -31,11 +46,13 @@ class AuthLogic {
     }
   }
 
+  @override
   bool isUserAuthenticated() {
     return authData != null;
   }
 
   /// Set auth data
+  @override
   Future<void> set(AuthData data) async {
     // store the data in secure storage
     await _secureStorage.write(
@@ -49,6 +66,7 @@ class AuthLogic {
   }
 
   /// Clear auth data
+  @override
   Future<void> clear() async {
     await _secureStorage.delete(key: _phoneNumberKey, aOptions: _aOptions);
     await _secureStorage.delete(key: _userIdKey, aOptions: _aOptions);

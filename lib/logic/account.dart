@@ -6,17 +6,45 @@ import 'dart:convert';
 
 import '../services/api/api.pbgrpc.dart';
 
+abstract class AccountLogicInterface {
+  /// Init account logic
+  Future<void> load();
+
+  /// Generate a new keypair
+  Future<void> generateNewKeyPair();
+
+  bool keyPairExists();
+
+  /// Returns the locally stored user's key-pair if it was previosuly stored
+  ed.KeyPair? getKeyPair();
+
+  /// returns true if and only if the local user is signed to KarmaCoin
+  bool isSignedUp();
+
+  /// Update user signed up
+  Future<void> setSignedUp(bool signedUp);
+
+  /// Gets the user's user-name that is on-chain. Not the requested user name.
+  String? getUserName();
+
+  // Set the user name
+  Future<void> setUserName(String userName);
+
+  /// Clear account data
+  Future<void> clear();
+}
+
 /// Local karmaCoin account logic. We seperate between authentication and account.
 /// Account information includes user's name, accountId and private signing key.
-class AccountLogic {
+class AccountLogic implements AccountLogicInterface {
   final _secureStorage = const FlutterSecureStorage();
   final ApiServiceClient _apiServiceClient;
 
   static const String _privateKeyKey = "account_private_key";
   static const String _publicKeyKey = "account_public_key";
 
-  static const String _user_signed_up_key = "user_signed_up_key";
-  static const String _user_name_key = "user_name_key";
+  static const String _userSignedUpKey = "user_signed_up_key";
+  static const String _userNameKey = "user_name_key";
 
   static const _aOptions = AndroidOptions(
     encryptedSharedPreferences: true,
@@ -45,6 +73,7 @@ class AccountLogic {
         );
 
   /// Init account logic
+  @override
   Future<void> load() async {
     // load prev persisted keypair from secure store
     String? privateKeyData =
@@ -63,10 +92,10 @@ class AccountLogic {
     // load user signed-up state
 
     _userName =
-        await _secureStorage.read(key: _user_name_key, aOptions: _aOptions);
+        await _secureStorage.read(key: _userNameKey, aOptions: _aOptions);
 
-    var signedUpData = await _secureStorage.read(
-        key: _user_signed_up_key, aOptions: _aOptions);
+    var signedUpData =
+        await _secureStorage.read(key: _userSignedUpKey, aOptions: _aOptions);
 
     if (signedUpData != null) {
       _signedUp = signedUpData.toLowerCase() == 'true';
@@ -74,44 +103,49 @@ class AccountLogic {
   }
 
   /// Generate a new keypair
+  @override
   Future<void> generateNewKeyPair() async {
     await _setKeyPair(ed.generateKey());
   }
 
+  @override
   bool keyPairExists() {
     return _keyPair != null;
   }
 
   /// returns true if and only if the local user is signed to KarmaCoin
+  @override
   bool isSignedUp() {
     return _signedUp;
   }
 
   /// Returns the locally stored user's key-pair if it was previosuly stored
+  @override
   ed.KeyPair? getKeyPair() {
     return _keyPair;
   }
 
   /// Gets the user's user-name that is on-chain. Not the requested user name.
+  @override
   String? getUserName() {
     return _userName;
   }
 
   /// Set the canonical (onchain) user name for the local user
+  @override
   Future<void> setUserName(String userName) async {
     _userName = userName;
     await _secureStorage.write(
-        key: _user_name_key, value: userName, aOptions: _aOptions);
+        key: _userNameKey, value: userName, aOptions: _aOptions);
   }
 
   /// Set if the local user is gined up or not. User is sinedup when
   /// its new user transaction is on the chain.
+  @override
   Future<void> setSignedUp(bool signedUp) async {
     _signedUp = signedUp;
     await _secureStorage.write(
-        key: _user_signed_up_key,
-        value: signedUp.toString(),
-        aOptions: _aOptions);
+        key: _userSignedUpKey, value: signedUp.toString(), aOptions: _aOptions);
   }
 
   /// Set a new keypair
@@ -130,7 +164,7 @@ class AccountLogic {
     _keyPair = keyPair;
   }
 
-  /// Clear auth data
+  /// Clear all account data
   Future<void> clear() async {
     await _secureStorage.delete(key: _privateKeyKey, aOptions: _aOptions);
     await _secureStorage.delete(key: _publicKeyKey, aOptions: _aOptions);
