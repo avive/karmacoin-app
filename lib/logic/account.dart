@@ -30,7 +30,7 @@ abstract class AccountLogicInterface {
   // Set the user name
   Future<void> setUserName(String userName);
 
-  /// Clear account data
+  /// Clear all local account data
   Future<void> clear();
 }
 

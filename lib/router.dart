@@ -1,4 +1,5 @@
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/widgets/welcome_screen.dart';
 
 /// Shared paths / urls used across the app
 class ScreenPaths {
