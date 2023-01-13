@@ -11,13 +11,13 @@ class PhoneAuthScreen extends StatelessWidget {
       listener: (oldState, newState, controller) {
         debugPrint('Signup state: $newState');
         if (newState is SignedIn) {
-          User user = FirebaseAuth.instance.currentUser!;
-          accountLogic.updateWith(user);
+          // User user = FirebaseAuth.instance.currentUser!;
+          // accountLogic.onNewUserAuthenticated(user);
           context.go('/');
         } else if (newState is PhoneVerified) {
           // todo: go to next step in signup - set user name...
           // for now go back to main screen
-          context.go('/');
+          // context.go('/');
         }
       },
       builder: (context, state, ctrl, child) {

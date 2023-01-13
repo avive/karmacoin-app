@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:karma_coin/common_libs.dart';
 
@@ -12,6 +14,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Widget> _getWidgets(BuildContext context, User? user) {
     List<Widget> res = <Widget>[];
+
     if (user == null) {
       res.add(const Text('User not signed-in.'));
       res.add(const SizedBox(height: 14));
@@ -26,7 +29,10 @@ class _HomeScreenState extends State<HomeScreen> {
     } else {
       res.add(const Text('User signed in.'));
 
-      res.add(Text('Account id: ${accountLogic.getShortUserAccountId()}'));
+      if (user.displayName != null) {
+        String accountId = base64.decode(user.displayName!).toShortHexString();
+        res.add(Text(accountId));
+      }
       res.add(const SizedBox(height: 14));
       res.add(ElevatedButton(
         onPressed: () async {
@@ -68,8 +74,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           body: Center(
             child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: _getWidgets(context, snapshot.data)),
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: _getWidgets(context, snapshot.data),
+            ),
           ),
         );
       },

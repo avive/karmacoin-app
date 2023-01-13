@@ -5,7 +5,9 @@ import "package:hex/hex.dart";
 /// Returns a shortened display string for binary data. e.g. 0xE012...01EAF
 extension FormatHex on List<int> {
   String toShortHexString() {
-    assert(length >= 4);
+    if (length < 4) {
+      throw const FormatException('data too short');
+    }
     return "0x${HEX.encode(take(2).toList())}...${HEX.encode(getRange(length - 2, length).toList())}";
   }
 

@@ -4,7 +4,6 @@ import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:grpc/grpc.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'dart:convert';
-
 import '../services/api/api.pbgrpc.dart';
 
 abstract class AccountLogicInterface {
@@ -14,23 +13,8 @@ abstract class AccountLogicInterface {
   /// Generate a new keypair
   Future<void> generateNewKeyPair();
 
-  bool keyPairExists();
-
-  /// Returns the locally stored user's key-pair if it was previosuly stored
-  ed.KeyPair? getKeyPair();
-
-  /// returns true if and only if the local user is signed to KarmaCoin
-  /// Users are signed in to KarmaCoin if they have an on-chain NewUser transaction
-  bool isSignedUp();
-
   /// Update user signed up
   Future<void> setSignedUp(bool signedUp);
-
-  /// Gets the user's user-name that is on-chain. Not the requested user name.
-  String? getUserName();
-
-  /// Get's the user short account id display string
-  String? getShortUserAccountId();
 
   // Set the user name
   Future<void> setUserName(String userName);
@@ -39,7 +23,17 @@ abstract class AccountLogicInterface {
   Future<void> clear();
 
   /// Set the account id on a local Firebase Auth autenticated user
-  Future<void> updateWith(User user);
+  Future<void> onNewUserAuthenticated(User user);
+
+  /// User's id key pair - locally stored. Should be generated after a succesfull
+  /// user auth interaction for that user
+  final ValueNotifier<ed.KeyPair?> keyPair = ValueNotifier<ed.KeyPair?>(null);
+
+  // True if user signed up to KarmaCoin (NewUser transaction on chain)
+  final ValueNotifier<bool> signedUp = ValueNotifier<bool>(false);
+
+  // User name on-chain, if one was set. Not the user's reqested user-name.
+  final ValueNotifier<String?> userName = ValueNotifier<String?>(null);
 }
 
 class AccountStoreKeys {
@@ -58,16 +52,6 @@ class AccountLogic implements AccountLogicInterface {
   static const _aOptions = AndroidOptions(
     encryptedSharedPreferences: true,
   );
-
-  /// User's id key pair - locally stored. Should be generated after a succesfull
-  /// user auth interaction for that user
-  ed.KeyPair? _keyPair;
-
-  // True if user signed up to KarmaCoin (NewUser transaction on chain)
-  bool _signedUp = false;
-
-  // User name on-chain, if one was set. Not the user's reqested user-name.
-  String? _userName;
 
   // todo: add support to secure channel for production api usage
 
@@ -93,7 +77,7 @@ class AccountLogic implements AccountLogicInterface {
         key: AccountStoreKeys.publicKey, aOptions: _aOptions);
 
     if (privateKeyData != null && publicKeyData != null) {
-      debugPrint('got keyPair from secure store');
+      debugPrint('got keyPair from secure local store...');
       await _setKeyPair(ed.KeyPair(ed.PrivateKey(base64.decode(privateKeyData)),
           ed.PublicKey(base64.decode(publicKeyData))));
     } else {
@@ -102,64 +86,42 @@ class AccountLogic implements AccountLogicInterface {
 
     // load user signed-up state
 
-    _userName = await _secureStorage.read(
+    userName.value = await _secureStorage.read(
         key: AccountStoreKeys.userName, aOptions: _aOptions);
 
     var signedUpData = await _secureStorage.read(
         key: AccountStoreKeys.userSignedUp, aOptions: _aOptions);
 
     if (signedUpData != null) {
-      _signedUp = signedUpData.toLowerCase() == 'true';
+      signedUp.value = signedUpData.toLowerCase() == 'true';
     }
   }
 
   /// Generate a new keypair
   @override
   Future<void> generateNewKeyPair() async {
-    debugPrint("generating a new account keypair...");
+    debugPrint("generating a new random account keypair...");
     await _setKeyPair(ed.generateKey());
-  }
-
-  @override
-  bool keyPairExists() {
-    return _keyPair != null;
-  }
-
-  /// returns true if and only if the local user is signed to KarmaCoin
-  @override
-  bool isSignedUp() {
-    return _signedUp;
-  }
-
-  /// Returns the locally stored user's key-pair if it was previosuly stored
-  @override
-  ed.KeyPair? getKeyPair() {
-    return _keyPair;
-  }
-
-  /// Gets the user's user-name that is on-chain. Not the requested user name.
-  @override
-  String? getUserName() {
-    return _userName;
   }
 
   /// Set the canonical (onchain) user name for the local user
   @override
   Future<void> setUserName(String userName) async {
-    _userName = userName;
     await _secureStorage.write(
         key: AccountStoreKeys.userName, value: userName, aOptions: _aOptions);
+    this.userName.value = userName;
   }
 
   /// Set if the local user is gined up or not. User is sinedup when
   /// its new user transaction is on the chain.
   @override
   Future<void> setSignedUp(bool signedUp) async {
-    _signedUp = signedUp;
     await _secureStorage.write(
         key: AccountStoreKeys.userSignedUp,
         value: signedUp.toString(),
         aOptions: _aOptions);
+
+    this.signedUp.value = signedUp;
   }
 
   /// Set a new keypair
@@ -178,11 +140,11 @@ class AccountLogic implements AccountLogicInterface {
         value: publicKeyData,
         aOptions: _aOptions);
 
-    // store data in memory
-    _keyPair = keyPair;
+    this.keyPair.value = keyPair;
 
+    // store data in memory
     debugPrint(
-        'stroed keypair in secure store and in memory. Account: ${this.getShortUserAccountId()!}');
+        'keypair set. Account id: ${keyPair.publicKey.bytes.toShortHexString()}');
   }
 
   /// Clear all account data
@@ -193,42 +155,41 @@ class AccountLogic implements AccountLogicInterface {
         key: AccountStoreKeys.privateKey, aOptions: _aOptions);
     await _secureStorage.delete(
         key: AccountStoreKeys.publicKey, aOptions: _aOptions);
-    _userName = null;
-    _signedUp = false;
-    _keyPair = null;
+    userName.value = null;
+    signedUp.value = false;
+    keyPair.value = null;
   }
 
   /// Set the account id for a firebase user
   @override
-  Future<void> updateWith(User user) async {
-    // Update firebase user display name to local keypair account id
-
-    debugPrint('updating user accountId on firebase...');
-    if (_keyPair == null) {
+  Future<void> onNewUserAuthenticated(User user) async {
+    if (keyPair.value == null) {
+      debugPrint('no local keypair - generating new one...');
       await generateNewKeyPair();
     }
 
-    String accountIdBase64 = base64.encode(_keyPair!.publicKey.bytes);
+    String accountIdBase64 = base64.encode(keyPair.value!.publicKey.bytes);
 
     if (user.displayName != null && user.displayName!.isNotEmpty) {
-      if (user.displayName! != accountIdBase64) {
-        debugPrint("""
-            Warning! a different account id was set for this user
-            todo: notify user about this and hint that he can restore this account on current devuice
-            """);
+      if (user.displayName! == accountIdBase64) {
+        debugPrint('firebase user displayName(accountId) is up-to-date...');
+        return;
       }
     }
 
-    // todo: handle update error as this is a critical operation...
-
+    debugPrint('Storing accountId on firebase...');
     await user.updateDisplayName(accountIdBase64);
 
     debugPrint(
-        'User account id: ${_keyPair!.publicKey.bytes.toShortHexString()}');
+        'User account id: ${keyPair.value!.publicKey.bytes.toShortHexString()} stored on firebase.');
   }
 
   @override
-  String? getShortUserAccountId() {
-    return _keyPair?.publicKey.bytes.toShortHexString();
-  }
+  ValueNotifier<ed.KeyPair?> keyPair = ValueNotifier<ed.KeyPair?>(null);
+
+  @override
+  ValueNotifier<bool> signedUp = ValueNotifier<bool>(false);
+
+  @override
+  ValueNotifier<String?> userName = ValueNotifier<String?>(null);
 }

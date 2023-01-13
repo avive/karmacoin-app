@@ -84,7 +84,7 @@ class AppLogic implements AppLogicInterface {
       if (user != null) {
         debugPrint(
             'got a user from firebase auth. ${user.phoneNumber}, accountId: ${user.displayName}');
-        await accountLogic.updateWith(user);
+        await accountLogic.onNewUserAuthenticated(user);
       } else {
         debugPrint('no user from firebase auth');
       }
@@ -94,7 +94,7 @@ class AppLogic implements AppLogicInterface {
       debugPrint('user authenticated on app startup');
     }
 
-    if (accountLogic.isSignedUp()) {
+    if (accountLogic.signedUp.value == true) {
       debugPrint("User has signed up (new user tx on chain)");
     }
 
