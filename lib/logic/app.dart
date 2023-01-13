@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
@@ -69,32 +70,32 @@ class AppLogic implements AppLogicInterface {
       await FlutterDisplayMode.setHighRefreshRate();
     }
 
-    // Settings
+    // Load app settings
     await settingsLogic.load();
 
-    // Auth data
-    await authLogic.load();
+    // Init the account logic
+    await accountLogic.init();
 
-    // Account logic
-    await accountLogic.load();
+    // Int the auth logic
+    await authLogic.init();
 
-    bool userAuthenticated = authLogic.isUserAuthenticated();
-    bool keyPairExists = accountLogic.keyPairExists();
-
-    if (userAuthenticated) {
-      if (!keyPairExists) {
+    // Register on firebase user changes and update account logic when user changes
+    FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+      if (user != null) {
         debugPrint(
-            'Something is very wrong - we have a user but no keypair from store...');
-        // todo: deal wit it.
+            'got a user from firebase auth. ${user.phoneNumber}, accountId: ${user.displayName}');
+        await accountLogic.updateWith(user);
       } else {
-        debugPrint('Auth and account loaded from store');
+        debugPrint('no user from firebase auth');
       }
-    } else {
-      debugPrint('User not authenticated');
+    });
+
+    if (authLogic.isUserAuthenticated()) {
+      debugPrint('user authenticated on app startup');
     }
 
     if (accountLogic.isSignedUp()) {
-      debugPrint("User has signed up (new user tx on chain");
+      debugPrint("User has signed up (new user tx on chain)");
     }
 
     // Flag bootStrap as complete

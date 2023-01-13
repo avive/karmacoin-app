@@ -10,3 +10,4 @@ export 'package:karma_coin/logic/settings.dart';
 export 'package:karma_coin/logic/app.dart';
 export 'package:karma_coin/main.dart';
 export 'package:provider/provider.dart';
+export 'package:karma_coin/common/extensions.dart';

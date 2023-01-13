@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:grpc/grpc.dart';
@@ -8,7 +9,7 @@ import '../services/api/api.pbgrpc.dart';
 
 abstract class AccountLogicInterface {
   /// Init account logic
-  Future<void> load();
+  Future<void> init();
 
   /// Generate a new keypair
   Future<void> generateNewKeyPair();
@@ -19,6 +20,7 @@ abstract class AccountLogicInterface {
   ed.KeyPair? getKeyPair();
 
   /// returns true if and only if the local user is signed to KarmaCoin
+  /// Users are signed in to KarmaCoin if they have an on-chain NewUser transaction
   bool isSignedUp();
 
   /// Update user signed up
@@ -27,11 +29,17 @@ abstract class AccountLogicInterface {
   /// Gets the user's user-name that is on-chain. Not the requested user name.
   String? getUserName();
 
+  /// Get's the user short account id display string
+  String? getShortUserAccountId();
+
   // Set the user name
   Future<void> setUserName(String userName);
 
   /// Clear all local account data
   Future<void> clear();
+
+  /// Set the account id on a local Firebase Auth autenticated user
+  Future<void> updateWith(User user);
 }
 
 class AccountStoreKeys {
@@ -75,7 +83,8 @@ class AccountLogic implements AccountLogicInterface {
 
   /// Init account logic
   @override
-  Future<void> load() async {
+  Future<void> init() async {
+    debugPrint('initalizing account logic...');
     // load prev persisted keypair from secure store
     String? privateKeyData = await _secureStorage.read(
         key: AccountStoreKeys.privateKey, aOptions: _aOptions);
@@ -84,7 +93,8 @@ class AccountLogic implements AccountLogicInterface {
         key: AccountStoreKeys.publicKey, aOptions: _aOptions);
 
     if (privateKeyData != null && publicKeyData != null) {
-      _setKeyPair(ed.KeyPair(ed.PrivateKey(base64.decode(privateKeyData)),
+      debugPrint('got keyPair from secure store');
+      await _setKeyPair(ed.KeyPair(ed.PrivateKey(base64.decode(privateKeyData)),
           ed.PublicKey(base64.decode(publicKeyData))));
     } else {
       debugPrint('no account keyPair in local store');
@@ -106,6 +116,7 @@ class AccountLogic implements AccountLogicInterface {
   /// Generate a new keypair
   @override
   Future<void> generateNewKeyPair() async {
+    debugPrint("generating a new account keypair...");
     await _setKeyPair(ed.generateKey());
   }
 
@@ -169,10 +180,15 @@ class AccountLogic implements AccountLogicInterface {
 
     // store data in memory
     _keyPair = keyPair;
+
+    debugPrint(
+        'stroed keypair in secure store and in memory. Account: ${this.getShortUserAccountId()!}');
   }
 
   /// Clear all account data
+  @override
   Future<void> clear() async {
+    debugPrint('clearing all local user account from store...');
     await _secureStorage.delete(
         key: AccountStoreKeys.privateKey, aOptions: _aOptions);
     await _secureStorage.delete(
@@ -180,5 +196,39 @@ class AccountLogic implements AccountLogicInterface {
     _userName = null;
     _signedUp = false;
     _keyPair = null;
+  }
+
+  /// Set the account id for a firebase user
+  @override
+  Future<void> updateWith(User user) async {
+    // Update firebase user display name to local keypair account id
+
+    debugPrint('updating user accountId on firebase...');
+    if (_keyPair == null) {
+      await generateNewKeyPair();
+    }
+
+    String accountIdBase64 = base64.encode(_keyPair!.publicKey.bytes);
+
+    if (user.displayName != null && user.displayName!.isNotEmpty) {
+      if (user.displayName! != accountIdBase64) {
+        debugPrint("""
+            Warning! a different account id was set for this user
+            todo: notify user about this and hint that he can restore this account on current devuice
+            """);
+      }
+    }
+
+    // todo: handle update error as this is a critical operation...
+
+    await user.updateDisplayName(accountIdBase64);
+
+    debugPrint(
+        'User account id: ${_keyPair!.publicKey.bytes.toShortHexString()}');
+  }
+
+  @override
+  String? getShortUserAccountId() {
+    return _keyPair?.publicKey.bytes.toShortHexString();
   }
 }
