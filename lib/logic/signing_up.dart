@@ -1,4 +1,5 @@
 import '../common_libs.dart';
+import 'kc_user.dart';
 
 enum SignUpStatus {
   unknown,
@@ -33,7 +34,13 @@ class SignUpController extends ChangeNotifier {
     _status = SignUpStatus.validating;
     notifyListeners();
 
-    // todo - call the api to check if the user name is available
+    // Create a new local karma coin user and store it in local store
+    // we use this local user until we get the on-chain user
+    // so user can start sending transactions before his signup tx is confirmed
+    KarmaCoinUser karmaCoinUser = await accountLogic.createNewKarmaCoinUser();
+
+    // todo: call the api to validate the user's (accountId, phoneNumber)
+
     await Future.delayed(const Duration(milliseconds: 1000));
 
     await submitSignupTransaction();
