@@ -32,7 +32,7 @@ abstract class AccountLogicInterface {
   // True if user signed up to KarmaCoin (NewUser transaction on chain)
   final ValueNotifier<bool> signedUp = ValueNotifier<bool>(false);
 
-  // User name on-chain, if one was set. Not the user's reqested user-name.
+  // User name on-chain, if it was set. Not the user's reqested user-name.
   final ValueNotifier<String?> userName = ValueNotifier<String?>(null);
 }
 

@@ -1,5 +1,4 @@
 import "dart:convert";
-
 import "package:hex/hex.dart";
 
 /// Returns a shortened display string for binary data. e.g. 0xE012...01EAF

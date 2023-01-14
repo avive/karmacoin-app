@@ -1,11 +1,14 @@
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/widgets/auth_screen.dart';
 import 'package:karma_coin/widgets/home_screen.dart';
+import 'package:karma_coin/widgets/set_user_name.dart';
 
 /// Shared paths / urls used across the app
 class ScreenPaths {
   static String splash = '/splash';
   static String signup = '/signup';
+  static String userName = '/username';
+
   static String welcome = '/';
   static String home = '/home';
   static String settings = '/settings';
@@ -29,7 +32,14 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
         path: ScreenPaths.splash,
         builder: (BuildContext context, GoRouterState state) {
+          // todo: return karmacoin loading screen...
           return Container(color: Colors.blue);
+        }),
+    GoRoute(
+        path: ScreenPaths.userName,
+        builder: (BuildContext context, GoRouterState state) {
+          // todo: return user name screen
+          return const SetUserNameScreen(title: 'User Name');
         }),
     GoRoute(
       // Initial app screen

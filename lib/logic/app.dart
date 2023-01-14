@@ -8,6 +8,7 @@ import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:karma_coin/logic/auth.dart';
 import 'package:karma_coin/logic/settings.dart';
 import 'package:karma_coin/common/platform_info.dart';
+import 'package:karma_coin/logic/user_name_availability.dart';
 
 import 'account.dart';
 
@@ -17,6 +18,8 @@ AppLogic get appLogic => GetIt.I.get<AppLogic>();
 SettingsLogic get settingsLogic => GetIt.I.get<SettingsLogic>();
 AuthLogic get authLogic => GetIt.I.get<AuthLogic>();
 AccountLogic get accountLogic => GetIt.I.get<AccountLogic>();
+UserNameAvailabilityLogic get userNameAvailabilityLogic =>
+    GetIt.I.get<UserNameAvailabilityLogic>();
 
 abstract class AppLogicInterface {
   bool isBootstrapComplete = false;
@@ -53,6 +56,8 @@ class AppLogic implements AppLogicInterface {
     GetIt.I.registerLazySingleton<SettingsLogic>(() => SettingsLogic());
     GetIt.I.registerLazySingleton<AuthLogic>(() => AuthLogic());
     GetIt.I.registerLazySingleton<AccountLogic>(() => AccountLogic());
+    GetIt.I.registerLazySingleton<UserNameAvailabilityLogic>(
+        () => UserNameAvailabilityLogic());
   }
 
   /// Initialize the app and all main actors.
