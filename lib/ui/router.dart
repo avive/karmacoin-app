@@ -1,7 +1,7 @@
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/widgets/auth_screen.dart';
-import 'package:karma_coin/widgets/home_screen.dart';
-import 'package:karma_coin/widgets/set_user_name.dart';
+import 'package:karma_coin/ui/auth_screen.dart';
+import 'package:karma_coin/ui/home_screen.dart';
+import 'package:karma_coin/ui/set_user_name.dart';
 
 /// Shared paths / urls used across the app
 class ScreenPaths {

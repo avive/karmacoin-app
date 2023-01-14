@@ -80,7 +80,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
                         );
                       case UserNameAvailabilityStatus.error:
                         return const Text(
-                          'Error checking name availability',
+                          'Error checking name availability - please try again later',
                           style: TextStyle(color: Colors.red),
                         );
                     }

@@ -3,8 +3,7 @@ import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:get_it_mixin/get_it_mixin.dart';
-import 'package:karma_coin/router.dart';
+import 'package:karma_coin/ui/app.dart';
 import 'firebase_options.dart';
 import 'logic/app.dart';
 
@@ -26,15 +25,4 @@ void main() async {
   runApp(KarmaCoinApp());
   await appLogic.bootstrap();
   FlutterNativeSplash.remove();
-}
-
-class KarmaCoinApp extends StatelessWidget with GetItMixin {
-  KarmaCoinApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp.router(
-      routerConfig: appRouter,
-    );
-  }
 }

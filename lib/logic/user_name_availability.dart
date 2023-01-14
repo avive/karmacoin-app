@@ -22,7 +22,7 @@ class UserNameAvailabilityLogic extends ChangeNotifier {
     notifyListeners();
 
     // todo - call the api to check if the user name is available
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 1000));
 
     _status = UserNameAvailabilityStatus.available;
     notifyListeners();
