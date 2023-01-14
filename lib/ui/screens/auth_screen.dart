@@ -85,6 +85,7 @@ class PhoneAuthScreen extends StatelessWidget {
           return Container();
         } else if (state is AuthFailed) {
           // todo: show toaster and ask to try again later....
+
           return ErrorText(exception: state.exception);
         } else if (state is SMSCodeRequested) {
           return const CircularProgressIndicator();
