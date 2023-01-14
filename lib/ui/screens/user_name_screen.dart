@@ -106,9 +106,12 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
                     await accountLogic
                         .setRequestedUserName(_textController.text);
 
-                    // navigate to the holding screen
+                    // start the user signup flow
+                    await signingUpLogic.signUpUser();
+
+                    // navigate to the home screen
                     if (!mounted) return;
-                    context.go('/holditnow');
+                    context.go('/');
                   } else {
                     if (!mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(

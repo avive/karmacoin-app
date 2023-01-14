@@ -1,17 +1,26 @@
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/ui/auth_screen.dart';
-import 'package:karma_coin/ui/holding_screen.dart';
-import 'package:karma_coin/ui/home_screen.dart';
-import 'package:karma_coin/ui/set_user_name.dart';
+import 'package:karma_coin/ui/screens/auth_screen.dart';
+import 'package:karma_coin/ui/screens/home_screen.dart';
+import 'package:karma_coin/ui/screens/user_name_screen.dart';
 
 /// Shared paths / urls used across the app
 class ScreenPaths {
+  /// Splash screen
   static String splash = '/splash';
+
+  /// Signup with phone number flow first screen
   static String signup = '/signup';
+
+  /// User name input screen
   static String userName = '/username';
-  static String holdItNow = '/holditnow';
+
+  /// Guest home screen (playground for now)
   static String welcome = '/';
+
+  /// Signed up user screen
   static String home = '/home';
+
+  /// A signed up user settings screen
   static String settings = '/settings';
 }
 
@@ -43,17 +52,10 @@ final GoRouter appRouter = GoRouter(
           return const SetUserNameScreen(title: 'User Name');
         }),
     GoRoute(
-        // Initial app screen
+        // Initial app screen (playground for now)
         path: ScreenPaths.welcome,
         builder: (BuildContext context, GoRouterState state) {
           return const HomeScreen(title: 'Karma Coin');
         }),
-    GoRoute(
-      // Hold it now screen while the user is signed up...
-      path: ScreenPaths.holdItNow,
-      builder: (BuildContext context, GoRouterState state) {
-        return const HoldItNowScreen();
-      },
-    ),
   ],
 );

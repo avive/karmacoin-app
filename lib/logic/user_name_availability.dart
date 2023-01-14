@@ -8,6 +8,8 @@ enum UserNameAvailabilityStatus {
   error
 }
 
+/// The UserNameAvailabilityLogic class is responsible for checking if a user name
+/// is available. Karma Coin user names are unique
 class UserNameAvailabilityLogic extends ChangeNotifier {
   String _userName = '';
   UserNameAvailabilityStatus _status = UserNameAvailabilityStatus.unknown;

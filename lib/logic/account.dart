@@ -38,7 +38,7 @@ abstract class AccountLogicInterface {
   // User name on-chain, if it was set. Not the user's reqested user-name.
   final ValueNotifier<String?> userName = ValueNotifier<String?>(null);
 
-  // Requested user name, if it was set byt the user.
+  // Requested user name, if one was set by the user.
   final ValueNotifier<String?> requestedUserName = ValueNotifier<String?>(null);
 }
 

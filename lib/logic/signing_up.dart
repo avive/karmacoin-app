@@ -11,7 +11,10 @@ enum SignUpStatus {
   signedUp, // signup tx confirmed on chain
 }
 
-class SignUpLogic extends ChangeNotifier {
+/// SignUp Controller drives the sign-up process once user provided all
+/// requred data. It uses data from accountLogic and a Karmacoin API service provider
+/// to drive the state of the sign-up process.
+class SignUpController extends ChangeNotifier {
   String _errorMessge = '';
 
   SignUpStatus _status = SignUpStatus.unknown;
@@ -19,7 +22,7 @@ class SignUpLogic extends ChangeNotifier {
   String get errorMessage => _errorMessge;
   SignUpStatus get status => _status;
 
-  // Start the signup process
+  /// Start the signup process using local data in accountManager and a Karmacoin API service provider
   Future<void> signUpUser() async {
     await getValidatorEvidence();
   }
@@ -46,6 +49,14 @@ class SignUpLogic extends ChangeNotifier {
     await Future.delayed(const Duration(milliseconds: 1000));
 
     _status = SignUpStatus.transactionSubmitted;
+
+    // todo - call the api to check if the user name is available
+    await Future.delayed(const Duration(milliseconds: 20000));
+
+    // todo: listen for account creation transaction and change state to signedup
+    // once it is confirmed or to one of the transaction errors if it failed
+    // for example, user name taken
+    _status = SignUpStatus.signedUp;
   }
 
   // todo: register on stream of transactions from the user's account and look for the signup transaction event / on chain tx. drive the state once it is obtained

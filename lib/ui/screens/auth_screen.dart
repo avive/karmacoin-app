@@ -1,5 +1,5 @@
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
-import '../common_libs.dart';
+import 'package:karma_coin/common_libs.dart';
 
 class PhoneAuthScreen extends StatelessWidget {
   const PhoneAuthScreen({Key? key}) : super(key: key);
