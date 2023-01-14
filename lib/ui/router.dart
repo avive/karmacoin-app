@@ -1,5 +1,6 @@
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/ui/auth_screen.dart';
+import 'package:karma_coin/ui/holding_screen.dart';
 import 'package:karma_coin/ui/home_screen.dart';
 import 'package:karma_coin/ui/set_user_name.dart';
 
@@ -8,7 +9,7 @@ class ScreenPaths {
   static String splash = '/splash';
   static String signup = '/signup';
   static String userName = '/username';
-
+  static String holdItNow = '/holditnow';
   static String welcome = '/';
   static String home = '/home';
   static String settings = '/settings';
@@ -42,10 +43,16 @@ final GoRouter appRouter = GoRouter(
           return const SetUserNameScreen(title: 'User Name');
         }),
     GoRoute(
-      // Initial app screen
-      path: ScreenPaths.welcome,
+        // Initial app screen
+        path: ScreenPaths.welcome,
+        builder: (BuildContext context, GoRouterState state) {
+          return const HomeScreen(title: 'Karma Coin');
+        }),
+    GoRoute(
+      // Hold it now screen while the user is signed up...
+      path: ScreenPaths.holdItNow,
       builder: (BuildContext context, GoRouterState state) {
-        return const HomeScreen(title: 'Karma Coin');
+        return const HoldItNowScreen();
       },
     ),
   ],

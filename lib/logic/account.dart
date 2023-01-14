@@ -19,6 +19,9 @@ abstract class AccountLogicInterface {
   // Set the user name
   Future<void> setUserName(String userName);
 
+  // Set the user reuqested user name
+  Future<void> setRequestedUserName(String requestedUserName);
+
   /// Clear all local account data
   Future<void> clear();
 
@@ -34,6 +37,9 @@ abstract class AccountLogicInterface {
 
   // User name on-chain, if it was set. Not the user's reqested user-name.
   final ValueNotifier<String?> userName = ValueNotifier<String?>(null);
+
+  // Requested user name, if it was set byt the user.
+  final ValueNotifier<String?> requestedUserName = ValueNotifier<String?>(null);
 }
 
 class AccountStoreKeys {
@@ -41,6 +47,7 @@ class AccountStoreKeys {
   static String publicKey = 'public_key';
   static String userSignedUp = 'user_signed_up';
   static String userName = 'user_name';
+  static String requestedUserName = 'requested_user_name';
 }
 
 /// Local karmaCoin account logic. We seperate between authentication and account.
@@ -88,6 +95,9 @@ class AccountLogic implements AccountLogicInterface {
 
     userName.value = await _secureStorage.read(
         key: AccountStoreKeys.userName, aOptions: _aOptions);
+
+    requestedUserName.value = await _secureStorage.read(
+        key: AccountStoreKeys.requestedUserName, aOptions: _aOptions);
 
     var signedUpData = await _secureStorage.read(
         key: AccountStoreKeys.userSignedUp, aOptions: _aOptions);
@@ -192,4 +202,17 @@ class AccountLogic implements AccountLogicInterface {
 
   @override
   ValueNotifier<String?> userName = ValueNotifier<String?>(null);
+
+  /// Set the requested user name
+  @override
+  Future<void> setRequestedUserName(String requestedUserName) async {
+    await _secureStorage.write(
+        key: AccountStoreKeys.requestedUserName,
+        value: requestedUserName,
+        aOptions: _aOptions);
+    this.requestedUserName.value = requestedUserName;
+  }
+
+  @override
+  ValueNotifier<String?> get requestedUserName => ValueNotifier<String?>(null);
 }

@@ -102,12 +102,13 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
 
                   if (userNameAvailabilityLogic.status ==
                       UserNameAvailabilityStatus.available) {
+                    // set user reuqested name
+                    await accountLogic
+                        .setRequestedUserName(_textController.text);
+
+                    // navigate to the holding screen
                     if (!mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Set available user name...'),
-                      ),
-                    );
+                    context.go('/holditnow');
                   } else {
                     if (!mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
