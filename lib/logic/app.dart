@@ -23,7 +23,7 @@ UserNameAvailabilityLogic get userNameAvailabilityLogic =>
     GetIt.I.get<UserNameAvailabilityLogic>();
 SignUpController get signingUpLogic => GetIt.I.get<SignUpController>();
 
-abstract class AppLogicInterface {
+mixin AppLogicInterface {
   bool isBootstrapComplete = false;
   bool get isLandscapeEnabled;
   Size get deviceSize;
@@ -31,7 +31,7 @@ abstract class AppLogicInterface {
   Future<void> bootstrap();
 }
 
-class AppLogic implements AppLogicInterface {
+class AppLogic with AppLogicInterface {
   /// Indicates to the rest of the app that bootstrap has not completed.
   /// The router will use this to prevent redirects while bootstrapping.
   @override

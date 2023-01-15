@@ -9,7 +9,7 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/api/verifier.pbgrpc.dart' as verifier;
 import 'dart:convert';
 import 'account_interface.dart';
-import '../data/kc_user.dart';
+import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/verify_number_request.dart' as data;
 
 class AccountStoreKeys {
@@ -24,7 +24,7 @@ class AccountStoreKeys {
 }
 
 /// Local karmaCoin account logic. We seperate between authentication and account. Authentication is handled by Firebase Auth.
-class AccountLogic implements AccountLogicInterface {
+class AccountLogic with AccountLogicInterface {
   final _secureStorage = const FlutterSecureStorage();
   // ignore: unused_field
   final ApiServiceClient _apiServiceClient;
@@ -292,6 +292,9 @@ class AccountLogic implements AccountLogicInterface {
     );
 
     requestData.sign(keyPair.value!.privateKey);
+
+    // sanity check the signature is valid
+    requestData.verify(keyPair.value!.publicKey);
 
     VerifyNumberResponse response =
         await _verifierServiceClient.verifyNumber(requestData.request);

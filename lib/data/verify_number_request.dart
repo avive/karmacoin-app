@@ -3,6 +3,7 @@ import 'package:karma_coin/data/signer_mixin.dart';
 import 'package:karma_coin/services/api/verifier.pb.dart' as vt;
 import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
+import 'package:protobuf/protobuf.dart';
 
 /// An extension class over vt.VerifyNumberRequest to support signing and verification
 class VerifyNumberRequest implements Signer {
@@ -25,7 +26,10 @@ class VerifyNumberRequest implements Signer {
       return false;
     }
 
-    return ed.verify(publicKey, request.writeToBuffer(),
+    vt.VerifyNumberRequest message = request.deepCopy();
+    message.clearSignature();
+
+    return ed.verify(publicKey, message.writeToBuffer(),
         request.signature.signature as Uint8List);
   }
 }

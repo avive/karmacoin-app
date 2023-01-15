@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
 /// User authentication logic
-abstract class AuthLogicInterface {
+mixin AuthLogicInterface {
   /// Init auth logic - load prev saved auth data from local secure storage
   Future<void> init();
 
@@ -16,7 +16,7 @@ abstract class AuthLogicInterface {
 }
 
 /// User authentication logic
-class AuthLogic implements AuthLogicInterface {
+class AuthLogic with AuthLogicInterface {
   /// Init auth logic - load prev saved auth data from local secure storage
 
   @override
