@@ -102,9 +102,11 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
 
                   if (userNameAvailabilityLogic.status ==
                       UserNameAvailabilityStatus.available) {
-                    // set user reuqested name
+                    // store the user's reuqested name in account logic
                     await accountLogic
                         .setRequestedUserName(_textController.text);
+
+                    // todo: show spinner and disable next button while transaction is being submitted
 
                     // start the user signup flow
                     await signingUpLogic.signUpUser();

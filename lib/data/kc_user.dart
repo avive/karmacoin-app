@@ -18,7 +18,7 @@ class KarmaCoinUser {
     balance.value = newBalance;
 
     // persist changes
-    await accountLogic.setKarmaCoinUser(this);
+    await accountLogic.updateKarmaCoinUserData(this);
   }
 
   /// Update nonce in an observable way
@@ -27,6 +27,6 @@ class KarmaCoinUser {
     this.nonce.value = nonce;
 
     // persist changes
-    await accountLogic.setKarmaCoinUser(this);
+    await accountLogic.updateKarmaCoinUserData(this);
   }
 }

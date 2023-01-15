@@ -13,10 +13,18 @@ class SettingsLogic with ThrottledSaveLoadMixin {
     ..addListener(scheduleSave);
   late final currentLocale = ValueNotifier<String?>(null)
     ..addListener(scheduleSave);
+
   late final apiHostName = ValueNotifier<String>('127.0.0.1')
     ..addListener(scheduleSave);
   late final apiHostPort = ValueNotifier<int>(8099)..addListener(scheduleSave);
   late final apiSecureConnection = ValueNotifier<bool>(false)
+    ..addListener(scheduleSave);
+
+  late final verifierHostName = ValueNotifier<String>('127.0.0.1')
+    ..addListener(scheduleSave);
+  late final verifierHostPort = ValueNotifier<int>(8099)
+    ..addListener(scheduleSave);
+  late final verifierSecureConnection = ValueNotifier<bool>(false)
     ..addListener(scheduleSave);
 
   // requested user name entered by the user. For the canonical user-name, check AccountLogic
@@ -34,6 +42,11 @@ class SettingsLogic with ThrottledSaveLoadMixin {
     apiHostName.value = value['apiHostName'] ?? '127.0.0.1';
     apiHostPort.value = value['apiHostPort'] ?? 5088;
     apiSecureConnection.value = value['apiSecureConnection'] ?? false;
+
+    verifierHostName.value = value['apiHostName'] ?? '127.0.0.1';
+    verifierHostPort.value = value['apiHostPort'] ?? 5088;
+    verifierSecureConnection.value = value['apiSecureConnection'] ?? false;
+
     requestedUserName.value = value['requestedUserName'] ?? '127.0.0.1';
   }
 
@@ -46,6 +59,9 @@ class SettingsLogic with ThrottledSaveLoadMixin {
       'apiHostName': apiHostName.value,
       'apiHostPort': apiHostPort.value,
       'apiSecureConnection': apiSecureConnection.value,
+      'verifierHostName': apiHostName.value,
+      'verifierHostPort': apiHostPort.value,
+      'verifierSecureConnection': apiSecureConnection.value,
       'requestedUserName': requestedUserName.value,
     };
   }

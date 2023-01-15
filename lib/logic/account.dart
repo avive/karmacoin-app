@@ -6,69 +6,11 @@ import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/services/api/api.pbgrpc.dart';
 import 'package:grpc/grpc.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/services/api/verifier.pbgrpc.dart' as verifier;
 import 'dart:convert';
-import 'kc_user.dart';
-
-abstract class AccountLogicInterface {
-  /// Init account logic
-  Future<void> init();
-
-  /// Generate a new keypair
-  Future<void> generateNewKeyPair();
-
-  /// Update user signed up
-  Future<void> setSignedUp(bool signedUp);
-
-  // Set the user name (canonical on-chain)
-  Future<void> setUserName(String userName);
-
-  // Set last verifier's response
-  Future<void> setVerifierResponse(VerifyNumberResponse response);
-
-  // Set the user's karma coin user data and store it
-  Future<void> setKarmaCoinUser(KarmaCoinUser user);
-
-  // Set the user reuqested user name
-  Future<void> setRequestedUserName(String requestedUserName);
-
-  // Set the user's phone number
-  Future<void> setUserPhoneNumber(String phoneNumber);
-
-  /// Clear all local account data
-  Future<void> clear();
-
-  /// Set the account id on a local Firebase Auth autenticated user
-  Future<void> onNewUserAuthenticated(fb.User user);
-
-  /// User's id key pair - locally stored. Should be generated after a succesfull
-  /// user auth interaction for that user
-  final ValueNotifier<ed.KeyPair?> keyPair = ValueNotifier<ed.KeyPair?>(null);
-
-  // True if user signed up to KarmaCoin (NewUser transaction on chain)
-  final ValueNotifier<bool> signedUp = ValueNotifier<bool>(false);
-
-  // User name on-chain, if it was set. Not the user's reqested user-name.
-  final ValueNotifier<String?> userName = ValueNotifier<String?>(null);
-
-  // Requested user name, if one was set by the user.
-  final ValueNotifier<String?> requestedUserName = ValueNotifier<String?>(null);
-
-  // Create a new karma coin (not firebase) user from local account data
-  // and store it locally. This user's data is going to be updated with on-chain data
-  Future<KarmaCoinUser> createNewKarmaCoinUser();
-
-  final ValueNotifier<KarmaCoinUser?> karmaCoinUser =
-      ValueNotifier<KarmaCoinUser?>(null);
-
-  // the last obtained verify number response from a KC verifier
-  // we store it here so an interrupted signup flow can continue on next
-  // session on a device
-  final ValueNotifier<VerifyNumberResponse?> verifyNumberResponse =
-      ValueNotifier<VerifyNumberResponse?>(null);
-
-  // Local authenticated user's phone number
-  final ValueNotifier<String?> phoneNumber = ValueNotifier<String?>(null);
-}
+import 'account_interface.dart';
+import '../data/kc_user.dart';
+import 'package:karma_coin/data/verify_number_request.dart' as data;
 
 class AccountStoreKeys {
   static String privateKey = 'private_key';
@@ -81,12 +23,18 @@ class AccountStoreKeys {
   static String verifyNumberResponse = 'verify_number_response';
 }
 
-/// Local karmaCoin account logic. We seperate between authentication and account.
-/// Account information includes user's name, accountId and private signing key.
+/// Local karmaCoin account logic. We seperate between authentication and account. Authentication is handled by Firebase Auth.
 class AccountLogic implements AccountLogicInterface {
   final _secureStorage = const FlutterSecureStorage();
   // ignore: unused_field
   final ApiServiceClient _apiServiceClient;
+
+  // ignore: unused_field
+  final verifier.VerifierServiceClient _verifierServiceClient;
+
+  // last verifier response
+  // ignore: unused_field
+  VerifyNumberResponse? _verifyNumberResponse;
 
   static const _aOptions = AndroidOptions(
     encryptedSharedPreferences: true,
@@ -96,6 +44,15 @@ class AccountLogic implements AccountLogicInterface {
 
   AccountLogic()
       : _apiServiceClient = ApiServiceClient(
+          ClientChannel(
+            settingsLogic.apiHostName.value,
+            port: settingsLogic.apiHostPort.value,
+            options: const ChannelOptions(
+                // todo: take this from settings
+                credentials: ChannelCredentials.insecure()),
+          ),
+        ),
+        _verifierServiceClient = verifier.VerifierServiceClient(
           ClientChannel(
             settingsLogic.apiHostName.value,
             port: settingsLogic.apiHostPort.value,
@@ -151,7 +108,7 @@ class AccountLogic implements AccountLogicInterface {
     String? data = await _secureStorage.read(
         key: AccountStoreKeys.verifyNumberResponse, aOptions: _aOptions);
     if (data != null) {
-      verifyNumberResponse.value =
+      _verifyNumberResponse =
           VerifyNumberResponse.fromBuffer(base64.decode(data));
     }
   }
@@ -172,7 +129,7 @@ class AccountLogic implements AccountLogicInterface {
   }
 
   @override
-  Future<void> setKarmaCoinUser(KarmaCoinUser user) async {
+  Future<void> updateKarmaCoinUserData(KarmaCoinUser user) async {
     String userData = user.userData.writeToBuffer().toBase64();
     await _secureStorage.write(
         key: AccountStoreKeys.karmaCoinUser,
@@ -284,10 +241,6 @@ class AccountLogic implements AccountLogicInterface {
       ValueNotifier<KarmaCoinUser?>(null);
 
   @override
-  ValueNotifier<VerifyNumberResponse?> verifyNumberResponse =
-      ValueNotifier<VerifyNumberResponse?>(null);
-
-  @override
   ValueNotifier<String?> phoneNumber = ValueNotifier<String?>(null);
 
   /// Set the requested user name
@@ -306,29 +259,52 @@ class AccountLogic implements AccountLogicInterface {
   /// Create a new karma coin user from account data
   @override
   Future<KarmaCoinUser> createNewKarmaCoinUser() async {
-    KarmaCoinUser user = KarmaCoinUser(User(
-      accountId: AccountId(data: keyPair.value!.publicKey.bytes),
-      nonce: Int64.ZERO,
-      userName: userName.value,
-      mobileNumber: MobileNumber(number: phoneNumber.value!),
-      balance: Int64.ZERO, // todo: set to signup reward
-      traitScores: [], // todo: set to default new user trait scores :-)
-      preKeys: [],
-    ));
+    KarmaCoinUser user = KarmaCoinUser(
+      User(
+        accountId: AccountId(data: keyPair.value!.publicKey.bytes),
+        nonce: Int64.ZERO,
+        userName: userName.value,
+        mobileNumber: MobileNumber(number: phoneNumber.value!),
+        balance: Int64.ZERO, // todo: set to signup reward
+        traitScores: [], // todo: set to default new user trait scores :-)
+        preKeys: [],
+      ),
+    );
 
     // set it so it is stored locally
-    await setKarmaCoinUser(user);
+    await updateKarmaCoinUserData(user);
 
     return user;
   }
 
+  /// Verify the user's phone number and account id, store response
+  /// and return verification result
   @override
-  Future<void> setVerifierResponse(VerifyNumberResponse response) async {
+  Future<VerifyNumberResult> verifyPhoneNumber() async {
+    // todo: prepare rqeuest and sign it!
+
+    data.VerifyNumberRequest requestData = data.VerifyNumberRequest(
+      verifier.VerifyNumberRequest(
+        mobileNumber: MobileNumber(number: phoneNumber.value!),
+        accountId: AccountId(data: keyPair.value!.publicKey.bytes),
+        nickname: userName.value,
+      ),
+    );
+
+    requestData.sign(keyPair.value!.privateKey);
+
+    VerifyNumberResponse response =
+        await _verifierServiceClient.verifyNumber(requestData.request);
+
+    // store this response as last verifier response in secure storage
     await _secureStorage.write(
         key: AccountStoreKeys.verifyNumberResponse,
         value: response.writeToBuffer().toBase64(),
         aOptions: _aOptions);
 
-    verifyNumberResponse.value = response;
+    // keep it in memory for this session
+    _verifyNumberResponse = response;
+
+    return response.result;
   }
 }
