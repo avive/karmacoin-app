@@ -8,7 +8,7 @@ import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:karma_coin/logic/auth.dart';
 import 'package:karma_coin/logic/settings.dart';
 import 'package:karma_coin/common/platform_info.dart';
-import 'package:karma_coin/logic/signing_up.dart';
+import 'package:karma_coin/logic/signup_controller.dart';
 import 'package:karma_coin/logic/user_name_availability.dart';
 
 import 'account.dart';
@@ -24,6 +24,8 @@ UserNameAvailabilityLogic get userNameAvailabilityLogic =>
 SignUpController get signingUpLogic => GetIt.I.get<SignUpController>();
 
 mixin AppLogicInterface {
+  /// Indicates to the rest of the app that bootstrap has not completed.
+  /// The router will use this to prevent redirects while bootstrapping.
   bool isBootstrapComplete = false;
   bool get isLandscapeEnabled;
   Size get deviceSize;
@@ -32,11 +34,6 @@ mixin AppLogicInterface {
 }
 
 class AppLogic with AppLogicInterface {
-  /// Indicates to the rest of the app that bootstrap has not completed.
-  /// The router will use this to prevent redirects while bootstrapping.
-  @override
-  bool isBootstrapComplete = false;
-
   @override
   bool get isLandscapeEnabled =>
       PlatformInfo.isDesktopOrWeb || deviceSize.shortestSide > 500;

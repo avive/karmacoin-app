@@ -1,4 +1,4 @@
-import 'package:karma_coin/logic/signing_up.dart';
+import 'package:karma_coin/logic/signup_controller.dart';
 
 import '../../common_libs.dart';
 
@@ -45,6 +45,9 @@ Widget _getStatusWidget(context) {
           case SignUpStatus.submittingTransaction:
             return const Text(
                 'Submitting transaction, please wait few seconds...');
+          case SignUpStatus.missingData:
+            return const Text(
+                'Intrnal error - missing expected local data..'); // TODO: Handle this case.
         }
       },
     ),

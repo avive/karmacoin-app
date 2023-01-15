@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/ui/widgets/signup_status.dart';
+import 'package:karma_coin/ui/widgets/user_status.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.title});

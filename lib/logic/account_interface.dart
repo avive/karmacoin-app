@@ -2,6 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/kc_user.dart';
+import 'package:karma_coin/services/api/api.pbgrpc.dart';
+
+import '../services/api/types.pbenum.dart';
 
 mixin AccountLogicInterface {
   /// Init account logic
@@ -49,11 +52,19 @@ mixin AccountLogicInterface {
   Future<KarmaCoinUser> createNewKarmaCoinUser();
 
   // Verify user's phone number and account id
-  Future<void> verifyPhoneNumber();
+  Future<VerifyNumberResult> verifyPhoneNumber();
+
+  // Submit a new user transaction to the chain with local user data
+  Future<SubmitTransactionResponse> submitNewUserTransacation();
 
   final ValueNotifier<KarmaCoinUser?> karmaCoinUser =
       ValueNotifier<KarmaCoinUser?>(null);
 
   // Local authenticated user's phone number
   final ValueNotifier<String?> phoneNumber = ValueNotifier<String?>(null);
+
+  bool isDataValidForNewKarmaCoinUser();
+  bool isDataValidForPhoneVerification();
+  bool isDataValidForNewUserTransaction();
+
 }

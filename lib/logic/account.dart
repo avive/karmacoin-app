@@ -11,6 +11,8 @@ import 'dart:convert';
 import 'account_interface.dart';
 import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/verify_number_request.dart' as data;
+import 'package:karma_coin/data/verify_number_response.dart' as vnr;
+import 'package:karma_coin/data/signed_transaction.dart' as est;
 
 class AccountStoreKeys {
   static String privateKey = 'private_key';
@@ -227,22 +229,6 @@ class AccountLogic with AccountLogicInterface {
         'User account id: ${keyPair.value!.publicKey.bytes.toShortHexString()} stored on firebase.');
   }
 
-  @override
-  ValueNotifier<ed.KeyPair?> keyPair = ValueNotifier<ed.KeyPair?>(null);
-
-  @override
-  ValueNotifier<bool> signedUp = ValueNotifier<bool>(false);
-
-  @override
-  ValueNotifier<String?> userName = ValueNotifier<String?>(null);
-
-  @override
-  ValueNotifier<KarmaCoinUser?> karmaCoinUser =
-      ValueNotifier<KarmaCoinUser?>(null);
-
-  @override
-  ValueNotifier<String?> phoneNumber = ValueNotifier<String?>(null);
-
   /// Set the requested user name
   @override
   Future<void> setRequestedUserName(String requestedUserName) async {
@@ -271,7 +257,7 @@ class AccountLogic with AccountLogicInterface {
       ),
     );
 
-    // set it so it is stored locally
+    // store it locally
     await updateKarmaCoinUserData(user);
 
     return user;
@@ -305,9 +291,89 @@ class AccountLogic with AccountLogicInterface {
         value: response.writeToBuffer().toBase64(),
         aOptions: _aOptions);
 
+    // create an enrichedResponse for signature verification purposes
+    vnr.VerifyNumberResponse enrichedResponse =
+        vnr.VerifyNumberResponse(response);
+
+    // todo: compare the response accountId with the verifier's account id
+    // from genesis config and reject if they don't match
+    enrichedResponse.verifySignature(ed.PublicKey(response.accountId.data));
+
     // keep it in memory for this session
     _verifyNumberResponse = response;
 
     return response.result;
+  }
+
+  /// Returns true iff account logic has all required data to verify the user's phone number
+  @override
+  bool isDataValidForPhoneVerification() {
+    return karmaCoinUser.value != null;
+  }
+
+  @override
+  bool isDataValidForNewKarmaCoinUser() {
+    return keyPair.value != null &&
+        userName.value != null &&
+        phoneNumber.value != null;
+  }
+
+  /// Returns true iff account logic has all required data to create a new user
+  @override
+  bool isDataValidForNewUserTransaction() {
+    return isDataValidForPhoneVerification() && _verifyNumberResponse != null;
+  }
+
+  /// Submit a new user transaction to the network using the last verifier response
+  /// Throws an exception if failed to sent tx to an api provider or it rejected it
+  /// Otherwise returns the transaction submission result (submitted or invalid)
+  @override
+  Future<SubmitTransactionResponse> submitNewUserTransacation() async {
+    NewUserTransactionV1 newUserTx =
+        NewUserTransactionV1(verifyNumberResponse: _verifyNumberResponse!);
+
+    TransactionData txData = TransactionData(
+      transactionData: newUserTx.writeToBuffer(),
+      transactionType: TransactionType.TRANSACTION_TYPE_NEW_USER_V1,
+    );
+
+    SignedTransaction signedTx = _newSignedTransaction(txData);
+    SubmitTransactionResponse resp = SubmitTransactionResponse();
+
+    resp = await _apiServiceClient
+        .submitTransaction(SubmitTransactionRequest(transaction: signedTx));
+
+    switch (resp.submitTransactionResult) {
+      case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
+        debugPrint('submitNewUserTransacation success!');
+        // increment user's nonce and store it locally
+        KarmaCoinUser user = karmaCoinUser.value!;
+        user.nonce.value += 1;
+        updateKarmaCoinUserData(user);
+        break;
+      case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_INVALID:
+        // throw so clients deal with this
+        throw Exception('submitNewUserTransacation rejected by network!');
+      default:
+        throw Exception('unexpected submitNewUserTransacation result!');
+    }
+
+    return resp;
+  }
+
+  /// Create a new signed transaction with the local account data
+  SignedTransaction _newSignedTransaction(TransactionData data) {
+    SignedTransaction tx = SignedTransaction(
+      nonce: karmaCoinUser.value!.nonce.value + 1,
+      fee: Int64.ONE, // todo: get default tx fee from settings
+      netId: 0, // todo: get from settings
+      transactionData: data,
+      signer: AccountId(data: keyPair.value!.publicKey.bytes),
+    );
+
+    est.SignedTransaction enrichedTx = est.SignedTransaction(tx);
+    enrichedTx.sign(ed.PrivateKey(keyPair.value!.privateKey.bytes));
+
+    return enrichedTx.transaction;
   }
 }

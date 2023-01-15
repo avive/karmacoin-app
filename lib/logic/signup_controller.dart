@@ -1,3 +1,4 @@
+import 'package:karma_coin/services/api/api.pbgrpc.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 
 import '../common_libs.dart';
@@ -11,6 +12,7 @@ enum SignUpStatus {
   transactionError,
   userNameTaken, // rare but possible and needed to be handled
   signedUp, // signup tx confirmed on chain
+  missingData,
 }
 
 /// SignUp Controller drives the sign-up process once user provided all
@@ -35,21 +37,24 @@ class SignUpController extends ChangeNotifier {
     _status = SignUpStatus.validating;
     notifyListeners();
 
+    if (!accountLogic.isDataValidForNewKarmaCoinUser()) {
+      _errorMessge = 'Internal error - missing data';
+      _status = SignUpStatus.missingData;
+      notifyListeners();
+      return;
+    }
+
     // Create a new local karma coin user and store it in local store
     // we use this local user until we get the on-chain user
     // so user can start sending transactions before his signup tx is confirmed
     await accountLogic.createNewKarmaCoinUser();
 
-    // todo: call the api to validate the user's (accountId, phoneNumber)
-
-    /*
-    VERIFY_NUMBER_RESULT_NICKNAME_TAKEN,
-    VERIFY_NUMBER_RESULT_INVALID_CODE,
-    VERIFY_NUMBER_RESULT_INVALID_SIGNATURE,
-    VERIFY_NUMBER_RESULT_NUMBER_ALREADY_REGISTERED_OTHER_ACCOUNT,
-    VERIFY_NUMBER_RESULT_NUMBER_ALREADY_REGISTERED_THIS_ACCOUNT,
-    VERIFY_NUMBER_RESULT_VERIFIED,
-    */
+    if (!accountLogic.isDataValidForPhoneVerification()) {
+      _errorMessge = 'Internal error - missing data';
+      _status = SignUpStatus.missingData;
+      notifyListeners();
+      return;
+    }
 
     // todo: add unknown type in the api
     VerifyNumberResult result =
@@ -106,17 +111,42 @@ class SignUpController extends ChangeNotifier {
     _status = SignUpStatus.submittingTransaction;
     notifyListeners();
 
-    // todo - simulate time to prepare transaction
-    await Future.delayed(const Duration(milliseconds: 1000));
+    if (!accountLogic.isDataValidForNewUserTransaction()) {
+      _errorMessge = 'Internal error - missing data';
+      _status = SignUpStatus.missingData;
+      notifyListeners();
+      return;
+    }
+
+    SubmitTransactionResponse resp = SubmitTransactionResponse();
+    try {
+      resp = await accountLogic.submitNewUserTransacation();
+    } catch (e) {
+      _errorMessge = 'Failed to submit transaction - please try again later';
+      _status = SignUpStatus.transactionError;
+      notifyListeners();
+      return;
+    }
+
+    if (resp.submitTransactionResult !=
+        SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED) {
+      _errorMessge = 'Failed to submit transaction - please try again later';
+      _status = SignUpStatus.transactionError;
+      notifyListeners();
+      return;
+    }
 
     _status = SignUpStatus.transactionSubmitted;
+    notifyListeners();
 
-    // todo: listen for account creation transaction and change state to signedup
+    // todo: listen for account creation transaction and event
     // once it is confirmed or to one of the transaction errors if it failed
     // for example, user name taken
 
     // simulate signedup tx confirmed
+    await Future.delayed(const Duration(seconds: 2));
     _status = SignUpStatus.signedUp;
+    notifyListeners();
   }
 
   // todo: register on stream of transactions from the user's account and look for the signup transaction event / on chain tx. drive the state once it is obtained
