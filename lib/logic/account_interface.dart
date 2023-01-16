@@ -6,7 +6,7 @@ import 'package:karma_coin/services/api/api.pbgrpc.dart';
 
 import '../services/api/types.pbenum.dart';
 
-mixin AccountLogicInterface {
+abstract class AccountLogicInterface {
   /// Init account logic
   Future<void> init();
 
@@ -36,7 +36,8 @@ mixin AccountLogicInterface {
 
   /// Gets the user's seed words - this is the secret users needs to write in
   /// order to recover their account
-  final ValueNotifier<String?> seedSecurityWords = ValueNotifier<String?>(null);
+  final ValueNotifier<String?> accountSecurityWords =
+      ValueNotifier<String?>(null);
 
   /// User's id key pair - locally stored. Should be generated after a succesfull
   /// user auth interaction for that user
@@ -71,3 +72,4 @@ mixin AccountLogicInterface {
   bool isDataValidForPhoneVerification();
   bool isDataValidForNewUserTransaction();
 }
+

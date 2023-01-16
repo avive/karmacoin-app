@@ -8,7 +8,7 @@ enum SignUpStatus {
   validating,
   validatorError,
   submittingTransaction,
-  transactionSubmitted,
+  transactionSubmitted, // from this moment we use local user and txs until newuser tx is confirmed
   transactionError,
   userNameTaken, // rare but possible and needed to be handled
   signedUp, // signup tx confirmed on chain
@@ -28,11 +28,11 @@ class SignUpController extends ChangeNotifier {
 
   /// Start the signup process using local data in accountManager and a Karmacoin API service provider
   Future<void> signUpUser() async {
-    await getValidatorEvidence();
+    await _getValidatorEvidence();
   }
 
   // First step in signup process
-  Future<void> getValidatorEvidence() async {
+  Future<void> _getValidatorEvidence() async {
     _errorMessge = '';
     _status = SignUpStatus.validating;
     notifyListeners();

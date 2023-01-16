@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -12,13 +11,15 @@ import 'package:karma_coin/logic/signup_controller.dart';
 import 'package:karma_coin/logic/user_name_availability.dart';
 
 import 'account.dart';
+import 'account_interface.dart';
+import 'auth_interface.dart';
 
 /// Add syntax sugar for quickly accessing the main "logic" controllers in the app
 /// We deliberately do not create shortcuts for services, to discourage their use directly in the view/widget layer.
 AppLogic get appLogic => GetIt.I.get<AppLogic>();
 SettingsLogic get settingsLogic => GetIt.I.get<SettingsLogic>();
-AuthLogic get authLogic => GetIt.I.get<AuthLogic>();
-AccountLogic get accountLogic => GetIt.I.get<AccountLogic>();
+AuthLogicInterface get authLogic => GetIt.I.get<AuthLogicInterface>();
+AccountLogicInterface get accountLogic => GetIt.I.get<AccountLogicInterface>();
 UserNameAvailabilityLogic get userNameAvailabilityLogic =>
     GetIt.I.get<UserNameAvailabilityLogic>();
 SignUpController get signingUpLogic => GetIt.I.get<SignUpController>();
@@ -53,8 +54,8 @@ class AppLogic with AppLogicInterface {
     // Top level app controller
     GetIt.I.registerLazySingleton<AppLogic>(() => AppLogic());
     GetIt.I.registerLazySingleton<SettingsLogic>(() => SettingsLogic());
-    GetIt.I.registerLazySingleton<AuthLogic>(() => AuthLogic());
-    GetIt.I.registerLazySingleton<AccountLogic>(() => AccountLogic());
+    GetIt.I.registerLazySingleton<AuthLogicInterface>(() => AuthLogic());
+    GetIt.I.registerLazySingleton<AccountLogicInterface>(() => AccountLogic());
     GetIt.I.registerLazySingleton<UserNameAvailabilityLogic>(
         () => UserNameAvailabilityLogic());
     GetIt.I.registerLazySingleton<SignUpController>(() => SignUpController());
@@ -88,7 +89,7 @@ class AppLogic with AppLogicInterface {
     FirebaseAuth.instance.authStateChanges().listen((User? user) async {
       if (user != null) {
         debugPrint(
-            'got a user from firebase auth. ${user.phoneNumber}, accountId: ${user.displayName}');
+            'got a user from firebase auth. ${user.phoneNumber}, accountId (base64): ${user.displayName}');
         await accountLogic.onNewUserAuthenticated(user);
       } else {
         debugPrint('no user from firebase auth');

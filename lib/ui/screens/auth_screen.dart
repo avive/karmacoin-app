@@ -89,6 +89,8 @@ class PhoneAuthScreen extends StatelessWidget {
           return ErrorText(exception: state.exception);
         } else if (state is SMSCodeRequested) {
           return const CircularProgressIndicator();
+        } else if (state is UserCreated) {
+          return Container();
         } else {
           return Text('Unknown state $state . Deal with it!');
         }

@@ -27,7 +27,7 @@ class AccountStoreKeys {
 }
 
 /// Local karmaCoin account logic. We seperate between authentication and account. Authentication is handled by Firebase Auth.
-class AccountLogic with AccountLogicInterface {
+class AccountLogic extends AccountLogicInterface {
   final _secureStorage = const FlutterSecureStorage();
   // ignore: unused_field
   final ApiServiceClient _apiServiceClient;
@@ -78,9 +78,9 @@ class AccountLogic with AccountLogicInterface {
 
     if (seedData != null && seedWordsData != null) {
       debugPrint('got keyPair from secure local store...');
-      List<int> seed = base64.decode(seedData);
+      Uint8List seed = Uint8List.fromList(base64.decode(seedData));
       _setKeyPairFromSeed(seed);
-      seedSecurityWords.value = seedWordsData;
+      accountSecurityWords.value = seedWordsData;
     } else {
       debugPrint('seed and security words not found in secure local store.');
     }
@@ -119,10 +119,15 @@ class AccountLogic with AccountLogicInterface {
     }
   }
 
-  void _setKeyPairFromSeed(List<int> seed) {
-    ed.PrivateKey privateKey = ed.newKeyFromSeed(seed as Uint8List);
+  /// private helper to set keypair from seed
+  void _setKeyPairFromSeed(Uint8List seed) {
+    debugPrint('setting keypair from seed...');
+    ed.PrivateKey privateKey = ed.newKeyFromSeed(seed);
     ed.PublicKey publicKey = ed.public(privateKey);
     keyPair.value = ed.KeyPair(privateKey, publicKey);
+
+    debugPrint(
+        'keypair set. Account id: ${keyPair.value!.publicKey.bytes.toShortHexString()}');
   }
 
   /// Generate a new keypair
@@ -130,9 +135,30 @@ class AccountLogic with AccountLogicInterface {
   Future<void> generateNewKeyPair() async {
     debugPrint("generating a new account keypair from a new seed...");
 
+    // generate 24 english dict words for 256 bits of entropy we need for ed seed
+    String securityWords = bip39.generateMnemonic(strength: 256);
+
     // ed seed is 32 bytes so we generate words for crating a 32 bytes seed
-    String securityWords = bip39.generateMnemonic(strength: 32);
-    List<int> seed = bip39.mnemonicToSeed(securityWords);
+    /*
+    String securityWords = bip39.generateMnemonic(
+        strength: 32,
+        randomBytes: (length) {
+          Random rng = Random.secure();
+          List<int> values =
+              List<int>.generate(length, (i) => rng.nextInt(256));
+          return values as Uint8List;
+        });*/
+
+    debugPrint('account security words: $securityWords');
+
+    // we use a passphrase to derive the seed, and we only need 32 bytes of seed
+    // this allows in the future for the user to set an optional passphrase in settings
+    // and use it to derive the seed for a new account
+    Uint8List seed = bip39
+        .mnemonicToSeed(securityWords, passphrase: 'karmacoin')
+        .sublist(0, 32);
+
+    debugPrint('seed length:${seed.length} data: ${seed.toHexString()}');
 
     // store seed and seed security words on store
     await _secureStorage.write(
@@ -146,11 +172,10 @@ class AccountLogic with AccountLogicInterface {
         aOptions: _aOptions);
 
     // update security words in memory so client can display them for user in settings
-    seedSecurityWords.value = securityWords;
+    accountSecurityWords.value = securityWords;
 
     _setKeyPairFromSeed(seed);
 
-    // store data in memory
     debugPrint(
         'keypair set. Account id: ${keyPair.value!.publicKey.bytes.toShortHexString()}');
   }
@@ -202,6 +227,8 @@ class AccountLogic with AccountLogicInterface {
   /// from the secure storage.
   @override
   Future<void> clear() async {
+    // log out from firebase
+
     debugPrint('clearing all local user account from store and from memory...');
 
     await _secureStorage.delete(
@@ -228,12 +255,13 @@ class AccountLogic with AccountLogicInterface {
     await _secureStorage.delete(
         key: AccountStoreKeys.verifyNumberResponse, aOptions: _aOptions);
 
+    // clear all state from memory
     userName.value = null;
     requestedUserName.value = null;
     phoneNumber.value = null;
     signedUpOnChain.value = false;
     keyPair.value = null;
-    seedSecurityWords.value = null;
+    accountSecurityWords.value = null;
     karmaCoinUser.value = null;
     _verifyNumberResponse = null;
   }
@@ -243,7 +271,7 @@ class AccountLogic with AccountLogicInterface {
   @override
   Future<void> onNewUserAuthenticated(fb.User user) async {
     if (keyPair.value == null) {
-      debugPrint('no local keypair - generating new one...');
+      debugPrint('Warning: no local keypair exists - generating new one...');
       await generateNewKeyPair();
     }
 

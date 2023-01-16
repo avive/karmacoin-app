@@ -1,6 +1,8 @@
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/common/save_load_mixin.dart';
 
+// todo: add settings interface
+
 /// App settings logic
 class SettingsLogic with ThrottledSaveLoadMixin {
   @override
