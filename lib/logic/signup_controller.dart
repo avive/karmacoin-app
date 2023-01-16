@@ -139,6 +139,10 @@ class SignUpController extends ChangeNotifier {
     _status = SignUpStatus.transactionSubmitted;
     notifyListeners();
 
+    // go into fake mode - we give user signup reward and let him submit transactions
+    // before the signup tx is confirmed on chain. We store them locally and submit them
+    // once the signup tx is confirmed on chain.
+
     // todo: listen for account creation transaction and event
     // once it is confirmed or to one of the transaction errors if it failed
     // for example, user name taken

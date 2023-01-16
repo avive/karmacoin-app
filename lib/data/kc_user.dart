@@ -4,13 +4,19 @@ import '../services/api/types.pb.dart';
 
 /// An enriched KC user class supporting observable data and persistence.
 /// Setting data will persist the data to local secure storage and notify all listeners
-/// on the change
+/// on the change. Don't add any data members which are not defined on user for this class.
+/// It is designed to add observability to User data members
 class KarmaCoinUser {
   final User userData;
   final ValueNotifier<Int64> balance = ValueNotifier<Int64>(Int64.ZERO);
   final ValueNotifier<Int64> nonce = ValueNotifier<Int64>(Int64.ZERO);
 
   KarmaCoinUser(this.userData);
+
+  /// Increment user nonce in an observable way
+  Future<void> incNonce() async {
+    setNonce(nonce.value + Int64.ONE);
+  }
 
   /// Set user balance in an observable way
   Future<void> setBalance(Int64 newBalance) async {

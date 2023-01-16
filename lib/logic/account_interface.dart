@@ -34,12 +34,16 @@ mixin AccountLogicInterface {
   /// Set the account id on a local Firebase Auth autenticated user
   Future<void> onNewUserAuthenticated(fb.User user);
 
+  /// Gets the user's seed words - this is the secret users needs to write in
+  /// order to recover their account
+  final ValueNotifier<String?> seedSecurityWords = ValueNotifier<String?>(null);
+
   /// User's id key pair - locally stored. Should be generated after a succesfull
   /// user auth interaction for that user
   final ValueNotifier<ed.KeyPair?> keyPair = ValueNotifier<ed.KeyPair?>(null);
 
-  // True if user signed up to KarmaCoin (NewUser transaction on chain)
-  final ValueNotifier<bool> signedUp = ValueNotifier<bool>(false);
+  // True if user signed up to KarmaCoin - Client got a NewUser transaction on chain for this user
+  final ValueNotifier<bool> signedUpOnChain = ValueNotifier<bool>(false);
 
   // User name on-chain, if it was set. Not the user's reqested user-name.
   final ValueNotifier<String?> userName = ValueNotifier<String?>(null);
@@ -66,5 +70,4 @@ mixin AccountLogicInterface {
   bool isDataValidForNewKarmaCoinUser();
   bool isDataValidForPhoneVerification();
   bool isDataValidForNewUserTransaction();
-
 }

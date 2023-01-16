@@ -13,10 +13,11 @@ import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/verify_number_request.dart' as data;
 import 'package:karma_coin/data/verify_number_response.dart' as vnr;
 import 'package:karma_coin/data/signed_transaction.dart' as est;
+import 'package:bip39/bip39.dart' as bip39;
 
 class AccountStoreKeys {
-  static String privateKey = 'private_key';
-  static String publicKey = 'public_key';
+  static String seed = 'seed'; // keypair seed
+  static String seedSecurityWords = 'seed_security_words';
   static String userSignedUp = 'user_signed_up';
   static String userName = 'user_name';
   static String requestedUserName = 'requested_user_name';
@@ -68,18 +69,20 @@ class AccountLogic with AccountLogicInterface {
   Future<void> init() async {
     debugPrint('initalizing account logic...');
     // load prev persisted keypair from secure store
-    String? privateKeyData = await _secureStorage.read(
-        key: AccountStoreKeys.privateKey, aOptions: _aOptions);
 
-    String? publicKeyData = await _secureStorage.read(
-        key: AccountStoreKeys.publicKey, aOptions: _aOptions);
+    String? seedData = await _secureStorage.read(
+        key: AccountStoreKeys.seed, aOptions: _aOptions);
 
-    if (privateKeyData != null && publicKeyData != null) {
+    String? seedWordsData = await _secureStorage.read(
+        key: AccountStoreKeys.seedSecurityWords, aOptions: _aOptions);
+
+    if (seedData != null && seedWordsData != null) {
       debugPrint('got keyPair from secure local store...');
-      await _setKeyPair(ed.KeyPair(ed.PrivateKey(base64.decode(privateKeyData)),
-          ed.PublicKey(base64.decode(publicKeyData))));
+      List<int> seed = base64.decode(seedData);
+      _setKeyPairFromSeed(seed);
+      seedSecurityWords.value = seedWordsData;
     } else {
-      debugPrint('no account keyPair in local store');
+      debugPrint('seed and security words not found in secure local store.');
     }
 
     // load local user account data
@@ -97,11 +100,12 @@ class AccountLogic with AccountLogicInterface {
         key: AccountStoreKeys.userSignedUp, aOptions: _aOptions);
 
     if (signedUpData != null) {
-      signedUp.value = signedUpData.toLowerCase() == 'true';
+      signedUpOnChain.value = signedUpData.toLowerCase() == 'true';
     }
 
     String? karmaCoinUserData = await _secureStorage.read(
         key: AccountStoreKeys.karmaCoinUser, aOptions: _aOptions);
+
     if (karmaCoinUserData != null) {
       karmaCoinUser.value =
           KarmaCoinUser(User.fromBuffer(base64.decode(karmaCoinUserData)));
@@ -115,11 +119,40 @@ class AccountLogic with AccountLogicInterface {
     }
   }
 
+  void _setKeyPairFromSeed(List<int> seed) {
+    ed.PrivateKey privateKey = ed.newKeyFromSeed(seed as Uint8List);
+    ed.PublicKey publicKey = ed.public(privateKey);
+    keyPair.value = ed.KeyPair(privateKey, publicKey);
+  }
+
   /// Generate a new keypair
   @override
   Future<void> generateNewKeyPair() async {
-    debugPrint("generating a new random account keypair...");
-    await _setKeyPair(ed.generateKey());
+    debugPrint("generating a new account keypair from a new seed...");
+
+    // ed seed is 32 bytes so we generate words for crating a 32 bytes seed
+    String securityWords = bip39.generateMnemonic(strength: 32);
+    List<int> seed = bip39.mnemonicToSeed(securityWords);
+
+    // store seed and seed security words on store
+    await _secureStorage.write(
+        key: AccountStoreKeys.seed,
+        value: base64.encode(seed),
+        aOptions: _aOptions);
+
+    await _secureStorage.write(
+        key: AccountStoreKeys.seedSecurityWords,
+        value: securityWords,
+        aOptions: _aOptions);
+
+    // update security words in memory so client can display them for user in settings
+    seedSecurityWords.value = securityWords;
+
+    _setKeyPairFromSeed(seed);
+
+    // store data in memory
+    debugPrint(
+        'keypair set. Account id: ${keyPair.value!.publicKey.bytes.toShortHexString()}');
   }
 
   /// Set the canonical (onchain) user name for the local user
@@ -160,44 +193,49 @@ class AccountLogic with AccountLogicInterface {
         value: signedUp.toString(),
         aOptions: _aOptions);
 
-    this.signedUp.value = signedUp;
+    signedUpOnChain.value = signedUp;
   }
 
-  /// Set a new keypair
-  Future<void> _setKeyPair(ed.KeyPair keyPair) async {
-    String privateKeyData = base64.encode(keyPair.privateKey.bytes);
-    String publicKeyData = base64.encode(keyPair.publicKey.bytes);
-
-    // store the data in secure storage
-    await _secureStorage.write(
-        key: AccountStoreKeys.privateKey,
-        value: privateKeyData,
-        aOptions: _aOptions);
-
-    await _secureStorage.write(
-        key: AccountStoreKeys.publicKey,
-        value: publicKeyData,
-        aOptions: _aOptions);
-
-    this.keyPair.value = keyPair;
-
-    // store data in memory
-    debugPrint(
-        'keypair set. Account id: ${keyPair.publicKey.bytes.toShortHexString()}');
-  }
-
-  /// Clear all locally store account data
+  /// Clear all locally stored and in-memory account data. This will reset the account state
+  /// to its initial state on the first app session. This is useful for testing.
+  /// All account data in fields should be cleared by this method and they should be removed
+  /// from the secure storage.
   @override
   Future<void> clear() async {
-    debugPrint('clearing all local user account from store...');
+    debugPrint('clearing all local user account from store and from memory...');
+
     await _secureStorage.delete(
-        key: AccountStoreKeys.privateKey, aOptions: _aOptions);
+        key: AccountStoreKeys.seed, aOptions: _aOptions);
+
     await _secureStorage.delete(
-        key: AccountStoreKeys.publicKey, aOptions: _aOptions);
+        key: AccountStoreKeys.seedSecurityWords, aOptions: _aOptions);
+
+    await _secureStorage.delete(
+        key: AccountStoreKeys.karmaCoinUser, aOptions: _aOptions);
+
+    await _secureStorage.delete(
+        key: AccountStoreKeys.phoneNumber, aOptions: _aOptions);
+
+    await _secureStorage.delete(
+        key: AccountStoreKeys.requestedUserName, aOptions: _aOptions);
+
+    await _secureStorage.delete(
+        key: AccountStoreKeys.userName, aOptions: _aOptions);
+
+    await _secureStorage.delete(
+        key: AccountStoreKeys.userSignedUp, aOptions: _aOptions);
+
+    await _secureStorage.delete(
+        key: AccountStoreKeys.verifyNumberResponse, aOptions: _aOptions);
+
     userName.value = null;
+    requestedUserName.value = null;
     phoneNumber.value = null;
-    signedUp.value = false;
+    signedUpOnChain.value = false;
     keyPair.value = null;
+    seedSecurityWords.value = null;
+    karmaCoinUser.value = null;
+    _verifyNumberResponse = null;
   }
 
   /// Set the account id for a firebase user
@@ -245,20 +283,27 @@ class AccountLogic with AccountLogicInterface {
   /// Create a new karma coin user from account data
   @override
   Future<KarmaCoinUser> createNewKarmaCoinUser() async {
+    // todo: if we alrteady had anohter karma coin user then we should unregsiter from the transactionsBoss
+    // on transactions for this user
+
     KarmaCoinUser user = KarmaCoinUser(
       User(
         accountId: AccountId(data: keyPair.value!.publicKey.bytes),
         nonce: Int64.ZERO,
         userName: userName.value,
         mobileNumber: MobileNumber(number: phoneNumber.value!),
-        balance: Int64.ZERO, // todo: set to signup reward
-        traitScores: [], // todo: set to default new user trait scores :-)
+        balance: Int64
+            .ZERO, // todo: set to initial signup reward from genesis config
+        traitScores: [], // todo: set to default new user trait scores (from genesis)
         preKeys: [],
       ),
     );
 
     // store it locally
     await updateKarmaCoinUserData(user);
+
+    // todo: register on transactionsBoss and listen for NewUser transaction for the local account
+    // so the isUserOnChain flag can be set to true once we see the new user transaction on chain
 
     return user;
   }
@@ -337,7 +382,7 @@ class AccountLogic with AccountLogicInterface {
       transactionType: TransactionType.TRANSACTION_TYPE_NEW_USER_V1,
     );
 
-    SignedTransaction signedTx = _newSignedTransaction(txData);
+    SignedTransaction signedTx = _createSignedTransaction(txData);
     SubmitTransactionResponse resp = SubmitTransactionResponse();
 
     resp = await _apiServiceClient
@@ -347,9 +392,7 @@ class AccountLogic with AccountLogicInterface {
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
         debugPrint('submitNewUserTransacation success!');
         // increment user's nonce and store it locally
-        KarmaCoinUser user = karmaCoinUser.value!;
-        user.nonce.value += 1;
-        updateKarmaCoinUserData(user);
+        await karmaCoinUser.value!.incNonce();
         break;
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_INVALID:
         // throw so clients deal with this
@@ -361,8 +404,8 @@ class AccountLogic with AccountLogicInterface {
     return resp;
   }
 
-  /// Create a new signed transaction with the local account data
-  SignedTransaction _newSignedTransaction(TransactionData data) {
+  /// Create a new signed transaction with the local account data and the given transaction data
+  SignedTransaction _createSignedTransaction(TransactionData data) {
     SignedTransaction tx = SignedTransaction(
       nonce: karmaCoinUser.value!.nonce.value + 1,
       fee: Int64.ONE, // todo: get default tx fee from settings

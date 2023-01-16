@@ -46,8 +46,7 @@ Widget _getStatusWidget(context) {
             return const Text(
                 'Submitting transaction, please wait few seconds...');
           case SignUpStatus.missingData:
-            return const Text(
-                'Intrnal error - missing expected local data..'); // TODO: Handle this case.
+            return const Text('Intrnal error - missing expected local data..');
         }
       },
     ),

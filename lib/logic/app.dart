@@ -99,7 +99,7 @@ class AppLogic with AppLogicInterface {
       debugPrint('user authenticated on app startup');
     }
 
-    if (accountLogic.signedUp.value == true) {
+    if (accountLogic.signedUpOnChain.value == true) {
       debugPrint("User has signed up (new user tx on chain)");
     }
 
