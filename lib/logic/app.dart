@@ -12,11 +12,13 @@ import 'package:karma_coin/logic/user_name_availability.dart';
 
 import 'account.dart';
 import 'account_interface.dart';
+import 'api_client.dart';
 import 'auth_interface.dart';
 
 /// Add syntax sugar for quickly accessing the main "logic" controllers in the app
-/// We deliberately do not create shortcuts for services, to discourage their use directly in the view/widget layer.
 AppLogic get appLogic => GetIt.I.get<AppLogic>();
+ApiClient get apiClient => GetIt.I.get<ApiClient>();
+
 SettingsLogic get settingsLogic => GetIt.I.get<SettingsLogic>();
 AuthLogicInterface get authLogic => GetIt.I.get<AuthLogicInterface>();
 AccountLogicInterface get accountLogic => GetIt.I.get<AccountLogicInterface>();
@@ -52,6 +54,7 @@ class AppLogic with AppLogicInterface {
   /// Create singletons (logic and services) that can be shared across the app.
   static void registerSingletons() {
     // Top level app controller
+    GetIt.I.registerLazySingleton<ApiClient>(() => ApiClient());
     GetIt.I.registerLazySingleton<AppLogic>(() => AppLogic());
     GetIt.I.registerLazySingleton<SettingsLogic>(() => SettingsLogic());
     GetIt.I.registerLazySingleton<AuthLogicInterface>(() => AuthLogic());

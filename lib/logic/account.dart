@@ -410,22 +410,35 @@ class AccountLogic extends AccountLogicInterface {
       transactionType: TransactionType.TRANSACTION_TYPE_NEW_USER_V1,
     );
 
-    SignedTransaction signedTx = _createSignedTransaction(txData);
+    SignedTransactionWithStatus signedTx = _createSignedTransaction(txData);
     SubmitTransactionResponse resp = SubmitTransactionResponse();
 
-    resp = await _apiServiceClient
-        .submitTransaction(SubmitTransactionRequest(transaction: signedTx));
+    resp = await _apiServiceClient.submitTransaction(
+        SubmitTransactionRequest(transaction: signedTx.transaction));
 
     switch (resp.submitTransactionResult) {
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
+        signedTx.status = TransactionStatus.TRANSACTION_STATUS_PENDING;
+
         debugPrint('submitNewUserTransacation success!');
+
+        // todo: store the transactionWithStatus in local storage via tx boss
+
         // increment user's nonce and store it locally
         await karmaCoinUser.value!.incNonce();
         break;
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_INVALID:
+        signedTx.status = TransactionStatus.TRANSACTION_STATUS_REJECTED;
+
+        // todo: store the transactionWithStatus in local storage via tx boss
+
         // throw so clients deal with this
         throw Exception('submitNewUserTransacation rejected by network!');
       default:
+        signedTx.status = TransactionStatus.TRANSACTION_STATUS_REJECTED;
+
+        // todo: store the transactionWithStatus in local storage via tx boss
+
         throw Exception('unexpected submitNewUserTransacation result!');
     }
 
@@ -433,7 +446,7 @@ class AccountLogic extends AccountLogicInterface {
   }
 
   /// Create a new signed transaction with the local account data and the given transaction data
-  SignedTransaction _createSignedTransaction(TransactionData data) {
+  SignedTransactionWithStatus _createSignedTransaction(TransactionData data) {
     SignedTransaction tx = SignedTransaction(
       nonce: karmaCoinUser.value!.nonce.value + 1,
       fee: Int64.ONE, // todo: get default tx fee from settings
@@ -442,9 +455,13 @@ class AccountLogic extends AccountLogicInterface {
       signer: AccountId(data: keyPair.value!.publicKey.bytes),
     );
 
-    est.SignedTransaction enrichedTx = est.SignedTransaction(tx);
+    SignedTransactionWithStatus txWithStatus = SignedTransactionWithStatus(
+        transaction: tx, status: TransactionStatus.TRANSACTION_STATUS_UNKNOWN);
+
+    est.SignedTransactionWithStatus enrichedTx =
+        est.SignedTransactionWithStatus(txWithStatus);
     enrichedTx.sign(ed.PrivateKey(keyPair.value!.privateKey.bytes));
 
-    return enrichedTx.transaction;
+    return enrichedTx.txWithStatus;
   }
 }

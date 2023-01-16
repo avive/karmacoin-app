@@ -9,6 +9,7 @@
 #include <desktop_webview_auth/desktop_webview_auth_plugin.h>
 #include <desktop_window/desktop_window_plugin.h>
 #include <flutter_secure_storage_linux/flutter_secure_storage_linux_plugin.h>
+#include <r_crypto/r_crypto_plugin.h>
 
 void fl_register_plugins(FlPluginRegistry* registry) {
   g_autoptr(FlPluginRegistrar) desktop_webview_auth_registrar =
@@ -20,4 +21,7 @@ void fl_register_plugins(FlPluginRegistry* registry) {
   g_autoptr(FlPluginRegistrar) flutter_secure_storage_linux_registrar =
       fl_plugin_registry_get_registrar_for_plugin(registry, "FlutterSecureStorageLinuxPlugin");
   flutter_secure_storage_linux_plugin_register_with_registrar(flutter_secure_storage_linux_registrar);
+  g_autoptr(FlPluginRegistrar) r_crypto_registrar =
+      fl_plugin_registry_get_registrar_for_plugin(registry, "RCryptoPlugin");
+  r_crypto_plugin_register_with_registrar(r_crypto_registrar);
 }
