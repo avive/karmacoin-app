@@ -7,6 +7,7 @@ import 'package:karma_coin/services/api/api.pbgrpc.dart';
 import 'package:grpc/grpc.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/api/verifier.pbgrpc.dart' as verifier;
+import 'package:quiver/collection.dart';
 import 'dart:convert';
 import 'account_interface.dart';
 import 'package:karma_coin/data/kc_user.dart';
@@ -29,8 +30,6 @@ class AccountStoreKeys {
 /// Local karmaCoin account logic. We seperate between authentication and account. Authentication is handled by Firebase Auth.
 class AccountLogic extends AccountLogicInterface {
   final _secureStorage = const FlutterSecureStorage();
-  // ignore: unused_field
-  final ApiServiceClient _apiServiceClient;
 
   // ignore: unused_field
   final verifier.VerifierServiceClient _verifierServiceClient;
@@ -46,16 +45,7 @@ class AccountLogic extends AccountLogicInterface {
   // todo: add support to secure channel for production api usage
 
   AccountLogic()
-      : _apiServiceClient = ApiServiceClient(
-          ClientChannel(
-            settingsLogic.apiHostName.value,
-            port: settingsLogic.apiHostPort.value,
-            options: const ChannelOptions(
-                // todo: take this from settings
-                credentials: ChannelCredentials.insecure()),
-          ),
-        ),
-        _verifierServiceClient = verifier.VerifierServiceClient(
+      : _verifierServiceClient = verifier.VerifierServiceClient(
           ClientChannel(
             settingsLogic.apiHostName.value,
             port: settingsLogic.apiHostPort.value,
@@ -117,6 +107,35 @@ class AccountLogic extends AccountLogicInterface {
       _verifyNumberResponse =
           VerifyNumberResponse.fromBuffer(base64.decode(data));
     }
+
+    transactionBoss.newUserTransaction.addListener(() async {
+      // listen to new user transaction
+      if (transactionBoss.newUserTransaction.value == null) {
+        return;
+      }
+
+      SignedTransactionWithStatus tx =
+          transactionBoss.newUserTransaction.value!;
+      // set user as signed if there's a local karma user (user started the signup flow from this device)
+      // and that karma user id is same as the one in the transaction
+      if (karmaCoinUser.value == null) {
+        debugPrint('no local karma coin user found. ignoring...');
+        return;
+      }
+
+      if (listsEqual(karmaCoinUser.value!.userData.accountId.data,
+          tx.transaction.signer.data)) {
+        if (!signedUpOnChain.value) {
+          debugPrint('local user signed up on chain!');
+          await setSignedUp(true);
+        } else {
+          debugPrint(
+              'already set this user to be chain signed up. ignoring...');
+        }
+      } else {
+        debugPrint('signup tx by another user. ignoring...');
+      }
+    });
   }
 
   /// private helper to set keypair from seed
@@ -330,9 +349,6 @@ class AccountLogic extends AccountLogicInterface {
     // store it locally
     await updateKarmaCoinUserData(user);
 
-    // todo: register on transactionsBoss and listen for NewUser transaction for the local account
-    // so the isUserOnChain flag can be set to true once we see the new user transaction on chain
-
     return user;
   }
 
@@ -413,7 +429,7 @@ class AccountLogic extends AccountLogicInterface {
     SignedTransactionWithStatus signedTx = _createSignedTransaction(txData);
     SubmitTransactionResponse resp = SubmitTransactionResponse();
 
-    resp = await _apiServiceClient.submitTransaction(
+    resp = await apiClient.apiServiceClient.submitTransaction(
         SubmitTransactionRequest(transaction: signedTx.transaction));
 
     switch (resp.submitTransactionResult) {

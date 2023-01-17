@@ -1,5 +1,4 @@
 import 'package:karma_coin/logic/signup_controller.dart';
-
 import '../../common_libs.dart';
 
 /// A widget that displays the current signup status

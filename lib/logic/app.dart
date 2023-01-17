@@ -8,6 +8,8 @@ import 'package:karma_coin/logic/auth.dart';
 import 'package:karma_coin/logic/settings.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/logic/signup_controller.dart';
+import 'package:karma_coin/logic/txs_boss.dart';
+import 'package:karma_coin/logic/txs_boss_interface.dart';
 import 'package:karma_coin/logic/user_name_availability.dart';
 
 import 'account.dart';
@@ -25,6 +27,8 @@ AccountLogicInterface get accountLogic => GetIt.I.get<AccountLogicInterface>();
 UserNameAvailabilityLogic get userNameAvailabilityLogic =>
     GetIt.I.get<UserNameAvailabilityLogic>();
 SignUpController get signingUpLogic => GetIt.I.get<SignUpController>();
+TransactionsBossInterface get transactionBoss =>
+    GetIt.I.get<TransactionsBossInterface>();
 
 mixin AppLogicInterface {
   /// Indicates to the rest of the app that bootstrap has not completed.
@@ -62,6 +66,8 @@ class AppLogic with AppLogicInterface {
     GetIt.I.registerLazySingleton<UserNameAvailabilityLogic>(
         () => UserNameAvailabilityLogic());
     GetIt.I.registerLazySingleton<SignUpController>(() => SignUpController());
+    GetIt.I.registerLazySingleton<TransactionsBossInterface>(
+        () => TransactionsBoss());
   }
 
   /// Initialize the app and all main actors.
