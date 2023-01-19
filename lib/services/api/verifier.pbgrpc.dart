@@ -15,12 +15,6 @@ import 'types.pb.dart' as $2;
 export 'verifier.pb.dart';
 
 class VerifierServiceClient extends $grpc.Client {
-  static final _$registerNumber =
-      $grpc.ClientMethod<$1.RegisterNumberRequest, $1.RegisterNumberResponse>(
-          '/karma_coin.verifier.VerifierService/RegisterNumber',
-          ($1.RegisterNumberRequest value) => value.writeToBuffer(),
-          ($core.List<$core.int> value) =>
-              $1.RegisterNumberResponse.fromBuffer(value));
   static final _$verifyNumber =
       $grpc.ClientMethod<$1.VerifyNumberRequest, $2.VerifyNumberResponse>(
           '/karma_coin.verifier.VerifierService/VerifyNumber',
@@ -33,12 +27,6 @@ class VerifierServiceClient extends $grpc.Client {
       $core.Iterable<$grpc.ClientInterceptor>? interceptors})
       : super(channel, options: options, interceptors: interceptors);
 
-  $grpc.ResponseFuture<$1.RegisterNumberResponse> registerNumber(
-      $1.RegisterNumberRequest request,
-      {$grpc.CallOptions? options}) {
-    return $createUnaryCall(_$registerNumber, request, options: options);
-  }
-
   $grpc.ResponseFuture<$2.VerifyNumberResponse> verifyNumber(
       $1.VerifyNumberRequest request,
       {$grpc.CallOptions? options}) {
@@ -50,15 +38,6 @@ abstract class VerifierServiceBase extends $grpc.Service {
   $core.String get $name => 'karma_coin.verifier.VerifierService';
 
   VerifierServiceBase() {
-    $addMethod($grpc.ServiceMethod<$1.RegisterNumberRequest,
-            $1.RegisterNumberResponse>(
-        'RegisterNumber',
-        registerNumber_Pre,
-        false,
-        false,
-        ($core.List<$core.int> value) =>
-            $1.RegisterNumberRequest.fromBuffer(value),
-        ($1.RegisterNumberResponse value) => value.writeToBuffer()));
     $addMethod(
         $grpc.ServiceMethod<$1.VerifyNumberRequest, $2.VerifyNumberResponse>(
             'VerifyNumber',
@@ -70,20 +49,12 @@ abstract class VerifierServiceBase extends $grpc.Service {
             ($2.VerifyNumberResponse value) => value.writeToBuffer()));
   }
 
-  $async.Future<$1.RegisterNumberResponse> registerNumber_Pre(
-      $grpc.ServiceCall call,
-      $async.Future<$1.RegisterNumberRequest> request) async {
-    return registerNumber(call, await request);
-  }
-
   $async.Future<$2.VerifyNumberResponse> verifyNumber_Pre(
       $grpc.ServiceCall call,
       $async.Future<$1.VerifyNumberRequest> request) async {
     return verifyNumber(call, await request);
   }
 
-  $async.Future<$1.RegisterNumberResponse> registerNumber(
-      $grpc.ServiceCall call, $1.RegisterNumberRequest request);
   $async.Future<$2.VerifyNumberResponse> verifyNumber(
       $grpc.ServiceCall call, $1.VerifyNumberRequest request);
 }

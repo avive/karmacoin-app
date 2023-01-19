@@ -295,10 +295,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_native_splash
-      sha256: "6777a3abb974021a39b5fdd2d46a03ca390e03903b6351f21d10e7ecc969f12d"
+      sha256: "048bd1f1dc0e5ea25899f702815934d9a9e916fe23451c320e7dd94d5e3ad933"
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.16"
+    version: "2.2.17"
   flutter_secure_storage:
     dependency: "direct main"
     description:
@@ -457,10 +457,10 @@ packages:
     dependency: transitive
     description:
       name: image
-      sha256: "8e9d133755c3e84c73288363e6343157c383a0c6c56fc51afcc5d4d7180306d6"
+      sha256: "3f0cd7ca37d54521ad0f527f3c939c951ee2de9b4680c36388e46a99a56beda0"
       url: "https://pub.dev"
     source: hosted
-    version: "3.3.0"
+    version: "4.0.10"
   internet_connection_checker:
     dependency: "direct main"
     description:
@@ -677,14 +677,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.1"
-  r_crypto:
-    dependency: "direct main"
-    description:
-      name: r_crypto
-      sha256: a454318937c142dfa9ef47e6723a3cc1b9683b2bc88550597553188861a3664b
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.5.0"
   shared_preferences:
     dependency: "direct main"
     description:

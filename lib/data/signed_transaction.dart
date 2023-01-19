@@ -2,8 +2,8 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/api/types.pb.dart' as types;
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:protobuf/protobuf.dart';
-import 'package:r_crypto/r_crypto.dart';
 import '../services/api/types.pbenum.dart';
+import 'package:crypto/crypto.dart';
 
 /// An extension class over vt.VerifyNumberRequest to support signing and verification
 class SignedTransactionWithStatus {
@@ -47,10 +47,7 @@ class SignedTransactionWithStatus {
 
   /// Returns the canonical tx hash - used for indexing
   List<int> getHash() {
-    // We use balke3 with the default length of 32 bytes output
-
-    // todo: consider adding networkId as salt to the hash
-    return rHash.hashList(const HashType.blake3(length: 32),
-        txWithStatus.transaction.writeToBuffer());
+    // we downgraded to sha256 as blake dart libs such as r_crypto are native only
+    return sha256.convert(txWithStatus.transaction.writeToBuffer()).bytes;
   }
 }

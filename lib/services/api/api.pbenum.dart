@@ -10,11 +10,11 @@ import 'dart:core' as $core;
 import 'package:protobuf/protobuf.dart' as $pb;
 
 class SubmitTransactionResult extends $pb.ProtobufEnum {
-  static const SubmitTransactionResult SUBMIT_TRANSACTION_RESULT_INVALID = SubmitTransactionResult._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'SUBMIT_TRANSACTION_RESULT_INVALID');
+  static const SubmitTransactionResult SUBMIT_TRANSACTION_RESULT_REJECTED = SubmitTransactionResult._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'SUBMIT_TRANSACTION_RESULT_REJECTED');
   static const SubmitTransactionResult SUBMIT_TRANSACTION_RESULT_SUBMITTED = SubmitTransactionResult._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'SUBMIT_TRANSACTION_RESULT_SUBMITTED');
 
   static const $core.List<SubmitTransactionResult> values = <SubmitTransactionResult> [
-    SUBMIT_TRANSACTION_RESULT_INVALID,
+    SUBMIT_TRANSACTION_RESULT_REJECTED,
     SUBMIT_TRANSACTION_RESULT_SUBMITTED,
   ];
 

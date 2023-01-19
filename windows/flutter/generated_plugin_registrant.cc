@@ -9,7 +9,6 @@
 #include <desktop_webview_auth/desktop_webview_auth_plugin.h>
 #include <desktop_window/desktop_window_plugin.h>
 #include <flutter_secure_storage_windows/flutter_secure_storage_windows_plugin.h>
-#include <r_crypto/r_crypto_plugin.h>
 
 void RegisterPlugins(flutter::PluginRegistry* registry) {
   DesktopWebviewAuthPluginRegisterWithRegistrar(
@@ -18,6 +17,4 @@ void RegisterPlugins(flutter::PluginRegistry* registry) {
       registry->GetRegistrarForPlugin("DesktopWindowPlugin"));
   FlutterSecureStorageWindowsPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("FlutterSecureStorageWindowsPlugin"));
-  RCryptoPluginRegisterWithRegistrar(
-      registry->GetRegistrarForPlugin("RCryptoPlugin"));
 }

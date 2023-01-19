@@ -14,12 +14,12 @@ import 'api.pb.dart' as $0;
 export 'api.pb.dart';
 
 class ApiServiceClient extends $grpc.Client {
-  static final _$getUserInfoByNick = $grpc.ClientMethod<
-          $0.GetUserInfoByNickRequest, $0.GetUserInfoByNickResponse>(
-      '/karma_coin.api.ApiService/GetUserInfoByNick',
-      ($0.GetUserInfoByNickRequest value) => value.writeToBuffer(),
+  static final _$getUserInfoByUserName = $grpc.ClientMethod<
+          $0.GetUserInfoByUserNameRequest, $0.GetUserInfoByUserNameResponse>(
+      '/karma_coin.api.ApiService/GetUserInfoByUserName',
+      ($0.GetUserInfoByUserNameRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) =>
-          $0.GetUserInfoByNickResponse.fromBuffer(value));
+          $0.GetUserInfoByUserNameResponse.fromBuffer(value));
   static final _$getUserInfoByNumber = $grpc.ClientMethod<
           $0.GetUserInfoByNumberRequest, $0.GetUserInfoByNumberResponse>(
       '/karma_coin.api.ApiService/GetUserInfoByNumber',
@@ -80,10 +80,10 @@ class ApiServiceClient extends $grpc.Client {
       $core.Iterable<$grpc.ClientInterceptor>? interceptors})
       : super(channel, options: options, interceptors: interceptors);
 
-  $grpc.ResponseFuture<$0.GetUserInfoByNickResponse> getUserInfoByNick(
-      $0.GetUserInfoByNickRequest request,
+  $grpc.ResponseFuture<$0.GetUserInfoByUserNameResponse> getUserInfoByUserName(
+      $0.GetUserInfoByUserNameRequest request,
       {$grpc.CallOptions? options}) {
-    return $createUnaryCall(_$getUserInfoByNick, request, options: options);
+    return $createUnaryCall(_$getUserInfoByUserName, request, options: options);
   }
 
   $grpc.ResponseFuture<$0.GetUserInfoByNumberResponse> getUserInfoByNumber(
@@ -145,15 +145,15 @@ abstract class ApiServiceBase extends $grpc.Service {
   $core.String get $name => 'karma_coin.api.ApiService';
 
   ApiServiceBase() {
-    $addMethod($grpc.ServiceMethod<$0.GetUserInfoByNickRequest,
-            $0.GetUserInfoByNickResponse>(
-        'GetUserInfoByNick',
-        getUserInfoByNick_Pre,
+    $addMethod($grpc.ServiceMethod<$0.GetUserInfoByUserNameRequest,
+            $0.GetUserInfoByUserNameResponse>(
+        'GetUserInfoByUserName',
+        getUserInfoByUserName_Pre,
         false,
         false,
         ($core.List<$core.int> value) =>
-            $0.GetUserInfoByNickRequest.fromBuffer(value),
-        ($0.GetUserInfoByNickResponse value) => value.writeToBuffer()));
+            $0.GetUserInfoByUserNameRequest.fromBuffer(value),
+        ($0.GetUserInfoByUserNameResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.GetUserInfoByNumberRequest,
             $0.GetUserInfoByNumberResponse>(
         'GetUserInfoByNumber',
@@ -235,10 +235,10 @@ abstract class ApiServiceBase extends $grpc.Service {
         ($0.GetBlocksResponse value) => value.writeToBuffer()));
   }
 
-  $async.Future<$0.GetUserInfoByNickResponse> getUserInfoByNick_Pre(
+  $async.Future<$0.GetUserInfoByUserNameResponse> getUserInfoByUserName_Pre(
       $grpc.ServiceCall call,
-      $async.Future<$0.GetUserInfoByNickRequest> request) async {
-    return getUserInfoByNick(call, await request);
+      $async.Future<$0.GetUserInfoByUserNameRequest> request) async {
+    return getUserInfoByUserName(call, await request);
   }
 
   $async.Future<$0.GetUserInfoByNumberResponse> getUserInfoByNumber_Pre(
@@ -294,8 +294,8 @@ abstract class ApiServiceBase extends $grpc.Service {
     return getBlocks(call, await request);
   }
 
-  $async.Future<$0.GetUserInfoByNickResponse> getUserInfoByNick(
-      $grpc.ServiceCall call, $0.GetUserInfoByNickRequest request);
+  $async.Future<$0.GetUserInfoByUserNameResponse> getUserInfoByUserName(
+      $grpc.ServiceCall call, $0.GetUserInfoByUserNameRequest request);
   $async.Future<$0.GetUserInfoByNumberResponse> getUserInfoByNumber(
       $grpc.ServiceCall call, $0.GetUserInfoByNumberRequest request);
   $async.Future<$0.GetUserInfoByAccountResponse> getUserInfoByAccount(

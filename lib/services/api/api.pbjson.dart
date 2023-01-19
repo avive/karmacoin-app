@@ -12,33 +12,33 @@ import 'dart:typed_data' as $typed_data;
 const SubmitTransactionResult$json = const {
   '1': 'SubmitTransactionResult',
   '2': const [
-    const {'1': 'SUBMIT_TRANSACTION_RESULT_INVALID', '2': 0},
+    const {'1': 'SUBMIT_TRANSACTION_RESULT_REJECTED', '2': 0},
     const {'1': 'SUBMIT_TRANSACTION_RESULT_SUBMITTED', '2': 1},
   ],
 };
 
 /// Descriptor for `SubmitTransactionResult`. Decode as a `google.protobuf.EnumDescriptorProto`.
-final $typed_data.Uint8List submitTransactionResultDescriptor = $convert.base64Decode('ChdTdWJtaXRUcmFuc2FjdGlvblJlc3VsdBIlCiFTVUJNSVRfVFJBTlNBQ1RJT05fUkVTVUxUX0lOVkFMSUQQABInCiNTVUJNSVRfVFJBTlNBQ1RJT05fUkVTVUxUX1NVQk1JVFRFRBAB');
-@$core.Deprecated('Use getUserInfoByNickRequestDescriptor instead')
-const GetUserInfoByNickRequest$json = const {
-  '1': 'GetUserInfoByNickRequest',
+final $typed_data.Uint8List submitTransactionResultDescriptor = $convert.base64Decode('ChdTdWJtaXRUcmFuc2FjdGlvblJlc3VsdBImCiJTVUJNSVRfVFJBTlNBQ1RJT05fUkVTVUxUX1JFSkVDVEVEEAASJwojU1VCTUlUX1RSQU5TQUNUSU9OX1JFU1VMVF9TVUJNSVRURUQQAQ==');
+@$core.Deprecated('Use getUserInfoByUserNameRequestDescriptor instead')
+const GetUserInfoByUserNameRequest$json = const {
+  '1': 'GetUserInfoByUserNameRequest',
   '2': const [
-    const {'1': 'nickname', '3': 1, '4': 1, '5': 9, '10': 'nickname'},
+    const {'1': 'user_name', '3': 1, '4': 1, '5': 9, '10': 'userName'},
   ],
 };
 
-/// Descriptor for `GetUserInfoByNickRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List getUserInfoByNickRequestDescriptor = $convert.base64Decode('ChhHZXRVc2VySW5mb0J5Tmlja1JlcXVlc3QSGgoIbmlja25hbWUYASABKAlSCG5pY2tuYW1l');
-@$core.Deprecated('Use getUserInfoByNickResponseDescriptor instead')
-const GetUserInfoByNickResponse$json = const {
-  '1': 'GetUserInfoByNickResponse',
+/// Descriptor for `GetUserInfoByUserNameRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getUserInfoByUserNameRequestDescriptor = $convert.base64Decode('ChxHZXRVc2VySW5mb0J5VXNlck5hbWVSZXF1ZXN0EhsKCXVzZXJfbmFtZRgBIAEoCVIIdXNlck5hbWU=');
+@$core.Deprecated('Use getUserInfoByUserNameResponseDescriptor instead')
+const GetUserInfoByUserNameResponse$json = const {
+  '1': 'GetUserInfoByUserNameResponse',
   '2': const [
     const {'1': 'user', '3': 1, '4': 1, '5': 11, '6': '.karma_coin.core_types.User', '10': 'user'},
   ],
 };
 
-/// Descriptor for `GetUserInfoByNickResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List getUserInfoByNickResponseDescriptor = $convert.base64Decode('ChlHZXRVc2VySW5mb0J5Tmlja1Jlc3BvbnNlEi8KBHVzZXIYASABKAsyGy5rYXJtYV9jb2luLmNvcmVfdHlwZXMuVXNlclIEdXNlcg==');
+/// Descriptor for `GetUserInfoByUserNameResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getUserInfoByUserNameResponseDescriptor = $convert.base64Decode('Ch1HZXRVc2VySW5mb0J5VXNlck5hbWVSZXNwb25zZRIvCgR1c2VyGAEgASgLMhsua2FybWFfY29pbi5jb3JlX3R5cGVzLlVzZXJSBHVzZXI=');
 @$core.Deprecated('Use submitTransactionRequestDescriptor instead')
 const SubmitTransactionRequest$json = const {
   '1': 'SubmitTransactionRequest',

@@ -11,10 +11,6 @@ import 'package:protobuf/protobuf.dart' as $pb;
 
 import 'types.pb.dart' as $2;
 
-import 'verifier.pbenum.dart';
-
-export 'verifier.pbenum.dart';
-
 class VerifierInfo extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'VerifierInfo', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'karma_coin.verifier'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
@@ -150,186 +146,12 @@ class VerifierInfo extends $pb.GeneratedMessage {
   $2.Signature ensureSignature() => $_ensure(6);
 }
 
-class RegisterNumberRequest extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'RegisterNumberRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'karma_coin.verifier'), createEmptyInstance: create)
-    ..aOM<$2.AccountId>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'accountId', subBuilder: $2.AccountId.create)
-    ..aOM<$2.MobileNumber>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'mobileNumber', subBuilder: $2.MobileNumber.create)
-    ..aOM<$2.Signature>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'signature', subBuilder: $2.Signature.create)
-    ..hasRequiredFields = false
-  ;
-
-  RegisterNumberRequest._() : super();
-  factory RegisterNumberRequest({
-    $2.AccountId? accountId,
-    $2.MobileNumber? mobileNumber,
-    $2.Signature? signature,
-  }) {
-    final _result = create();
-    if (accountId != null) {
-      _result.accountId = accountId;
-    }
-    if (mobileNumber != null) {
-      _result.mobileNumber = mobileNumber;
-    }
-    if (signature != null) {
-      _result.signature = signature;
-    }
-    return _result;
-  }
-  factory RegisterNumberRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory RegisterNumberRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
-  RegisterNumberRequest clone() => RegisterNumberRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  RegisterNumberRequest copyWith(void Function(RegisterNumberRequest) updates) => super.copyWith((message) => updates(message as RegisterNumberRequest)) as RegisterNumberRequest; // ignore: deprecated_member_use
-  $pb.BuilderInfo get info_ => _i;
-  @$core.pragma('dart2js:noInline')
-  static RegisterNumberRequest create() => RegisterNumberRequest._();
-  RegisterNumberRequest createEmptyInstance() => create();
-  static $pb.PbList<RegisterNumberRequest> createRepeated() => $pb.PbList<RegisterNumberRequest>();
-  @$core.pragma('dart2js:noInline')
-  static RegisterNumberRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<RegisterNumberRequest>(create);
-  static RegisterNumberRequest? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $2.AccountId get accountId => $_getN(0);
-  @$pb.TagNumber(1)
-  set accountId($2.AccountId v) { setField(1, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasAccountId() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearAccountId() => clearField(1);
-  @$pb.TagNumber(1)
-  $2.AccountId ensureAccountId() => $_ensure(0);
-
-  @$pb.TagNumber(2)
-  $2.MobileNumber get mobileNumber => $_getN(1);
-  @$pb.TagNumber(2)
-  set mobileNumber($2.MobileNumber v) { setField(2, v); }
-  @$pb.TagNumber(2)
-  $core.bool hasMobileNumber() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearMobileNumber() => clearField(2);
-  @$pb.TagNumber(2)
-  $2.MobileNumber ensureMobileNumber() => $_ensure(1);
-
-  @$pb.TagNumber(3)
-  $2.Signature get signature => $_getN(2);
-  @$pb.TagNumber(3)
-  set signature($2.Signature v) { setField(3, v); }
-  @$pb.TagNumber(3)
-  $core.bool hasSignature() => $_has(2);
-  @$pb.TagNumber(3)
-  void clearSignature() => clearField(3);
-  @$pb.TagNumber(3)
-  $2.Signature ensureSignature() => $_ensure(2);
-}
-
-class RegisterNumberResponse extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'RegisterNumberResponse', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'karma_coin.verifier'), createEmptyInstance: create)
-    ..aOM<$2.AccountId>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'accountId', subBuilder: $2.AccountId.create)
-    ..e<RegisterNumberResult>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'result', $pb.PbFieldType.OE, defaultOrMaker: RegisterNumberResult.REGISTER_NUMBER_RESULT_INVALID_NUMBER, valueOf: RegisterNumberResult.valueOf, enumValues: RegisterNumberResult.values)
-    ..a<$core.int>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'code', $pb.PbFieldType.O3)
-    ..aOM<$2.Signature>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'signature', subBuilder: $2.Signature.create)
-    ..hasRequiredFields = false
-  ;
-
-  RegisterNumberResponse._() : super();
-  factory RegisterNumberResponse({
-    $2.AccountId? accountId,
-    RegisterNumberResult? result,
-    $core.int? code,
-    $2.Signature? signature,
-  }) {
-    final _result = create();
-    if (accountId != null) {
-      _result.accountId = accountId;
-    }
-    if (result != null) {
-      _result.result = result;
-    }
-    if (code != null) {
-      _result.code = code;
-    }
-    if (signature != null) {
-      _result.signature = signature;
-    }
-    return _result;
-  }
-  factory RegisterNumberResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory RegisterNumberResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
-  RegisterNumberResponse clone() => RegisterNumberResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  RegisterNumberResponse copyWith(void Function(RegisterNumberResponse) updates) => super.copyWith((message) => updates(message as RegisterNumberResponse)) as RegisterNumberResponse; // ignore: deprecated_member_use
-  $pb.BuilderInfo get info_ => _i;
-  @$core.pragma('dart2js:noInline')
-  static RegisterNumberResponse create() => RegisterNumberResponse._();
-  RegisterNumberResponse createEmptyInstance() => create();
-  static $pb.PbList<RegisterNumberResponse> createRepeated() => $pb.PbList<RegisterNumberResponse>();
-  @$core.pragma('dart2js:noInline')
-  static RegisterNumberResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<RegisterNumberResponse>(create);
-  static RegisterNumberResponse? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $2.AccountId get accountId => $_getN(0);
-  @$pb.TagNumber(1)
-  set accountId($2.AccountId v) { setField(1, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasAccountId() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearAccountId() => clearField(1);
-  @$pb.TagNumber(1)
-  $2.AccountId ensureAccountId() => $_ensure(0);
-
-  @$pb.TagNumber(2)
-  RegisterNumberResult get result => $_getN(1);
-  @$pb.TagNumber(2)
-  set result(RegisterNumberResult v) { setField(2, v); }
-  @$pb.TagNumber(2)
-  $core.bool hasResult() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearResult() => clearField(2);
-
-  @$pb.TagNumber(3)
-  $core.int get code => $_getIZ(2);
-  @$pb.TagNumber(3)
-  set code($core.int v) { $_setSignedInt32(2, v); }
-  @$pb.TagNumber(3)
-  $core.bool hasCode() => $_has(2);
-  @$pb.TagNumber(3)
-  void clearCode() => clearField(3);
-
-  @$pb.TagNumber(4)
-  $2.Signature get signature => $_getN(3);
-  @$pb.TagNumber(4)
-  set signature($2.Signature v) { setField(4, v); }
-  @$pb.TagNumber(4)
-  $core.bool hasSignature() => $_has(3);
-  @$pb.TagNumber(4)
-  void clearSignature() => clearField(4);
-  @$pb.TagNumber(4)
-  $2.Signature ensureSignature() => $_ensure(3);
-}
-
 class VerifyNumberRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'VerifyNumberRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'karma_coin.verifier'), createEmptyInstance: create)
     ..aOM<$2.AccountId>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'accountId', subBuilder: $2.AccountId.create)
     ..aOM<$2.MobileNumber>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'mobileNumber', subBuilder: $2.MobileNumber.create)
     ..a<$core.int>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'code', $pb.PbFieldType.O3)
-    ..aOS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'nickname')
+    ..aOS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'requestedUserName')
     ..aOM<$2.Signature>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'signature', subBuilder: $2.Signature.create)
     ..hasRequiredFields = false
   ;
@@ -339,7 +161,7 @@ class VerifyNumberRequest extends $pb.GeneratedMessage {
     $2.AccountId? accountId,
     $2.MobileNumber? mobileNumber,
     $core.int? code,
-    $core.String? nickname,
+    $core.String? requestedUserName,
     $2.Signature? signature,
   }) {
     final _result = create();
@@ -352,8 +174,8 @@ class VerifyNumberRequest extends $pb.GeneratedMessage {
     if (code != null) {
       _result.code = code;
     }
-    if (nickname != null) {
-      _result.nickname = nickname;
+    if (requestedUserName != null) {
+      _result.requestedUserName = requestedUserName;
     }
     if (signature != null) {
       _result.signature = signature;
@@ -413,13 +235,13 @@ class VerifyNumberRequest extends $pb.GeneratedMessage {
   void clearCode() => clearField(3);
 
   @$pb.TagNumber(4)
-  $core.String get nickname => $_getSZ(3);
+  $core.String get requestedUserName => $_getSZ(3);
   @$pb.TagNumber(4)
-  set nickname($core.String v) { $_setString(3, v); }
+  set requestedUserName($core.String v) { $_setString(3, v); }
   @$pb.TagNumber(4)
-  $core.bool hasNickname() => $_has(3);
+  $core.bool hasRequestedUserName() => $_has(3);
   @$pb.TagNumber(4)
-  void clearNickname() => clearField(4);
+  void clearRequestedUserName() => clearField(4);
 
   @$pb.TagNumber(5)
   $2.Signature get signature => $_getN(4);

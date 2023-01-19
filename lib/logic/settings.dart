@@ -3,6 +3,8 @@ import 'package:karma_coin/common/save_load_mixin.dart';
 
 // todo: add settings interface
 
+// todo: add genesis config file and get verifier info from it and not from settings
+
 /// App settings logic
 class SettingsLogic with ThrottledSaveLoadMixin {
   @override
@@ -29,6 +31,11 @@ class SettingsLogic with ThrottledSaveLoadMixin {
   late final verifierSecureConnection = ValueNotifier<bool>(false)
     ..addListener(scheduleSave);
 
+  // this is default dev mode verifier account id.
+  late final verifierAccountId = ValueNotifier<String>(
+      'a885bf7ac670b0f01a3551740020e115641005a93f59472002bfd1dc665f4a4e')
+    ..addListener(scheduleSave);
+
   // requested user name entered by the user. For the canonical user-name, check AccountLogic
   late final requestedUserName = ValueNotifier<String>('')
     ..addListener(scheduleSave);
@@ -50,6 +57,8 @@ class SettingsLogic with ThrottledSaveLoadMixin {
     verifierSecureConnection.value = value['apiSecureConnection'] ?? false;
 
     requestedUserName.value = value['requestedUserName'] ?? '127.0.0.1';
+    verifierAccountId.value = value['verifierAccountId'] ??
+        'a885bf7ac670b0f01a3551740020e115641005a93f59472002bfd1dc665f4a4e';
   }
 
   @override
