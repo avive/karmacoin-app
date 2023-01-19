@@ -4,8 +4,6 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/services/api/api.pbgrpc.dart';
 
-import '../services/api/types.pbenum.dart';
-
 abstract class AccountLogicInterface {
   /// Init account logic
   Future<void> init();
@@ -57,7 +55,7 @@ abstract class AccountLogicInterface {
   Future<KarmaCoinUser> createNewKarmaCoinUser();
 
   // Verify user's phone number and account id
-  Future<VerifyNumberResult> verifyPhoneNumber();
+  Future<void> verifyPhoneNumber();
 
   // Submit a new user transaction to the chain with local user data
   Future<SubmitTransactionResponse> submitNewUserTransacation();

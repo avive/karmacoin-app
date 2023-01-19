@@ -352,17 +352,16 @@ class AccountLogic extends AccountLogicInterface {
     return user;
   }
 
-  /// Verify the user's phone number and account id, store response
-  /// and return verification result
+  /// Verify the user's phone number and account id, store verification response
   @override
-  Future<VerifyNumberResult> verifyPhoneNumber() async {
+  Future<void> verifyPhoneNumber() async {
     // todo: prepare rqeuest and sign it!
 
     data.VerifyNumberRequest requestData = data.VerifyNumberRequest(
       verifier.VerifyNumberRequest(
         mobileNumber: MobileNumber(number: phoneNumber.value!),
         accountId: AccountId(data: keyPair.value!.publicKey.bytes),
-        nickname: userName.value,
+        requestedUserName: userName.value,
       ),
     );
 
@@ -390,8 +389,6 @@ class AccountLogic extends AccountLogicInterface {
 
     // keep it in memory for this session
     _verifyNumberResponse = response;
-
-    return response.result;
   }
 
   /// Returns true iff account logic has all required data to verify the user's phone number
@@ -434,7 +431,7 @@ class AccountLogic extends AccountLogicInterface {
 
     switch (resp.submitTransactionResult) {
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
-        signedTx.status = TransactionStatus.TRANSACTION_STATUS_PENDING;
+        signedTx.status = TransactionStatus.TRANSACTION_STATUS_SUBMITTED;
 
         debugPrint('submitNewUserTransacation success!');
 
@@ -443,19 +440,13 @@ class AccountLogic extends AccountLogicInterface {
         // increment user's nonce and store it locally
         await karmaCoinUser.value!.incNonce();
         break;
-      case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_INVALID:
+      case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
         signedTx.status = TransactionStatus.TRANSACTION_STATUS_REJECTED;
 
         // todo: store the transactionWithStatus in local storage via tx boss
 
         // throw so clients deal with this
         throw Exception('submitNewUserTransacation rejected by network!');
-      default:
-        signedTx.status = TransactionStatus.TRANSACTION_STATUS_REJECTED;
-
-        // todo: store the transactionWithStatus in local storage via tx boss
-
-        throw Exception('unexpected submitNewUserTransacation result!');
     }
 
     return resp;

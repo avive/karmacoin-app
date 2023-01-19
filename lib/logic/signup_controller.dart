@@ -1,6 +1,4 @@
 import 'package:karma_coin/services/api/api.pbgrpc.dart';
-import 'package:karma_coin/services/api/types.pb.dart';
-
 import '../common_libs.dart';
 
 enum SignUpStatus {
@@ -56,12 +54,8 @@ class SignUpController extends ChangeNotifier {
       return;
     }
 
-    // todo: add unknown type in the api
-    VerifyNumberResult result =
-        VerifyNumberResult.VERIFY_NUMBER_RESULT_VERIFIED;
-
     try {
-      result = await accountLogic.verifyPhoneNumber();
+      await accountLogic.verifyPhoneNumber();
     } catch (e) {
       _errorMessge = 'Verification error - please try again later';
       _status = SignUpStatus.validatorError;
@@ -69,40 +63,7 @@ class SignUpController extends ChangeNotifier {
       return;
     }
 
-    switch (result) {
-      case VerifyNumberResult.VERIFY_NUMBER_RESULT_VERIFIED:
-        await submitSignupTransaction();
-        break;
-      case VerifyNumberResult.VERIFY_NUMBER_RESULT_INVALID_SIGNATURE:
-        // bad user signature on verificaiton request
-        _errorMessge = 'Verification error - invalid user signature';
-        _status = SignUpStatus.validatorError;
-        notifyListeners();
-        break;
-      case VerifyNumberResult
-          .VERIFY_NUMBER_RESULT_NUMBER_ALREADY_REGISTERED_OTHER_ACCOUNT:
-
-        // todo: prompt user to restore his account that is registered with this phone number
-        _errorMessge = 'Phone number already user by another account';
-        _status = SignUpStatus.validatorError;
-        notifyListeners();
-        break;
-      case VerifyNumberResult
-          .VERIFY_NUMBER_RESULT_NUMBER_ALREADY_REGISTERED_THIS_ACCOUNT:
-        // todo: change the server to just return VERIFED in this case. it is not an error.
-        await submitSignupTransaction();
-        break;
-      case VerifyNumberResult.VERIFY_NUMBER_RESULT_NICKNAME_TAKEN:
-        _errorMessge =
-            'User name already taken. todo: prompt user to set new user name - button';
-        _status = SignUpStatus.validatorError;
-        notifyListeners();
-        break;
-      case VerifyNumberResult.VERIFY_NUMBER_RESULT_INVALID_CODE:
-        // todo: change server to remove this case - no code is involved
-        notifyListeners();
-        break;
-    }
+    await submitSignupTransaction();
   }
 
   // Second step in signup process - submit transaction with valid validation evidence
