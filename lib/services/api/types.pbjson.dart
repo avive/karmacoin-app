@@ -271,13 +271,13 @@ const VerifyNumberResponse$json = const {
     const {'1': 'timestamp', '3': 2, '4': 1, '5': 4, '10': 'timestamp'},
     const {'1': 'account_id', '3': 3, '4': 1, '5': 11, '6': '.karma_coin.core_types.AccountId', '10': 'accountId'},
     const {'1': 'mobile_number', '3': 4, '4': 1, '5': 11, '6': '.karma_coin.core_types.MobileNumber', '10': 'mobileNumber'},
-    const {'1': 'user_name', '3': 5, '4': 1, '5': 9, '10': 'userName'},
+    const {'1': 'requested_user_name', '3': 5, '4': 1, '5': 9, '10': 'requestedUserName'},
     const {'1': 'signature', '3': 6, '4': 1, '5': 11, '6': '.karma_coin.core_types.Signature', '10': 'signature'},
   ],
 };
 
 /// Descriptor for `VerifyNumberResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List verifyNumberResponseDescriptor = $convert.base64Decode('ChRWZXJpZnlOdW1iZXJSZXNwb25zZRJQChN2ZXJpZmllcl9hY2NvdW50X2lkGAEgASgLMiAua2FybWFfY29pbi5jb3JlX3R5cGVzLkFjY291bnRJZFIRdmVyaWZpZXJBY2NvdW50SWQSHAoJdGltZXN0YW1wGAIgASgEUgl0aW1lc3RhbXASPwoKYWNjb3VudF9pZBgDIAEoCzIgLmthcm1hX2NvaW4uY29yZV90eXBlcy5BY2NvdW50SWRSCWFjY291bnRJZBJICg1tb2JpbGVfbnVtYmVyGAQgASgLMiMua2FybWFfY29pbi5jb3JlX3R5cGVzLk1vYmlsZU51bWJlclIMbW9iaWxlTnVtYmVyEhsKCXVzZXJfbmFtZRgFIAEoCVIIdXNlck5hbWUSPgoJc2lnbmF0dXJlGAYgASgLMiAua2FybWFfY29pbi5jb3JlX3R5cGVzLlNpZ25hdHVyZVIJc2lnbmF0dXJl');
+final $typed_data.Uint8List verifyNumberResponseDescriptor = $convert.base64Decode('ChRWZXJpZnlOdW1iZXJSZXNwb25zZRJQChN2ZXJpZmllcl9hY2NvdW50X2lkGAEgASgLMiAua2FybWFfY29pbi5jb3JlX3R5cGVzLkFjY291bnRJZFIRdmVyaWZpZXJBY2NvdW50SWQSHAoJdGltZXN0YW1wGAIgASgEUgl0aW1lc3RhbXASPwoKYWNjb3VudF9pZBgDIAEoCzIgLmthcm1hX2NvaW4uY29yZV90eXBlcy5BY2NvdW50SWRSCWFjY291bnRJZBJICg1tb2JpbGVfbnVtYmVyGAQgASgLMiMua2FybWFfY29pbi5jb3JlX3R5cGVzLk1vYmlsZU51bWJlclIMbW9iaWxlTnVtYmVyEi4KE3JlcXVlc3RlZF91c2VyX25hbWUYBSABKAlSEXJlcXVlc3RlZFVzZXJOYW1lEj4KCXNpZ25hdHVyZRgGIAEoCzIgLmthcm1hX2NvaW4uY29yZV90eXBlcy5TaWduYXR1cmVSCXNpZ25hdHVyZQ==');
 @$core.Deprecated('Use newUserTransactionV1Descriptor instead')
 const NewUserTransactionV1$json = const {
   '1': 'NewUserTransactionV1',

@@ -28,13 +28,13 @@ final $typed_data.Uint8List verifierInfoDescriptor = $convert.base64Decode('CgxW
 const VerifyNumberRequest$json = const {
   '1': 'VerifyNumberRequest',
   '2': const [
-    const {'1': 'account_id', '3': 1, '4': 1, '5': 11, '6': '.karma_coin.core_types.AccountId', '10': 'accountId'},
-    const {'1': 'mobile_number', '3': 2, '4': 1, '5': 11, '6': '.karma_coin.core_types.MobileNumber', '10': 'mobileNumber'},
-    const {'1': 'code', '3': 3, '4': 1, '5': 5, '10': 'code'},
+    const {'1': 'timestamp', '3': 1, '4': 1, '5': 4, '10': 'timestamp'},
+    const {'1': 'account_id', '3': 2, '4': 1, '5': 11, '6': '.karma_coin.core_types.AccountId', '10': 'accountId'},
+    const {'1': 'mobile_number', '3': 3, '4': 1, '5': 11, '6': '.karma_coin.core_types.MobileNumber', '10': 'mobileNumber'},
     const {'1': 'requested_user_name', '3': 4, '4': 1, '5': 9, '10': 'requestedUserName'},
     const {'1': 'signature', '3': 5, '4': 1, '5': 11, '6': '.karma_coin.core_types.Signature', '10': 'signature'},
   ],
 };
 
 /// Descriptor for `VerifyNumberRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List verifyNumberRequestDescriptor = $convert.base64Decode('ChNWZXJpZnlOdW1iZXJSZXF1ZXN0Ej8KCmFjY291bnRfaWQYASABKAsyIC5rYXJtYV9jb2luLmNvcmVfdHlwZXMuQWNjb3VudElkUglhY2NvdW50SWQSSAoNbW9iaWxlX251bWJlchgCIAEoCzIjLmthcm1hX2NvaW4uY29yZV90eXBlcy5Nb2JpbGVOdW1iZXJSDG1vYmlsZU51bWJlchISCgRjb2RlGAMgASgFUgRjb2RlEi4KE3JlcXVlc3RlZF91c2VyX25hbWUYBCABKAlSEXJlcXVlc3RlZFVzZXJOYW1lEj4KCXNpZ25hdHVyZRgFIAEoCzIgLmthcm1hX2NvaW4uY29yZV90eXBlcy5TaWduYXR1cmVSCXNpZ25hdHVyZQ==');
+final $typed_data.Uint8List verifyNumberRequestDescriptor = $convert.base64Decode('ChNWZXJpZnlOdW1iZXJSZXF1ZXN0EhwKCXRpbWVzdGFtcBgBIAEoBFIJdGltZXN0YW1wEj8KCmFjY291bnRfaWQYAiABKAsyIC5rYXJtYV9jb2luLmNvcmVfdHlwZXMuQWNjb3VudElkUglhY2NvdW50SWQSSAoNbW9iaWxlX251bWJlchgDIAEoCzIjLmthcm1hX2NvaW4uY29yZV90eXBlcy5Nb2JpbGVOdW1iZXJSDG1vYmlsZU51bWJlchIuChNyZXF1ZXN0ZWRfdXNlcl9uYW1lGAQgASgJUhFyZXF1ZXN0ZWRVc2VyTmFtZRI+CglzaWduYXR1cmUYBSABKAsyIC5rYXJtYV9jb2luLmNvcmVfdHlwZXMuU2lnbmF0dXJlUglzaWduYXR1cmU=');

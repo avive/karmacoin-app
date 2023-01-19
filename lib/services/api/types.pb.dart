@@ -1149,7 +1149,7 @@ class VerifyNumberResponse extends $pb.GeneratedMessage {
     ..a<$fixnum.Int64>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'timestamp', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
     ..aOM<AccountId>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'accountId', subBuilder: AccountId.create)
     ..aOM<MobileNumber>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'mobileNumber', subBuilder: MobileNumber.create)
-    ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'userName')
+    ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'requestedUserName')
     ..aOM<Signature>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'signature', subBuilder: Signature.create)
     ..hasRequiredFields = false
   ;
@@ -1160,7 +1160,7 @@ class VerifyNumberResponse extends $pb.GeneratedMessage {
     $fixnum.Int64? timestamp,
     AccountId? accountId,
     MobileNumber? mobileNumber,
-    $core.String? userName,
+    $core.String? requestedUserName,
     Signature? signature,
   }) {
     final _result = create();
@@ -1176,8 +1176,8 @@ class VerifyNumberResponse extends $pb.GeneratedMessage {
     if (mobileNumber != null) {
       _result.mobileNumber = mobileNumber;
     }
-    if (userName != null) {
-      _result.userName = userName;
+    if (requestedUserName != null) {
+      _result.requestedUserName = requestedUserName;
     }
     if (signature != null) {
       _result.signature = signature;
@@ -1248,13 +1248,13 @@ class VerifyNumberResponse extends $pb.GeneratedMessage {
   MobileNumber ensureMobileNumber() => $_ensure(3);
 
   @$pb.TagNumber(5)
-  $core.String get userName => $_getSZ(4);
+  $core.String get requestedUserName => $_getSZ(4);
   @$pb.TagNumber(5)
-  set userName($core.String v) { $_setString(4, v); }
+  set requestedUserName($core.String v) { $_setString(4, v); }
   @$pb.TagNumber(5)
-  $core.bool hasUserName() => $_has(4);
+  $core.bool hasRequestedUserName() => $_has(4);
   @$pb.TagNumber(5)
-  void clearUserName() => clearField(5);
+  void clearRequestedUserName() => clearField(5);
 
   @$pb.TagNumber(6)
   Signature get signature => $_getN(5);
