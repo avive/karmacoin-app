@@ -36,7 +36,8 @@ class TransactionsBoss extends TransactionsBossInterface {
 
     _accountId = accountId;
     txNotifer.value = {};
-    newUserTransaction.value = null;
+    txEventsNotifer.value = {};
+    newUserTransactionEvent.value = null;
 
     if (_timer != null) {
       _timer!.cancel();
@@ -50,9 +51,11 @@ class TransactionsBoss extends TransactionsBossInterface {
 
   /// Add one or more transactions
   /// This is public as it is called to store locally submitted user transactions
+  /// If a locally created trnsaction, it will be submitted as soon as client
+  /// knows that the user is on-chain
   @override
-  Future<void> updateWith(
-      List<types.SignedTransactionWithStatus> transactions) async {
+  Future<void> updateWith(List<types.SignedTransactionWithStatus> transactions,
+      List<types.TransactionEvent>? transactionsEvents) async {
     if (transactions.isEmpty) {
       return;
     }
@@ -105,8 +108,29 @@ class TransactionsBoss extends TransactionsBossInterface {
       }
     }
 
-    txNotifer.value = newTxs;
+    if (transactionsEvents != null && transactionsEvents.isNotEmpty) {
+      // index new transaction events from the api by tx hash
+      Map<String, types.TransactionEvent> txEvents = {...txEventsNotifer.value};
+      for (types.TransactionEvent event in transactionsEvents) {
+        // todo: emit event if we got an event for local user signup (success or rejection)
+        // rejection can be due to taken user name, etc....
+
+        String txHash = base64.encode(event.transactionHash);
+        txEvents[txHash] = event;
+        if (event.transaction.transactionData.transactionType ==
+            types.TransactionType.TRANSACTION_TYPE_NEW_USER_V1) {
+          if (listsEqual(event.transaction.signer.data, _accountId)) {
+            debugPrint('Found new user transaction event for local user');
+            newUserTransactionEvent.value = event;
+          }
+        }
+      }
+      txEventsNotifer.value = txEvents;
+    }
+
     await _saveData();
+
+    txNotifer.value = newTxs;
     notifyListeners();
   }
 
@@ -137,9 +161,13 @@ class TransactionsBoss extends TransactionsBossInterface {
 
     if (_localDataFile!.existsSync()) {
       try {
-        String contents = _localDataFile!.readAsStringSync();
+        var jsonData = jsonDecode(_localDataFile!.readAsStringSync());
         txNotifer.value = Map<String, types.SignedTransactionWithStatus>.from(
-            jsonDecode(contents));
+            jsonDecode(jsonData.txs));
+
+        txEventsNotifer.value = Map<String, types.TransactionEvent>.from(
+            jsonDecode(jsonData.events));
+
         notifyListeners();
       } on FileSystemException catch (fse) {
         debugPrint('error loading txs from file: $fse');
@@ -154,7 +182,8 @@ class TransactionsBoss extends TransactionsBossInterface {
     if (_localDataFile == null) {
       return;
     }
-    await _localDataFile!.writeAsString(jsonEncode(txNotifer.value));
+    await _localDataFile!.writeAsString(
+        '{"txs": ${jsonEncode(txNotifer.value)}, "events": ${jsonEncode(txEventsNotifer.value)}}');
   }
 
   Future<void> _fetchTransactions() async {
@@ -173,7 +202,7 @@ class TransactionsBoss extends TransactionsBossInterface {
 
       if (resp.transactions.isNotEmpty) {
         debugPrint('got one or more transactions');
-        await updateWith(resp.transactions);
+        await updateWith(resp.transactions, resp.txEvents.events);
       } else {
         debugPrint('no transactions on chain yet');
       }

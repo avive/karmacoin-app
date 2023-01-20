@@ -46,6 +46,9 @@ Widget _getStatusWidget(context) {
                 'Submitting transaction, please wait few seconds...');
           case SignUpStatus.missingData:
             return const Text('Intrnal error - missing expected local data..');
+          case SignUpStatus.accountAlreadyExists:
+            return const Text(
+                'Account already created. what to do in this case?');
         }
       },
     ),

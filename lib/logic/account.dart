@@ -99,6 +99,9 @@ class AccountLogic extends AccountLogicInterface {
     if (karmaCoinUserData != null) {
       karmaCoinUser.value =
           KarmaCoinUser(User.fromBuffer(base64.decode(karmaCoinUserData)));
+
+      // attempt to get updated user data from chain and update signup status
+      await _updateLocalKarmaUserFromChain();
     }
 
     String? data = await _secureStorage.read(
@@ -127,7 +130,10 @@ class AccountLogic extends AccountLogicInterface {
           tx.transaction.signer.data)) {
         if (!signedUpOnChain.value) {
           debugPrint('local user signed up on chain!');
-          await setSignedUp(true);
+
+          // todo: if we have locally created transactions (apprenticeship, etc) we should send them to chain now.
+
+          await _updateLocalKarmaUserFromChain();
         } else {
           debugPrint(
               'already set this user to be chain signed up. ignoring...');
@@ -136,6 +142,20 @@ class AccountLogic extends AccountLogicInterface {
         debugPrint('signup tx by another user. ignoring...');
       }
     });
+  }
+
+  /// Update the local KarmaCoin user from chain
+  Future<void> _updateLocalKarmaUserFromChain() async {
+    try {
+      GetUserInfoByAccountResponse resp = await apiClient.apiServiceClient
+          .getUserInfoByAccount(GetUserInfoByAccountRequest(
+              accountId: karmaCoinUser.value!.userData.accountId));
+
+      updateKarmaCoinUserData(KarmaCoinUser(resp.user));
+      await _setSignedUp(true);
+    } catch (e) {
+      debugPrint('error getting user by account id from chain: $e');
+    }
   }
 
   /// private helper to set keypair from seed
@@ -228,10 +248,9 @@ class AccountLogic extends AccountLogicInterface {
     this.phoneNumber.value = phoneNumber;
   }
 
-  /// Set if the local user is gined up or not. User is sinedup when
+  /// Set if the local user is gined up or not. User is signed-up when
   /// its new user transaction is on the chain.
-  @override
-  Future<void> setSignedUp(bool signedUp) async {
+  Future<void> _setSignedUp(bool signedUp) async {
     await _secureStorage.write(
         key: AccountStoreKeys.userSignedUp,
         value: signedUp.toString(),
@@ -435,6 +454,8 @@ class AccountLogic extends AccountLogicInterface {
 
         debugPrint('submitNewUserTransacation success!');
 
+        localMode.value = true;
+
         // todo: store the transactionWithStatus in local storage via tx boss
 
         // increment user's nonce and store it locally
@@ -443,7 +464,8 @@ class AccountLogic extends AccountLogicInterface {
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
         signedTx.status = TransactionStatus.TRANSACTION_STATUS_REJECTED;
 
-        // todo: store the transactionWithStatus in local storage via tx boss
+        // todo: store the transactionWithStatus in local storage via tx boss so
+        // it can be submitted later
 
         // throw so clients deal with this
         throw Exception('submitNewUserTransacation rejected by network!');

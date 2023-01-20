@@ -9,14 +9,23 @@ abstract class TransactionsBossInterface extends ChangeNotifier {
 
   /// Add one or more transactions
   /// This is public as it is called to store locally submitted user transactions
-  Future<void> updateWith(List<types.SignedTransactionWithStatus> transactions);
+  Future<void> updateWith(List<types.SignedTransactionWithStatus> transactions,
+      List<types.TransactionEvent>? transactionsEvents);
 
   // transactions for _accountId indexed by tx hash
   final ValueNotifier<Map<String, types.SignedTransactionWithStatus>>
       txNotifer =
       ValueNotifier<Map<String, types.SignedTransactionWithStatus>>({});
 
+// transactions events for _accountId indexed by tx hash
+  final ValueNotifier<Map<String, types.TransactionEvent>> txEventsNotifer =
+      ValueNotifier<Map<String, types.TransactionEvent>>({});
+
   // signup transaction for accountId...
   final ValueNotifier<types.SignedTransactionWithStatus?> newUserTransaction =
       ValueNotifier<types.SignedTransactionWithStatus?>(null);
+
+  // signup transaction event for accountId...
+  final ValueNotifier<types.TransactionEvent?> newUserTransactionEvent =
+      ValueNotifier<types.TransactionEvent?>(null);
 }

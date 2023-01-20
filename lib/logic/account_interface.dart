@@ -11,9 +11,6 @@ abstract class AccountLogicInterface {
   /// Generate a new keypair
   Future<void> generateNewKeyPair();
 
-  /// Update user signed up
-  Future<void> setSignedUp(bool signedUp);
-
   // Set the user name (canonical on-chain)
   Future<void> setUserName(String userName);
 
@@ -63,6 +60,9 @@ abstract class AccountLogicInterface {
   final ValueNotifier<KarmaCoinUser?> karmaCoinUser =
       ValueNotifier<KarmaCoinUser?>(null);
 
+  // Local mode - KarmaUser was created locally, signup tx submitted but not confirmed yet
+  final ValueNotifier<bool> localMode = ValueNotifier<bool>(true);
+
   // Local authenticated user's phone number
   final ValueNotifier<String?> phoneNumber = ValueNotifier<String?>(null);
 
@@ -70,4 +70,3 @@ abstract class AccountLogicInterface {
   bool isDataValidForPhoneVerification();
   bool isDataValidForNewUserTransaction();
 }
-
