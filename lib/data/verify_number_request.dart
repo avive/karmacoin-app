@@ -27,6 +27,6 @@ class VerifyNumberRequest {
     message.clearSignature();
 
     return ed.verify(publicKey, message.writeToBuffer(),
-        request.signature.signature as Uint8List);
+        Uint8List.fromList(request.signature.signature));
   }
 }

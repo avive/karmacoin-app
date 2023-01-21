@@ -59,6 +59,7 @@ class SignUpController extends ChangeNotifier {
     try {
       await accountLogic.verifyPhoneNumber();
     } catch (e) {
+      debugPrint('verify exception: $e');
       _errorMessge = 'Verification error - please try again later';
       _status = SignUpStatus.validatorError;
       notifyListeners();

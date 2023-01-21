@@ -108,7 +108,6 @@ class AppLogic with AppLogicInterface {
     isBootstrapComplete = true;
 
     // temp test api connection
-
     try {
       GetUserInfoByUserNameResponse resp = await api.apiServiceClient
           .getUserInfoByUserName(

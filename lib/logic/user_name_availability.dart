@@ -33,6 +33,7 @@ class UserNameAvailabilityLogic extends ChangeNotifier {
               GetUserInfoByUserNameRequest(userName: userName));
 
       if (resp.hasUser()) {
+        debugPrint('api result: user name is not available');
         _status = UserNameAvailabilityStatus.unavailable;
         notifyListeners();
         return;
@@ -43,6 +44,7 @@ class UserNameAvailabilityLogic extends ChangeNotifier {
       notifyListeners();
     }
 
+    debugPrint('api result: user name is available');
     _status = UserNameAvailabilityStatus.available;
     notifyListeners();
   }

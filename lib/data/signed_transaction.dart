@@ -31,7 +31,7 @@ class SignedTransactionWithStatus {
     message.clearSignature();
 
     return ed.verify(publicKey, message.writeToBuffer(),
-        txWithStatus.transaction.signature.signature as Uint8List);
+        Uint8List.fromList(txWithStatus.transaction.signature.signature));
   }
 
   /// Serilize the transaction to a buffer

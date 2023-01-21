@@ -156,8 +156,13 @@ class AccountLogic extends AccountLogicInterface {
           .getUserInfoByAccount(GetUserInfoByAccountRequest(
               accountId: karmaCoinUser.value!.userData.accountId));
 
-      updateKarmaCoinUserData(KarmaCoinUser(resp.user));
-      await _setSignedUp(true);
+      if (resp.hasUser()) {
+        debugPrint('Got back user from api.. updating local user data...');
+        updateKarmaCoinUserData(KarmaCoinUser(resp.user));
+        await _setSignedUp(true);
+      } else {
+        debugPrint('No user found on chain.');
+      }
     } catch (e) {
       debugPrint('error getting user by account data from api: $e');
     }
@@ -381,6 +386,7 @@ class AccountLogic extends AccountLogicInterface {
   @override
   Future<void> verifyPhoneNumber() async {
     debugPrint('verify phone number...');
+    
     data.VerifyNumberRequest requestData = data.VerifyNumberRequest(
       verifier_types.VerifyNumberRequest(
         mobileNumber: MobileNumber(number: phoneNumber.value!),
@@ -394,9 +400,16 @@ class AccountLogic extends AccountLogicInterface {
     // sanity check the signature is valid
     requestData.verify(keyPair.value!.publicKey);
 
-    debugPrint('calling verifier.verifyNumber...');
-    VerifyNumberResponse response =
-        await verifier.verifierServiceClient.verifyNumber(requestData.request);
+    VerifyNumberResponse response;
+
+    try {
+      debugPrint('calling verifier.verifyNumber()...');
+      response = await verifier.verifierServiceClient
+          .verifyNumber(requestData.request);
+    } catch (e) {
+      debugPrint('Error calling verifier api: $e');
+      rethrow;
+    }
 
     // store this response as last verifier response in secure storage
     await _secureStorage.write(
