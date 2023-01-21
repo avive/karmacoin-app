@@ -30,6 +30,7 @@ class PhoneAuthScreen extends StatelessWidget {
                 PhoneInput(
                   initialCountryCode: 'US',
                   onSubmit: (phoneNumber) {
+                    debugPrint(phoneNumber);
                     ctrl.acceptPhoneNumber(phoneNumber);
                   },
                 ),
@@ -84,6 +85,8 @@ class PhoneAuthScreen extends StatelessWidget {
         } else if (state is SignedIn) {
           return Container();
         } else if (state is AuthFailed) {
+          // bad code used - show error and ask to try again
+
           // todo: show toaster and ask to try again later....
 
           return ErrorText(exception: state.exception);

@@ -7,7 +7,7 @@ import 'package:karma_coin/logic/txs_boss_interface.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/api/types.pb.dart' as types;
-import 'package:karma_coin/services/api/api.pbgrpc.dart' as api;
+import 'package:karma_coin/services/api/api.pbgrpc.dart' as api_types;
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:quiver/collection.dart';
 import 'package:karma_coin/data/verify_number_response.dart';
@@ -194,9 +194,9 @@ class TransactionsBoss extends TransactionsBossInterface {
     try {
       debugPrint('fetching transactions for account $_accountId');
 
-      api.GetTransactionsResponse resp =
-          await apiClient.apiServiceClient.getTransactions(
-        api.GetTransactionsRequest(
+      api_types.GetTransactionsResponse resp =
+          await api.apiServiceClient.getTransactions(
+        api_types.GetTransactionsRequest(
             accountId: types.AccountId(data: _accountId!)),
       );
 

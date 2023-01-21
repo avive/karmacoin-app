@@ -4,9 +4,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/services/api/api.pbgrpc.dart';
-import 'package:grpc/grpc.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/services/api/verifier.pbgrpc.dart' as verifier;
+import 'package:karma_coin/services/api/verifier.pbgrpc.dart' as verifier_types;
 import 'package:quiver/collection.dart';
 import 'dart:convert';
 import 'account_interface.dart';
@@ -31,9 +30,6 @@ class AccountStoreKeys {
 class AccountLogic extends AccountLogicInterface {
   final _secureStorage = const FlutterSecureStorage();
 
-  // ignore: unused_field
-  final verifier.VerifierServiceClient _verifierServiceClient;
-
   // last verifier response
   // ignore: unused_field
   VerifyNumberResponse? _verifyNumberResponse;
@@ -44,21 +40,16 @@ class AccountLogic extends AccountLogicInterface {
 
   // todo: add support to secure channel for production api usage
 
-  AccountLogic()
-      : _verifierServiceClient = verifier.VerifierServiceClient(
-          ClientChannel(
-            settingsLogic.apiHostName.value,
-            port: settingsLogic.apiHostPort.value,
-            options: const ChannelOptions(
-                credentials: ChannelCredentials.insecure()),
-          ),
-        );
+  AccountLogic();
 
   /// Init account logic
   @override
   Future<void> init() async {
     debugPrint('initalizing account logic...');
     // load prev persisted keypair from secure store
+
+    // Uncommet to start w/o any local data
+    // await clear();
 
     String? seedData = await _secureStorage.read(
         key: AccountStoreKeys.seed, aOptions: _aOptions);
@@ -97,6 +88,7 @@ class AccountLogic extends AccountLogicInterface {
         key: AccountStoreKeys.karmaCoinUser, aOptions: _aOptions);
 
     if (karmaCoinUserData != null) {
+      debugPrint('loading karma coin user from secure local store...');
       karmaCoinUser.value =
           KarmaCoinUser(User.fromBuffer(base64.decode(karmaCoinUserData)));
 
@@ -110,6 +102,18 @@ class AccountLogic extends AccountLogicInterface {
       _verifyNumberResponse =
           VerifyNumberResponse.fromBuffer(base64.decode(data));
     }
+
+    // Register on firebase user changes and update account logic when user changes
+    // this will be called on every app startup
+    fb.FirebaseAuth.instance.authStateChanges().listen((fb.User? user) async {
+      if (user != null) {
+        debugPrint(
+            'got a user from firebase auth. ${user.phoneNumber}, accountId (base64): ${user.displayName}');
+        await accountLogic.onNewUserAuthenticated(user);
+      } else {
+        debugPrint('no user from firebase auth');
+      }
+    });
 
     transactionBoss.newUserTransaction.addListener(() async {
       // listen to new user transaction
@@ -147,14 +151,15 @@ class AccountLogic extends AccountLogicInterface {
   /// Update the local KarmaCoin user from chain
   Future<void> _updateLocalKarmaUserFromChain() async {
     try {
-      GetUserInfoByAccountResponse resp = await apiClient.apiServiceClient
+      debugPrint('Calling api to get updated karma coin user...');
+      GetUserInfoByAccountResponse resp = await api.apiServiceClient
           .getUserInfoByAccount(GetUserInfoByAccountRequest(
               accountId: karmaCoinUser.value!.userData.accountId));
 
       updateKarmaCoinUserData(KarmaCoinUser(resp.user));
       await _setSignedUp(true);
     } catch (e) {
-      debugPrint('error getting user by account id from chain: $e');
+      debugPrint('error getting user by account data from api: $e');
     }
   }
 
@@ -222,6 +227,7 @@ class AccountLogic extends AccountLogicInterface {
   /// Set the canonical (onchain) user name for the local user
   @override
   Future<void> setUserName(String userName) async {
+    debugPrint('setting user name: $userName');
     await _secureStorage.write(
         key: AccountStoreKeys.userName, value: userName, aOptions: _aOptions);
     this.userName.value = userName;
@@ -229,6 +235,7 @@ class AccountLogic extends AccountLogicInterface {
 
   @override
   Future<void> updateKarmaCoinUserData(KarmaCoinUser user) async {
+    debugPrint('updating local karma coin user data...');
     String userData = user.userData.writeToBuffer().toBase64();
     await _secureStorage.write(
         key: AccountStoreKeys.karmaCoinUser,
@@ -322,11 +329,11 @@ class AccountLogic extends AccountLogicInterface {
       }
     }
 
-    debugPrint('Storing accountId on firebase...');
+    debugPrint('Storing accountId $accountIdBase64 firebase...');
     await user.updateDisplayName(accountIdBase64);
 
     debugPrint(
-        'Storing user phone number we got from firebase to secure local store...');
+        'Storing user phone number we got from firebase to secure local store... ${user.phoneNumber}');
     await setUserPhoneNumber(user.phoneNumber!);
 
     debugPrint(
@@ -336,6 +343,7 @@ class AccountLogic extends AccountLogicInterface {
   /// Set the requested user name
   @override
   Future<void> setRequestedUserName(String requestedUserName) async {
+    debugPrint('setting local requested user name: $requestedUserName');
     await _secureStorage.write(
         key: AccountStoreKeys.requestedUserName,
         value: requestedUserName,
@@ -343,14 +351,12 @@ class AccountLogic extends AccountLogicInterface {
     this.requestedUserName.value = requestedUserName;
   }
 
-  @override
-  ValueNotifier<String?> get requestedUserName => ValueNotifier<String?>(null);
-
   /// Create a new karma coin user from account data
   @override
   Future<KarmaCoinUser> createNewKarmaCoinUser() async {
     // todo: if we alrteady had anohter karma coin user then we should unregsiter from the transactionsBoss
     // on transactions for this user
+    debugPrint('Creating new karmacoin user...');
 
     KarmaCoinUser user = KarmaCoinUser(
       User(
@@ -374,10 +380,9 @@ class AccountLogic extends AccountLogicInterface {
   /// Verify the user's phone number and account id, store verification response
   @override
   Future<void> verifyPhoneNumber() async {
-    // todo: prepare rqeuest and sign it!
-
+    debugPrint('verify phone number...');
     data.VerifyNumberRequest requestData = data.VerifyNumberRequest(
-      verifier.VerifyNumberRequest(
+      verifier_types.VerifyNumberRequest(
         mobileNumber: MobileNumber(number: phoneNumber.value!),
         accountId: AccountId(data: keyPair.value!.publicKey.bytes),
         requestedUserName: userName.value,
@@ -389,8 +394,9 @@ class AccountLogic extends AccountLogicInterface {
     // sanity check the signature is valid
     requestData.verify(keyPair.value!.publicKey);
 
+    debugPrint('calling verifier.verifyNumber...');
     VerifyNumberResponse response =
-        await _verifierServiceClient.verifyNumber(requestData.request);
+        await verifier.verifierServiceClient.verifyNumber(requestData.request);
 
     // store this response as last verifier response in secure storage
     await _secureStorage.write(
@@ -404,7 +410,10 @@ class AccountLogic extends AccountLogicInterface {
 
     // todo: compare the response accountId with the verifier's account id
     // from genesis config and reject if they don't match
-    enrichedResponse.verifySignature(ed.PublicKey(response.accountId.data));
+    if (!enrichedResponse
+        .verifySignature(ed.PublicKey(response.accountId.data))) {
+      throw Exception('Invalid signature on verify number response');
+    }
 
     // keep it in memory for this session
     _verifyNumberResponse = response;
@@ -413,19 +422,26 @@ class AccountLogic extends AccountLogicInterface {
   /// Returns true iff account logic has all required data to verify the user's phone number
   @override
   bool isDataValidForPhoneVerification() {
+    debugPrint(
+        'validating local data for phone verification... ${karmaCoinUser.value}');
     return karmaCoinUser.value != null;
   }
 
   @override
   bool isDataValidForNewKarmaCoinUser() {
+    debugPrint(
+        'validating local data for new kc user... ${keyPair.value}, ${requestedUserName.value}, ${phoneNumber.value}');
+
     return keyPair.value != null &&
-        userName.value != null &&
+        requestedUserName.value != null &&
         phoneNumber.value != null;
   }
 
   /// Returns true iff account logic has all required data to create a new user
   @override
   bool isDataValidForNewUserTransaction() {
+    debugPrint(
+        'validating local data for new user tx... validator response: $_verifyNumberResponse');
     return isDataValidForPhoneVerification() && _verifyNumberResponse != null;
   }
 
@@ -445,7 +461,7 @@ class AccountLogic extends AccountLogicInterface {
     SignedTransactionWithStatus signedTx = _createSignedTransaction(txData);
     SubmitTransactionResponse resp = SubmitTransactionResponse();
 
-    resp = await apiClient.apiServiceClient.submitTransaction(
+    resp = await api.apiServiceClient.submitTransaction(
         SubmitTransactionRequest(transaction: signedTx.transaction));
 
     switch (resp.submitTransactionResult) {

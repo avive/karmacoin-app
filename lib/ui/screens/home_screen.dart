@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/ui/widgets/user_status.dart';
+// import 'package:karma_coin/ui/widgets/user_status.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.title});
@@ -59,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: const Text('Get Transactions'),
       ));
       res.add(const SizedBox(height: 14));
-      res.add(const SignupStatusWidget());
+      //res.add(const SignupStatusWidget());
     }
 
     return res;

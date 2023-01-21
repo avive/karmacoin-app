@@ -49,11 +49,11 @@ class SettingsLogic with ThrottledSaveLoadMixin {
         value['hasDismissedSearchMessage'] ?? false;
     currentLocale.value = value['currentLocale'];
     apiHostName.value = value['apiHostName'] ?? '127.0.0.1';
-    apiHostPort.value = value['apiHostPort'] ?? 5088;
+    apiHostPort.value = value['apiHostPort'] ?? 9080;
     apiSecureConnection.value = value['apiSecureConnection'] ?? false;
 
     verifierHostName.value = value['apiHostName'] ?? '127.0.0.1';
-    verifierHostPort.value = value['apiHostPort'] ?? 5088;
+    verifierHostPort.value = value['apiHostPort'] ?? 8080;
     verifierSecureConnection.value = value['apiSecureConnection'] ?? false;
 
     requestedUserName.value = value['requestedUserName'] ?? 'GoodKarma1';

@@ -27,6 +27,7 @@ class SignUpController extends ChangeNotifier {
 
   /// Start the signup process using local data in accountManager and a Karmacoin API service provider
   Future<void> signUpUser() async {
+    debugPrint('starting signup flow...');
     await _getValidatorEvidence();
   }
 
@@ -69,6 +70,8 @@ class SignUpController extends ChangeNotifier {
 
   // Second step in signup process - submit transaction with valid validation evidence
   Future<void> submitSignupTransaction() async {
+    debugPrint('submitting signup transaction...');
+
     _errorMessge = '';
     _status = SignUpStatus.submittingTransaction;
     notifyListeners();
@@ -101,6 +104,8 @@ class SignUpController extends ChangeNotifier {
       return;
     }
 
+    debugPrint('new user transaction submitted');
+
     // todo: listen on the local user signup tx event and drive the state from there based on
 
     transactionBoss.newUserTransactionEvent.addListener(() async {
@@ -109,7 +114,7 @@ class SignUpController extends ChangeNotifier {
       }
 
       TransactionEvent event = transactionBoss.newUserTransactionEvent.value!;
-
+      debugPrint('processing transaction event: ${event.toString()}');
       switch (event.result) {
         case ExecutionResult.EXECUTION_RESULT_EXECUTED:
           // no need to check the tx event - if the signup was executed than the user is on-chain
@@ -140,7 +145,4 @@ class SignUpController extends ChangeNotifier {
     _status = SignUpStatus.transactionSubmitted;
     notifyListeners();
   }
-
-  // todo: register on stream of transactions from the user's account and look for the signup transaction event / on chain tx. drive the state once it is obtained
-  // possible state from here: 1) tx event showing tx error such as user name taken or other. 2) tx on chain - account was created...
 }

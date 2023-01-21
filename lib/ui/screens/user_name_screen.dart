@@ -107,6 +107,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
                         .setRequestedUserName(_textController.text);
 
                     // todo: show spinner and disable next button while transaction is being submitted
+                    debugPrint('starting signup flow');
 
                     // start the user signup flow
                     await signingUpLogic.signUpUser();

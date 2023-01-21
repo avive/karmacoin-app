@@ -1,3 +1,5 @@
+import 'package:karma_coin/services/api/api.pbgrpc.dart';
+
 import '../common_libs.dart';
 
 enum UserNameAvailabilityStatus {
@@ -24,7 +26,22 @@ class UserNameAvailabilityLogic extends ChangeNotifier {
     notifyListeners();
 
     // todo - call the api to check if the user name is available
-    await Future.delayed(const Duration(milliseconds: 1000));
+
+    try {
+      GetUserInfoByUserNameResponse resp = await api.apiServiceClient
+          .getUserInfoByUserName(
+              GetUserInfoByUserNameRequest(userName: userName));
+
+      if (resp.hasUser()) {
+        _status = UserNameAvailabilityStatus.unavailable;
+        notifyListeners();
+        return;
+      }
+    } catch (e) {
+      debugPrint('error checking user name availability: $e');
+      _status = UserNameAvailabilityStatus.error;
+      notifyListeners();
+    }
 
     _status = UserNameAvailabilityStatus.available;
     notifyListeners();
