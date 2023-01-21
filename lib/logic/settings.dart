@@ -52,8 +52,8 @@ class SettingsLogic with ThrottledSaveLoadMixin {
     apiHostPort.value = value['apiHostPort'] ?? 9080;
     apiSecureConnection.value = value['apiSecureConnection'] ?? false;
 
-    verifierHostName.value = value['apiHostName'] ?? '127.0.0.1';
-    verifierHostPort.value = value['apiHostPort'] ?? 10000;
+    verifierHostName.value = value['verifierHostName'] ?? '127.0.0.1';
+    verifierHostPort.value = value['verifierHostPort'] ?? 10000;
     verifierSecureConnection.value = value['apiSecureConnection'] ?? false;
 
     requestedUserName.value = value['requestedUserName'] ?? 'GoodKarma1';

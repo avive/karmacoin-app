@@ -9,6 +9,9 @@ class Api {
   Api() {
     // todo: add support to secure channel for production api usage
 
+    debugPrint(
+        'Api config: ${settingsLogic.apiHostName.value}:${settingsLogic.apiHostPort.value}');
+
     final clientChannel = GrpcOrGrpcWebClientChannel.toSingleEndpoint(
       host: settingsLogic.apiHostName.value,
       port: settingsLogic.apiHostPort.value,

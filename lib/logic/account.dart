@@ -14,6 +14,7 @@ import 'package:karma_coin/data/verify_number_request.dart' as data;
 import 'package:karma_coin/data/verify_number_response.dart' as vnr;
 import 'package:karma_coin/data/signed_transaction.dart' as est;
 import 'package:bip39/bip39.dart' as bip39;
+import 'package:grpc/grpc.dart';
 
 class AccountStoreKeys {
   static String seed = 'seed'; // keypair seed
@@ -386,7 +387,7 @@ class AccountLogic extends AccountLogicInterface {
   @override
   Future<void> verifyPhoneNumber() async {
     debugPrint('verify phone number...');
-    
+
     data.VerifyNumberRequest requestData = data.VerifyNumberRequest(
       verifier_types.VerifyNumberRequest(
         mobileNumber: MobileNumber(number: phoneNumber.value!),
@@ -404,8 +405,14 @@ class AccountLogic extends AccountLogicInterface {
 
     try {
       debugPrint('calling verifier.verifyNumber()...');
-      response = await verifier.verifierServiceClient
-          .verifyNumber(requestData.request);
+      response = await verifier.verifierServiceClient.verifyNumber(
+          requestData.request
+          /*,
+            options: CallOptions(
+              compression: const GzipCodec(),
+              timeout: const Duration(seconds: 30),
+            ),*/
+          );
     } catch (e) {
       debugPrint('Error calling verifier api: $e');
       rethrow;

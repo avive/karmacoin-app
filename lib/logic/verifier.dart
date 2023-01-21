@@ -9,6 +9,9 @@ class Verifier {
   Verifier() {
     // todo: add support to secure channel for production api usage
 
+    debugPrint(
+        'Verifier config: ${settingsLogic.verifierHostName.value}:${settingsLogic.verifierHostPort.value}');
+
     final clientChannel = GrpcOrGrpcWebClientChannel.toSingleEndpoint(
       host: settingsLogic.verifierHostName.value,
       port: settingsLogic.verifierHostPort.value,
