@@ -7,6 +7,6 @@ To learn more about KarmaCoin visit https://karmaco.in
 - Web, iOs, Android
 
 
-Copyright (c) 2022 by the KarmaCoin Authors. This work is licensed under the KarmaCoin License v0.1.0.
+Copyright (c) 2022 by the KarmaCoin Authors. This work is licensed under the [KarmaCoin License](https://github.com/karma-coin/.github/blob/main/LICENSE).
 
 
