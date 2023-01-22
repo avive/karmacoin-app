@@ -8,13 +8,13 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/api/verifier.pbgrpc.dart' as verifier_types;
 import 'package:quiver/collection.dart';
 import 'dart:convert';
+import '../services/api/verifier.pb.dart';
 import 'account_interface.dart';
 import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/verify_number_request.dart' as data;
-import 'package:karma_coin/data/verify_number_response.dart' as vnr;
+import 'package:karma_coin/data/user_verification_data.dart' as vnr;
 import 'package:karma_coin/data/signed_transaction.dart' as est;
 import 'package:bip39/bip39.dart' as bip39;
-import 'package:grpc/grpc.dart';
 
 class AccountStoreKeys {
   static String seed = 'seed'; // keypair seed
@@ -24,7 +24,7 @@ class AccountStoreKeys {
   static String requestedUserName = 'requested_user_name';
   static String phoneNumber = 'phone_number';
   static String karmaCoinUser = 'karma_coin_user';
-  static String verifyNumberResponse = 'verify_number_response';
+  static String verificationData = 'verification_data';
 }
 
 /// Local karmaCoin account logic. We seperate between authentication and account. Authentication is handled by Firebase Auth.
@@ -33,7 +33,7 @@ class AccountLogic extends AccountLogicInterface {
 
   // last verifier response
   // ignore: unused_field
-  VerifyNumberResponse? _verifyNumberResponse;
+  UserVerificationData? _userVerificationData;
 
   static const _aOptions = AndroidOptions(
     encryptedSharedPreferences: true,
@@ -98,10 +98,10 @@ class AccountLogic extends AccountLogicInterface {
     }
 
     String? data = await _secureStorage.read(
-        key: AccountStoreKeys.verifyNumberResponse, aOptions: _aOptions);
+        key: AccountStoreKeys.verificationData, aOptions: _aOptions);
     if (data != null) {
-      _verifyNumberResponse =
-          VerifyNumberResponse.fromBuffer(base64.decode(data));
+      _userVerificationData =
+          UserVerificationData.fromBuffer(base64.decode(data));
     }
 
     // Register on firebase user changes and update account logic when user changes
@@ -131,7 +131,7 @@ class AccountLogic extends AccountLogicInterface {
         return;
       }
 
-      if (listsEqual(karmaCoinUser.value!.userData.accountId.data,
+      if (listsEqual(karmaCoinUser.value?.userData.accountId.data,
           tx.transaction.signer.data)) {
         if (!signedUpOnChain.value) {
           debugPrint('local user signed up on chain!');
@@ -155,7 +155,7 @@ class AccountLogic extends AccountLogicInterface {
       debugPrint('Calling api to get updated karma coin user...');
       GetUserInfoByAccountResponse resp = await api.apiServiceClient
           .getUserInfoByAccount(GetUserInfoByAccountRequest(
-              accountId: karmaCoinUser.value!.userData.accountId));
+              accountId: karmaCoinUser.value?.userData.accountId));
 
       if (resp.hasUser()) {
         debugPrint('Got back user from api.. updating local user data...');
@@ -177,7 +177,7 @@ class AccountLogic extends AccountLogicInterface {
     keyPair.value = ed.KeyPair(privateKey, publicKey);
 
     debugPrint(
-        'keypair set. Account id: ${keyPair.value!.publicKey.bytes.toShortHexString()}');
+        'keypair set. Account id: ${keyPair.value?.publicKey.bytes.toShortHexString()}');
   }
 
   /// Generate a new keypair
@@ -227,7 +227,7 @@ class AccountLogic extends AccountLogicInterface {
     _setKeyPairFromSeed(seed);
 
     debugPrint(
-        'keypair set. Account id: ${keyPair.value!.publicKey.bytes.toShortHexString()}');
+        'keypair set. Account id: ${keyPair.value?.publicKey.bytes.toShortHexString()}');
   }
 
   /// Set the canonical (onchain) user name for the local user
@@ -269,6 +269,8 @@ class AccountLogic extends AccountLogicInterface {
         value: signedUp.toString(),
         aOptions: _aOptions);
 
+    // get out of local pre-signup confirmation mode...
+    localMode.value = false;
     signedUpOnChain.value = signedUp;
   }
 
@@ -304,7 +306,7 @@ class AccountLogic extends AccountLogicInterface {
         key: AccountStoreKeys.userSignedUp, aOptions: _aOptions);
 
     await _secureStorage.delete(
-        key: AccountStoreKeys.verifyNumberResponse, aOptions: _aOptions);
+        key: AccountStoreKeys.verificationData, aOptions: _aOptions);
 
     // clear all state from memory
     userName.value = null;
@@ -314,7 +316,7 @@ class AccountLogic extends AccountLogicInterface {
     keyPair.value = null;
     accountSecurityWords.value = null;
     karmaCoinUser.value = null;
-    _verifyNumberResponse = null;
+    _userVerificationData = null;
   }
 
   /// Set the account id for a firebase user
@@ -346,6 +348,10 @@ class AccountLogic extends AccountLogicInterface {
         'User account id: ${keyPair.value!.publicKey.bytes.toShortHexString()} stored on firebase.');
   }
 
+  List<int>? _getAccountId() {
+    return keyPair.value?.publicKey.bytes;
+  }
+
   /// Set the requested user name
   @override
   Future<void> setRequestedUserName(String requestedUserName) async {
@@ -366,7 +372,7 @@ class AccountLogic extends AccountLogicInterface {
 
     KarmaCoinUser user = KarmaCoinUser(
       User(
-        accountId: AccountId(data: keyPair.value!.publicKey.bytes),
+        accountId: AccountId(data: _getAccountId()),
         nonce: Int64.ZERO,
         userName: userName.value,
         mobileNumber: MobileNumber(number: phoneNumber.value!),
@@ -391,7 +397,7 @@ class AccountLogic extends AccountLogicInterface {
     data.VerifyNumberRequest requestData = data.VerifyNumberRequest(
       verifier_types.VerifyNumberRequest(
         mobileNumber: MobileNumber(number: phoneNumber.value!),
-        accountId: AccountId(data: keyPair.value!.publicKey.bytes),
+        accountId: AccountId(data: _getAccountId()),
         requestedUserName: userName.value,
       ),
     );
@@ -401,42 +407,48 @@ class AccountLogic extends AccountLogicInterface {
     // sanity check the signature is valid
     requestData.verify(keyPair.value!.publicKey);
 
-    VerifyNumberResponse response;
+    UserVerificationData userVerificationData;
 
     try {
       debugPrint('calling verifier.verifyNumber()...');
-      response = await verifier.verifierServiceClient.verifyNumber(
-          requestData.request
-          /*,
+      VerifyNumberResponse response =
+          await verifier.verifierServiceClient.verifyNumber(requestData.request
+              /*,
             options: CallOptions(
               compression: const GzipCodec(),
               timeout: const Duration(seconds: 30),
             ),*/
-          );
+              );
+
+      userVerificationData = response.userVerificationData;
     } catch (e) {
       debugPrint('Error calling verifier api: $e');
       rethrow;
     }
 
+    debugPrint('Storing verifier response from verifier');
     // store this response as last verifier response in secure storage
     await _secureStorage.write(
-        key: AccountStoreKeys.verifyNumberResponse,
-        value: response.writeToBuffer().toBase64(),
+        key: AccountStoreKeys.verificationData,
+        value: userVerificationData.writeToBuffer().toBase64(),
         aOptions: _aOptions);
 
     // create an enrichedResponse for signature verification purposes
-    vnr.VerifyNumberResponse enrichedResponse =
-        vnr.VerifyNumberResponse(response);
+    vnr.UserVerificationData enrichedResponse =
+        vnr.UserVerificationData(userVerificationData);
 
     // todo: compare the response accountId with the verifier's account id
     // from genesis config and reject if they don't match
-    if (!enrichedResponse
-        .verifySignature(ed.PublicKey(response.accountId.data))) {
+
+    if (!enrichedResponse.verifySignature(
+        ed.PublicKey(userVerificationData.verifierAccountId.data))) {
       throw Exception('Invalid signature on verify number response');
     }
 
+    debugPrint('verifier signature is valid');
+
     // keep it in memory for this session
-    _verifyNumberResponse = response;
+    _userVerificationData = userVerificationData;
   }
 
   /// Returns true iff account logic has all required data to verify the user's phone number
@@ -461,8 +473,8 @@ class AccountLogic extends AccountLogicInterface {
   @override
   bool isDataValidForNewUserTransaction() {
     debugPrint(
-        'validating local data for new user tx... validator response: $_verifyNumberResponse');
-    return isDataValidForPhoneVerification() && _verifyNumberResponse != null;
+        'validating local data for new user tx... validator response: $_userVerificationData');
+    return isDataValidForPhoneVerification() && _userVerificationData != null;
   }
 
   /// Submit a new user transaction to the network using the last verifier response
@@ -471,7 +483,7 @@ class AccountLogic extends AccountLogicInterface {
   @override
   Future<SubmitTransactionResponse> submitNewUserTransacation() async {
     NewUserTransactionV1 newUserTx =
-        NewUserTransactionV1(verifyNumberResponse: _verifyNumberResponse!);
+        NewUserTransactionV1(verifyNumberResponse: _userVerificationData!);
 
     TransactionData txData = TransactionData(
       transactionData: newUserTx.writeToBuffer(),
@@ -481,25 +493,35 @@ class AccountLogic extends AccountLogicInterface {
     SignedTransactionWithStatus signedTx = _createSignedTransaction(txData);
     SubmitTransactionResponse resp = SubmitTransactionResponse();
 
-    resp = await api.apiServiceClient.submitTransaction(
-        SubmitTransactionRequest(transaction: signedTx.transaction));
+    debugPrint('submitting newuser tx via the api...');
+
+    try {
+      resp = await api.apiServiceClient.submitTransaction(
+          SubmitTransactionRequest(transaction: signedTx.transaction));
+    } catch (e) {
+      debugPrint('failed to submit transaction to api: $e');
+    }
 
     switch (resp.submitTransactionResult) {
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
         signedTx.status = TransactionStatus.TRANSACTION_STATUS_SUBMITTED;
 
-        debugPrint('submitNewUserTransacation success!');
+        debugPrint('tx submission acccepted by api - entering local mode...');
 
         localMode.value = true;
+
+        // start tracking txs for this account...
+        transactionBoss.setAccountId(_getAccountId());
 
         // todo: store the transactionWithStatus in local storage via tx boss
 
         // increment user's nonce and store it locally
-        await karmaCoinUser.value!.incNonce();
+        await karmaCoinUser.value?.incNonce();
         break;
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
         signedTx.status = TransactionStatus.TRANSACTION_STATUS_REJECTED;
 
+        debugPrint('transaction rejected by api');
         // todo: store the transactionWithStatus in local storage via tx boss so
         // it can be submitted later
 

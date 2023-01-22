@@ -105,9 +105,7 @@ class SignUpController extends ChangeNotifier {
       return;
     }
 
-    debugPrint('new user transaction submitted');
-
-    // todo: listen on the local user signup tx event and drive the state from there based on
+    debugPrint('new user transaction accepted by api');
 
     transactionBoss.newUserTransactionEvent.addListener(() async {
       if (transactionBoss.newUserTransactionEvent.value == null) {

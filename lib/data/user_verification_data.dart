@@ -4,16 +4,16 @@ import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:protobuf/protobuf.dart';
 
 /// An extension class over vt.VerifyNumberRequest to support signing and verification
-class VerifyNumberResponse {
-  final types.VerifyNumberResponse response;
-  VerifyNumberResponse(this.response);
+class UserVerificationData {
+  final types.UserVerificationData data;
+  UserVerificationData(this.data);
 
   /// verify the signature using the provided verifier public key known to client from genesis config
   bool verifySignature(ed.PublicKey publicKey) {
-    types.VerifyNumberResponse message = response.deepCopy();
+    types.UserVerificationData message = data.deepCopy();
     message.clearSignature();
 
     return ed.verify(publicKey, message.writeToBuffer(),
-        Uint8List.fromList(response.signature.signature));
+        Uint8List.fromList(data.signature.signature));
   }
 }

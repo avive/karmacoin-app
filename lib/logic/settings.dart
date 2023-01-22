@@ -26,7 +26,7 @@ class SettingsLogic with ThrottledSaveLoadMixin {
 
   late final verifierHostName = ValueNotifier<String>('127.0.0.1')
     ..addListener(scheduleSave);
-  late final verifierHostPort = ValueNotifier<int>(10000)
+  late final verifierHostPort = ValueNotifier<int>(9080)
     ..addListener(scheduleSave);
   late final verifierSecureConnection = ValueNotifier<bool>(false)
     ..addListener(scheduleSave);
@@ -53,7 +53,7 @@ class SettingsLogic with ThrottledSaveLoadMixin {
     apiSecureConnection.value = value['apiSecureConnection'] ?? false;
 
     verifierHostName.value = value['verifierHostName'] ?? '127.0.0.1';
-    verifierHostPort.value = value['verifierHostPort'] ?? 10000;
+    verifierHostPort.value = value['verifierHostPort'] ?? 9080;
     verifierSecureConnection.value = value['apiSecureConnection'] ?? false;
 
     requestedUserName.value = value['requestedUserName'] ?? 'GoodKarma1';

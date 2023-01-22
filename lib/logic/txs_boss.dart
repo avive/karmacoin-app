@@ -10,7 +10,7 @@ import 'package:karma_coin/services/api/types.pb.dart' as types;
 import 'package:karma_coin/services/api/api.pbgrpc.dart' as api_types;
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:quiver/collection.dart';
-import 'package:karma_coin/data/verify_number_response.dart';
+import 'package:karma_coin/data/user_verification_data.dart';
 
 /// The TransactionsBoss is responsible for managing the transactions this device knows about.
 /// Boss is a cooler name than manager, and it's shorter to type.
@@ -28,6 +28,8 @@ class TransactionsBoss extends TransactionsBossInterface {
     if (listsEqual(_accountId, accountId)) {
       return;
     }
+
+    debugPrint('txsbox - config for new account...');
 
     // delete old txs file for old account _accountId if it exists
     if (_accountId != null && _localDataFile != null) {
@@ -47,6 +49,10 @@ class TransactionsBoss extends TransactionsBossInterface {
     if (accountId == null) {
       return;
     }
+
+    debugPrint('Pooling txs every minute...');
+    _timer = Timer.periodic(const Duration(seconds: 60),
+        (Timer t) async => await _fetchTransactions());
   }
 
   /// Add one or more transactions
@@ -82,18 +88,20 @@ class TransactionsBoss extends TransactionsBossInterface {
               types.NewUserTransactionV1.fromBuffer(
                   tx.transaction.transactionData.transactionData);
 
-          types.VerifyNumberResponse vresp = newUserTx.verifyNumberResponse;
-          if (!listsEqual(vresp.accountId.data, _accountId)) {
+          types.UserVerificationData verificationData =
+              newUserTx.verifyNumberResponse;
+          if (!listsEqual(verificationData.accountId.data, _accountId)) {
             debugPrint('Skipping new user transaction - not for local account');
             continue;
           }
 
-          VerifyNumberResponse evidence = VerifyNumberResponse(vresp);
+          UserVerificationData evidence =
+              UserVerificationData(verificationData);
 
           // todo: validate verifier accountId is valid - defined in genesis config
 
-          if (!evidence
-              .verifySignature(ed.PublicKey(vresp.verifierAccountId.data))) {
+          if (!evidence.verifySignature(
+              ed.PublicKey(verificationData.verifierAccountId.data))) {
             debugPrint('rejecting new user transaction with invalid signature');
             continue;
           }
@@ -173,9 +181,6 @@ class TransactionsBoss extends TransactionsBossInterface {
         debugPrint('error loading txs from file: $fse');
       }
     }
-
-    _timer = Timer.periodic(const Duration(seconds: 60),
-        (Timer t) async => await _fetchTransactions());
   }
 
   Future<void> _saveData() async {
@@ -201,7 +206,8 @@ class TransactionsBoss extends TransactionsBossInterface {
       );
 
       if (resp.transactions.isNotEmpty) {
-        debugPrint('got one or more transactions');
+        debugPrint(
+            'got $resp.transactions.length transactions and ${resp.txEvents.events.length} events');
         await updateWith(resp.transactions, resp.txEvents.events);
       } else {
         debugPrint('no transactions on chain yet');

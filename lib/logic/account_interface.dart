@@ -60,7 +60,7 @@ abstract class AccountLogicInterface {
   final ValueNotifier<KarmaCoinUser?> karmaCoinUser =
       ValueNotifier<KarmaCoinUser?>(null);
 
-  // Local mode - KarmaUser was created locally, signup tx submitted but not confirmed yet
+  // Local mode - KarmaUser was created locally, signup tx submitted and accepted but not confirmed yet... we use this to allow user to start appreicating other users as soon as it signs up...
   final ValueNotifier<bool> localMode = ValueNotifier<bool>(true);
 
   // Local authenticated user's phone number
