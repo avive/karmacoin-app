@@ -1,6 +1,9 @@
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/logic/signup_controller.dart';
+import 'package:karma_coin/ui/screens/account_setup.dart';
 import 'package:karma_coin/ui/screens/auth_screen.dart';
-import 'package:karma_coin/ui/screens/home_screen.dart';
+import 'package:karma_coin/ui/screens/user_home.dart';
+import 'package:karma_coin/ui/screens/welcome_screen.dart';
 import 'package:karma_coin/ui/screens/user_name_screen.dart';
 
 /// Shared paths / urls used across the app
@@ -10,6 +13,9 @@ class ScreenPaths {
 
   /// Signup with phone number flow first screen
   static String signup = '/signup';
+
+  /// Account setup progress screen...
+  static String accountSetup = '/setup';
 
   /// User name input screen
   static String userName = '/username';
@@ -26,6 +32,17 @@ class ScreenPaths {
 
 /// The route configuration
 final GoRouter appRouter = GoRouter(
+  refreshListenable: signingUpController,
+  redirect: (context, state) {
+    // if we are on the account setup screen and the user is signed up
+    // then redirect to user's home screen
+
+    if (state.path == ScreenPaths.accountSetup &&
+        signingUpController.status == AccountSetupStatus.signedUp) {
+      return ScreenPaths.home;
+    }
+    return null;
+  },
   routes: <RouteBase>[
     GoRoute(
       path: ScreenPaths.signup,
@@ -37,7 +54,7 @@ final GoRouter appRouter = GoRouter(
         // Signed-in user home screen
         path: ScreenPaths.home,
         builder: (BuildContext context, GoRouterState state) {
-          return Container(color: Colors.blue);
+          return const UserHomeScreen();
         }),
     GoRoute(
         path: ScreenPaths.splash,
@@ -52,10 +69,16 @@ final GoRouter appRouter = GoRouter(
           return const SetUserNameScreen(title: 'User Name');
         }),
     GoRoute(
+        path: ScreenPaths.accountSetup,
+        builder: (BuildContext context, GoRouterState state) {
+          // todo: return user name screen
+          return const AccountSetupScreen();
+        }),
+    GoRoute(
         // Initial app screen (playground for now)
         path: ScreenPaths.welcome,
         builder: (BuildContext context, GoRouterState state) {
-          return const HomeScreen(title: 'Karma Coin');
+          return const WelcomeScreen(title: 'Karma Coin');
         }),
   ],
 );

@@ -29,7 +29,7 @@ class TransactionsBoss extends TransactionsBossInterface {
       return;
     }
 
-    debugPrint('txsbox - config for new account...');
+    debugPrint('txsboss - config for new account...');
 
     // delete old txs file for old account _accountId if it exists
     if (_accountId != null && _localDataFile != null) {
@@ -50,7 +50,10 @@ class TransactionsBoss extends TransactionsBossInterface {
       return;
     }
 
-    debugPrint('Pooling txs every minute...');
+    // fetch now and start polling
+    await _fetchTransactions();
+
+    debugPrint('Pooling txs every 60 secs...');
     _timer = Timer.periodic(const Duration(seconds: 60),
         (Timer t) async => await _fetchTransactions());
   }
@@ -207,7 +210,7 @@ class TransactionsBoss extends TransactionsBossInterface {
 
       if (resp.transactions.isNotEmpty) {
         debugPrint(
-            'got $resp.transactions.length transactions and ${resp.txEvents.events.length} events');
+            'got ${resp.transactions.length} transactions and ${resp.txEvents.events.length} events');
         await updateWith(resp.transactions, resp.txEvents.events);
       } else {
         debugPrint('no transactions on chain yet');

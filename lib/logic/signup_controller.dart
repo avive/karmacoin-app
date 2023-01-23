@@ -2,8 +2,8 @@ import 'package:karma_coin/services/api/api.pbgrpc.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 import '../common_libs.dart';
 
-enum SignUpStatus {
-  unknown,
+enum AccountSetupStatus {
+  readyToSignup,
   validating,
   validatorError,
   submittingTransaction,
@@ -17,13 +17,13 @@ enum SignUpStatus {
 
 /// SignUp Controller drives the sign-up interactive process in an app session once user provided all
 /// requred data. It uses data from accountLogic to drive the state of the sign-up process.
-class SignUpController extends ChangeNotifier {
+class AccountSetupController extends ChangeNotifier {
   String _errorMessge = '';
 
-  SignUpStatus _status = SignUpStatus.unknown;
+  AccountSetupStatus _status = AccountSetupStatus.readyToSignup;
 
   String get errorMessage => _errorMessge;
-  SignUpStatus get status => _status;
+  AccountSetupStatus get status => _status;
 
   /// Start the signup process using local data in accountManager and a Karmacoin API service provider
   Future<void> signUpUser() async {
@@ -34,12 +34,12 @@ class SignUpController extends ChangeNotifier {
   // First step in signup process
   Future<void> _getValidatorEvidence() async {
     _errorMessge = '';
-    _status = SignUpStatus.validating;
+    _status = AccountSetupStatus.validating;
     notifyListeners();
 
     if (!accountLogic.isDataValidForNewKarmaCoinUser()) {
       _errorMessge = 'Internal error - missing data';
-      _status = SignUpStatus.missingData;
+      _status = AccountSetupStatus.missingData;
       notifyListeners();
       return;
     }
@@ -51,7 +51,7 @@ class SignUpController extends ChangeNotifier {
 
     if (!accountLogic.isDataValidForPhoneVerification()) {
       _errorMessge = 'Internal error - missing data';
-      _status = SignUpStatus.missingData;
+      _status = AccountSetupStatus.missingData;
       notifyListeners();
       return;
     }
@@ -61,7 +61,7 @@ class SignUpController extends ChangeNotifier {
     } catch (e) {
       debugPrint('verify exception: $e');
       _errorMessge = 'Verification error - please try again later';
-      _status = SignUpStatus.validatorError;
+      _status = AccountSetupStatus.validatorError;
       notifyListeners();
       return;
     }
@@ -74,12 +74,12 @@ class SignUpController extends ChangeNotifier {
     debugPrint('submitting signup transaction...');
 
     _errorMessge = '';
-    _status = SignUpStatus.submittingTransaction;
+    _status = AccountSetupStatus.submittingTransaction;
     notifyListeners();
 
     if (!accountLogic.isDataValidForNewUserTransaction()) {
       _errorMessge = 'Internal error - missing data';
-      _status = SignUpStatus.missingData;
+      _status = AccountSetupStatus.missingData;
       notifyListeners();
       return;
     }
@@ -90,7 +90,7 @@ class SignUpController extends ChangeNotifier {
     } catch (e) {
       // todo: think how to handle this case - auto retry? ask to leave app open?
       _errorMessge = 'Failed to submit transaction - please try again later';
-      _status = SignUpStatus.transactionError;
+      _status = AccountSetupStatus.transactionError;
       notifyListeners();
       return;
     }
@@ -100,7 +100,7 @@ class SignUpController extends ChangeNotifier {
       // todo: think how to handle this case - auto retry? ask to leave app open?
 
       _errorMessge = 'Failed to submit transaction - please try again later';
-      _status = SignUpStatus.transactionError;
+      _status = AccountSetupStatus.transactionError;
       notifyListeners();
       return;
     }
@@ -116,22 +116,23 @@ class SignUpController extends ChangeNotifier {
       debugPrint('processing transaction event: ${event.toString()}');
       switch (event.result) {
         case ExecutionResult.EXECUTION_RESULT_EXECUTED:
-          // no need to check the tx event - if the signup was executed than the user is on-chain
-          _status = SignUpStatus.signedUp;
+          // no need to check the tx event - if the signup was executed then the user is on-chain
+          _status = AccountSetupStatus.signedUp;
           notifyListeners();
+
           break;
         case ExecutionResult.EXECUTION_RESULT_INVALID:
           switch (event.info) {
             case ExecutionInfo.EXECUTION_INFO_NICKNAME_NOT_AVAILABLE:
               // another user was able to signup with the reuqested user name - rare but can happen
               // todo: show UI to pick another user name and submit a new transaction
-              _status = SignUpStatus.userNameTaken;
+              _status = AccountSetupStatus.userNameTaken;
               notifyListeners();
               break;
             // todo: update protos and add case that there's already an on-chain acount for the accountId
             case ExecutionInfo.EXECUTION_INFO_ACCOUNT_CREATED:
             default:
-              _status = SignUpStatus.transactionError;
+              _status = AccountSetupStatus.transactionError;
               notifyListeners();
               break;
           }
@@ -141,7 +142,7 @@ class SignUpController extends ChangeNotifier {
     // from time tx is submitted until client knows it failed or it was procsessed
     // we are in local-mode. In localMode account.isChainSignedUp = false but we have alocal KarmaCoinUser
     // and user should be able to send transactions. We store them locally and submit them when user is on chain
-    _status = SignUpStatus.transactionSubmitted;
+    _status = AccountSetupStatus.transactionSubmitted;
     notifyListeners();
   }
 }

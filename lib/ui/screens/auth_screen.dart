@@ -1,5 +1,6 @@
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/ui/router.dart';
 
 class PhoneAuthScreen extends StatelessWidget {
   const PhoneAuthScreen({Key? key}) : super(key: key);
@@ -10,7 +11,7 @@ class PhoneAuthScreen extends StatelessWidget {
       listener: (oldState, newState, controller) {
         debugPrint('Signup state: $newState');
         if (newState is SignedIn) {
-          context.go('/username');
+          context.go(ScreenPaths.userName);
         } else if (newState is PhoneVerified) {
           // todo: go to next step in signup - set user name...
           // for now go back to main screen

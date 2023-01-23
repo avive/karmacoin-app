@@ -398,7 +398,7 @@ class AccountLogic extends AccountLogicInterface {
       verifier_types.VerifyNumberRequest(
         mobileNumber: MobileNumber(number: phoneNumber.value!),
         accountId: AccountId(data: _getAccountId()),
-        requestedUserName: userName.value,
+        requestedUserName: requestedUserName.value,
       ),
     );
 
@@ -426,13 +426,6 @@ class AccountLogic extends AccountLogicInterface {
       rethrow;
     }
 
-    debugPrint('Storing verifier response from verifier');
-    // store this response as last verifier response in secure storage
-    await _secureStorage.write(
-        key: AccountStoreKeys.verificationData,
-        value: userVerificationData.writeToBuffer().toBase64(),
-        aOptions: _aOptions);
-
     // create an enrichedResponse for signature verification purposes
     vnr.UserVerificationData enrichedResponse =
         vnr.UserVerificationData(userVerificationData);
@@ -446,6 +439,13 @@ class AccountLogic extends AccountLogicInterface {
     }
 
     debugPrint('verifier signature is valid');
+
+    // store this  response as last verifier response in secure storage
+    // even if it reports a failure so we can deal with failure in ui
+    await _secureStorage.write(
+        key: AccountStoreKeys.verificationData,
+        value: userVerificationData.writeToBuffer().toBase64(),
+        aOptions: _aOptions);
 
     // keep it in memory for this session
     _userVerificationData = userVerificationData;
@@ -473,8 +473,11 @@ class AccountLogic extends AccountLogicInterface {
   @override
   bool isDataValidForNewUserTransaction() {
     debugPrint(
-        'validating local data for new user tx... validator response: $_userVerificationData');
-    return isDataValidForPhoneVerification() && _userVerificationData != null;
+        'validating local data for new user tx... store validator response: $_userVerificationData');
+
+    return _userVerificationData != null &&
+        _userVerificationData?.verificationResult ==
+            VerificationResult.VERIFICATION_RESULT_VERIFIED;
   }
 
   /// Submit a new user transaction to the network using the last verifier response
@@ -536,10 +539,11 @@ class AccountLogic extends AccountLogicInterface {
   SignedTransactionWithStatus _createSignedTransaction(TransactionData data) {
     SignedTransaction tx = SignedTransaction(
       nonce: karmaCoinUser.value!.nonce.value + 1,
-      fee: Int64.ONE, // todo: get default tx fee from settings
-      netId: 0, // todo: get from settings
+      fee: Int64.ONE, // todo: get default tx fee from genesis
+      netId: 1, // todo: get from genesis config
       transactionData: data,
       signer: AccountId(data: keyPair.value!.publicKey.bytes),
+      timestamp: Int64(DateTime.now().millisecondsSinceEpoch),
     );
 
     SignedTransactionWithStatus txWithStatus = SignedTransactionWithStatus(

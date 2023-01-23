@@ -1,6 +1,8 @@
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/user_name_availability.dart';
 
+import '../router.dart';
+
 class SetUserNameScreen extends StatefulWidget {
   const SetUserNameScreen({super.key, required this.title});
   final String title;
@@ -106,15 +108,11 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
                     await accountLogic
                         .setRequestedUserName(_textController.text);
 
-                    // todo: show spinner and disable next button while transaction is being submitted
-                    debugPrint('starting signup flow');
-
-                    // start the user signup flow
-                    await signingUpLogic.signUpUser();
+                    debugPrint('starting signup flow...');
 
                     // navigate to the home screen
                     if (!mounted) return;
-                    context.go('/');
+                    context.go(ScreenPaths.accountSetup);
                   } else {
                     if (!mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(

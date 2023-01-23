@@ -27,7 +27,8 @@ AuthLogicInterface get authLogic => GetIt.I.get<AuthLogicInterface>();
 AccountLogicInterface get accountLogic => GetIt.I.get<AccountLogicInterface>();
 UserNameAvailabilityLogic get userNameAvailabilityLogic =>
     GetIt.I.get<UserNameAvailabilityLogic>();
-SignUpController get signingUpLogic => GetIt.I.get<SignUpController>();
+AccountSetupController get signingUpController =>
+    GetIt.I.get<AccountSetupController>();
 TransactionsBossInterface get transactionBoss =>
     GetIt.I.get<TransactionsBossInterface>();
 
@@ -67,7 +68,8 @@ class AppLogic with AppLogicInterface {
     GetIt.I.registerLazySingleton<AccountLogicInterface>(() => AccountLogic());
     GetIt.I.registerLazySingleton<UserNameAvailabilityLogic>(
         () => UserNameAvailabilityLogic());
-    GetIt.I.registerLazySingleton<SignUpController>(() => SignUpController());
+    GetIt.I.registerLazySingleton<AccountSetupController>(
+        () => AccountSetupController());
     GetIt.I.registerLazySingleton<TransactionsBossInterface>(
         () => TransactionsBoss());
   }
@@ -108,6 +110,7 @@ class AppLogic with AppLogicInterface {
     isBootstrapComplete = true;
 
     // temp test api connection
+    /*
     try {
       GetUserInfoByUserNameResponse resp = await api.apiServiceClient
           .getUserInfoByUserName(
@@ -120,7 +123,8 @@ class AppLogic with AppLogicInterface {
       }
     } catch (e) {
       debugPrint('api error checking user name availability: $e');
-    }
+    }*/
+    
   }
 
   @override

@@ -4,15 +4,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:karma_coin/common_libs.dart';
 // import 'package:karma_coin/ui/widgets/user_status.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, required this.title});
+class WelcomeScreen extends StatefulWidget {
+  const WelcomeScreen({super.key, required this.title});
   final String title;
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _WelcomeScreenState extends State<WelcomeScreen> {
   List<Widget> _getWidgets(BuildContext context, User? user) {
     List<Widget> res = <Widget>[];
 

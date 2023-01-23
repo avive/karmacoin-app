@@ -3,7 +3,7 @@ import 'package:karma_coin/common/save_load_mixin.dart';
 
 // todo: add settings interface
 
-// todo: add genesis config file and get verifier info from it and not from settings
+// todo: add genesis config file and get verifier and net id info from it and not from settings
 
 /// App settings logic
 class SettingsLogic with ThrottledSaveLoadMixin {
