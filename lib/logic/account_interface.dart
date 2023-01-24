@@ -8,12 +8,6 @@ abstract class AccountLogicInterface {
   /// Init account logic
   Future<void> init();
 
-  /// Generate a new keypair
-  Future<void> generateNewKeyPair();
-
-  // Set the user name (canonical on-chain)
-  Future<void> setUserName(String userName);
-
   // Set the user's karma coin user data and store it
   Future<void> updateKarmaCoinUserData(KarmaCoinUser user);
 
@@ -41,9 +35,6 @@ abstract class AccountLogicInterface {
   // True if user signed up to KarmaCoin - Client got a NewUser transaction on chain for this user
   final ValueNotifier<bool> signedUpOnChain = ValueNotifier<bool>(false);
 
-  // User name on-chain, if it was set. Not the user's reqested user-name.
-  final ValueNotifier<String?> userName = ValueNotifier<String?>(null);
-
   // Requested user name, if one was set by the user.
   final ValueNotifier<String?> requestedUserName = ValueNotifier<String?>(null);
 
@@ -61,6 +52,7 @@ abstract class AccountLogicInterface {
       ValueNotifier<KarmaCoinUser?>(null);
 
   // Local mode - KarmaUser was created locally, signup tx submitted and accepted but not confirmed yet... we use this to allow user to start appreicating other users as soon as it signs up...
+  // user name should be taken from KarmaUser.
   final ValueNotifier<bool> localMode = ValueNotifier<bool>(true);
 
   // Local authenticated user's phone number

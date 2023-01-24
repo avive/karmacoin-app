@@ -107,6 +107,13 @@ class AccountSetupController extends ChangeNotifier {
 
     debugPrint('new user transaction accepted by api');
 
+    // todo: this is for popup widgets that should be displayed once
+    // we get some signup errors via the signup tx event - in this case
+    // we need to ask the user to pick a new nickname and try again...
+    // currently the account setup screen goes away as soon as the tx
+    // is submitted and accepted so the user can start to use the app and
+    // appreciate
+
     transactionBoss.newUserTransactionEvent.addListener(() async {
       if (transactionBoss.newUserTransactionEvent.value == null) {
         return;

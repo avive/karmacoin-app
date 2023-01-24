@@ -11,8 +11,6 @@ import 'package:karma_coin/logic/txs_boss.dart';
 import 'package:karma_coin/logic/txs_boss_interface.dart';
 import 'package:karma_coin/logic/user_name_availability.dart';
 import 'package:karma_coin/logic/verifier.dart';
-
-import '../services/api/api.pb.dart';
 import 'account.dart';
 import 'account_interface.dart';
 import 'api.dart';
@@ -124,7 +122,6 @@ class AppLogic with AppLogicInterface {
     } catch (e) {
       debugPrint('api error checking user name availability: $e');
     }*/
-    
   }
 
   @override

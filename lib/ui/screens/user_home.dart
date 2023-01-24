@@ -12,7 +12,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Usee Home Screen'),
+        title: const Text('User Home Screen'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
