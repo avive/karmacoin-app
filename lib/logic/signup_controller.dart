@@ -37,7 +37,7 @@ class AccountSetupController extends ChangeNotifier {
     _status = AccountSetupStatus.validating;
     notifyListeners();
 
-    if (!accountLogic.isDataValidForNewKarmaCoinUser()) {
+    if (!accountLogic.validateDataForNewKarmCoinUser()) {
       _errorMessge = 'Internal error - missing data';
       _status = AccountSetupStatus.missingData;
       notifyListeners();
@@ -49,7 +49,7 @@ class AccountSetupController extends ChangeNotifier {
     // so user can start sending transactions before his signup tx is confirmed
     await accountLogic.createNewKarmaCoinUser();
 
-    if (!accountLogic.isDataValidForPhoneVerification()) {
+    if (!accountLogic.validateDataForPhoneVerification()) {
       _errorMessge = 'Internal error - missing data';
       _status = AccountSetupStatus.missingData;
       notifyListeners();
@@ -77,7 +77,7 @@ class AccountSetupController extends ChangeNotifier {
     _status = AccountSetupStatus.submittingTransaction;
     notifyListeners();
 
-    if (!accountLogic.isDataValidForNewUserTransaction()) {
+    if (!accountLogic.validateDataForNewUserTransaction()) {
       _errorMessge = 'Internal error - missing data';
       _status = AccountSetupStatus.missingData;
       notifyListeners();

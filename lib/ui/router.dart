@@ -30,6 +30,30 @@ class ScreenPaths {
   static String settings = '/settings';
 }
 
+/// Shared screen names across the app
+class ScreenNames {
+  /// Splash screen
+  static String splash = 'splash';
+
+  /// Signup with phone number flow first screen
+  static String signup = 'signup';
+
+  /// Account setup progress screen...
+  static String accountSetup = 'setup';
+
+  /// User name input screen
+  static String userName = 'user-name-input';
+
+  /// Guest home screen (playground for now)
+  static String welcome = '/';
+
+  /// Signed up user screen
+  static String home = 'home';
+
+  /// A signed up user settings screen
+  static String settings = 'settings';
+}
+
 /// The route configuration
 final GoRouter appRouter = GoRouter(
   refreshListenable: signingUpController,
@@ -45,6 +69,8 @@ final GoRouter appRouter = GoRouter(
   },
   routes: <RouteBase>[
     GoRoute(
+      // signup screen
+      name: ScreenNames.signup,
       path: ScreenPaths.signup,
       builder: (BuildContext context, GoRouterState state) {
         return const PhoneAuthScreen();
@@ -52,23 +78,30 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
         // Signed-in user home screen
+        name: ScreenNames.home,
         path: ScreenPaths.home,
         builder: (BuildContext context, GoRouterState state) {
           return const UserHomeScreen();
         }),
     GoRoute(
+        // Splash screen
+        name: ScreenNames.splash,
         path: ScreenPaths.splash,
         builder: (BuildContext context, GoRouterState state) {
           // todo: return karmacoin loading screen...
           return Container(color: Colors.blue);
         }),
     GoRoute(
+        // User name input screen
+        name: ScreenNames.userName,
         path: ScreenPaths.userName,
         builder: (BuildContext context, GoRouterState state) {
           // todo: return user name screen
           return const SetUserNameScreen(title: 'User Name');
         }),
     GoRoute(
+        // Account setup progress screen
+        name: ScreenNames.accountSetup,
         path: ScreenPaths.accountSetup,
         builder: (BuildContext context, GoRouterState state) {
           // todo: return user name screen
@@ -76,6 +109,7 @@ final GoRouter appRouter = GoRouter(
         }),
     GoRoute(
         // Initial app screen (playground for now)
+        name: ScreenNames.welcome,
         path: ScreenPaths.welcome,
         builder: (BuildContext context, GoRouterState state) {
           return const WelcomeScreen(title: 'Karma Coin');

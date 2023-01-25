@@ -1,8 +1,6 @@
 import 'dart:convert';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:karma_coin/common_libs.dart';
-// import 'package:karma_coin/ui/widgets/user_status.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key, required this.title});
@@ -17,8 +15,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     List<Widget> res = <Widget>[];
 
     if (user == null) {
-      res.add(const Text('User not signed-in.'));
-      res.add(const SizedBox(height: 14));
+      res.add(const Text('Welcome to Karma Coin'));
+      res.add(const SizedBox(height: 16));
       res.add(ElevatedButton(
         onPressed: () {
           context.go('/signup');
@@ -26,6 +24,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         style: ElevatedButton.styleFrom(
             elevation: 12.0, textStyle: const TextStyle(color: Colors.white)),
         child: const Text('Sign Up'),
+      ));
+      res.add(const SizedBox(height: 16));
+      res.add(ElevatedButton(
+        onPressed: () async {},
+        style: ElevatedButton.styleFrom(
+            elevation: 12.0, textStyle: const TextStyle(color: Colors.white)),
+        child: const Text('Restore Account'),
       ));
     } else {
       res.add(const Text('User signed in.'));
@@ -47,7 +52,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             elevation: 12.0, textStyle: const TextStyle(color: Colors.white)),
         child: const Text('Sign out'),
       ));
-      res.add(const SizedBox(height: 14));
+      res.add(const SizedBox(height: 16));
 
       res.add(ElevatedButton(
         onPressed: () {
@@ -58,8 +63,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             elevation: 12.0, textStyle: const TextStyle(color: Colors.white)),
         child: const Text('Get Transactions'),
       ));
-      res.add(const SizedBox(height: 14));
-      //res.add(const SignupStatusWidget());
+      res.add(const SizedBox(height: 16));
     }
 
     return res;

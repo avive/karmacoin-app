@@ -117,7 +117,7 @@ class AccountLogic extends AccountLogicInterface {
         debugPrint(
             'got a user from firebase auth. ${user.phoneNumber}, accountId (base64): ${user.displayName}');
         // set the current firebase user
-        await accountLogic.onNewUserAuthenticated(user);
+        await _onNewUserAuthenticated(user);
       } else {
         debugPrint('no user from firebase auth');
       }
@@ -148,6 +148,7 @@ class AccountLogic extends AccountLogicInterface {
 
           // todo: if we have locally created transactions (apprenticeship, etc) we should send them to chain now.
 
+          // Update karma coin user local data with the on-chain data
           await _updateLocalKarmaUserFromChain();
         } else {
           debugPrint(
@@ -265,8 +266,7 @@ class AccountLogic extends AccountLogicInterface {
   }
 
   /// Set local user's phone number
-  @override
-  Future<void> setUserPhoneNumber(String phoneNumber) async {
+  Future<void> _setUserPhoneNumber(String phoneNumber) async {
     await _secureStorage.write(
         key: _AccountStoreKeys.phoneNumber,
         value: phoneNumber,
@@ -291,6 +291,7 @@ class AccountLogic extends AccountLogicInterface {
   }
 
   Future<void> _setLocalMode(bool mode) async {
+    debugPrint('setting local mode to: $mode');
     await _secureStorage.write(
         key: _AccountStoreKeys.localMode,
         value: mode.toString(),
@@ -344,10 +345,8 @@ class AccountLogic extends AccountLogicInterface {
     _userVerificationData = null;
   }
 
-  /// Set the account id for a firebase user
-  /// and store the user's phone number
-  @override
-  Future<void> onNewUserAuthenticated(fb.User user) async {
+  /// Set the account id for a firebase user and store the user's phone number
+  Future<void> _onNewUserAuthenticated(fb.User user) async {
     if (keyPair.value == null) {
       debugPrint('Warning: no local keypair exists - generating new one...');
       await _generateNewKeyPair();
@@ -362,12 +361,18 @@ class AccountLogic extends AccountLogicInterface {
       }
     }
 
-    debugPrint('Storing accountId $accountIdBase64 firebase...');
-    await user.updateDisplayName(accountIdBase64);
-
     debugPrint(
         'Storing user phone number we got from firebase to secure local store... ${user.phoneNumber}');
-    await setUserPhoneNumber(user.phoneNumber!);
+
+    await _setUserPhoneNumber(user.phoneNumber!);
+
+    debugPrint('Storing accountId $accountIdBase64 firebase...');
+    try {
+      await user.updateDisplayName(accountIdBase64);
+    } catch (e) {
+      debugPrint('Error updating firebase user displayName: $e');
+      return;
+    }
 
     debugPrint(
         'User account id: ${keyPair.value!.publicKey.bytes.toShortHexString()} stored on firebase.');
@@ -477,14 +482,14 @@ class AccountLogic extends AccountLogicInterface {
 
   /// Returns true iff account logic has all required data to verify the user's phone number
   @override
-  bool isDataValidForPhoneVerification() {
+  bool validateDataForPhoneVerification() {
     debugPrint(
         'validating local data for phone verification... ${karmaCoinUser.value}');
     return karmaCoinUser.value != null;
   }
 
   @override
-  bool isDataValidForNewKarmaCoinUser() {
+  bool validateDataForNewKarmCoinUser() {
     debugPrint(
         'validating local data for new kc user... ${keyPair.value}, ${requestedUserName.value}, ${phoneNumber.value}');
 
@@ -495,7 +500,7 @@ class AccountLogic extends AccountLogicInterface {
 
   /// Returns true iff account logic has all required data to create a new user
   @override
-  bool isDataValidForNewUserTransaction() {
+  bool validateDataForNewUserTransaction() {
     debugPrint(
         'validating local data for new user tx... store validator response: $_userVerificationData');
 
@@ -503,6 +508,8 @@ class AccountLogic extends AccountLogicInterface {
         _userVerificationData?.verificationResult ==
             VerificationResult.VERIFICATION_RESULT_VERIFIED;
   }
+
+  /// todo: this should move to TransactionsGenerator class
 
   /// Submit a new user transaction to the network using the last verifier response
   /// Throws an exception if failed to sent tx to an api provider or it rejected it
@@ -560,6 +567,8 @@ class AccountLogic extends AccountLogicInterface {
     return resp;
   }
 
+  /// todo: this should move to TransactionsGenerator class
+
   /// Create a new signed transaction with the local account data and the given transaction data
   SignedTransactionWithStatus _createSignedTransaction(TransactionData data) {
     SignedTransaction tx = SignedTransaction(
@@ -579,5 +588,10 @@ class AccountLogic extends AccountLogicInterface {
     enrichedTx.sign(ed.PrivateKey(keyPair.value!.privateKey.bytes));
 
     return enrichedTx.txWithStatus;
+  }
+
+  @override
+  bool canSubmitTransactions() {
+    return localMode.value == true || signedUpOnChain.value == true;
   }
 }

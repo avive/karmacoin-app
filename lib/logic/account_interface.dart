@@ -14,14 +14,12 @@ abstract class AccountLogicInterface {
   // Set the user reuqested user name
   Future<void> setRequestedUserName(String requestedUserName);
 
-  // Set the user's phone number
-  Future<void> setUserPhoneNumber(String phoneNumber);
-
   /// Clear all local account data
   Future<void> clear();
 
-  /// Set the account id on a local Firebase Auth autenticated user
-  Future<void> onNewUserAuthenticated(fb.User user);
+  /// returns true if user can submit transacitons.
+  /// This is the case if user is signed up to karmacoin on-chain or is in local-mode
+  bool canSubmitTransactions();
 
   /// Gets the user's seed words - this is the secret users needs to write in
   /// order to recover their account
@@ -58,7 +56,7 @@ abstract class AccountLogicInterface {
   // Local authenticated user's phone number
   final ValueNotifier<String?> phoneNumber = ValueNotifier<String?>(null);
 
-  bool isDataValidForNewKarmaCoinUser();
-  bool isDataValidForPhoneVerification();
-  bool isDataValidForNewUserTransaction();
+  bool validateDataForNewKarmCoinUser();
+  bool validateDataForPhoneVerification();
+  bool validateDataForNewUserTransaction();
 }
