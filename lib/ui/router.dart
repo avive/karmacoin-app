@@ -1,10 +1,10 @@
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/signup_controller.dart';
 import 'package:karma_coin/ui/screens/account_setup.dart';
-import 'package:karma_coin/ui/screens/auth_screen.dart';
+import 'package:karma_coin/ui/screens/phone_auth.dart';
 import 'package:karma_coin/ui/screens/user_home.dart';
-import 'package:karma_coin/ui/screens/welcome_screen.dart';
-import 'package:karma_coin/ui/screens/user_name_screen.dart';
+import 'package:karma_coin/ui/screens/welcome.dart';
+import 'package:karma_coin/ui/screens/user_name.dart';
 
 /// Shared paths / urls used across the app
 class ScreenPaths {

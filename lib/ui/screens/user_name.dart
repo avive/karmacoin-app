@@ -99,7 +99,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
                     return;
                   }
 
-                  // todo: verify we need to do this again on next....
+                  // check once again for availbility...
                   await userNameAvailabilityLogic.check(_textController.text);
 
                   if (userNameAvailabilityLogic.status ==
