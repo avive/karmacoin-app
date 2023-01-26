@@ -43,8 +43,8 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
                   controller: _textController,
                 ),
                 const SizedBox(height: 14),
-                ChangeNotifierProvider(
-                  create: (context) => userNameAvailabilityLogic,
+                ChangeNotifierProvider.value(
+                  value: userNameAvailabilityLogic,
                   child: Consumer<UserNameAvailabilityLogic>(
                     builder: (context, state, child) {
                       switch (state.status) {
@@ -94,7 +94,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
 
                       // navigate to the home screen
                       if (!mounted) return;
-                      context.go(ScreenPaths.accountSetup);
+                      context.push(ScreenPaths.accountSetup);
                     } else {
                       if (!mounted) return;
                       //ScaffoldMessenger.of(context).showSnackBar(

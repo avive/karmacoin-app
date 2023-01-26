@@ -31,7 +31,7 @@ class PhoneAuthScreen extends StatelessWidget {
       BuildContext context, SMSCodeSent state, PhoneAuthController ctrl) {
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         SMSCodeInput(onSubmit: (smsCode) {
           debugPrint('Verify sms code: $smsCode');
           ctrl.verifySMSCode(
@@ -60,7 +60,7 @@ class PhoneAuthScreen extends StatelessWidget {
         if (newState is SignedIn) {
           Future.delayed(Duration.zero, () {
             debugPrint('navigating to user name screen...');
-            context.go(ScreenPaths.userName);
+            context.push(ScreenPaths.userName);
           });
         } else if (newState is AuthFailed) {
           // bad code used - show error and ask to try again
@@ -116,9 +116,9 @@ class PhoneAuthScreen extends StatelessWidget {
           body = Container();
         }
         return CupertinoPageScaffold(
-            navigationBar:
-                const CupertinoNavigationBar(middle: Text('Sign Up')),
-            child: body);
+          navigationBar: const CupertinoNavigationBar(middle: Text('Sign Up')),
+          child: SafeArea(child: body),
+        );
       },
     );
   }

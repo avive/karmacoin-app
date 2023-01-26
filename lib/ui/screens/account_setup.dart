@@ -1,4 +1,4 @@
-import 'package:karma_coin/logic/signup_controller.dart';
+import 'package:karma_coin/logic/account_status_controller.dart';
 import 'package:karma_coin/common_libs.dart';
 
 /// Screen displaying account setup progress
@@ -18,10 +18,10 @@ class _AccountSetupState extends State<AccountSetupScreen> {
   }
 
   void postFrame(BuildContext context) async {
-    debugPrint('AccountSetupStatus: ${signingUpController.status}');
-    if (signingUpController.status == AccountSetupStatus.readyToSignup) {
+    debugPrint('AccountSetupStatus: ${accountSetupController.status}');
+    if (accountSetupController.status == AccountSetupStatus.readyToSignup) {
       debugPrint('Ready to sign up state - starting signup proces...');
-      await signingUpController.signUpUser();
+      await accountSetupController.signUpUser();
     }
   }
 
@@ -44,8 +44,8 @@ class _AccountSetupState extends State<AccountSetupScreen> {
   }
 
   Widget _getStatusWidget(context) {
-    return ChangeNotifierProvider(
-      create: (context) => signingUpController,
+    return ChangeNotifierProvider.value(
+      value: accountSetupController,
       child: Consumer<AccountSetupController>(
         builder: (context, state, child) {
           switch (state.status) {

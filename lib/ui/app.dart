@@ -6,6 +6,7 @@ class KarmaCoinApp extends StatelessWidget with GetItMixin {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('KarmaCoinApp build');
     return CupertinoApp.router(
       routerConfig: appRouter,
       debugShowCheckedModeBanner: false,

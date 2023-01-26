@@ -1,5 +1,5 @@
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/logic/signup_controller.dart';
+import 'package:karma_coin/logic/account_status_controller.dart';
 import 'package:karma_coin/ui/screens/account_setup.dart';
 import 'package:karma_coin/ui/screens/phone_auth.dart';
 import 'package:karma_coin/ui/screens/user_home.dart';
@@ -56,13 +56,13 @@ class ScreenNames {
 
 /// The route configuration
 final GoRouter appRouter = GoRouter(
-  refreshListenable: signingUpController,
+  refreshListenable: accountSetupController,
   redirect: (context, state) {
     // if we are on the account setup screen and the user is signed up
     // then redirect to user's home screen
 
     if (state.path == ScreenPaths.accountSetup &&
-        signingUpController.status == AccountSetupStatus.signedUp) {
+        accountSetupController.status == AccountSetupStatus.signedUp) {
       return ScreenPaths.home;
     }
     return null;

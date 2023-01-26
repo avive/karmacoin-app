@@ -6,7 +6,7 @@ import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:karma_coin/logic/auth.dart';
 import 'package:karma_coin/logic/settings.dart';
 import 'package:karma_coin/common/platform_info.dart';
-import 'package:karma_coin/logic/signup_controller.dart';
+import 'package:karma_coin/logic/account_status_controller.dart';
 import 'package:karma_coin/logic/txs_boss.dart';
 import 'package:karma_coin/logic/txs_boss_interface.dart';
 import 'package:karma_coin/logic/user_name_availability.dart';
@@ -25,7 +25,7 @@ AuthLogicInterface get authLogic => GetIt.I.get<AuthLogicInterface>();
 AccountLogicInterface get accountLogic => GetIt.I.get<AccountLogicInterface>();
 UserNameAvailabilityLogic get userNameAvailabilityLogic =>
     GetIt.I.get<UserNameAvailabilityLogic>();
-AccountSetupController get signingUpController =>
+AccountSetupController get accountSetupController =>
     GetIt.I.get<AccountSetupController>();
 TransactionsBossInterface get transactionBoss =>
     GetIt.I.get<TransactionsBossInterface>();
