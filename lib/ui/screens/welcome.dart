@@ -17,19 +17,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     if (user == null) {
       res.add(const Text('Welcome to Karma Coin'));
       res.add(const SizedBox(height: 16));
-      res.add(ElevatedButton(
+      res.add(CupertinoButton.filled(
         onPressed: () {
           context.go('/signup');
         },
-        style: ElevatedButton.styleFrom(
-            elevation: 12.0, textStyle: const TextStyle(color: Colors.white)),
         child: const Text('Sign Up'),
       ));
       res.add(const SizedBox(height: 16));
-      res.add(ElevatedButton(
+      res.add(CupertinoButton(
         onPressed: () async {},
-        style: ElevatedButton.styleFrom(
-            elevation: 12.0, textStyle: const TextStyle(color: Colors.white)),
         child: const Text('Restore Account'),
       ));
     } else {
@@ -40,27 +36,24 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         res.add(Text(accountId));
       }
       res.add(const SizedBox(height: 14));
-      res.add(ElevatedButton(
+      res.add(CupertinoButton.filled(
         onPressed: () async {
           await accountLogic.clear();
           await authLogic.signOut();
+          /*
           const snackBar = SnackBar(content: Text('Logged out'));
           if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
         },
-        style: ElevatedButton.styleFrom(
-            elevation: 12.0, textStyle: const TextStyle(color: Colors.white)),
         child: const Text('Sign out'),
       ));
       res.add(const SizedBox(height: 16));
 
-      res.add(ElevatedButton(
+      res.add(CupertinoButton(
         onPressed: () {
-          const snackBar = SnackBar(content: Text('Got transactions'));
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          // const snackBar = SnackBar(content: Text('Got transactions'));
+          // ScaffoldMessenger.of(context).showSnackBar(snackBar);
         },
-        style: ElevatedButton.styleFrom(
-            elevation: 12.0, textStyle: const TextStyle(color: Colors.white)),
         child: const Text('Get Transactions'),
       ));
       res.add(const SizedBox(height: 16));
@@ -74,14 +67,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(widget.title),
-          ),
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: _getWidgets(context, snapshot.data),
+        return CupertinoPageScaffold(
+          navigationBar:
+              const CupertinoNavigationBar(middle: Text('Karma Coin')),
+          child: SafeArea(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: _getWidgets(context, snapshot.data),
+              ),
             ),
           ),
         );

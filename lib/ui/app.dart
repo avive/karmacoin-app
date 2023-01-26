@@ -1,5 +1,4 @@
-import '../common_libs.dart';
-import './router.dart';
+import 'package:karma_coin/common_libs.dart';
 
 /// The KarmaCoinApp widget is the root of the app
 class KarmaCoinApp extends StatelessWidget with GetItMixin {
@@ -7,8 +6,13 @@ class KarmaCoinApp extends StatelessWidget with GetItMixin {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
+    return CupertinoApp.router(
       routerConfig: appRouter,
+      debugShowCheckedModeBanner: false,
+      title: 'Karma Coin',
+      theme: const CupertinoThemeData(brightness: Brightness.light),
+      //routeInformationParser: appRouter.routeInformationParser,
+      //routerDelegate: appRouter.routerDelegate,
     );
   }
 }

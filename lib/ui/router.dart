@@ -89,7 +89,7 @@ final GoRouter appRouter = GoRouter(
         path: ScreenPaths.splash,
         builder: (BuildContext context, GoRouterState state) {
           // todo: return karmacoin loading screen...
-          return Container(color: Colors.blue);
+          return Container(color: CupertinoTheme.of(context).primaryColor);
         }),
     GoRoute(
         // User name input screen

@@ -1,6 +1,5 @@
 import 'package:karma_coin/logic/signup_controller.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/ui/router.dart';
 
 /// Screen displaying account setup progress
 /// with possible errors and actions to resolve them
@@ -28,16 +27,18 @@ class _AccountSetupState extends State<AccountSetupScreen> {
 
   @override
   build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Just a minute...'),
+    return CupertinoPageScaffold(
+      navigationBar: const CupertinoNavigationBar(
+        middle: Text('Just a minute...'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-          _getStatusWidget(context),
-          const SizedBox(height: 14),
-        ]),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+            _getStatusWidget(context),
+            const SizedBox(height: 14),
+          ]),
+        ),
       ),
     );
   }
@@ -49,11 +50,10 @@ class _AccountSetupState extends State<AccountSetupScreen> {
         builder: (context, state, child) {
           switch (state.status) {
             case AccountSetupStatus.signedUp:
-              /*
               Future.delayed(Duration.zero, () {
                 debugPrint('going to user home...');
                 context.go(ScreenPaths.home);
-              });*/
+              });
               return const Text('You are signed up! Time to appretiate...');
             case AccountSetupStatus.validating:
               return const Text(
