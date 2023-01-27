@@ -28,16 +28,23 @@ class _AccountSetupState extends State<AccountSetupScreen> {
   @override
   build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text('Just a minute...'),
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-            _getStatusWidget(context),
-            const SizedBox(height: 14),
-          ]),
+      child: NestedScrollView(
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          return <Widget>[
+            CupertinoSliverNavigationBar(
+              largeTitle: Text('Just a minute...'),
+            ),
+          ];
+        },
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+              _getStatusWidget(context),
+              const SizedBox(height: 14),
+            ]),
+          ),
         ),
       ),
     );

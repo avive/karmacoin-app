@@ -11,16 +11,24 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   @override
   build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(middle: Text('Karma Coin')),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: const [
-                Text('Karma Score...'),
-                SizedBox(height: 14),
-              ]),
+      child: NestedScrollView(
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          return <Widget>[
+            CupertinoSliverNavigationBar(
+              largeTitle: Text('Karma Coin'),
+            )
+          ];
+        },
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: const [
+                  Text('Karma Score...'),
+                  SizedBox(height: 14),
+                ]),
+          ),
         ),
       ),
     );

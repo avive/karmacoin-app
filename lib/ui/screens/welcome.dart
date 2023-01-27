@@ -48,12 +48,16 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         child: const Text('Sign out'),
       ));
       res.add(const SizedBox(height: 16));
+      res.add(CupertinoButton(
+        onPressed: () async {
+          context.go(ScreenPaths.home);
+        },
+        child: const Text('User Home'),
+      ));
+      res.add(const SizedBox(height: 16));
 
       res.add(CupertinoButton(
-        onPressed: () {
-          // const snackBar = SnackBar(content: Text('Got transactions'));
-          // ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        },
+        onPressed: () {},
         child: const Text('Get Transactions'),
       ));
       res.add(const SizedBox(height: 16));
@@ -68,13 +72,21 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         return CupertinoPageScaffold(
-          navigationBar:
-              const CupertinoNavigationBar(middle: Text('Karma Coin')),
-          child: SafeArea(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: _getWidgets(context, snapshot.data),
+          child: NestedScrollView(
+            headerSliverBuilder:
+                (BuildContext context, bool innerBoxIsScrolled) {
+              return <Widget>[
+                CupertinoSliverNavigationBar(
+                  largeTitle: Text('Karma Coin'),
+                )
+              ];
+            },
+            body: SafeArea(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: _getWidgets(context, snapshot.data),
+                ),
               ),
             ),
           ),

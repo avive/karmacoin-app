@@ -116,8 +116,17 @@ class PhoneAuthScreen extends StatelessWidget {
           body = Container();
         }
         return CupertinoPageScaffold(
-          navigationBar: const CupertinoNavigationBar(middle: Text('Sign Up')),
-          child: SafeArea(child: body),
+          child: NestedScrollView(
+            headerSliverBuilder:
+                (BuildContext context, bool innerBoxIsScrolled) {
+              return <Widget>[
+                CupertinoSliverNavigationBar(
+                  largeTitle: Text('Sign Up'),
+                )
+              ];
+            },
+            body: SafeArea(child: body),
+          ),
         );
       },
     );
