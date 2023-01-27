@@ -146,6 +146,7 @@ class TransactionsBoss extends TransactionsBossInterface {
   }
 
   /// Set the txs data file for an account
+  /// todo: migrate to Hive
   Future<void> _setDataFile(List<int> accountId) async {
     Directory dir = await getApplicationDocumentsDirectory();
     String localPath = dir.path;
@@ -167,7 +168,9 @@ class TransactionsBoss extends TransactionsBossInterface {
       }
     }
 
-    // read any txs for this account from local store
+    /// read any txs for this account from local store
+    /// todo: use hive instead of json file
+
     await _setDataFile(accountId);
 
     if (_localDataFile!.existsSync()) {

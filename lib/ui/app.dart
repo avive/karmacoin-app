@@ -18,7 +18,7 @@ class KarmaCoinApp extends StatelessWidget with GetItMixin {
       debugShowCheckedModeBanner: false,
       useInheritedMediaQuery: true,
       title: 'Karma Coin',
-      // for now we work in light mode only due to widgets
+      // for now we work in light brightness mode only due to widgets
       // color issues in the firebase_ui_auth package
       // remove brightness to have the app switch between light and dark mode based on system's brightness.
       theme: const CupertinoThemeData(brightness: Brightness.light),

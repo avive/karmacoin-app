@@ -1,5 +1,5 @@
 name: karma_coin
-description: A new Flutter project.
+description: The Karma Coin App
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -31,7 +31,6 @@ dependencies:
   flutter:
     sdk: flutter
 
-
   cupertino_icons: ^1.0.2
   fixnum: ^1.0.1
   protobuf: ^2.1.0
@@ -56,6 +55,10 @@ dependencies:
   path_provider: ^2.0.11
   quiver: ^3.2.1
   url_strategy: ^0.2.0
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  sheet: 
+    path: ../sheet
 
 dev_dependencies:
   flutter_test:
@@ -78,6 +81,8 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  assets: 
+    - assets/images/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

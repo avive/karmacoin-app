@@ -28,21 +28,24 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
           child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
             Form(
               key: _formKey,
-              child: Center(
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      _getTextField(context),
-                      const SizedBox(height: 14),
-                      _getAvailabilityStatus(context),
-                      const SizedBox(height: 14),
-                      CupertinoButton.filled(
-                        onPressed: () async {
-                          await _submitName();
-                        },
-                        child: const Text('Next'),
-                      ),
-                    ]),
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: Center(
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        _getTextField(context),
+                        const SizedBox(height: 14),
+                        _getAvailabilityStatus(context),
+                        const SizedBox(height: 14),
+                        CupertinoButton.filled(
+                          onPressed: () async {
+                            await _submitName();
+                          },
+                          child: const Text('Next'),
+                        ),
+                      ]),
+                ),
               ),
             ),
           ]),

@@ -14,9 +14,26 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   List<Widget> _getWidgets(BuildContext context, User? user) {
     List<Widget> res = <Widget>[];
 
+    CupertinoTextThemeData textTheme = CupertinoTheme.of(context).textTheme;
+
     if (user == null) {
-      res.add(const Text('Welcome to Karma Coin'));
       res.add(const SizedBox(height: 16));
+      res.add(Image.asset('assets/images/logo_400.png', width: 160));
+      res.add(const SizedBox(height: 32));
+      res.add(
+          Text('Welcome to Karma Coin', style: textTheme.navTitleTextStyle));
+      res.add(const SizedBox(height: 16));
+      res.add(
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 64.0),
+          child: Text(
+            'An easy-to-use cryptocurrency designed for appreciation, tipping and communities.',
+            style: textTheme.textStyle,
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+      res.add(const SizedBox(height: 32));
       res.add(CupertinoButton.filled(
         onPressed: () {
           context.push(ScreenPaths.signup);
@@ -40,10 +57,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         onPressed: () async {
           await accountLogic.clear();
           await authLogic.signOut();
-          /*
-          const snackBar = SnackBar(content: Text('Logged out'));
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
         },
         child: const Text('Sign out'),
       ));
@@ -84,7 +97,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             body: SafeArea(
               child: Center(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: _getWidgets(context, snapshot.data),
                 ),
               ),

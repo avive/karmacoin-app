@@ -1,10 +1,13 @@
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/account_status_controller.dart';
 import 'package:karma_coin/ui/screens/account_setup.dart';
+import 'package:karma_coin/ui/screens/actions.dart';
 import 'package:karma_coin/ui/screens/phone_auth.dart';
 import 'package:karma_coin/ui/screens/user_home.dart';
 import 'package:karma_coin/ui/screens/welcome.dart';
 import 'package:karma_coin/ui/screens/user_name.dart';
+import 'package:karma_coin/ui/widgets/appreciate.dart';
+import 'package:sheet/route.dart';
 
 /// Shared paths / urls used across the app
 class ScreenPaths {
@@ -26,8 +29,11 @@ class ScreenPaths {
   /// Signed up user screen
   static String home = '/home';
 
-  /// A signed up user settings screen
-  static String settings = '/settings';
+  /// A signed up user actions screen
+  static String actions = '/actions';
+
+  /// A signed up user actions screen
+  static String appreciate = '/appreciate';
 }
 
 /// Shared screen names across the app
@@ -51,7 +57,10 @@ class ScreenNames {
   static String home = 'home';
 
   /// A signed up user settings screen
-  static String settings = 'settings';
+  static String actions = 'actions';
+
+  /// A signed up user actions screen
+  static String appreciate = 'appreciate';
 }
 
 /// The route configuration
@@ -114,5 +123,20 @@ final GoRouter appRouter = GoRouter(
         builder: (BuildContext context, GoRouterState state) {
           return const WelcomeScreen(title: 'Karma Coin');
         }),
+    GoRoute(
+        name: ScreenNames.actions,
+        path: ScreenPaths.actions,
+        builder: (BuildContext context, GoRouterState state) {
+          return const ActionsScreen();
+        }),
+    GoRoute(
+      name: ScreenNames.appreciate,
+      path: ScreenPaths.appreciate,
+      pageBuilder: (BuildContext context, GoRouterState state) {
+        return CupertinoSheetPage<void>(
+          child: AppreciateWidget(),
+        );
+      },
+    ),
   ],
 );
