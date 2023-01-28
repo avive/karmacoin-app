@@ -13,15 +13,25 @@ class KarmaCoinApp extends StatelessWidget with GetItMixin {
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
-    return CupertinoApp.router(
-      routerConfig: appRouter,
-      debugShowCheckedModeBanner: false,
-      useInheritedMediaQuery: true,
-      title: 'Karma Coin',
-      // for now we work in light brightness mode only due to widgets
-      // color issues in the firebase_ui_auth package
-      // remove brightness to have the app switch between light and dark mode based on system's brightness.
-      theme: const CupertinoThemeData(brightness: Brightness.light),
+    return Builder(
+      builder: (BuildContext context) {
+        return DefaultTextStyle(
+          style: CupertinoTheme.of(context).textTheme.textStyle,
+          child: CupertinoApp.router(
+            routerConfig: appRouter,
+            debugShowCheckedModeBanner: false,
+            useInheritedMediaQuery: true,
+            title: 'Karma Coin',
+
+            // for now we work in light brightness mode only due to widgets
+            // color issues in the firebase_ui_auth package
+            // remove brightness to have the app switch between light and dark mode based on system's brightness.
+            //theme: const CupertinoThemeData(brightness: Brightness.light),
+
+            theme: const CupertinoThemeData(),
+          ),
+        );
+      },
     );
   }
 }

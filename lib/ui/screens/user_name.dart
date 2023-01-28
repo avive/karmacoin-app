@@ -120,6 +120,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
       autocorrect: false,
       clearButtonMode: OverlayVisibilityMode.editing,
       placeholder: 'Enter your user name',
+      style: CupertinoTheme.of(context).textTheme.textStyle,
       textAlign: TextAlign.center,
       padding: const EdgeInsets.all(16.0),
       onSubmitted: (value) async {
@@ -129,6 +130,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
         border: Border(
           bottom: BorderSide(
             width: 0,
+            // todo: from theme
             color: CupertinoColors.inactiveGray,
           ),
         ),

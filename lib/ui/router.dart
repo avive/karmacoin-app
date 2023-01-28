@@ -6,8 +6,6 @@ import 'package:karma_coin/ui/screens/phone_auth.dart';
 import 'package:karma_coin/ui/screens/user_home.dart';
 import 'package:karma_coin/ui/screens/welcome.dart';
 import 'package:karma_coin/ui/screens/user_name.dart';
-import 'package:karma_coin/ui/widgets/appreciate.dart';
-import 'package:sheet/route.dart';
 
 /// Shared paths / urls used across the app
 class ScreenPaths {
@@ -31,9 +29,6 @@ class ScreenPaths {
 
   /// A signed up user actions screen
   static String actions = '/actions';
-
-  /// A signed up user actions screen
-  static String appreciate = '/appreciate';
 }
 
 /// Shared screen names across the app
@@ -58,9 +53,6 @@ class ScreenNames {
 
   /// A signed up user settings screen
   static String actions = 'actions';
-
-  /// A signed up user actions screen
-  static String appreciate = 'appreciate';
 }
 
 /// The route configuration
@@ -129,14 +121,5 @@ final GoRouter appRouter = GoRouter(
         builder: (BuildContext context, GoRouterState state) {
           return const ActionsScreen();
         }),
-    GoRoute(
-      name: ScreenNames.appreciate,
-      path: ScreenPaths.appreciate,
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        return CupertinoSheetPage<void>(
-          child: AppreciateWidget(),
-        );
-      },
-    ),
   ],
 );

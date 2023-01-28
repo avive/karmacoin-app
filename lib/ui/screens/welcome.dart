@@ -46,11 +46,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         child: const Text('Restore Account'),
       ));
     } else {
-      res.add(const Text('User signed in.'));
+      res.add(Text('User signed in.',
+          style: CupertinoTheme.of(context).textTheme.textStyle));
 
       if (user.displayName != null) {
         String accountId = base64.decode(user.displayName!).toShortHexString();
-        res.add(Text(accountId));
+        res.add(
+          Text(accountId,
+              style: CupertinoTheme.of(context).textTheme.textStyle),
+        );
       }
       res.add(const SizedBox(height: 14));
       res.add(CupertinoButton.filled(

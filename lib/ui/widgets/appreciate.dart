@@ -15,13 +15,11 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             CupertinoSliverNavigationBar(
-              backgroundColor: CupertinoColors.white,
               leading: Container(),
               trailing: CupertinoButton(
                 onPressed: () {
                   context.pop();
                 },
-                padding: EdgeInsets.zero,
                 child: const Icon(CupertinoIcons.xmark_circle, size: 32),
               ),
               largeTitle: Text('Appreciate'),
@@ -34,7 +32,12 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Appreciate'),
+                  Text(
+                    'Appreciate',
+                    style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                          TextStyle(fontSize: 24),
+                        ),
+                  ),
                   SizedBox(height: 14),
                   CupertinoButton.filled(
                     onPressed: () {

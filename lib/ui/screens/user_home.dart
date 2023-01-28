@@ -1,4 +1,5 @@
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/ui/widgets/appreciate.dart';
 
 class UserHomeScreen extends StatefulWidget {
   const UserHomeScreen({super.key});
@@ -15,11 +16,17 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     );
   }
 
+  static Route<void> _activityModelBuilder(
+      BuildContext context, Object? arguments) {
+    return CupertinoModalPopupRoute<void>(builder: (BuildContext context) {
+      return AppreciateWidget();
+    });
+  }
+
   @override
   build(BuildContext context) {
     return CupertinoPageScaffold(
       child: NestedScrollView(
-        
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             CupertinoSliverNavigationBar(
@@ -28,7 +35,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     onPressed: () {
                       context.push(ScreenPaths.actions);
                     },
-                    padding: EdgeInsets.only(top: 10),
                     child: const Icon(CupertinoIcons.ellipsis_circle, size: 32),
                   ),
                   0),
@@ -38,43 +44,80 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         },
         body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(0),
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    children: [
-                      Text('53', style: TextStyle(fontSize: 120)),
-                      Text('Karma Score'),
-                    ],
-                  ),
-                  Column(children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      textBaseline: TextBaseline.alphabetic,
-                      mainAxisAlignment: MainAxisAlignment.center,
+              padding: const EdgeInsets.all(0),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Column(
                       children: [
                         Text(
-                          '14',
-                          style: TextStyle(fontSize: 120),
+                          '53',
+                          style: CupertinoTheme.of(context)
+                              .textTheme
+                              .textStyle
+                              .merge(
+                                TextStyle(fontSize: 120),
+                              ),
                         ),
                         Text(
-                          'KC',
-                          style: TextStyle(fontSize: 24),
-                          textAlign: TextAlign.end,
+                          'Karma Score',
+                          style: CupertinoTheme.of(context)
+                              .textTheme
+                              .textStyle
+                              .merge(
+                                TextStyle(fontSize: 32),
+                              ),
                         ),
+                        const SizedBox(height: 24),
                       ],
                     ),
-                    Text('Karma Coins Balance'),
-                  ]),
-                  CupertinoButton.filled(
-                    onPressed: () {
-                      context.push(ScreenPaths.appreciate);
-                    },
-                    child: Text('Appreciate'),
-                  ),
-                ]),
-          ),
+                    Column(children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '14',
+                            style: CupertinoTheme.of(context)
+                                .textTheme
+                                .textStyle
+                                .merge(
+                                  TextStyle(fontSize: 120),
+                                ),
+                          ),
+                          Text(
+                            'KC',
+                            style: CupertinoTheme.of(context)
+                                .textTheme
+                                .textStyle
+                                .merge(
+                                  TextStyle(fontSize: 24),
+                                ),
+                            textAlign: TextAlign.end,
+                          ),
+                        ],
+                      ),
+                      Text(
+                        'Karma Coins Balance',
+                        style: CupertinoTheme.of(context)
+                            .textTheme
+                            .textStyle
+                            .merge(
+                              TextStyle(fontSize: 32),
+                            ),
+                      ),
+                    ]),
+                    const SizedBox(height: 36),
+                    CupertinoButton.filled(
+                      onPressed: () {
+                        //context.push(ScreenPaths.appreciate);
+                        Navigator.of(context)
+                            .restorablePush(_activityModelBuilder);
+                      },
+                      child: Text('Appreciate'),
+                    ),
+                  ])),
         ),
       ),
     );

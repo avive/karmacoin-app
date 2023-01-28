@@ -57,9 +57,7 @@ dependencies:
   url_strategy: ^0.2.0
   hive: ^2.2.3
   hive_flutter: ^1.1.0
-  sheet: 
-    path: ../sheet
-
+ 
 dev_dependencies:
   flutter_test:
     sdk: flutter
