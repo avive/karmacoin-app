@@ -13,7 +13,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
     return [
       CupertinoListSection.insetGrouped(
           header: Text(
-            'MY KARMA COINS',
+            'KARMA COINS',
             style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                   TextStyle(fontSize: 14, color: CupertinoColors.inactiveGray),
                 ),
@@ -26,7 +26,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
               onTap: () => {},
             ),
             CupertinoListTile.notched(
-              title: const Text('Appreciations Log'),
+              title: const Text('Appreciations'),
               leading: const Icon(CupertinoIcons.square_list, size: 28),
               trailing: const CupertinoListTileChevron(),
               onTap: () => {},
@@ -34,19 +34,20 @@ class _ActionsScreenState extends State<ActionsScreen> {
           ]),
       CupertinoListSection.insetGrouped(
         header: Text(
-          'MY COMMUNITIES',
+          'COMMUNITIES',
           style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                 TextStyle(fontSize: 14, color: CupertinoColors.inactiveGray),
               ),
         ),
         children: <CupertinoListTile>[
+          /*
           CupertinoListTile.notched(
             title: const Text('Stable Diffusion'),
             leading: const Icon(CupertinoIcons.circle_grid_3x3,
                 size: 28, color: CupertinoColors.activeOrange),
             trailing: const CupertinoListTileChevron(),
             onTap: () => {},
-          ),
+          ),*/
           CupertinoListTile.notched(
             leading: const Icon(CupertinoIcons.add, size: 28),
             trailing: const CupertinoListTileChevron(),
@@ -73,7 +74,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
           ),
           CupertinoListTile.notched(
             title: const Text('Update Profile'),
-            leading: const Icon(CupertinoIcons.person, size: 28),
+            leading: const Icon(CupertinoIcons.person_crop_circle, size: 28),
             trailing: const CupertinoListTileChevron(),
             onTap: () => {},
           ),

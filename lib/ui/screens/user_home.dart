@@ -1,6 +1,8 @@
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/ui/widgets/appreciate.dart';
 
+import 'package:karma_coin/common/widget_utils.dart';
+
 class UserHomeScreen extends StatefulWidget {
   const UserHomeScreen({super.key});
 
@@ -9,13 +11,6 @@ class UserHomeScreen extends StatefulWidget {
 }
 
 class _UserHomeScreenState extends State<UserHomeScreen> {
-  Widget _adjustNavigationBarButtonPosition(Widget button, double x) {
-    return Container(
-      transform: Matrix4.translationValues(x, 0, 0),
-      child: button,
-    );
-  }
-
   static Route<void> _activityModelBuilder(
       BuildContext context, Object? arguments) {
     return CupertinoModalPopupRoute<void>(builder: (BuildContext context) {
@@ -31,14 +26,15 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             CupertinoSliverNavigationBar(
-              trailing: _adjustNavigationBarButtonPosition(
+              trailing: adjustNavigationBarButtonPosition(
                   CupertinoButton(
                     onPressed: () {
                       context.push(ScreenPaths.actions);
                     },
-                    child: const Icon(CupertinoIcons.ellipsis_circle, size: 32),
+                    child: const Icon(CupertinoIcons.ellipsis_circle, size: 24),
                   ),
-                  0),
+                  0,
+                  -10),
               largeTitle: Text('Karma Coin'),
             ),
           ];

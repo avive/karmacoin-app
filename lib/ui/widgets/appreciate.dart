@@ -1,3 +1,4 @@
+import 'package:karma_coin/common/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 
 class AppreciateWidget extends StatefulWidget {
@@ -16,12 +17,15 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
           return <Widget>[
             CupertinoSliverNavigationBar(
               leading: Container(),
-              trailing: CupertinoButton(
-                onPressed: () {
-                  context.pop();
-                },
-                child: const Icon(CupertinoIcons.xmark_circle, size: 32),
-              ),
+              trailing: adjustNavigationBarButtonPosition(
+                  CupertinoButton(
+                    onPressed: () {
+                      context.pop();
+                    },
+                    child: const Icon(CupertinoIcons.xmark_circle, size: 24),
+                  ),
+                  0,
+                  -10),
               largeTitle: Text('Appreciate'),
             ),
           ];
