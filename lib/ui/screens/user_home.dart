@@ -26,6 +26,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   @override
   build(BuildContext context) {
     return CupertinoPageScaffold(
+      resizeToAvoidBottomInset: true,
       child: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
