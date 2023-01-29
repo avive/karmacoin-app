@@ -40,14 +40,13 @@ class _ActionsScreenState extends State<ActionsScreen> {
               ),
         ),
         children: <CupertinoListTile>[
-          /*
           CupertinoListTile.notched(
-            title: const Text('Stable Diffusion'),
+            title: const Text('Karma Coiners'),
             leading: const Icon(CupertinoIcons.circle_grid_3x3,
                 size: 28, color: CupertinoColors.activeOrange),
             trailing: const CupertinoListTileChevron(),
             onTap: () => {},
-          ),*/
+          ),
           CupertinoListTile.notched(
             leading: const Icon(CupertinoIcons.add, size: 28),
             trailing: const CupertinoListTileChevron(),
@@ -118,7 +117,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
         children: <CupertinoListTile>[
           CupertinoListTile.notched(
             title: const Text('Send Feedback'),
-            leading: const Icon(CupertinoIcons.envelope, size: 28),
+            leading: const Icon(CupertinoIcons.ellipses_bubble, size: 28),
             trailing: const CupertinoListTileChevron(),
             onTap: () => {},
           ),

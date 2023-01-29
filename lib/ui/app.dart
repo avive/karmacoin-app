@@ -1,4 +1,5 @@
 import 'package:karma_coin/common_libs.dart';
+import 'package:keyboard_dismisser/keyboard_dismisser.dart';
 
 /// The KarmaCoinApp widget is the root of the app
 class KarmaCoinApp extends StatelessWidget with GetItMixin {
@@ -17,18 +18,20 @@ class KarmaCoinApp extends StatelessWidget with GetItMixin {
       builder: (BuildContext context) {
         return DefaultTextStyle(
           style: CupertinoTheme.of(context).textTheme.textStyle,
-          child: CupertinoApp.router(
-            routerConfig: appRouter,
-            debugShowCheckedModeBanner: false,
-            useInheritedMediaQuery: true,
-            title: 'Karma Coin',
+          child: KeyboardDismisser(
+            child: CupertinoApp.router(
+              routerConfig: appRouter,
+              debugShowCheckedModeBanner: false,
+              useInheritedMediaQuery: true,
+              title: 'Karma Coin',
 
-            // for now we work in light brightness mode only due to widgets
-            // color issues in the firebase_ui_auth package
-            // remove brightness to have the app switch between light and dark mode based on system's brightness.
-            //theme: const CupertinoThemeData(brightness: Brightness.light),
+              // for now we work in light brightness mode only due to widgets
+              // color issues in the firebase_ui_auth package
+              // remove brightness to have the app switch between light and dark mode based on system's brightness.
+              //theme: const CupertinoThemeData(brightness: Brightness.light),
 
-            theme: const CupertinoThemeData(),
+              theme: const CupertinoThemeData(),
+            ),
           ),
         );
       },
