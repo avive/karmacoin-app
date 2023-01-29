@@ -1,3 +1,4 @@
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:karma_coin/common/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/ui/widgets/traits_picker.dart';
@@ -50,9 +51,15 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                   Container(
                     padding: EdgeInsets.only(left: 36, right: 36),
                     child: CupertinoTextField(
+                      padding: const EdgeInsets.all(16),
+                      style: CupertinoTheme.of(context)
+                          .textTheme
+                          .textStyle
+                          .merge(TextStyle(
+                            fontSize: 24,
+                          )),
                       keyboardType: TextInputType.phone,
                       placeholder: 'phone number',
-                      prefix: const Icon(CupertinoIcons.phone),
                     ),
                   ),
                   SizedBox(height: 14),
@@ -60,9 +67,20 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                   Container(
                     padding: EdgeInsets.only(left: 36, right: 36),
                     child: CupertinoTextField(
-                      prefix: const Icon(CupertinoIcons.money_dollar),
+                      padding: const EdgeInsets.all(16),
+                      prefix: Text('KC '),
+                      style: CupertinoTheme.of(context)
+                          .textTheme
+                          .textStyle
+                          .merge(TextStyle(
+                            fontSize: 24,
+                          )),
                       keyboardType: TextInputType.number,
-                      placeholder: 'Amount to send',
+                      placeholder: 'Enter amount to send',
+                      inputFormatters: [
+                        CurrencyTextInputFormatter(
+                            symbol: '', name: 'Karma Coin'),
+                      ],
                     ),
                   ),
                   CupertinoButton.filled(
