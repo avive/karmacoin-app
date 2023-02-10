@@ -190,7 +190,7 @@ class AccountLogic extends AccountLogicInterface {
     keyPair.value = ed.KeyPair(privateKey, publicKey);
 
     debugPrint(
-        'keypair set. Account id: ${keyPair.value?.publicKey.bytes.toShortHexString()}');
+        'keypair set. Account id: ${keyPair.value?.publicKey.bytes.toHexString()}. length: ${keyPair.value?.publicKey.bytes.length}');
   }
 
   /// private helper to set keypair from seed. This is an expensive function and should be run in a separate isolate
@@ -250,7 +250,7 @@ class AccountLogic extends AccountLogicInterface {
     _setKeyPairFromSeed(seed);
 
     debugPrint(
-        'keypair set. Account id: ${keyPair.value?.publicKey.bytes.toShortHexString()}');
+        'keypair set. Account id: ${keyPair.value?.publicKey.bytes.toHexString()}');
   }
 
   @override
@@ -375,7 +375,7 @@ class AccountLogic extends AccountLogicInterface {
     }
 
     debugPrint(
-        'User account id: ${keyPair.value!.publicKey.bytes.toShortHexString()} stored on firebase.');
+        'User account id: ${keyPair.value!.publicKey.bytes.toHexString()} stored on firebase.');
   }
 
   List<int>? _getAccountId() {

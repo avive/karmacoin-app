@@ -1,4 +1,3 @@
-import 'package:karma_coin/common/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 
 class PersonalityTrait {
@@ -21,6 +20,7 @@ class TraitsPickerWidget extends StatefulWidget {
 const double _kItemExtent = 32.0;
 
 class _TraitsPickerWidgetState extends State<TraitsPickerWidget> {
+  // ignore: unused_field
   int _selectedIndex = 0;
 
   @required

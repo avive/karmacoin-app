@@ -1,5 +1,6 @@
 import 'package:karma_coin/common_libs.dart';
 import 'package:keyboard_dismisser/keyboard_dismisser.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 /// The KarmaCoinApp widget is the root of the app
 class KarmaCoinApp extends StatelessWidget with GetItMixin {
@@ -31,6 +32,15 @@ class KarmaCoinApp extends StatelessWidget with GetItMixin {
               //theme: const CupertinoThemeData(brightness: Brightness.light),
 
               theme: const CupertinoThemeData(),
+              localizationsDelegates: const [
+                ...GlobalMaterialLocalizations.delegates,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+              ],
+              supportedLocales: const [
+                Locale('en', ''),
+              ],
             ),
           ),
         );

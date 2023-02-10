@@ -65,6 +65,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.1"
+  circle_flags:
+    dependency: transitive
+    description:
+      name: circle_flags
+      sha256: "96ab4c2cb3ef7a76c57d998a3a3d4db5d994ff29ec10fbbb7bc1da694dc079f2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
   clock:
     dependency: transitive
     description:
@@ -121,6 +129,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.8"
+  dart_countries:
+    dependency: transitive
+    description:
+      name: dart_countries
+      sha256: c42fc90c38d57c857960b793c45d9cf2ba227f5eeb43c69d25d9ea47a9d44553
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.3"
   desktop_webview_auth:
     dependency: transitive
     description:
@@ -137,6 +153,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.4.0"
+  diacritic:
+    dependency: transitive
+    description:
+      name: diacritic
+      sha256: c09a420e737dc036122121fea9f774767e95068f34a17894ee9db30c5bda3075
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.3"
   ed25519_edwards:
     dependency: "direct main"
     description:
@@ -363,6 +387,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.6"
+  flutter_svg_provider:
+    dependency: transitive
+    description:
+      name: flutter_svg_provider
+      sha256: cbb2d02fd9feb70fc30221fc36a7ee5347f1cceae6b0c99ab4fa011bbd9f1f7f
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -645,6 +677,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.1.0"
+  phone_form_field:
+    dependency: "direct main"
+    description:
+      name: phone_form_field
+      sha256: f39c036be37bcc3a292a85cbca7e4c64e5ecb889508e2595f1ba7d233d225faf
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.0.5"
+  phone_number_metadata:
+    dependency: transitive
+    description:
+      name: phone_number_metadata
+      sha256: "5788320b6bc58d85b1151e6406f52caa9c7f879064ed11bd4f945d3ca5c88fda"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.4"
+  phone_numbers_parser:
+    dependency: transitive
+    description:
+      name: phone_numbers_parser
+      sha256: "77f2ee1741c346f137001c10e43c70924251332ef2773c823fcd3c21bc40a1d9"
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.0.0+1"
   platform:
     dependency: transitive
     description:
