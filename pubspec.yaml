@@ -60,6 +60,7 @@ dependencies:
   keyboard_dismisser: ^3.0.0
   currency_text_input_formatter: ^2.1.8
   phone_form_field: ^7.0.5
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:

@@ -1,7 +1,7 @@
-import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:karma_coin/common/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:flutter/material.dart';
+import 'package:karma_coin/ui/widgets/amount_input.dart';
 import 'package:karma_coin/ui/widgets/traits_picker.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 
@@ -53,6 +53,13 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     PersonalityTrait(5, 'Smart', '🥸'),
     PersonalityTrait(6, 'Sexy', '😍'),
   ];
+
+  static Route<void> _amountInputModelBuilder(
+      BuildContext context, Object? arguments) {
+    return CupertinoModalPopupRoute<void>(builder: (BuildContext context) {
+      return AmountInputWidget();
+    });
+  }
 
   @override
   build(BuildContext context) {
@@ -112,7 +119,11 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                               .textTheme
                               .pickerTextStyle),
                       CupertinoButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          //context.push(ScreenPaths.appreciate);
+                          Navigator.of(context)
+                              .restorablePush(_amountInputModelBuilder);
+                        },
                         child: Text('0.1 Karma Coins (0.01 USD)'),
                       ),
                     ],
