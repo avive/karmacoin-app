@@ -2,7 +2,7 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/common/widget_utils.dart';
 
 import 'decimal_input.dart';
-import 'numerical_input.dart';
+import 'numerical_amount_input.dart';
 
 class AmountInputWidget extends StatefulWidget {
   const AmountInputWidget({super.key});

@@ -1,6 +1,7 @@
 import 'package:karma_coin/common/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:flutter/material.dart';
+import 'package:karma_coin/logic/kc_amounts_formatter.dart';
 import 'package:karma_coin/ui/widgets/amount_input.dart';
 import 'package:karma_coin/ui/widgets/traits_picker.dart';
 import 'package:phone_form_field/phone_form_field.dart';
@@ -28,6 +29,8 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   final formKey = GlobalKey<FormState>();
   final phoneKey = GlobalKey<FormFieldState<PhoneNumber>>();
 
+  _AppreciateWidgetState();
+
   @override
   initState() {
     super.initState();
@@ -52,6 +55,30 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     PersonalityTrait(3, 'Awesome', '😎'),
     PersonalityTrait(5, 'Smart', '🥸'),
     PersonalityTrait(6, 'Sexy', '😍'),
+    PersonalityTrait(7, 'Patient', '😀'),
+    PersonalityTrait(8, 'Grateful', '😇'),
+    PersonalityTrait(9, 'Spiritual', '🖖'),
+    PersonalityTrait(10, 'Funny', '😎'),
+    PersonalityTrait(11, 'Caring', '🥸'),
+    PersonalityTrait(12, 'Loving', '😍'),
+    PersonalityTrait(13, 'Generous', '😀'),
+    PersonalityTrait(14, 'Honest', '😇'),
+    PersonalityTrait(15, 'Respectful', '🖖'),
+    PersonalityTrait(16, 'Creative', '😎'),
+    PersonalityTrait(17, 'Intelligent', '🥸'),
+    PersonalityTrait(18, 'Loyal', '😍'),
+    PersonalityTrait(19, 'Trustworthy', '😀'),
+    PersonalityTrait(20, 'Humble', '😇'),
+    PersonalityTrait(21, 'Courageous', '🖖'),
+    PersonalityTrait(22, 'Confident', '😎'),
+    PersonalityTrait(23, 'Passionate', '🥸'),
+    PersonalityTrait(24, 'Optimistic', '😍'),
+    PersonalityTrait(25, 'Adventurous', '😀'),
+    PersonalityTrait(26, 'Determined', '😇'),
+    PersonalityTrait(27, 'Selfless', '🖖'),
+    PersonalityTrait(28, 'Self-aware', '😎'),
+    PersonalityTrait(29, 'Self-disciplined', '🥸'),
+    PersonalityTrait(30, 'Mindfull', '😍'),
   ];
 
   static Route<void> _amountInputModelBuilder(
@@ -124,7 +151,10 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                           Navigator.of(context)
                               .restorablePush(_amountInputModelBuilder);
                         },
-                        child: Text('0.1 Karma Coins (0.01 USD)'),
+                        child: ValueListenableBuilder<double>(
+                            valueListenable: appState.kCentsAmount,
+                            builder: (context, value, child) =>
+                                Text(KarmaCoinAmountFormatter.format(value))),
                       ),
                     ],
                   ),

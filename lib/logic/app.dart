@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
+import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/logic/auth.dart';
 import 'package:karma_coin/logic/settings.dart';
 import 'package:karma_coin/common/platform_info.dart';
@@ -29,6 +30,7 @@ AccountSetupController get accountSetupController =>
     GetIt.I.get<AccountSetupController>();
 TransactionsBossInterface get transactionBoss =>
     GetIt.I.get<TransactionsBossInterface>();
+AppState get appState => GetIt.I.get<AppState>();
 
 mixin AppLogicInterface {
   /// Indicates to the rest of the app that bootstrap has not completed.
@@ -70,6 +72,7 @@ class AppLogic with AppLogicInterface {
         () => AccountSetupController());
     GetIt.I.registerLazySingleton<TransactionsBossInterface>(
         () => TransactionsBoss());
+    GetIt.I.registerLazySingleton<AppState>(() => AppState());
   }
 
   /// Initialize the app and all main actors.

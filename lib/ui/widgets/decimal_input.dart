@@ -1,5 +1,6 @@
 import 'package:intl/intl.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/logic/kc_amounts_formatter.dart';
 
 class DecimalAmountInputWidget extends StatefulWidget {
   const DecimalAmountInputWidget({super.key});
@@ -11,10 +12,8 @@ class DecimalAmountInputWidget extends StatefulWidget {
 
 const double _kItemExtent = 32.0;
 
-var _deicmalFormat = NumberFormat("###.##");
-
 class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
-  // this is the picker's currently selected amount
+  // picker's currently selected amount in karma coins
   double _kAmountCoins = 1;
 
   // this is the exchange rate - needs to come from the api for real time estimate
@@ -41,9 +40,21 @@ class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
   @override
   void initState() {
     super.initState();
-    _kcMajorUnitsScrollController = FixedExtentScrollController(initialItem: 1);
-    _kcDeciUnitsScrollController = FixedExtentScrollController();
-    _kcCentiUnitsScrollController = FixedExtentScrollController();
+
+    double val = appState.kCentsAmount.value;
+
+    var digit = val / 1000000;
+    var deci = digit % 10;
+    var centi = deci % 10;
+
+    _kcMajorUnitsScrollController =
+        FixedExtentScrollController(initialItem: digit.toInt());
+
+    _kcDeciUnitsScrollController =
+        FixedExtentScrollController(initialItem: deci.toInt());
+
+    _kcCentiUnitsScrollController =
+        FixedExtentScrollController(initialItem: centi.toInt());
   }
 
   void _pickerHandler() {
@@ -69,6 +80,7 @@ class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
         centiIndex.toDouble() * 0.01;
 
     setState(() => _kAmountCoins = kAmountCoins);
+    appState.kCentsAmount.value = kAmountCoins * 1000000;
   }
 
   _DecimalAmountInputWidgetState();
@@ -78,8 +90,7 @@ class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Text(
-            '${_deicmalFormat.format(_kAmountCoins)} Karma Coins (${NumberFormat.currency().format(_kAmountCoins * _kToUsdExchangeRate)})',
+        Text('${KarmaCoinAmountFormatter.format(_kAmountCoins * 1000000)}',
             style: CupertinoTheme.of(context).textTheme.pickerTextStyle),
         Container(
           height: 300,
@@ -95,9 +106,6 @@ class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
                     useMagnifier: true,
                     itemExtent: _kItemExtent,
                     onSelectedItemChanged: (int index) {
-                      debugPrint(
-                          'left picker changed to $index. Selected item: ${_kcMajorUnitsScrollController?.selectedItem}');
-
                       _pickerHandler();
                     },
                     looping: true,
@@ -202,8 +210,9 @@ class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
             ],
           ),
         ),
-        Text(
-            '1 Karma Coin is about ${NumberFormat.currency().format(_kToUsdExchangeRate)}'),
+        Text('1 Karma Coin is about \$${NumberFormat.currency(
+          customPattern: '#.## USD',
+        ).format(_kToUsdExchangeRate)}'),
       ],
     );
   }

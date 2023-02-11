@@ -1,5 +1,6 @@
 import 'package:intl/intl.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/logic/kc_amounts_formatter.dart';
 
 class NumericalAmountInputWidget extends StatefulWidget {
   const NumericalAmountInputWidget({super.key});
@@ -15,7 +16,7 @@ var _deicmalFormat = NumberFormat("###.#####");
 
 class _NumericalAmountInputWidgetState
     extends State<NumericalAmountInputWidget> {
-  // this is the picker's currently selected amount
+  // picker's currently selected amount in karma cents
   double _kAmountCents = 1;
 
   // this is the exchange rate - needs to come from the api for real time estimate
@@ -44,9 +45,10 @@ class _NumericalAmountInputWidgetState
       majorIndex = _kcMajorDecimalDigits.length + majorIndex;
     }
 
-    double kAmountCents = majorIndex.toDouble();
+    double amountCents = majorIndex.toDouble();
 
-    setState(() => _kAmountCents = kAmountCents);
+    setState(() => _kAmountCents = amountCents);
+    appState.kCentsAmount.value = amountCents;
   }
 
   _NumericalAmountInputWidgetState();
@@ -56,8 +58,7 @@ class _NumericalAmountInputWidgetState
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Text(
-            '${_deicmalFormat.format(_kAmountCents)} Karma Cents (${NumberFormat.currency(decimalDigits: 8).format((_kAmountCents / 1000000) * _kToUsdExchangeRate)})',
+        Text('${KarmaCoinAmountFormatter.format(_kAmountCents)}',
             style: CupertinoTheme.of(context).textTheme.pickerTextStyle),
         Column(
           children: [
