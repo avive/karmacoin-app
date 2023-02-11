@@ -147,7 +147,6 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                               .pickerTextStyle),
                       CupertinoButton(
                         onPressed: () {
-                          //context.push(ScreenPaths.appreciate);
                           Navigator.of(context)
                               .restorablePush(_amountInputModelBuilder);
                         },

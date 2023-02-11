@@ -70,6 +70,10 @@ class _AmountInputWidgetState extends State<AmountInputWidget> {
                   // Callback that sets the selected segmented control.
                   onValueChanged: (CoinKind value) {
                     setState(() => _coinKind = value);
+                    if (value == CoinKind.kCents) {
+                      // set input to 1 cents
+                      appState.kCentsAmount.value = 1;
+                    }
                   },
                   children: const <CoinKind, Widget>{
                     CoinKind.kCoins: Padding(

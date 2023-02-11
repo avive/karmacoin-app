@@ -32,7 +32,7 @@ class _NumericalAmountInputWidgetState
   @override
   void initState() {
     super.initState();
-    _kcMajorUnitsScrollController = FixedExtentScrollController(initialItem: 1);
+    _kcMajorUnitsScrollController = FixedExtentScrollController(initialItem: 0);
   }
 
   void _pickerHandler() {
