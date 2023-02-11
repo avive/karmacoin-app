@@ -210,9 +210,11 @@ class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
             ],
           ),
         ),
-        Text('1 Karma Coin is about \$${NumberFormat.currency(
-          customPattern: '#.## USD',
-        ).format(_kToUsdExchangeRate)}'),
+        Text(
+            '1 Karma Coin is about \$${NumberFormat.currency(
+              customPattern: '#.## USD',
+            ).format(_kToUsdExchangeRate)}',
+            style: CupertinoTheme.of(context).textTheme.textStyle),
       ],
     );
   }
