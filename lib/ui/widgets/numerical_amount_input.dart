@@ -19,9 +19,6 @@ class _NumericalAmountInputWidgetState
   // picker's currently selected amount in karma cents
   double _kAmountCents = 1;
 
-  // this is the exchange rate - needs to come from the api for real time estimate
-  double _kToUsdExchangeRate = 0.02;
-
   List<int> _kcMajorDecimalDigits = Iterable<int>.generate(100000).toList();
 
   FixedExtentScrollController? _kcMajorUnitsScrollController;
@@ -45,7 +42,7 @@ class _NumericalAmountInputWidgetState
       majorIndex = _kcMajorDecimalDigits.length + majorIndex;
     }
 
-    double amountCents = majorIndex.toDouble();
+    double amountCents = majorIndex.toDouble() + 1;
 
     setState(() => _kAmountCents = amountCents);
     appState.kCentsAmount.value = amountCents;
@@ -89,7 +86,7 @@ class _NumericalAmountInputWidgetState
                                 children: [
                                   SizedBox(width: 14),
                                   Text(
-                                    '${_kcMajorDecimalDigits[index]}',
+                                    '${_kcMajorDecimalDigits[index] + 1}',
                                   ),
                                 ],
                               )

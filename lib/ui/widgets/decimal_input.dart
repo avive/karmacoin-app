@@ -43,9 +43,9 @@ class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
 
     double val = appState.kCentsAmount.value;
 
-    var digit = val / 1000000;
-    var deci = digit % 10;
-    var centi = deci % 10;
+    var digit = (val / 1000000);
+    var deci = (digit % 10);
+    var centi = (deci % 10);
 
     _kcMajorUnitsScrollController =
         FixedExtentScrollController(initialItem: digit.toInt());
