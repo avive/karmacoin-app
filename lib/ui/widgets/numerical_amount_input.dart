@@ -12,8 +12,6 @@ class NumericalAmountInputWidget extends StatefulWidget {
 
 const double _kItemExtent = 32.0;
 
-var _deicmalFormat = NumberFormat("###.#####");
-
 class _NumericalAmountInputWidgetState
     extends State<NumericalAmountInputWidget> {
   // picker's currently selected amount in karma cents
