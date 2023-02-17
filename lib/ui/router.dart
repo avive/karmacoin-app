@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/account_status_controller.dart';
 import 'package:karma_coin/ui/screens/account_setup.dart';
@@ -55,6 +56,14 @@ class ScreenNames {
   static String actions = 'actions';
 }
 
+Widget scaffoldIt(Widget body) {
+  return ScaffoldMessenger(
+    child: Scaffold(
+      body: body,
+    ),
+  );
+}
+
 /// The route configuration
 final GoRouter appRouter = GoRouter(
   refreshListenable: accountSetupController,
@@ -74,7 +83,7 @@ final GoRouter appRouter = GoRouter(
       name: ScreenNames.signup,
       path: ScreenPaths.signup,
       builder: (BuildContext context, GoRouterState state) {
-        return const PhoneAuthScreen();
+        return scaffoldIt(PhoneAuthScreen());
       },
     ),
     GoRoute(
@@ -82,7 +91,7 @@ final GoRouter appRouter = GoRouter(
         name: ScreenNames.home,
         path: ScreenPaths.home,
         builder: (BuildContext context, GoRouterState state) {
-          return const UserHomeScreen();
+          return scaffoldIt(UserHomeScreen());
         }),
     GoRoute(
         // Splash screen
@@ -98,7 +107,7 @@ final GoRouter appRouter = GoRouter(
         path: ScreenPaths.userName,
         builder: (BuildContext context, GoRouterState state) {
           // todo: return user name screen
-          return const SetUserNameScreen(title: 'User Name');
+          return scaffoldIt(SetUserNameScreen(title: 'User Name'));
         }),
     GoRoute(
         // Account setup progress screen
@@ -106,20 +115,20 @@ final GoRouter appRouter = GoRouter(
         path: ScreenPaths.accountSetup,
         builder: (BuildContext context, GoRouterState state) {
           // todo: return user name screen
-          return const AccountSetupScreen();
+          return scaffoldIt(AccountSetupScreen());
         }),
     GoRoute(
         // Initial app screen (playground for now)
         name: ScreenNames.welcome,
         path: ScreenPaths.welcome,
         builder: (BuildContext context, GoRouterState state) {
-          return const WelcomeScreen(title: 'Karma Coin');
+          return scaffoldIt(WelcomeScreen(title: 'Karma Coin'));
         }),
     GoRoute(
         name: ScreenNames.actions,
         path: ScreenPaths.actions,
         builder: (BuildContext context, GoRouterState state) {
-          return const ActionsScreen();
+          return scaffoldIt(ActionsScreen());
         }),
   ],
 );

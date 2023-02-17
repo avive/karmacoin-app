@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/logic/app_state.dart';
+import 'package:karma_coin/ui/widgets/snack_bar.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key, required this.title});
@@ -78,6 +80,44 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         child: const Text('Get Transactions'),
       ));
       res.add(const SizedBox(height: 16));
+      res.add(CupertinoButton(
+        onPressed: () {
+          /*          final snackBar = SnackBar(
+            content: Text('Yay! A SnackBar!'),
+            action: SnackBarAction(
+              label: 'Undo',
+              onPressed: () {
+                // Some code to undo the change!
+              },
+            ),
+          );*/
+
+          appState.snackType.value = SnackType.Success;
+          appState.snackMessage.value = 'hello world';
+
+          Future.delayed(const Duration(milliseconds: 2000), () {
+            appState.snackType.value = SnackType.Error;
+            appState.snackMessage.value = 'hello world 2';
+          });
+
+// Find the Scaffold in the Widget tree and use it to show a SnackBar!
+          // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+          //showCupertinoSnackBar(context: context, message: 'hello');
+          /*showCupertinoModalPopup<void>(
+              context: context,
+              builder: (BuildContext context) {
+                // some UI setting omitted
+                return CupertinoPopupSurface(
+                  child:
+                      Container(color: CupertinoColors.activeBlue, height: 200),
+                );
+              });*/
+        },
+        child: const Text('Show bottom sheet'),
+      ));
+      res.add(const SizedBox(height: 16));
+      res.add(GloblaSnackWdiget());
     }
 
     return res;
