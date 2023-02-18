@@ -40,28 +40,38 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       );
       return;
     }
+  }
 
-    if (appState.appreciationSent.value) {
-      appState.appreciationSent.value = false;
-      StatusAlert.hide();
-      StatusAlert.show(
-        context,
-        duration: Duration(seconds: 2),
-        title: 'Appreciating...',
-        subtitle: '',
-        configuration: IconConfiguration(icon: CupertinoIcons.clock),
-        maxWidth: 260,
-      );
-      Future.delayed(const Duration(seconds: 3), () {
-        StatusAlert.hide();
-        StatusAlert.show(
-          context,
-          duration: Duration(seconds: 2),
-          configuration: IconConfiguration(icon: CupertinoIcons.check_mark),
-          title: 'Apreciaiton Sent',
-        );
-      });
-    }
+  Widget _getAppreciationListener(BuildContext context) {
+    return ValueListenableBuilder<bool>(
+        valueListenable: appState.appreciationSent,
+        builder: (context, value, child) {
+          if (appState.appreciationSent.value) {
+            appState.appreciationSent.value = false;
+            Future.delayed(Duration.zero, () {
+              StatusAlert.hide();
+              StatusAlert.show(
+                context,
+                duration: Duration(seconds: 2),
+                title: 'Appreciating...',
+                subtitle: '',
+                configuration: IconConfiguration(icon: CupertinoIcons.clock),
+                maxWidth: 240,
+              );
+              Future.delayed(const Duration(seconds: 3), () {
+                StatusAlert.show(
+                  context,
+                  duration: Duration(seconds: 2),
+                  configuration:
+                      IconConfiguration(icon: CupertinoIcons.check_mark),
+                  title: 'Apreciaiton Sent',
+                  maxWidth: 240,
+                );
+              });
+            });
+          }
+          return Container();
+        });
   }
 
   @override
@@ -159,6 +169,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       },
                       child: Text('Appreciate'),
                     ),
+                    _getAppreciationListener(context),
                   ])),
         ),
       ),

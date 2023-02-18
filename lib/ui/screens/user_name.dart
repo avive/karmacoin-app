@@ -28,7 +28,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             CupertinoSliverNavigationBar(
-              largeTitle: Text('Sign Up'),
+              largeTitle: Text('You User Name'),
               leading: Container(),
             ),
           ];
@@ -64,6 +64,8 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
     );
   }
 
+
+
   Widget _getAccountStatusObserver(BuildContext context) {
     return ChangeNotifierProvider.value(
       value: accountSetupController,
@@ -73,7 +75,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
             if (mounted && !_userHomePushed) {
               _userHomePushed = true;
               appState.signedUpInCurentSession.value = true;
-              Future.delayed(Duration.zero, () {
+              Future.delayed(Duration(milliseconds: 100), () {
                 debugPrint('going to user home...');
                 context.go(ScreenPaths.home);
               });
