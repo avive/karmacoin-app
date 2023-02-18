@@ -368,6 +368,7 @@ class AccountLogic extends AccountLogicInterface {
 
     debugPrint('Storing accountId $accountIdBase64 firebase...');
     try {
+      // store the account id on firebase
       await user.updateDisplayName(accountIdBase64);
     } catch (e) {
       debugPrint('Error updating firebase user displayName: $e');

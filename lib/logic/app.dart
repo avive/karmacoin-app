@@ -7,7 +7,7 @@ import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/logic/auth.dart';
 import 'package:karma_coin/logic/settings.dart';
 import 'package:karma_coin/common/platform_info.dart';
-import 'package:karma_coin/logic/account_status_controller.dart';
+import 'package:karma_coin/logic/account_setup_controller.dart';
 import 'package:karma_coin/logic/txs_boss.dart';
 import 'package:karma_coin/logic/txs_boss_interface.dart';
 import 'package:karma_coin/logic/user_name_availability.dart';

@@ -1,4 +1,5 @@
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/logic/account_setup_controller.dart';
 import 'package:karma_coin/logic/user_name_availability.dart';
 
 class SetUserNameScreen extends StatefulWidget {
@@ -12,6 +13,13 @@ class SetUserNameScreen extends StatefulWidget {
 class _SetUserNameScreenState extends State<SetUserNameScreen> {
   final _textController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  bool _userHomePushed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _userHomePushed = false;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +29,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
           return <Widget>[
             CupertinoSliverNavigationBar(
               largeTitle: Text('Sign Up'),
+              leading: Container(),
             ),
           ];
         },
@@ -44,12 +53,34 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
                           },
                           child: const Text('Next'),
                         ),
+                        _getAccountStatusObserver(context),
                       ]),
                 ),
               ),
             ),
           ]),
         ),
+      ),
+    );
+  }
+
+  Widget _getAccountStatusObserver(BuildContext context) {
+    return ChangeNotifierProvider.value(
+      value: accountSetupController,
+      child: Consumer<AccountSetupController>(
+        builder: (context, state, child) {
+          if (state.status == AccountSetupStatus.signedUp) {
+            if (mounted && !_userHomePushed) {
+              _userHomePushed = true;
+              appState.signedUpInCurentSession.value = true;
+              Future.delayed(Duration.zero, () {
+                debugPrint('going to user home...');
+                context.go(ScreenPaths.home);
+              });
+            }
+          }
+          return Container();
+        },
       ),
     );
   }
@@ -103,9 +134,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
 
       debugPrint('starting signup flow...');
 
-      // navigate to the home screen
-      if (!mounted) return;
-      context.push(ScreenPaths.accountSetup);
+      await accountSetupController.signUpUser();
     }
   }
 

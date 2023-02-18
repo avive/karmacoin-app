@@ -160,6 +160,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                   SizedBox(height: 14),
                   CupertinoButton.filled(
                     onPressed: () {
+                      appState.appreciationSent.value = true;
                       context.pop();
                     },
                     child: Text('Appreciate'),

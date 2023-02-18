@@ -61,6 +61,8 @@ dependencies:
   currency_text_input_formatter: ^2.1.8
   phone_form_field: ^7.0.5
   intl: ^0.17.0
+  status_alert: ^1.0.1
+  flutter_otp_text_field: ^1.1.1
 
 dev_dependencies:
   flutter_test:

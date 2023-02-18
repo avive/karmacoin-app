@@ -18,11 +18,8 @@ enum AccountSetupStatus {
 /// Drives the sign-up interactive process in an app session once user provided all
 /// requred data. It uses data from accountLogic to drive the state of the sign-up process.
 class AccountSetupController extends ChangeNotifier {
-  String _errorMessge = '';
-
   AccountSetupStatus _status = AccountSetupStatus.readyToSignup;
 
-  String get errorMessage => _errorMessge;
   AccountSetupStatus get status => _status;
 
   /// Start the signup process using local data in accountManager and a Karmacoin API service provider
@@ -33,12 +30,10 @@ class AccountSetupController extends ChangeNotifier {
 
   // First step in signup process
   Future<void> _getValidatorEvidence() async {
-    _errorMessge = '';
     _status = AccountSetupStatus.validating;
     notifyListeners();
 
     if (!accountLogic.validateDataForNewKarmCoinUser()) {
-      _errorMessge = 'Internal error - missing data';
       _status = AccountSetupStatus.missingData;
       notifyListeners();
       return;
@@ -50,7 +45,6 @@ class AccountSetupController extends ChangeNotifier {
     await accountLogic.createNewKarmaCoinUser();
 
     if (!accountLogic.validateDataForPhoneVerification()) {
-      _errorMessge = 'Internal error - missing data';
       _status = AccountSetupStatus.missingData;
       notifyListeners();
       return;
@@ -60,7 +54,6 @@ class AccountSetupController extends ChangeNotifier {
       await accountLogic.verifyPhoneNumber();
     } catch (e) {
       debugPrint('verify exception: $e');
-      _errorMessge = 'Verification error - please try again later';
       _status = AccountSetupStatus.validatorError;
       notifyListeners();
       return;
@@ -73,12 +66,10 @@ class AccountSetupController extends ChangeNotifier {
   Future<void> submitSignupTransaction() async {
     debugPrint('submitting signup transaction...');
 
-    _errorMessge = '';
     _status = AccountSetupStatus.submittingTransaction;
     notifyListeners();
 
     if (!accountLogic.validateDataForNewUserTransaction()) {
-      _errorMessge = 'Internal error - missing data';
       _status = AccountSetupStatus.missingData;
       notifyListeners();
       return;
@@ -89,7 +80,6 @@ class AccountSetupController extends ChangeNotifier {
       resp = await accountLogic.submitNewUserTransacation();
     } catch (e) {
       // todo: think how to handle this case - auto retry? ask to leave app open?
-      _errorMessge = 'Failed to submit transaction - please try again later';
       _status = AccountSetupStatus.transactionError;
       notifyListeners();
       return;
@@ -99,7 +89,6 @@ class AccountSetupController extends ChangeNotifier {
         SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED) {
       // todo: think how to handle this case - auto retry? ask to leave app open?
 
-      _errorMessge = 'Failed to submit transaction - please try again later';
       _status = AccountSetupStatus.transactionError;
       notifyListeners();
       return;
@@ -124,9 +113,13 @@ class AccountSetupController extends ChangeNotifier {
       switch (event.result) {
         case ExecutionResult.EXECUTION_RESULT_EXECUTED:
           // no need to check the tx event - if the signup was executed then the user is on-chain
-          _status = AccountSetupStatus.signedUp;
-          notifyListeners();
 
+          if (_status != AccountSetupStatus.signedUp) {
+            _status = AccountSetupStatus.signedUp;
+            // appState.snackType.value = SnackType.Success;
+            // appState.snackMessage.value = 'You are signed up to Karma Coin!';
+            notifyListeners();
+          }
           break;
         case ExecutionResult.EXECUTION_RESULT_INVALID:
           switch (event.info) {
@@ -138,6 +131,7 @@ class AccountSetupController extends ChangeNotifier {
               break;
             // todo: update protos and add case that there's already an on-chain acount for the accountId
             case ExecutionInfo.EXECUTION_INFO_ACCOUNT_CREATED:
+              break;
             default:
               _status = AccountSetupStatus.transactionError;
               notifyListeners();

@@ -2,6 +2,7 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/ui/widgets/appreciate.dart';
 
 import 'package:karma_coin/common/widget_utils.dart';
+import 'package:status_alert/status_alert.dart';
 
 class UserHomeScreen extends StatefulWidget {
   const UserHomeScreen({super.key});
@@ -16,6 +17,51 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     return CupertinoModalPopupRoute<void>(builder: (BuildContext context) {
       return AppreciateWidget();
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _postFrameCallback(context));
+  }
+
+  void _postFrameCallback(BuildContext context) {
+    debugPrint('post frame handler');
+    if (appState.signedUpInCurentSession.value) {
+      appState.signedUpInCurentSession.value = false;
+      StatusAlert.show(
+        context,
+        duration: Duration(seconds: 4),
+        title: 'Signed up',
+        subtitle: 'Welcome to Karma Coin!',
+        configuration: IconConfiguration(icon: CupertinoIcons.check_mark),
+        maxWidth: 260,
+      );
+      return;
+    }
+
+    if (appState.appreciationSent.value) {
+      appState.appreciationSent.value = false;
+      StatusAlert.hide();
+      StatusAlert.show(
+        context,
+        duration: Duration(seconds: 2),
+        title: 'Appreciating...',
+        subtitle: '',
+        configuration: IconConfiguration(icon: CupertinoIcons.clock),
+        maxWidth: 260,
+      );
+      Future.delayed(const Duration(seconds: 3), () {
+        StatusAlert.hide();
+        StatusAlert.show(
+          context,
+          duration: Duration(seconds: 2),
+          configuration: IconConfiguration(icon: CupertinoIcons.check_mark),
+          title: 'Apreciaiton Sent',
+        );
+      });
+    }
   }
 
   @override
@@ -108,7 +154,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     const SizedBox(height: 36),
                     CupertinoButton.filled(
                       onPressed: () {
-                        //context.push(ScreenPaths.appreciate);
                         Navigator.of(context)
                             .restorablePush(_activityModelBuilder);
                       },

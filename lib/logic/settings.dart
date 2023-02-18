@@ -10,11 +10,7 @@ class SettingsLogic with ThrottledSaveLoadMixin {
   @override
   String get fileName => 'settings.dat';
 
-  late final hasCompletedOnboarding = ValueNotifier<bool>(false)
-    ..addListener(scheduleSave);
 
-  late final hasDismissedSearchMessage = ValueNotifier<bool>(false)
-    ..addListener(scheduleSave);
   late final currentLocale = ValueNotifier<String?>(null)
     ..addListener(scheduleSave);
 
@@ -48,9 +44,6 @@ class SettingsLogic with ThrottledSaveLoadMixin {
 
   @override
   void copyFromJson(Map<String, dynamic> value) {
-    hasCompletedOnboarding.value = value['hasCompletedOnboarding'] ?? false;
-    hasDismissedSearchMessage.value =
-        value['hasDismissedSearchMessage'] ?? false;
     currentLocale.value = value['currentLocale'];
     apiHostName.value = value['apiHostName'] ?? '127.0.0.1';
     apiHostPort.value = value['apiHostPort'] ?? 9080;
@@ -70,8 +63,6 @@ class SettingsLogic with ThrottledSaveLoadMixin {
   @override
   Map<String, dynamic> toJson() {
     return {
-      'hasCompletedOnboarding': hasCompletedOnboarding.value,
-      'hasDismissedSearchMessage': hasDismissedSearchMessage.value,
       'currentLocale': currentLocale.value,
       'apiHostName': apiHostName.value,
       'apiHostPort': apiHostPort.value,
