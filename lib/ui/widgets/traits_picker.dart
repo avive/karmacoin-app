@@ -32,7 +32,7 @@ class _TraitsPickerWidgetState extends State<TraitsPickerWidget> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Text('You are...',
+        Text('You are',
             style: CupertinoTheme.of(context).textTheme.pickerTextStyle),
         Container(
           height: _kItemExtent * 7,

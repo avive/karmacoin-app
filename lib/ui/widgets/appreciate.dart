@@ -188,7 +188,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text('Send To',
+                    Text('Send to',
                         style: CupertinoTheme.of(context)
                             .textTheme
                             .pickerTextStyle),

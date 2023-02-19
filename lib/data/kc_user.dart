@@ -1,4 +1,5 @@
 import 'package:fixnum/fixnum.dart';
+import 'package:karma_coin/data/genesis_config.dart';
 import '../common_libs.dart';
 import '../services/api/types.pb.dart';
 
@@ -8,7 +9,11 @@ import '../services/api/types.pb.dart';
 /// It is designed to add observability to User data members
 class KarmaCoinUser {
   final User userData;
-  final ValueNotifier<Int64> balance = ValueNotifier<Int64>(Int64.ZERO);
+
+  // We start with the balance after signup reward
+  final ValueNotifier<Int64> balance =
+      ValueNotifier<Int64>(Int64(GenesisConfig.kCentsSignupReward));
+
   final ValueNotifier<Int64> nonce = ValueNotifier<Int64>(Int64.ZERO);
 
   KarmaCoinUser(this.userData);
