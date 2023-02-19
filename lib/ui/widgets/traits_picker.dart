@@ -1,11 +1,6 @@
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/data/personality_traits.dart';
 
-class PersonalityTrait {
-  final int index;
-  final String name;
-  final String emoji;
-  PersonalityTrait(this.index, this.name, this.emoji);
-}
 
 class TraitsPickerWidget extends StatefulWidget {
   @required
@@ -20,9 +15,6 @@ class TraitsPickerWidget extends StatefulWidget {
 const double _kItemExtent = 32.0;
 
 class _TraitsPickerWidgetState extends State<TraitsPickerWidget> {
-  // ignore: unused_field
-  int _selectedIndex = 0;
-
   @required
   final List<PersonalityTrait> items;
 
@@ -45,7 +37,7 @@ class _TraitsPickerWidgetState extends State<TraitsPickerWidget> {
             // This is called when selected item is changed.
             onSelectedItemChanged: (int selectedItem) {
               setState(() {
-                _selectedIndex = selectedItem;
+                appState.charTraitPickerIndex.value = selectedItem;
               });
             },
             children: List<Widget>.generate(items.length, (int index) {

@@ -1,3 +1,4 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/kc_amounts_formatter.dart';
 
@@ -14,7 +15,7 @@ const double _kItemExtent = 32.0;
 class _NumericalAmountInputWidgetState
     extends State<NumericalAmountInputWidget> {
   // picker's currently selected amount in karma cents
-  double _kAmountCents = 1;
+  Int64 _kAmountCents = Int64.ONE;
 
   List<int> _kcMajorDecimalDigits = Iterable<int>.generate(100000).toList();
 
@@ -39,7 +40,7 @@ class _NumericalAmountInputWidgetState
       majorIndex = _kcMajorDecimalDigits.length + majorIndex;
     }
 
-    double amountCents = majorIndex.toDouble() + 1;
+    Int64 amountCents = Int64(majorIndex + 1);
 
     setState(() => _kAmountCents = amountCents);
     appState.kCentsAmount.value = amountCents;

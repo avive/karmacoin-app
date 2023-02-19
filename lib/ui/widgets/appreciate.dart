@@ -1,10 +1,14 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:karma_coin/common/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:flutter/material.dart';
+import 'package:karma_coin/data/personality_traits.dart';
+import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/logic/kc_amounts_formatter.dart';
 import 'package:karma_coin/ui/widgets/amount_input.dart';
 import 'package:karma_coin/ui/widgets/traits_picker.dart';
 import 'package:phone_form_field/phone_form_field.dart';
+import 'package:status_alert/status_alert.dart';
 
 class AppreciateWidget extends StatefulWidget {
   const AppreciateWidget({super.key});
@@ -14,7 +18,8 @@ class AppreciateWidget extends StatefulWidget {
 }
 
 class _AppreciateWidgetState extends State<AppreciateWidget> {
-  late PhoneController controller;
+  late PhoneController phoneController;
+  TraitsPickerWidget traitsPicker = TraitsPickerWidget(PersonalityTraits);
   bool outlineBorder = false;
   bool mobileOnly = true;
   bool shouldFormat = true;
@@ -34,8 +39,14 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   @override
   initState() {
     super.initState();
-    controller = PhoneController(null);
-    controller.addListener(() => setState(() {}));
+    phoneController = PhoneController(null);
+    phoneController.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    phoneController.dispose();
+    super.dispose();
   }
 
   PhoneNumberInputValidator? _getValidator() {
@@ -48,44 +59,60 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     return validators.isNotEmpty ? PhoneValidator.compose(validators) : null;
   }
 
-  static List<PersonalityTrait> _personalityTraits = [
-    PersonalityTrait(0, 'Kind', '😀'),
-    PersonalityTrait(1, 'Helpful', '😇'),
-    PersonalityTrait(2, 'Uber Geek', '🖖'),
-    PersonalityTrait(3, 'Awesome', '😎'),
-    PersonalityTrait(5, 'Smart', '🥸'),
-    PersonalityTrait(6, 'Sexy', '😍'),
-    PersonalityTrait(7, 'Patient', '😀'),
-    PersonalityTrait(8, 'Grateful', '😇'),
-    PersonalityTrait(9, 'Spiritual', '🖖'),
-    PersonalityTrait(10, 'Funny', '😎'),
-    PersonalityTrait(11, 'Caring', '🥸'),
-    PersonalityTrait(12, 'Loving', '😍'),
-    PersonalityTrait(13, 'Generous', '😀'),
-    PersonalityTrait(14, 'Honest', '😇'),
-    PersonalityTrait(15, 'Respectful', '🖖'),
-    PersonalityTrait(16, 'Creative', '😎'),
-    PersonalityTrait(17, 'Intelligent', '🥸'),
-    PersonalityTrait(18, 'Loyal', '😍'),
-    PersonalityTrait(19, 'Trustworthy', '😀'),
-    PersonalityTrait(20, 'Humble', '😇'),
-    PersonalityTrait(21, 'Courageous', '🖖'),
-    PersonalityTrait(22, 'Confident', '😎'),
-    PersonalityTrait(23, 'Passionate', '🥸'),
-    PersonalityTrait(24, 'Optimistic', '😍'),
-    PersonalityTrait(25, 'Adventurous', '😀'),
-    PersonalityTrait(26, 'Determined', '😇'),
-    PersonalityTrait(27, 'Selfless', '🖖'),
-    PersonalityTrait(28, 'Self-aware', '😎'),
-    PersonalityTrait(29, 'Self-disciplined', '🥸'),
-    PersonalityTrait(30, 'Mindfull', '😍'),
-  ];
-
   static Route<void> _amountInputModelBuilder(
       BuildContext context, Object? arguments) {
     return CupertinoModalPopupRoute<void>(builder: (BuildContext context) {
       return AmountInputWidget();
     });
+  }
+
+  // validate input data and show alers if invalid
+  bool _validateData() {
+    debugPrint('validate data... ${phoneController.value}');
+    if (phoneController.value == null ||
+        phoneController.value!.countryCode.isEmpty ||
+        phoneController.value!.nsn.isEmpty) {
+      StatusAlert.show(
+        context,
+        duration: Duration(seconds: 2),
+        title: 'Oops...',
+        subtitle: 'Please enter receiver\'s mobile phone number',
+        configuration: IconConfiguration(icon: CupertinoIcons.exclamationmark),
+        maxWidth: 260,
+      );
+      return false;
+    }
+
+    if (appState.kCentsAmount.value == Int64.ZERO) {
+      StatusAlert.show(
+        context,
+        duration: Duration(seconds: 2),
+        title: 'Oops...',
+        subtitle: 'Please enter a non-zero Karma Coin amount',
+        configuration: IconConfiguration(icon: CupertinoIcons.exclamationmark),
+        maxWidth: 260,
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  Future<void> _sendAppreciation(BuildContext context) async {
+    // todo: validate data and show alerts if invalid
+
+    String number =
+        '+${phoneController.value!.countryCode}${phoneController.value!.nsn}';
+
+    // store data in app state - will be handeled in user's home screen dispatcher....
+    appState.userProvidedAppreciationData.value = UserProvidedAppreciationData(
+        appState.kCentsAmount.value,
+        PersonalityTraits[appState.charTraitPickerIndex.value].index,
+        -1,
+        number,
+        '');
+
+    context.pop();
   }
 
   @override
@@ -119,7 +146,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                           left: 36, right: 36, top: 16, bottom: 16),
                       child: PhoneFormField(
                         key: phoneKey,
-                        controller: controller,
+                        controller: phoneController,
                         shouldFormat: shouldFormat && !useRtl,
                         autofocus: true,
                         autofillHints: const [AutofillHints.telephoneNumber],
@@ -137,7 +164,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                     ),
                   ),
                   SizedBox(height: 14),
-                  TraitsPickerWidget(_personalityTraits),
+                  traitsPicker,
                   SizedBox(height: 14),
                   Column(
                     children: [
@@ -150,7 +177,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                           Navigator.of(context)
                               .restorablePush(_amountInputModelBuilder);
                         },
-                        child: ValueListenableBuilder<double>(
+                        child: ValueListenableBuilder<Int64>(
                             valueListenable: appState.kCentsAmount,
                             builder: (context, value, child) =>
                                 Text(KarmaCoinAmountFormatter.format(value))),
@@ -159,9 +186,10 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                   ),
                   SizedBox(height: 14),
                   CupertinoButton.filled(
-                    onPressed: () {
-                      appState.appreciationSent.value = true;
-                      context.pop();
+                    onPressed: () async {
+                      if (_validateData()) {
+                        await _sendAppreciation(context);
+                      }
                     },
                     child: Text('Appreciate'),
                   ),

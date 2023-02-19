@@ -1,4 +1,5 @@
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/ui/widgets/appreciate.dart';
 
 import 'package:karma_coin/common/widget_utils.dart';
@@ -43,33 +44,41 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   }
 
   Widget _getAppreciationListener(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-        valueListenable: appState.appreciationSent,
+    return ValueListenableBuilder<UserProvidedAppreciationData?>(
+        valueListenable: appState.userProvidedAppreciationData,
         builder: (context, value, child) {
-          if (appState.appreciationSent.value) {
-            appState.appreciationSent.value = false;
-            Future.delayed(Duration.zero, () {
-              StatusAlert.hide();
-              StatusAlert.show(
-                context,
-                duration: Duration(seconds: 2),
-                title: 'Appreciating...',
-                subtitle: '',
-                configuration: IconConfiguration(icon: CupertinoIcons.clock),
-                maxWidth: 240,
-              );
-              Future.delayed(const Duration(seconds: 3), () {
-                StatusAlert.show(
-                  context,
-                  duration: Duration(seconds: 2),
-                  configuration:
-                      IconConfiguration(icon: CupertinoIcons.check_mark),
-                  title: 'Apreciaiton Sent',
-                  maxWidth: 240,
-                );
-              });
-            });
+          if (value == null) {
+            return Container();
           }
+
+          // show sending alert
+          Future.delayed(Duration.zero, () {
+            StatusAlert.show(
+              context,
+              duration: Duration(seconds: 2),
+              title: 'Appreciating...',
+              subtitle: 'Sending your appreciation.',
+              configuration: IconConfiguration(icon: CupertinoIcons.airplane),
+              maxWidth: 240,
+            );
+          });
+
+          // todo: send the appreciation data to the server via user's account - this is a transaction
+          // take data from value
+
+          Future.delayed(const Duration(seconds: 3), () {
+            StatusAlert.show(
+              context,
+              duration: Duration(seconds: 2),
+              configuration: IconConfiguration(icon: CupertinoIcons.check_mark),
+              title: 'Apreciaiton Sent',
+              maxWidth: 240,
+            );
+          });
+
+          // clear the data
+          appState.userProvidedAppreciationData.value = null;
+
           return Container();
         });
   }

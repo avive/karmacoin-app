@@ -1,3 +1,4 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:intl/intl.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/kc_amounts_formatter.dart';
@@ -41,9 +42,9 @@ class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
   void initState() {
     super.initState();
 
-    double val = appState.kCentsAmount.value;
+    Int64 val = appState.kCentsAmount.value;
 
-    double digit = (val / 1000000);
+    double digit = (val.toDouble() / 1000000);
     double deci = (digit - digit.toInt()) * 10;
     double centi = (deci - deci.toInt()) * 10;
 
@@ -80,7 +81,7 @@ class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
         centiIndex.toDouble() * 0.01;
 
     setState(() => _kAmountCoins = kAmountCoins);
-    appState.kCentsAmount.value = kAmountCoins * 1000000;
+    appState.kCentsAmount.value = Int64((kAmountCoins * 1000000).round());
   }
 
   _DecimalAmountInputWidgetState();
@@ -90,7 +91,8 @@ class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Text('${KarmaCoinAmountFormatter.format(_kAmountCoins * 1000000)}',
+        Text(
+            '${KarmaCoinAmountFormatter.format(Int64((_kAmountCoins * 1000000).round()))}',
             style: CupertinoTheme.of(context).textTheme.pickerTextStyle),
         Container(
           height: 300,
