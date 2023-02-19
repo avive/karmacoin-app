@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:keyboard_dismisser/keyboard_dismisser.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -15,32 +16,40 @@ class KarmaCoinApp extends StatelessWidget with GetItMixin {
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
+    final Brightness platformBrightness =
+        WidgetsBinding.instance!.window.platformBrightness;
+
+    // Theme is used below to have the Material widgets theme adapt to platform brightness
+
     return Builder(
       builder: (BuildContext context) {
         return DefaultTextStyle(
           style: CupertinoTheme.of(context).textTheme.textStyle,
           child: KeyboardDismisser(
-            child: CupertinoApp.router(
-              routerConfig: appRouter,
-              debugShowCheckedModeBanner: false,
-              useInheritedMediaQuery: true,
-              title: 'Karma Coin',
+            child: Theme(
+              data: ThemeData(brightness: platformBrightness),
+              child: CupertinoApp.router(
+                routerConfig: appRouter,
+                debugShowCheckedModeBanner: false,
+                useInheritedMediaQuery: true,
+                title: 'Karma Coin',
 
-              // for now we work in light brightness mode only due to widgets
-              // color issues in the firebase_ui_auth package
-              // remove brightness to have the app switch between light and dark mode based on system's brightness.
-              //theme: const CupertinoThemeData(brightness: Brightness.light),
+                // for now we work in light brightness mode only due to widgets
+                // color issues in the firebase_ui_auth package
+                // remove brightness to have the app switch between light and dark mode based on system's brightness.
+                //theme: const CupertinoThemeData(brightness: Brightness.light),
 
-              theme: const CupertinoThemeData(),
-              localizationsDelegates: const [
-                ...GlobalMaterialLocalizations.delegates,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate,
-                GlobalMaterialLocalizations.delegate,
-              ],
-              supportedLocales: const [
-                Locale('en', ''),
-              ],
+                theme: const CupertinoThemeData(),
+                localizationsDelegates: const [
+                  ...GlobalMaterialLocalizations.delegates,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                ],
+                supportedLocales: const [
+                  Locale('en', ''),
+                ],
+              ),
             ),
           ),
         );

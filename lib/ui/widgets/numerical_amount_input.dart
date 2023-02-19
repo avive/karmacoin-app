@@ -1,13 +1,17 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/logic/kc_amounts_formatter.dart';
 
 class NumericalAmountInputWidget extends StatefulWidget {
-  const NumericalAmountInputWidget({super.key});
+  @required
+  final FeeType feeType;
+
+  const NumericalAmountInputWidget({super.key, this.feeType = FeeType.Payment});
 
   @override
   State<NumericalAmountInputWidget> createState() =>
-      _NumericalAmountInputWidgetState();
+      _NumericalAmountInputWidgetState(feeType);
 }
 
 const double _kItemExtent = 32.0;
@@ -16,10 +20,13 @@ class _NumericalAmountInputWidgetState
     extends State<NumericalAmountInputWidget> {
   // picker's currently selected amount in karma cents
   Int64 _kAmountCents = Int64.ONE;
-
   List<int> _kcMajorDecimalDigits = Iterable<int>.generate(100000).toList();
-
   FixedExtentScrollController? _kcMajorUnitsScrollController;
+
+  @required
+  final FeeType feeType;
+
+  _NumericalAmountInputWidgetState(this.feeType);
 
   @override
   void dispose() {
@@ -31,6 +38,14 @@ class _NumericalAmountInputWidgetState
   void initState() {
     super.initState();
     _kcMajorUnitsScrollController = FixedExtentScrollController(initialItem: 0);
+
+    Future.delayed(Duration.zero, () {
+      if (feeType == FeeType.Payment) {
+        appState.kCentsAmount.value = Int64.ONE;
+      } else {
+        appState.kCentsFeeAmount.value = Int64.ONE;
+      }
+    });
   }
 
   void _pickerHandler() {
@@ -43,10 +58,12 @@ class _NumericalAmountInputWidgetState
     Int64 amountCents = Int64(majorIndex + 1);
 
     setState(() => _kAmountCents = amountCents);
-    appState.kCentsAmount.value = amountCents;
+    if (feeType == FeeType.Payment) {
+      appState.kCentsAmount.value = amountCents;
+    } else {
+      appState.kCentsFeeAmount.value = amountCents;
+    }
   }
-
-  _NumericalAmountInputWidgetState();
 
   @override
   build(BuildContext context) {

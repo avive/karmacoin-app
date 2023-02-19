@@ -36,7 +36,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         duration: Duration(seconds: 4),
         title: 'Signed up',
         subtitle: 'Welcome to Karma Coin!',
-        configuration: IconConfiguration(icon: CupertinoIcons.check_mark),
+        configuration:
+            IconConfiguration(icon: CupertinoIcons.check_mark_circled),
         maxWidth: 260,
       );
       return;
@@ -44,8 +45,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   }
 
   Widget _getAppreciationListener(BuildContext context) {
-    return ValueListenableBuilder<UserProvidedAppreciationData?>(
-        valueListenable: appState.userProvidedAppreciationData,
+    return ValueListenableBuilder<PaymentTransactionData?>(
+        valueListenable: appState.paymentTransactionData,
         builder: (context, value, child) {
           if (value == null) {
             return Container();
@@ -56,9 +57,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             StatusAlert.show(
               context,
               duration: Duration(seconds: 2),
-              title: 'Appreciating...',
-              subtitle: 'Sending your appreciation.',
-              configuration: IconConfiguration(icon: CupertinoIcons.airplane),
+              title: 'Sending appreciation...',
+              configuration: IconConfiguration(icon: CupertinoIcons.wand_stars),
+              dismissOnBackgroundTap: true,
               maxWidth: 240,
             );
           });
@@ -70,14 +71,16 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             StatusAlert.show(
               context,
               duration: Duration(seconds: 2),
-              configuration: IconConfiguration(icon: CupertinoIcons.check_mark),
+              configuration:
+                  IconConfiguration(icon: CupertinoIcons.check_mark_circled),
               title: 'Apreciaiton Sent',
+              dismissOnBackgroundTap: true,
               maxWidth: 240,
             );
           });
 
           // clear the data
-          appState.userProvidedAppreciationData.value = null;
+          appState.paymentTransactionData.value = null;
 
           return Container();
         });

@@ -1,21 +1,41 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/common/widget_utils.dart';
-
+import 'package:karma_coin/logic/app_state.dart';
 import 'decimal_input.dart';
 import 'numerical_amount_input.dart';
 
 class AmountInputWidget extends StatefulWidget {
-  const AmountInputWidget({super.key});
+  @required
+  final CoinKind coinKind;
+
+  @required
+  final FeeType feeType;
+
+  @required
+  final String title;
+
+  AmountInputWidget(
+      {Key? key,
+      this.feeType = FeeType.Payment,
+      this.coinKind = CoinKind.kCoins,
+      this.title = 'Karma Coin Amount'})
+      : super(key: key);
 
   @override
-  State<AmountInputWidget> createState() => _AmountInputWidgetState();
+  State<AmountInputWidget> createState() =>
+      _AmountInputWidgetState(feeType, coinKind, title);
 }
 
-enum CoinKind { kCents, kCoins }
-
 class _AmountInputWidgetState extends State<AmountInputWidget> {
-  CoinKind _coinKind = CoinKind.kCoins;
+  @required
+  CoinKind coinKind;
+
+  @required
+  final FeeType feeType;
+
+  @required
+  final String title;
 
   @override
   void dispose() {
@@ -27,14 +47,14 @@ class _AmountInputWidgetState extends State<AmountInputWidget> {
     super.initState();
   }
 
-  _AmountInputWidgetState();
+  _AmountInputWidgetState(this.feeType, this.coinKind, this.title);
 
   Widget _getPickerWidget(CoinKind units) {
     switch (units) {
       case CoinKind.kCoins:
-        return DecimalAmountInputWidget();
+        return DecimalAmountInputWidget(feeType: feeType);
       case CoinKind.kCents:
-        return NumericalAmountInputWidget();
+        return NumericalAmountInputWidget(feeType: feeType);
     }
   }
 
@@ -55,7 +75,7 @@ class _AmountInputWidgetState extends State<AmountInputWidget> {
                 ),
                 0,
                 -10),
-            largeTitle: Text('Karma Coins Amount'),
+            largeTitle: Text(title),
           ),
           SliverFillRemaining(
             hasScrollBody: false,
@@ -67,10 +87,10 @@ class _AmountInputWidgetState extends State<AmountInputWidget> {
                   // Provide horizontal padding around the children.
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   // This represents a currently selected segmented control.
-                  groupValue: _coinKind,
+                  groupValue: coinKind,
                   // Callback that sets the selected segmented control.
                   onValueChanged: (CoinKind value) {
-                    setState(() => _coinKind = value);
+                    setState(() => coinKind = value);
                     if (value == CoinKind.kCents) {
                       // set input to 1 cents
                       appState.kCentsAmount.value = Int64(1);
@@ -88,7 +108,7 @@ class _AmountInputWidgetState extends State<AmountInputWidget> {
                   },
                 ),
                 SizedBox(height: 24),
-                _getPickerWidget(_coinKind),
+                _getPickerWidget(coinKind),
                 CupertinoButton(
                   onPressed: () {},
                   child: Text('Another amount...'),

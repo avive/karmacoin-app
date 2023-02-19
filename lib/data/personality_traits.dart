@@ -6,6 +6,7 @@ class PersonalityTrait {
 }
 
 List<PersonalityTrait> PersonalityTraits = [
+  PersonalityTrait(-1, '', ''),
   PersonalityTrait(0, 'Kind', '😀'),
   PersonalityTrait(1, 'Helpful', '😇'),
   PersonalityTrait(2, 'Uber Geek', '🖖'),
@@ -36,4 +37,12 @@ List<PersonalityTrait> PersonalityTraits = [
   PersonalityTrait(28, 'Self-aware', '😎'),
   PersonalityTrait(29, 'Self-disciplined', '🥸'),
   PersonalityTrait(30, 'Mindfull', '😍'),
+  PersonalityTrait(31, 'My Guardian Angel', '😍'),
+  PersonalityTrait(32, 'a Fairy', '😍'),
+  PersonalityTrait(33, 'a Wizard', '😍'),
+  PersonalityTrait(34, 'a Witch', '😍'),
+  PersonalityTrait(35, 'a Warrior', '😍'),
+  PersonalityTrait(36, 'a Healer', '😍'),
+  PersonalityTrait(37, 'a Guardian', '😍'),
+  PersonalityTrait(38, 'an Inspiration', '😍'),
 ];

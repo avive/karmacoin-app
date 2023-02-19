@@ -3,6 +3,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
+import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/services/api/api.pbgrpc.dart';
 import 'package:karma_coin/common_libs.dart';
@@ -594,5 +595,12 @@ class AccountLogic extends AccountLogicInterface {
   @override
   bool canSubmitTransactions() {
     return localMode.value == true || signedUpOnChain.value == true;
+  }
+
+  @override
+  Future<SubmitTransactionResponse> submitPaymentTransaction(
+      PaymentTransactionData data) {
+    // TODO: implement submitPaymentTransaction
+    throw UnimplementedError();
   }
 }

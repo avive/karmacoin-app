@@ -1,14 +1,18 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:intl/intl.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/logic/kc_amounts_formatter.dart';
 
 class DecimalAmountInputWidget extends StatefulWidget {
-  const DecimalAmountInputWidget({super.key});
+  @required
+  final FeeType feeType;
 
+  DecimalAmountInputWidget({Key? key, this.feeType = FeeType.Payment})
+      : super(key: key);
   @override
   State<DecimalAmountInputWidget> createState() =>
-      _DecimalAmountInputWidgetState();
+      _DecimalAmountInputWidgetState(feeType);
 }
 
 const double _kItemExtent = 32.0;
@@ -16,6 +20,11 @@ const double _kItemExtent = 32.0;
 class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
   // picker's currently selected amount in karma coins
   double _kAmountCoins = 1;
+
+  @required
+  FeeType feeType;
+
+  _DecimalAmountInputWidgetState(this.feeType);
 
   // this is the exchange rate - needs to come from the api for real time estimate
   double _kToUsdExchangeRate = 0.02;
@@ -42,7 +51,9 @@ class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
   void initState() {
     super.initState();
 
-    Int64 val = appState.kCentsAmount.value;
+    Int64 val = feeType == FeeType.Payment
+        ? appState.kCentsAmount.value
+        : appState.kCentsFeeAmount.value;
 
     double digit = (val.toDouble() / 1000000);
     double deci = (digit - digit.toInt()) * 10;
@@ -81,10 +92,12 @@ class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
         centiIndex.toDouble() * 0.01;
 
     setState(() => _kAmountCoins = kAmountCoins);
-    appState.kCentsAmount.value = Int64((kAmountCoins * 1000000).round());
+    if (feeType == FeeType.Payment) {
+      appState.kCentsAmount.value = Int64((kAmountCoins * 1000000).round());
+    } else {
+      appState.kCentsFeeAmount.value = Int64((kAmountCoins * 1000000).round());
+    }
   }
-
-  _DecimalAmountInputWidgetState();
 
   @override
   build(BuildContext context) {

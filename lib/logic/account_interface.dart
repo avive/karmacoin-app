@@ -1,6 +1,7 @@
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/kc_user.dart';
+import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/services/api/api.pbgrpc.dart';
 
 abstract class AccountLogicInterface {
@@ -44,6 +45,10 @@ abstract class AccountLogicInterface {
 
   // Submit a new user transaction to the chain with local user data
   Future<SubmitTransactionResponse> submitNewUserTransacation();
+
+  // Submit a payemnt/apprecition transaction to the chain with local user data
+  Future<SubmitTransactionResponse> submitPaymentTransaction(
+      PaymentTransactionData data);
 
   final ValueNotifier<KarmaCoinUser?> karmaCoinUser =
       ValueNotifier<KarmaCoinUser?>(null);
