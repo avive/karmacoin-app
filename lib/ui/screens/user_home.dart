@@ -1,4 +1,7 @@
+import 'package:fixnum/fixnum.dart';
+import 'package:intl/intl.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/ui/widgets/appreciate.dart';
 
@@ -86,6 +89,46 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         });
   }
 
+  Widget _getBalanceWidget(BuildContext context) {
+    return ValueListenableBuilder<Int64>(
+        valueListenable: accountLogic.karmaCoinUser.value!.balance,
+        builder: (context, value, child) {
+          return Column(
+            children: [
+              FittedBox(
+                child: Text(
+                  KarmaCoinAmountFormatter.formatAmount(value),
+                  style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                        TextStyle(fontSize: 120),
+                      ),
+                ),
+              ),
+              Text(
+                KarmaCoinAmountFormatter.getUnitsLabel(value),
+                style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                      TextStyle(fontSize: 24),
+                    ),
+              ),
+            ],
+          );
+        });
+  }
+
+  Widget _getKarmaScoreWidget(BuildContext context) {
+    return ValueListenableBuilder<int>(
+        valueListenable: accountLogic.karmaCoinUser.value!.karmaScore,
+        builder: (context, value, child) {
+          return FittedBox(
+            child: Text(
+              NumberFormat.compact().format(value),
+              style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                    TextStyle(fontSize: 120),
+                  ),
+            ),
+          );
+        });
+  }
+
   @override
   build(BuildContext context) {
     return CupertinoPageScaffold(
@@ -109,21 +152,12 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         },
         body: SafeArea(
           child: Padding(
-              padding: const EdgeInsets.all(0),
+              padding: const EdgeInsets.all(32),
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Column(
                       children: [
-                        Text(
-                          '53',
-                          style: CupertinoTheme.of(context)
-                              .textTheme
-                              .textStyle
-                              .merge(
-                                TextStyle(fontSize: 120),
-                              ),
-                        ),
                         Text(
                           'Karma Score',
                           style: CupertinoTheme.of(context)
@@ -133,38 +167,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                 TextStyle(fontSize: 32),
                               ),
                         ),
+                        _getKarmaScoreWidget(context),
                         const SizedBox(height: 24),
                       ],
                     ),
                     Column(children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.baseline,
-                        textBaseline: TextBaseline.alphabetic,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            '14',
-                            style: CupertinoTheme.of(context)
-                                .textTheme
-                                .textStyle
-                                .merge(
-                                  TextStyle(fontSize: 120),
-                                ),
-                          ),
-                          Text(
-                            'KC',
-                            style: CupertinoTheme.of(context)
-                                .textTheme
-                                .textStyle
-                                .merge(
-                                  TextStyle(fontSize: 24),
-                                ),
-                            textAlign: TextAlign.end,
-                          ),
-                        ],
-                      ),
                       Text(
-                        'Karma Coins Balance',
+                        'Balance',
                         style: CupertinoTheme.of(context)
                             .textTheme
                             .textStyle
@@ -172,6 +181,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                               TextStyle(fontSize: 32),
                             ),
                       ),
+                      _getBalanceWidget(context),
                     ]),
                     const SizedBox(height: 36),
                     CupertinoButton.filled(

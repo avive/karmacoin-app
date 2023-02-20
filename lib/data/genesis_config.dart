@@ -1,6 +1,6 @@
 class GenesisConfig {
   /// Signup reward in kCents (phase I reward)
-  static final kCentsSignupReward = 10 * 100000000;
+  static final kCentsSignupReward = 10 * 1000000;
 
   /// Default personality trait index for trait picket
   static final defaultAppreciationTraitIndex = 27;

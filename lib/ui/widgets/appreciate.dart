@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/personality_traits.dart';
 import 'package:karma_coin/logic/app_state.dart';
-import 'package:karma_coin/logic/kc_amounts_formatter.dart';
+import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/ui/widgets/amount_input.dart';
 import 'package:karma_coin/ui/widgets/traits_picker.dart';
 import 'package:phone_form_field/phone_form_field.dart';

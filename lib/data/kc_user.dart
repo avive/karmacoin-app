@@ -16,6 +16,9 @@ class KarmaCoinUser {
 
   final ValueNotifier<Int64> nonce = ValueNotifier<Int64>(Int64.ZERO);
 
+  // User's karma score is 1 after signup
+  final ValueNotifier<int> karmaScore = ValueNotifier<int>(1);
+
   KarmaCoinUser(this.userData);
 
   /// Increment user nonce in an observable way

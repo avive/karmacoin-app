@@ -1,7 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/app_state.dart';
-import 'package:karma_coin/logic/kc_amounts_formatter.dart';
+import 'package:karma_coin/data/kc_amounts_formatter.dart';
 
 class NumericalAmountInputWidget extends StatefulWidget {
   @required
