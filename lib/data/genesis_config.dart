@@ -1,6 +1,10 @@
+import 'package:fixnum/fixnum.dart';
+
 class GenesisConfig {
+  static final kCentsPerCoin = 1000000;
+
   /// Signup reward in kCents (phase I reward)
-  static final kCentsSignupReward = 10 * 1000000;
+  static final kCentsSignupReward = Int64(10 * kCentsPerCoin);
 
   /// Default personality trait index for trait picket
   static final defaultAppreciationTraitIndex = 27;

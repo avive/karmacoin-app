@@ -64,8 +64,6 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
     );
   }
 
-
-
   Widget _getAccountStatusObserver(BuildContext context) {
     return ChangeNotifierProvider.value(
       value: accountSetupController,
@@ -127,7 +125,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
     }
 
     // check once again for availbility...
-    await userNameAvailabilityLogic.check(_textController.text);
+    // await userNameAvailabilityLogic.check(_textController.text);
 
     if (userNameAvailabilityLogic.status ==
         UserNameAvailabilityStatus.available) {

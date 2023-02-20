@@ -3,6 +3,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
+import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/services/api/api.pbgrpc.dart';
@@ -94,6 +95,8 @@ class AccountLogic extends AccountLogicInterface {
       debugPrint('loading karma coin user from secure local store...');
       karmaCoinUser.value =
           KarmaCoinUser(User.fromBuffer(base64.decode(karmaCoinUserData)));
+
+      // todo: read stored computed karma score from local store
 
       // Get updated user data from chain
       await _updateLocalKarmaUserFromChain();
@@ -254,6 +257,7 @@ class AccountLogic extends AccountLogicInterface {
         'keypair set. Account id: ${keyPair.value?.publicKey.bytes.toHexString()}');
   }
 
+  /// Update the local KarmaCoinUser data and persist it
   @override
   Future<void> updateKarmaCoinUserData(KarmaCoinUser user) async {
     debugPrint('updating local karma coin user data...');
@@ -401,15 +405,20 @@ class AccountLogic extends AccountLogicInterface {
     // todo: if we alrteady had anohter karma coin user then we should unregsiter from the transactionsBoss on transactions for this user
     debugPrint('Creating new karmacoin user...');
 
+    // all new users get this on signup - we simulate it in clients until
+    // we get it from the user's on-chain account
+    TraitScore newUserTrait = TraitScore();
+    newUserTrait.score = 1;
+    newUserTrait.traitId = GenesisConfig.signUpCharTraitIndex;
+
     KarmaCoinUser user = KarmaCoinUser(
       User(
         accountId: AccountId(data: _getAccountId()),
         nonce: Int64.ZERO,
         userName: requestedUserName.value,
         mobileNumber: MobileNumber(number: phoneNumber.value!),
-        balance: Int64
-            .ZERO, // todo: set to initial signup reward from genesis config
-        traitScores: [], // todo: set to default new user trait scores (from genesis)
+        balance: GenesisConfig.kCentsSignupReward,
+        traitScores: [newUserTrait],
         preKeys: [],
       ),
     );

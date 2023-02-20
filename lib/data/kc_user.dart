@@ -12,11 +12,11 @@ class KarmaCoinUser {
 
   // We start with the balance after signup reward
   final ValueNotifier<Int64> balance =
-      ValueNotifier<Int64>(Int64(GenesisConfig.kCentsSignupReward));
+      ValueNotifier<Int64>(GenesisConfig.kCentsSignupReward);
 
   final ValueNotifier<Int64> nonce = ValueNotifier<Int64>(Int64.ZERO);
 
-  // User's karma score is 1 after signup
+  // Expose karma coin
   final ValueNotifier<int> karmaScore = ValueNotifier<int>(1);
 
   KarmaCoinUser(this.userData);

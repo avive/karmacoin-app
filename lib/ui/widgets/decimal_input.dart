@@ -1,6 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:intl/intl.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 
@@ -55,7 +56,7 @@ class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
         ? appState.kCentsAmount.value
         : appState.kCentsFeeAmount.value;
 
-    double digit = (val.toDouble() / 1000000);
+    double digit = (val.toDouble() / GenesisConfig.kCentsPerCoin);
     double deci = (digit - digit.toInt()) * 10;
     double centi = (deci - deci.toInt()) * 10;
 
@@ -93,9 +94,11 @@ class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
 
     setState(() => _kAmountCoins = kAmountCoins);
     if (feeType == FeeType.Payment) {
-      appState.kCentsAmount.value = Int64((kAmountCoins * 1000000).round());
+      appState.kCentsAmount.value =
+          Int64((kAmountCoins * GenesisConfig.kCentsPerCoin).round());
     } else {
-      appState.kCentsFeeAmount.value = Int64((kAmountCoins * 1000000).round());
+      appState.kCentsFeeAmount.value =
+          Int64((kAmountCoins * GenesisConfig.kCentsPerCoin).round());
     }
   }
 
@@ -105,7 +108,7 @@ class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(
-            '${KarmaCoinAmountFormatter.format(Int64((_kAmountCoins * 1000000).round()))}',
+            '${KarmaCoinAmountFormatter.format(Int64((_kAmountCoins * GenesisConfig.kCentsPerCoin).round()))}',
             style: CupertinoTheme.of(context).textTheme.pickerTextStyle),
         Container(
           height: 300,

@@ -182,6 +182,10 @@ class TransactionsBoss extends TransactionsBossInterface {
         txEventsNotifer.value = Map<String, types.TransactionEvent>.from(
             jsonDecode(jsonData.events));
 
+        incomingTxsCount.value = jsonData.incomingTxsCount;
+        outgoingTxsCount.value = jsonData.outgoingTxsCount;
+        referralTxsCount.value = jsonData.referralTxsCount;
+
         notifyListeners();
       } on FileSystemException catch (fse) {
         debugPrint('error loading txs from file: $fse');
@@ -193,8 +197,11 @@ class TransactionsBoss extends TransactionsBossInterface {
     if (_localDataFile == null) {
       return;
     }
+
+    // todo: persist the counters so they are available on new app session
+
     await _localDataFile!.writeAsString(
-        '{"txs": ${jsonEncode(txNotifer.value)}, "events": ${jsonEncode(txEventsNotifer.value)}}');
+        '{"txs": ${jsonEncode(txNotifer.value)}, "events": ${jsonEncode(txEventsNotifer.value)}, "incomingTxsCount": ${incomingTxsCount.value}, "outgoingTxsCount": ${outgoingTxsCount.value}, "referralTxsCount": ${referralTxsCount.value}');
   }
 
   Future<void> _fetchTransactions() async {
