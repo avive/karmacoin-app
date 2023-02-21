@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
-import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/services/api/api.pb.dart';
 import 'package:karma_coin/ui/widgets/appreciate.dart';
 
@@ -58,18 +57,15 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           }
 
           // show sending alert
-          Future.delayed(Duration.zero, () {
-            StatusAlert.show(
-              context,
-              duration: Duration(seconds: 2),
-              title: 'Sending appreciation...',
-              configuration: IconConfiguration(icon: CupertinoIcons.wand_stars),
-              dismissOnBackgroundTap: true,
-              maxWidth: 240,
-            );
-          });
-
           Future.delayed(Duration.zero, () async {
+            StatusAlert.show(context,
+                duration: Duration(seconds: 2),
+                title: 'Sending appreciation...',
+                configuration:
+                    IconConfiguration(icon: CupertinoIcons.wand_stars),
+                dismissOnBackgroundTap: true,
+                maxWidth: 240);
+
             SubmitTransactionResponse resp =
                 await accountLogic.submitPaymentTransaction(
                     appState.paymentTransactionData.value!);
@@ -99,10 +95,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 );
                 break;
             }
+            // clear the data
+            appState.paymentTransactionData.value = null;
           });
-
-          // clear the data
-          appState.paymentTransactionData.value = null;
 
           return Container();
         });

@@ -3,6 +3,7 @@ import 'package:karma_coin/common/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:flutter/material.dart';
 import 'package:karma_coin/data/kc_user.dart';
+import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/data/personality_traits.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
@@ -121,11 +122,14 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
         duration: Duration(seconds: 2),
         title: 'Oops...',
         subtitle: 'Please login to your account',
-        configuration: IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
+        configuration:
+            IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
         maxWidth: 260,
       );
       return false;
     }
+
+    debugPrint('user balance: ${user.balance.value}');
 
     if (user.balance.value < appState.kCentsAmount.value) {
       StatusAlert.show(
@@ -153,9 +157,12 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
         appState.kCentsAmount.value,
         appState.kCentsFeeAmount.value,
         appState.selectedPersonalityTrait.value,
-        -1,
+        0,
         number,
         '');
+
+    debugPrint(
+        'payment transaction data: ${appState.paymentTransactionData.value}');
 
     context.pop();
   }

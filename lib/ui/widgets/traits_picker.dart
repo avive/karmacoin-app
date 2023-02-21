@@ -21,7 +21,9 @@ class _TraitsPickerWidgetState extends State<TraitsPickerWidget> {
   @required
   final List<PersonalityTrait> items;
 
-  _TraitsPickerWidgetState(this.items, this.selectedItemIndex);
+  _TraitsPickerWidgetState(this.items, this.selectedItemIndex) {
+    appState.selectedPersonalityTrait.value = items[selectedItemIndex];
+  }
 
   // ignore: unused_field
   @required

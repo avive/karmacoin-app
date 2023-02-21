@@ -2,7 +2,6 @@ import 'package:fixnum/fixnum.dart';
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
-import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/services/api/api.pbgrpc.dart';
 import 'package:karma_coin/common_libs.dart';
@@ -24,7 +23,7 @@ abstract class TrnasactionGenerator {
 
     TransactionData txData = TransactionData(
       transactionData: paymentTx.writeToBuffer(),
-      transactionType: TransactionType.TRANSACTION_TYPE_NEW_USER_V1,
+      transactionType: TransactionType.TRANSACTION_TYPE_PAYMENT_V1,
     );
 
     SignedTransactionWithStatus signedTx =
@@ -43,9 +42,17 @@ abstract class TrnasactionGenerator {
 
     switch (resp.submitTransactionResult) {
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
+        debugPrint('Payment transaction submitted to api!');
         signedTx.status = TransactionStatus.TRANSACTION_STATUS_SUBMITTED;
         // store in txboss as outgoing
         transactionBoss.updateWith([signedTx]);
+
+        // Update local balance to reflect outgoing amount so UI is updated
+        // it will update again once the user is periodically updated from chain
+        karmaCoinUser.balance.value -= data.kCentsAmount;
+
+        // each sent appreciation increases the user's karma score by 1
+        karmaCoinUser.karmaScore.value += 1;
 
         break;
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:

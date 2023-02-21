@@ -18,4 +18,9 @@ class PaymentTransactionData {
       this.communityId,
       this.mobilePhoneNumber,
       this.personalMessage);
+
+  @override
+  String toString() {
+    return 'Amount: $kCentsAmount, Fee: $kCentsFeeAmount, Trait: $personalityTrait, Community: $communityId, Mobile: $mobilePhoneNumber, Message: $personalMessage';
+  }
 }

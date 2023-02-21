@@ -43,4 +43,9 @@ class KarmaCoinUser {
     // persist changes
     await accountLogic.updateKarmaCoinUserData(this);
   }
+
+  @override
+  String toString() {
+    return 'KarmaCoinUser{userData: $userData, balance: $balance, nonce: $nonce, karmaScore: $karmaScore}';
+  }
 }

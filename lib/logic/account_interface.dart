@@ -2,7 +2,6 @@ import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
-import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/services/api/api.pbgrpc.dart';
 
 abstract class AccountLogicInterface {

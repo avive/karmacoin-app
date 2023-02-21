@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart';
@@ -5,7 +7,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
-import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/logic/tx_generator.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/services/api/api.pbgrpc.dart';
@@ -34,6 +35,9 @@ class _AccountStoreKeys {
 /// Local karmaCoin account logic. We seperate between authentication and account. Authentication is handled by Firebase Auth.
 class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
   final _secureStorage = const FlutterSecureStorage();
+
+  // update user data from chain polling timer
+  Timer? _timer = null;
 
   // User verification data from verifier
   UserVerificationData? _userVerificationData;
@@ -97,10 +101,12 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
       karmaCoinUser.value =
           KarmaCoinUser(User.fromBuffer(base64.decode(karmaCoinUserData)));
 
-      // todo: read stored computed karma score from local store
-
-      // Get updated user data from chain
+      // Get updated user data from chain and store it locally
       await _updateLocalKarmaUserFromChain();
+
+      // start tracking txs for this account...
+      transactionBoss
+          .setAccountId(karmaCoinUser.value!.userData.accountId.data);
     }
 
     String? verificationData = await _secureStorage.read(
@@ -151,10 +157,15 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
         if (!signedUpOnChain.value) {
           debugPrint('local user signed up on chain!');
 
-          // todo: if we have locally created transactions (apprenticeship, etc) we should send them to chain now.
-
           // Update karma coin user local data with the on-chain data
+
+          // todo: set this on schedule - update every 60 seconds...
+
           await _updateLocalKarmaUserFromChain();
+
+          debugPrint('Polling for user account data every 60 secs...');
+          _timer = Timer.periodic(const Duration(seconds: 60),
+              (Timer t) async => await _updateLocalKarmaUserFromChain());
         } else {
           debugPrint(
               'already set this user to be chain signed up. ignoring...');
@@ -169,12 +180,14 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
   Future<void> _updateLocalKarmaUserFromChain() async {
     try {
       debugPrint('Calling api to get updated karma coin user...');
+
       GetUserInfoByAccountResponse resp = await api.apiServiceClient
           .getUserInfoByAccount(GetUserInfoByAccountRequest(
               accountId: karmaCoinUser.value?.userData.accountId));
 
       if (resp.hasUser()) {
-        debugPrint('Got back user from api.. updating local user data...');
+        debugPrint('Got back user from api. Updating local user data...');
+
         await updateKarmaCoinUserData(KarmaCoinUser(resp.user));
 
         // User is signed up on chain
@@ -183,6 +196,8 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
         debugPrint('No user found on chain.');
       }
     } catch (e) {
+      // todo: set global error for display in user home in case app
+      // can't access the api on startp
       debugPrint('error getting user by account data from api: $e');
     }
   }
@@ -261,7 +276,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
   /// Update the local KarmaCoinUser data and persist it
   @override
   Future<void> updateKarmaCoinUserData(KarmaCoinUser karmaCoinUser) async {
-    debugPrint('updating local karma coin user data...');
+    debugPrint('updating local karma coin user data from chain via api...');
     String userData = karmaCoinUser.userData.writeToBuffer().toBase64();
     await _secureStorage.write(
         key: _AccountStoreKeys.karmaCoinUser,
@@ -269,6 +284,10 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
         aOptions: _aOptions);
 
     this.karmaCoinUser.value = karmaCoinUser;
+
+    debugPrint('Current balance: ${karmaCoinUser.userData.balance}');
+    debugPrint('Current karma score: ${karmaCoinUser.userData.karmaScore}');
+    debugPrint('Current nonce: ${karmaCoinUser.userData.nonce}');
 
     // Update observable values that UI depends on using on-chain data
     // For example, user's baance and karma score in user's home screen
@@ -321,6 +340,11 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     // log out from firebase
 
     debugPrint('clearing all local user account from store and from memory...');
+
+    if (_timer != null) {
+      _timer!.cancel();
+      _timer = null;
+    }
 
     await _secureStorage.delete(
         key: _AccountStoreKeys.seed, aOptions: _aOptions);

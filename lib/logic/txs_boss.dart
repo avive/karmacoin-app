@@ -54,8 +54,8 @@ class TransactionsBoss extends TransactionsBossInterface {
     // fetch now and start polling
     await _fetchTransactions();
 
-    debugPrint('Pooling txs every 60 secs...');
-    _timer = Timer.periodic(const Duration(seconds: 60),
+    debugPrint('Polling txs every 30 secs...');
+    _timer = Timer.periodic(const Duration(seconds: 30),
         (Timer t) async => await _fetchTransactions());
   }
 
@@ -224,7 +224,8 @@ class TransactionsBoss extends TransactionsBossInterface {
     }
 
     try {
-      debugPrint('fetching transactions for account $_accountId');
+      debugPrint(
+          'fetching transactions for account ${_accountId?.toHexString()}');
 
       api_types.GetTransactionsResponse resp =
           await api.apiServiceClient.getTransactions(
