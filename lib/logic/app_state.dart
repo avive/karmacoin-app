@@ -1,25 +1,8 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart';
+import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/data/personality_traits.dart';
 
-/// Model of user input data of a new appreciation
-class PaymentTransactionData {
-  Int64 kCentsAmount = Int64.ZERO;
-  Int64 kCentsFeeAmount = Int64.ZERO;
-
-  PersonalityTrait personalityTrait = PersonalityTraits[0];
-  int communityId = 0;
-  String mobilePhoneNumber = '';
-  String personalMessage = '';
-
-  PaymentTransactionData(
-      this.kCentsAmount,
-      this.kCentsFeeAmount,
-      this.personalityTrait,
-      this.communityId,
-      this.mobilePhoneNumber,
-      this.personalMessage);
-}
 
 enum FeeType { Payment, Fee }
 

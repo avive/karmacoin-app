@@ -121,7 +121,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
         duration: Duration(seconds: 2),
         title: 'Oops...',
         subtitle: 'Please login to your account',
-        configuration: IconConfiguration(icon: CupertinoIcons.exclamationmark),
+        configuration: IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
         maxWidth: 260,
       );
       return false;

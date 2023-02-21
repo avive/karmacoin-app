@@ -37,7 +37,8 @@ class TransactionsBoss extends TransactionsBossInterface {
     }
 
     _accountId = accountId;
-    txNotifer.value = {};
+    incomingTxsNotifer.value = {};
+    outgoingTxsNotifer.value = {};
     txEventsNotifer.value = {};
     newUserTransactionEvent.value = null;
 
@@ -64,13 +65,17 @@ class TransactionsBoss extends TransactionsBossInterface {
   /// knows that the user is on-chain
   @override
   Future<void> updateWith(List<types.SignedTransactionWithStatus> transactions,
-      List<types.TransactionEvent>? transactionsEvents) async {
+      {List<types.TransactionEvent>? transactionsEvents = null}) async {
     if (transactions.isEmpty) {
       return;
     }
 
-    Map<String, types.SignedTransactionWithStatus> newTxs = {
-      ...txNotifer.value
+    Map<String, types.SignedTransactionWithStatus> newIncomingTxs = {
+      ...incomingTxsNotifer.value
+    };
+
+    Map<String, types.SignedTransactionWithStatus> newOutgoingTxs = {
+      ...outgoingTxsNotifer.value
     };
 
     for (types.SignedTransactionWithStatus tx in transactions) {
@@ -81,9 +86,16 @@ class TransactionsBoss extends TransactionsBossInterface {
         continue;
       }
 
-      // overwrite existing tx with same hash with the updated tx from the api
-      // or add new tx
-      newTxs[base64.encode(enriched.getHash())] = tx;
+      bool isTxFromLocalUser =
+          listsEqual(tx.transaction.signer.data, _accountId);
+
+      if (isTxFromLocalUser) {
+        // outgoing tx
+        newOutgoingTxs[base64.encode(enriched.getHash())] = tx;
+      } else {
+        // incoming tx
+        newIncomingTxs[base64.encode(enriched.getHash())] = tx;
+      }
 
       switch (tx.transaction.transactionData.transactionType) {
         case types.TransactionType.TRANSACTION_TYPE_NEW_USER_V1:
@@ -141,7 +153,8 @@ class TransactionsBoss extends TransactionsBossInterface {
 
     await _saveData();
 
-    txNotifer.value = newTxs;
+    incomingTxsNotifer.value = newIncomingTxs;
+    outgoingTxsNotifer.value = newOutgoingTxs;
     notifyListeners();
   }
 
@@ -176,15 +189,16 @@ class TransactionsBoss extends TransactionsBossInterface {
     if (_localDataFile!.existsSync()) {
       try {
         var jsonData = jsonDecode(_localDataFile!.readAsStringSync());
-        txNotifer.value = Map<String, types.SignedTransactionWithStatus>.from(
-            jsonDecode(jsonData.txs));
+        incomingTxsNotifer.value =
+            Map<String, types.SignedTransactionWithStatus>.from(
+                jsonDecode(jsonData.incomingTxs));
+
+        outgoingTxsNotifer.value =
+            Map<String, types.SignedTransactionWithStatus>.from(
+                jsonDecode(jsonData.outgoingTxs));
 
         txEventsNotifer.value = Map<String, types.TransactionEvent>.from(
             jsonDecode(jsonData.events));
-
-        incomingTxsCount.value = jsonData.incomingTxsCount;
-        outgoingTxsCount.value = jsonData.outgoingTxsCount;
-        referralTxsCount.value = jsonData.referralTxsCount;
 
         notifyListeners();
       } on FileSystemException catch (fse) {
@@ -201,7 +215,7 @@ class TransactionsBoss extends TransactionsBossInterface {
     // todo: persist the counters so they are available on new app session
 
     await _localDataFile!.writeAsString(
-        '{"txs": ${jsonEncode(txNotifer.value)}, "events": ${jsonEncode(txEventsNotifer.value)}, "incomingTxsCount": ${incomingTxsCount.value}, "outgoingTxsCount": ${outgoingTxsCount.value}, "referralTxsCount": ${referralTxsCount.value}');
+        '{"incomingTxs": ${jsonEncode(incomingTxsNotifer.value)}, "outgoingTxs": ${outgoingTxsNotifer.value},  "events": ${jsonEncode(txEventsNotifer.value)}}');
   }
 
   Future<void> _fetchTransactions() async {
@@ -221,7 +235,8 @@ class TransactionsBoss extends TransactionsBossInterface {
       if (resp.transactions.isNotEmpty) {
         debugPrint(
             'got ${resp.transactions.length} transactions and ${resp.txEvents.events.length} events');
-        await updateWith(resp.transactions, resp.txEvents.events);
+        await updateWith(resp.transactions,
+            transactionsEvents: resp.txEvents.events);
       } else {
         debugPrint('no transactions on chain yet');
       }

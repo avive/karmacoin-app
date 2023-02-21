@@ -4,7 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:karma_coin/data/genesis_config.dart';
+import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/logic/app_state.dart';
+import 'package:karma_coin/logic/tx_generator.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/services/api/api.pbgrpc.dart';
 import 'package:karma_coin/common_libs.dart';
@@ -16,7 +18,6 @@ import 'account_interface.dart';
 import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/verify_number_request.dart' as data;
 import 'package:karma_coin/data/user_verification_data.dart' as vnr;
-import 'package:karma_coin/data/signed_transaction.dart' as est;
 import 'package:bip39/bip39.dart' as bip39;
 
 class _AccountStoreKeys {
@@ -31,7 +32,7 @@ class _AccountStoreKeys {
 }
 
 /// Local karmaCoin account logic. We seperate between authentication and account. Authentication is handled by Firebase Auth.
-class AccountLogic extends AccountLogicInterface {
+class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
   final _secureStorage = const FlutterSecureStorage();
 
   // User verification data from verifier
@@ -128,7 +129,7 @@ class AccountLogic extends AccountLogicInterface {
     });
   }
 
-  /// Register on new user transaction and event and update state accordingly
+  /// Register on new user tx and tx ecent, and update state accordingly
   void _registerTransactions() {
     transactionBoss.newUserTransaction.addListener(() async {
       // listen to new user transaction
@@ -174,7 +175,7 @@ class AccountLogic extends AccountLogicInterface {
 
       if (resp.hasUser()) {
         debugPrint('Got back user from api.. updating local user data...');
-        updateKarmaCoinUserData(KarmaCoinUser(resp.user));
+        await updateKarmaCoinUserData(KarmaCoinUser(resp.user));
 
         // User is signed up on chain
         await _setSignedUp(true);
@@ -259,15 +260,21 @@ class AccountLogic extends AccountLogicInterface {
 
   /// Update the local KarmaCoinUser data and persist it
   @override
-  Future<void> updateKarmaCoinUserData(KarmaCoinUser user) async {
+  Future<void> updateKarmaCoinUserData(KarmaCoinUser karmaCoinUser) async {
     debugPrint('updating local karma coin user data...');
-    String userData = user.userData.writeToBuffer().toBase64();
+    String userData = karmaCoinUser.userData.writeToBuffer().toBase64();
     await _secureStorage.write(
         key: _AccountStoreKeys.karmaCoinUser,
         value: userData,
         aOptions: _aOptions);
 
-    karmaCoinUser.value = user;
+    this.karmaCoinUser.value = karmaCoinUser;
+
+    // Update observable values that UI depends on using on-chain data
+    // For example, user's baance and karma score in user's home screen
+    karmaCoinUser.balance.value = karmaCoinUser.userData.balance;
+    karmaCoinUser.karmaScore.value = karmaCoinUser.userData.karmaScore;
+    karmaCoinUser.nonce.value = karmaCoinUser.userData.nonce;
   }
 
   /// Set local user's phone number
@@ -418,6 +425,7 @@ class AccountLogic extends AccountLogicInterface {
         userName: requestedUserName.value,
         mobileNumber: MobileNumber(number: phoneNumber.value!),
         balance: GenesisConfig.kCentsSignupReward,
+        karmaScore: 1,
         traitScores: [newUserTrait],
         preKeys: [],
       ),
@@ -517,7 +525,9 @@ class AccountLogic extends AccountLogicInterface {
 
     return _userVerificationData != null &&
         _userVerificationData?.verificationResult ==
-            VerificationResult.VERIFICATION_RESULT_VERIFIED;
+            VerificationResult.VERIFICATION_RESULT_VERIFIED &&
+        karmaCoinUser.value != null &&
+        keyPair.value != null;
   }
 
   /// todo: this should move to TransactionsGenerator class
@@ -527,30 +537,13 @@ class AccountLogic extends AccountLogicInterface {
   /// Otherwise returns the transaction submission result (submitted or invalid)
   @override
   Future<SubmitTransactionResponse> submitNewUserTransacation() async {
-    NewUserTransactionV1 newUserTx =
-        NewUserTransactionV1(verifyNumberResponse: _userVerificationData!);
+    debugPrint('submitting new user transaction...');
 
-    TransactionData txData = TransactionData(
-      transactionData: newUserTx.writeToBuffer(),
-      transactionType: TransactionType.TRANSACTION_TYPE_NEW_USER_V1,
-    );
-
-    SignedTransactionWithStatus signedTx = _createSignedTransaction(txData);
-    SubmitTransactionResponse resp = SubmitTransactionResponse();
-
-    debugPrint('submitting newuser tx via the api...');
-
-    try {
-      resp = await api.apiServiceClient.submitTransaction(
-          SubmitTransactionRequest(transaction: signedTx.transaction));
-    } catch (e) {
-      debugPrint('failed to submit transaction to api: $e');
-    }
+    SubmitTransactionResponse resp = await submitNewUserTransacationImpl(
+        _userVerificationData!, karmaCoinUser.value!, keyPair.value!);
 
     switch (resp.submitTransactionResult) {
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
-        signedTx.status = TransactionStatus.TRANSACTION_STATUS_SUBMITTED;
-
         debugPrint('tx submission acccepted by api - entering local mode...');
 
         // we are now in local mode
@@ -564,41 +557,12 @@ class AccountLogic extends AccountLogicInterface {
         // increment user's nonce and store it locally
         await karmaCoinUser.value?.incNonce();
         break;
-      case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
-        signedTx.status = TransactionStatus.TRANSACTION_STATUS_REJECTED;
-
-        debugPrint('transaction rejected by api');
-        // todo: store the transactionWithStatus in local storage via tx boss so
-        // it can be submitted later
-
-        // throw so clients deal with this
-        throw Exception('submitNewUserTransacation rejected by network!');
+      default:
+        // no need ot handle other states
+        break;
     }
 
     return resp;
-  }
-
-  /// todo: this should move to TransactionsGenerator class
-
-  /// Create a new signed transaction with the local account data and the given transaction data
-  SignedTransactionWithStatus _createSignedTransaction(TransactionData data) {
-    SignedTransaction tx = SignedTransaction(
-      nonce: karmaCoinUser.value!.nonce.value + 1,
-      fee: Int64.ONE, // todo: get default tx fee from genesis
-      netId: 1, // todo: get from genesis config
-      transactionData: data,
-      signer: AccountId(data: keyPair.value!.publicKey.bytes),
-      timestamp: Int64(DateTime.now().millisecondsSinceEpoch),
-    );
-
-    SignedTransactionWithStatus txWithStatus = SignedTransactionWithStatus(
-        transaction: tx, status: TransactionStatus.TRANSACTION_STATUS_UNKNOWN);
-
-    est.SignedTransactionWithStatus enrichedTx =
-        est.SignedTransactionWithStatus(txWithStatus);
-    enrichedTx.sign(ed.PrivateKey(keyPair.value!.privateKey.bytes));
-
-    return enrichedTx.txWithStatus;
   }
 
   @override
@@ -608,8 +572,14 @@ class AccountLogic extends AccountLogicInterface {
 
   @override
   Future<SubmitTransactionResponse> submitPaymentTransaction(
-      PaymentTransactionData data) {
-    // TODO: implement submitPaymentTransaction
-    throw UnimplementedError();
+      PaymentTransactionData data) async {
+    // We submit it to chain even if we are in local mode as the tx will go
+    // into the pool for up to 1 week and will be picked up by the network when user
+    // account is on chain as result of NewUser tx processing
+
+    SubmitTransactionResponse resp = await submitPaymentTransacationImpl(
+        data, karmaCoinUser.value!, keyPair.value!);
+
+    return resp;
   }
 }

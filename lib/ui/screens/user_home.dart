@@ -2,7 +2,9 @@ import 'package:fixnum/fixnum.dart';
 import 'package:intl/intl.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
+import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/logic/app_state.dart';
+import 'package:karma_coin/services/api/api.pb.dart';
 import 'package:karma_coin/ui/widgets/appreciate.dart';
 
 import 'package:karma_coin/common/widget_utils.dart';
@@ -67,19 +69,36 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             );
           });
 
-          // todo: send the appreciation data to the server via user's account - this is a transaction
-          // take data from value
+          Future.delayed(Duration.zero, () async {
+            SubmitTransactionResponse resp =
+                await accountLogic.submitPaymentTransaction(
+                    appState.paymentTransactionData.value!);
 
-          Future.delayed(const Duration(seconds: 3), () {
-            StatusAlert.show(
-              context,
-              duration: Duration(seconds: 2),
-              configuration:
-                  IconConfiguration(icon: CupertinoIcons.check_mark_circled),
-              title: 'Apreciaiton Sent',
-              dismissOnBackgroundTap: true,
-              maxWidth: 240,
-            );
+            switch (resp.submitTransactionResult) {
+              case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
+                StatusAlert.show(
+                  context,
+                  duration: Duration(seconds: 2),
+                  configuration: IconConfiguration(
+                      icon: CupertinoIcons.check_mark_circled),
+                  title: 'Apreciaiton Sent',
+                  dismissOnBackgroundTap: true,
+                  maxWidth: 240,
+                );
+                break;
+              case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
+                StatusAlert.show(
+                  context,
+                  duration: Duration(seconds: 2),
+                  configuration:
+                      IconConfiguration(icon: CupertinoIcons.stop_circle),
+                  title: 'Apreciaiton Error',
+                  subtitle: 'Appreciation rejected. Please try later.',
+                  dismissOnBackgroundTap: true,
+                  maxWidth: 240,
+                );
+                break;
+            }
           });
 
           // clear the data
