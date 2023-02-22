@@ -41,8 +41,9 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   @override
   initState() {
     super.initState();
-    phoneController = PhoneController(null);
-    phoneController.addListener(() => setState(() {}));
+    phoneController =
+        PhoneController(PhoneNumber(isoCode: IsoCode.IL, nsn: "549805380"));
+    // phoneController.addListener(() => setState(() {}));
   }
 
   @override

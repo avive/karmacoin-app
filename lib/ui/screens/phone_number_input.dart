@@ -31,9 +31,10 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
   @override
   initState() {
     super.initState();
-    controller = PhoneController(null);
+    controller =
+        PhoneController(PhoneNumber(isoCode: IsoCode.IL, nsn: "549805381"));
     validator = PhoneValidator.validMobile();
-    controller.addListener(() => setState(() {}));
+    // controller.addListener(() => setState(() {}));
   }
 
   @override

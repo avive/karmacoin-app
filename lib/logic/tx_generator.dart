@@ -50,9 +50,7 @@ abstract class TrnasactionGenerator {
         // Update local balance to reflect outgoing amount so UI is updated
         // it will update again once the user is periodically updated from chain
         karmaCoinUser.balance.value -= data.kCentsAmount;
-
-        // each sent appreciation increases the user's karma score by 1
-        karmaCoinUser.karmaScore.value += 1;
+        await karmaCoinUser.incNonce();
 
         break;
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
@@ -60,11 +58,8 @@ abstract class TrnasactionGenerator {
 
         debugPrint('transaction rejected by api');
 
-        // store via txs boss
+        // store via txs boss so tx can be resent later by user
         transactionBoss.updateWith([signedTx]);
-
-        // throw so clients deal with this
-        throw Exception('submitNewUserTransacation rejected by network!');
     }
 
     return resp;
@@ -103,19 +98,24 @@ abstract class TrnasactionGenerator {
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
         signedTx.status = TransactionStatus.TRANSACTION_STATUS_SUBMITTED;
         debugPrint('tx submission acccepted by api - entering local mode...');
+
+        // start tracking txs for this account...
+        await transactionBoss.setAccountId(karmaCoinUser.userData.accountId.data);
+
         // store in outgoing txs in boss
         transactionBoss.updateWith([signedTx]);
+
+        // increment user's nonce and store it locally
+        await karmaCoinUser.incNonce();
+
         break;
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
         signedTx.status = TransactionStatus.TRANSACTION_STATUS_REJECTED;
         transactionBoss.updateWith([signedTx]);
 
         debugPrint('transaction rejected by api');
-        // todo: store the transactionWithStatus in local storage via tx boss so
-        // it can be submitted later
-
-        // throw so clients deal with this
-        throw Exception('submitNewUserTransacation rejected by network!');
+      // todo: store the transactionWithStatus in local storage via tx boss so
+      // it can be submitted later
     }
 
     return resp;
@@ -138,7 +138,11 @@ abstract class TrnasactionGenerator {
 
     est.SignedTransactionWithStatus enrichedTx =
         est.SignedTransactionWithStatus(txWithStatus);
-    enrichedTx.sign(ed.PrivateKey(keyPair.privateKey.bytes));
+    enrichedTx.sign(keyPair.privateKey);
+    // verify signature
+    if (!enrichedTx.verify(keyPair.publicKey)) {
+      throw Exception('failed to verify signature');
+    }
 
     return enrichedTx.txWithStatus;
   }

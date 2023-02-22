@@ -12,7 +12,9 @@ class PersonalityTrait {
 
 List<PersonalityTrait> PersonalityTraits = [
   PersonalityTrait(0, '', ''),
+  // user gets it for on signup
   PersonalityTrait(1, 'a Karma Grower', '😇'),
+  // user gets one point in this for every tx sent
   PersonalityTrait(2, 'a Karma Appreciator', '🖖'),
   PersonalityTrait(3, 'Kind', '😀'),
   PersonalityTrait(4, 'Helpful', '😇'),
@@ -43,7 +45,7 @@ List<PersonalityTrait> PersonalityTraits = [
   PersonalityTrait(29, 'Selfless', '🖖'),
   PersonalityTrait(30, 'Self-aware', '😎'),
   PersonalityTrait(31, 'Self-disciplined', '🥸'),
-  PersonalityTrait(32, 'Mindfull', '😍'),
+  PersonalityTrait(32, 'Mindful', '😍'),
   PersonalityTrait(33, 'My Guardian Angel', '😍'),
   PersonalityTrait(34, 'a Fairy', '😍'),
   PersonalityTrait(35, 'a Wizard', '😍'),
@@ -52,4 +54,6 @@ List<PersonalityTrait> PersonalityTraits = [
   PersonalityTrait(38, 'a Healer', '😍'),
   PersonalityTrait(39, 'a Guardian', '😍'),
   PersonalityTrait(40, 'an Inspiration', '😍'),
+  // User gets this for every referal tx that converted to a new user
+  PersonalityTrait(41, 'a Karma Ambassador', '🖖'),
 ];

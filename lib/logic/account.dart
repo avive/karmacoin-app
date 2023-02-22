@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart';
@@ -105,7 +104,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
       await _updateLocalKarmaUserFromChain();
 
       // start tracking txs for this account...
-      transactionBoss
+      await transactionBoss
           .setAccountId(karmaCoinUser.value!.userData.accountId.data);
     }
 
@@ -341,10 +340,14 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
 
     debugPrint('clearing all local user account from store and from memory...');
 
+    // clear timer that pulls user data from chain
     if (_timer != null) {
       _timer!.cancel();
       _timer = null;
     }
+
+    // stop tracking txs for local user
+    await transactionBoss.setAccountId(null);
 
     await _secureStorage.delete(
         key: _AccountStoreKeys.seed, aOptions: _aOptions);
@@ -573,13 +576,6 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
         // we are now in local mode
         _setLocalMode(true);
 
-        // start tracking txs for this account...
-        transactionBoss.setAccountId(_getAccountId());
-
-        // todo: store the transactionWithStatus in local storage via tx boss
-
-        // increment user's nonce and store it locally
-        await karmaCoinUser.value?.incNonce();
         break;
       default:
         // no need ot handle other states
@@ -601,9 +597,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     // into the pool for up to 1 week and will be picked up by the network when user
     // account is on chain as result of NewUser tx processing
 
-    SubmitTransactionResponse resp = await submitPaymentTransacationImpl(
+    return await submitPaymentTransacationImpl(
         data, karmaCoinUser.value!, keyPair.value!);
-
-    return resp;
   }
 }

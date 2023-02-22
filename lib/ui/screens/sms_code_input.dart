@@ -73,6 +73,7 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
             Material(
               child: OtpTextField(
                 numberOfFields: 6,
+                autoFocus: true,
                 borderColor: Color(0xFF512DA8),
                 //set to true to show as box or false to show as dash
                 showFieldAsBox: true,

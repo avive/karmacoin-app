@@ -28,6 +28,12 @@ class AccountSetupController extends ChangeNotifier {
     await _getValidatorEvidence();
   }
 
+  AccountSetupController() {
+    Future.delayed(Duration.zero, () async {
+      await _registerSignupTxEvent();
+    });
+  }
+
   // First step in signup process
   Future<void> _getValidatorEvidence() async {
     _status = AccountSetupStatus.validating;
@@ -43,6 +49,8 @@ class AccountSetupController extends ChangeNotifier {
     // we use this local user until we get the on-chain user
     // so user can start sending transactions before his signup tx is confirmed
     await accountLogic.createNewKarmaCoinUser();
+
+    _status = AccountSetupStatus.readyToSignup;
 
     if (!accountLogic.validateDataForPhoneVerification()) {
       _status = AccountSetupStatus.missingData;
@@ -62,47 +70,8 @@ class AccountSetupController extends ChangeNotifier {
     await submitSignupTransaction();
   }
 
-  // Second step in signup process - submit transaction with valid validation evidence
-  Future<void> submitSignupTransaction() async {
-    debugPrint('submitting signup transaction...');
-
-    _status = AccountSetupStatus.submittingTransaction;
-    notifyListeners();
-
-    if (!accountLogic.validateDataForNewUserTransaction()) {
-      _status = AccountSetupStatus.missingData;
-      notifyListeners();
-      return;
-    }
-
-    SubmitTransactionResponse resp = SubmitTransactionResponse();
-    try {
-      resp = await accountLogic.submitNewUserTransacation();
-    } catch (e) {
-      // todo: think how to handle this case - auto retry? ask to leave app open?
-      _status = AccountSetupStatus.transactionError;
-      notifyListeners();
-      return;
-    }
-
-    if (resp.submitTransactionResult ==
-        SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED) {
-      // todo: think how to handle this case - auto retry? ask to leave app open?
-
-      _status = AccountSetupStatus.transactionError;
-      notifyListeners();
-      return;
-    }
-
-    debugPrint('new user transaction accepted by api');
-
-    // todo: this is for popup widgets that should be displayed once
-    // we get some signup errors via the signup tx event - in this case
-    // we need to ask the user to pick a new nickname and try again...
-    // currently the account setup screen goes away as soon as the tx
-    // is submitted and accepted so the user can start to use the app and
-    // appreciate
-
+  Future<void> _registerSignupTxEvent() async {
+    debugPrint('Registering signup tx event listener...');
     transactionBoss.newUserTransactionEvent.addListener(() async {
       if (transactionBoss.newUserTransactionEvent.value == null) {
         return;
@@ -139,11 +108,54 @@ class AccountSetupController extends ChangeNotifier {
           }
       }
     });
+  }
+
+  // Second step in signup process - submit transaction with valid validation evidence
+  Future<void> submitSignupTransaction() async {
+    debugPrint('submitting signup transaction...');
+
+    _status = AccountSetupStatus.submittingTransaction;
+    notifyListeners();
+
+    if (!accountLogic.validateDataForNewUserTransaction()) {
+      _status = AccountSetupStatus.missingData;
+      notifyListeners();
+      return;
+    }
+
+    _status = AccountSetupStatus.transactionSubmitted;
+    notifyListeners();
+
+    SubmitTransactionResponse resp = SubmitTransactionResponse();
+    try {
+      resp = await accountLogic.submitNewUserTransacation();
+    } catch (e) {
+      // todo: think how to handle this case - auto retry? ask to leave app open?
+      _status = AccountSetupStatus.transactionError;
+      notifyListeners();
+      return;
+    }
+
+    if (resp.submitTransactionResult ==
+        SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED) {
+      // todo: think how to handle this case - auto retry? ask to leave app open?
+
+      _status = AccountSetupStatus.transactionError;
+      notifyListeners();
+      return;
+    }
+
+    debugPrint('new user transaction accepted by api');
+
+    // todo: this is for popup widgets that should be displayed once
+    // we get some signup errors via the signup tx event - in this case
+    // we need to ask the user to pick a new nickname and try again...
+    // currently the account setup screen goes away as soon as the tx
+    // is submitted and accepted so the user can start to use the app and
+    // appreciate
 
     // from time tx is submitted until client knows it failed or it was procsessed
     // we are in local-mode. In localMode account.isChainSignedUp = false but we have alocal KarmaCoinUser
     // and user should be able to send transactions. We store them locally and submit them when user is on chain
-    _status = AccountSetupStatus.transactionSubmitted;
-    notifyListeners();
   }
 }

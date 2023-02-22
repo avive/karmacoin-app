@@ -11,7 +11,7 @@ class SetUserNameScreen extends StatefulWidget {
 }
 
 class _SetUserNameScreenState extends State<SetUserNameScreen> {
-  final _textController = TextEditingController();
+  final _textController = TextEditingController(text: "avive");
   final _formKey = GlobalKey<FormState>();
   bool _userHomePushed = false;
 
@@ -73,7 +73,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
             if (mounted && !_userHomePushed) {
               _userHomePushed = true;
               appState.signedUpInCurentSession.value = true;
-              Future.delayed(Duration(milliseconds: 100), () {
+              Future.delayed(Duration.zero, () {
                 debugPrint('going to user home...');
                 context.go(ScreenPaths.home);
               });

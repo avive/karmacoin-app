@@ -95,7 +95,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 );
                 break;
             }
-            // clear the data
+            // clear the user tx data
             appState.paymentTransactionData.value = null;
           });
 

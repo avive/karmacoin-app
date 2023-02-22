@@ -14,7 +14,7 @@ enum UserNameAvailabilityStatus {
 /// is available. Karma Coin user names are unique
 class UserNameAvailabilityLogic extends ChangeNotifier {
   String _userName = '';
-  UserNameAvailabilityStatus _status = UserNameAvailabilityStatus.unknown;
+  UserNameAvailabilityStatus _status = UserNameAvailabilityStatus.available;
 
   String get userName => _userName;
   UserNameAvailabilityStatus get status => _status;

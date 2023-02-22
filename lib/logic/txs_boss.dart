@@ -24,7 +24,7 @@ class TransactionsBoss extends TransactionsBossInterface {
   /// Set the local user account id - transactions to and from this accountId will be tracked by the TransactionBoss
   /// Boss will attempt to load known txs for this account from local store
   @override
-  void setAccountId(List<int>? accountId) async {
+  Future<void> setAccountId(List<int>? accountId) async {
     if (listsEqual(_accountId, accountId)) {
       return;
     }

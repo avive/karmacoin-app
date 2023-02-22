@@ -5,7 +5,7 @@ import 'package:karma_coin/services/api/types.pb.dart' as types;
 abstract class TransactionsBossInterface extends ChangeNotifier {
   /// Set the local user account id - transactions to and from this accountId will be tracked by the TransactionBoss
   /// Boss will attempt to load known txs for this account from local store
-  void setAccountId(List<int>? accountId);
+  Future<void> setAccountId(List<int>? accountId);
 
   /// Add one or more transactions
   /// This is public as it is called to store locally submitted user transactions
