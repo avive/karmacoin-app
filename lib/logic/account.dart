@@ -442,8 +442,8 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     // all new users get this on signup - we simulate it in clients until
     // we get it from the user's on-chain account
     TraitScore newUserTrait = TraitScore();
-    newUserTrait.score = 1;
-    newUserTrait.traitId = GenesisConfig.signUpCharTraitIndex;
+    newUserTrait.score = Int64.ONE;
+    newUserTrait.traitId = Int64(GenesisConfig.signUpCharTraitIndex);
 
     KarmaCoinUser user = KarmaCoinUser(
       User(

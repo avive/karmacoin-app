@@ -1,16 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:ed25519_edwards/ed25519_edwards.dart';
-import 'package:karma_coin/data/signed_transaction.dart';
 import 'package:karma_coin/logic/txs_boss_interface.dart';
+import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/api/types.pb.dart' as types;
 import 'package:karma_coin/services/api/api.pbgrpc.dart' as api_types;
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:quiver/collection.dart';
-import 'package:karma_coin/data/user_verification_data.dart';
+import 'package:karma_coin/data/user_verification_data.dart' as dvd;
+import 'package:karma_coin/data/signed_transaction.dart' as dst;
 
 /// The TransactionsBoss is responsible for managing the transactions this device knows about.
 /// Boss is a cooler name than manager, and it's shorter to type.
@@ -80,8 +80,9 @@ class TransactionsBoss extends TransactionsBossInterface {
 
     for (types.SignedTransactionWithStatus tx in transactions) {
       // enrich and get hash from enriched
-      SignedTransactionWithStatus enriched = SignedTransactionWithStatus(tx);
-      if (!enriched.verify(PublicKey(tx.transaction.signer.data))) {
+      dst.SignedTransactionWithStatus enriched =
+          dst.SignedTransactionWithStatus(tx);
+      if (!enriched.verify(ed.PublicKey(tx.transaction.signer.data))) {
         debugPrint('rejecting transaction with invalid user signature');
         continue;
       }
@@ -97,11 +98,14 @@ class TransactionsBoss extends TransactionsBossInterface {
         newIncomingTxs[base64.encode(enriched.getHash())] = tx;
       }
 
-      switch (tx.transaction.transactionData.transactionType) {
+      TransactionBody tx_body =
+          TransactionBody.fromBuffer(tx.transaction.transactionBody);
+      TransactionData tx_data = tx_body.transactionData;
+
+      switch (tx_data.transactionType) {
         case types.TransactionType.TRANSACTION_TYPE_NEW_USER_V1:
           types.NewUserTransactionV1 newUserTx =
-              types.NewUserTransactionV1.fromBuffer(
-                  tx.transaction.transactionData.transactionData);
+              types.NewUserTransactionV1.fromBuffer(tx_data.transactionData);
 
           types.UserVerificationData verificationData =
               newUserTx.verifyNumberResponse;
@@ -110,8 +114,8 @@ class TransactionsBoss extends TransactionsBossInterface {
             continue;
           }
 
-          UserVerificationData evidence =
-              UserVerificationData(verificationData);
+          dvd.UserVerificationData evidence =
+              dvd.UserVerificationData(verificationData);
 
           // todo: validate verifier accountId is valid - defined in genesis config
 
@@ -140,7 +144,11 @@ class TransactionsBoss extends TransactionsBossInterface {
 
         String txHash = base64.encode(event.transactionHash);
         txEvents[txHash] = event;
-        if (event.transaction.transactionData.transactionType ==
+
+        TransactionBody tx_body =
+            TransactionBody.fromBuffer(event.transaction.transactionBody);
+
+        if (tx_body.transactionData.transactionType ==
             types.TransactionType.TRANSACTION_TYPE_NEW_USER_V1) {
           if (listsEqual(event.transaction.signer.data, _accountId)) {
             debugPrint('Found new user transaction event for local user');

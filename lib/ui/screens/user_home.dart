@@ -79,7 +79,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       icon: CupertinoIcons.check_mark_circled),
                   title: 'Apreciaiton Sent',
                   dismissOnBackgroundTap: true,
-                  maxWidth: 240,
+                  maxWidth: 260,
                 );
                 break;
               case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
@@ -88,10 +88,10 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   duration: Duration(seconds: 2),
                   configuration:
                       IconConfiguration(icon: CupertinoIcons.stop_circle),
-                  title: 'Apreciaiton Error',
-                  subtitle: 'Appreciation rejected. Please try later.',
+                  title: 'Internal Error',
+                  subtitle: 'Sorry, please try again later.',
                   dismissOnBackgroundTap: true,
-                  maxWidth: 240,
+                  maxWidth: 260,
                 );
                 break;
             }

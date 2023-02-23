@@ -7,10 +7,9 @@ import 'package:karma_coin/services/api/api.pbgrpc.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/signed_transaction.dart' as est;
 
-/// Local karmaCoin account logic. We seperate between authentication and account. Authentication is handled by Firebase Auth.
+/// Transaction generator is responsible for creating and submitting transactions to the Karmachain
+/// it is designed to be mixed-into account logic
 abstract class TrnasactionGenerator {
-  /// todo: this should move to TransactionsGenerator class
-
   /// Submit an appreciation / payment txs to Karmachain
   Future<SubmitTransactionResponse> submitPaymentTransacationImpl(
       PaymentTransactionData data,
@@ -19,7 +18,8 @@ abstract class TrnasactionGenerator {
     PaymentTransactionV1 paymentTx = PaymentTransactionV1(
         to: MobileNumber(number: data.mobilePhoneNumber),
         amount: data.kCentsAmount,
-        charTraitId: data.personalityTrait.index);
+        charTraitId: Int64(data.personalityTrait.index),
+        communityId: Int64.ZERO);
 
     TransactionData txData = TransactionData(
       transactionData: paymentTx.writeToBuffer(),
@@ -100,7 +100,8 @@ abstract class TrnasactionGenerator {
         debugPrint('tx submission acccepted by api - entering local mode...');
 
         // start tracking txs for this account...
-        await transactionBoss.setAccountId(karmaCoinUser.userData.accountId.data);
+        await transactionBoss
+            .setAccountId(karmaCoinUser.userData.accountId.data);
 
         // store in outgoing txs in boss
         transactionBoss.updateWith([signedTx]);
@@ -124,13 +125,19 @@ abstract class TrnasactionGenerator {
   /// Create a new signed transaction with the local account data and the given transaction data
   SignedTransactionWithStatus _createSignedTransaction(
       TransactionData data, KarmaCoinUser karmaCoinUser, ed.KeyPair keyPair) {
-    SignedTransaction tx = SignedTransaction(
+    //
+    // create a new transaction body
+    TransactionBody txBody = TransactionBody(
       nonce: karmaCoinUser.nonce.value + 1,
       fee: Int64.ONE, // todo: get default tx fee from genesis
       netId: 1, // todo: get from genesis config
-      transactionData: data,
-      signer: AccountId(data: keyPair.publicKey.bytes),
       timestamp: Int64(DateTime.now().millisecondsSinceEpoch),
+      transactionData: data,
+    );
+
+    SignedTransaction tx = SignedTransaction(
+      signer: AccountId(data: keyPair.publicKey.bytes),
+      transactionBody: txBody.writeToBuffer(),
     );
 
     SignedTransactionWithStatus txWithStatus = SignedTransactionWithStatus(
@@ -138,11 +145,24 @@ abstract class TrnasactionGenerator {
 
     est.SignedTransactionWithStatus enrichedTx =
         est.SignedTransactionWithStatus(txWithStatus);
+
+    List<int> messageHash = enrichedTx.getHash();
     enrichedTx.sign(keyPair.privateKey);
-    // verify signature
+    List<int> txHashPostSign = enrichedTx.getHash();
+
+    debugPrint('Deubg signature...');
+    debugPrint('Signed message hash: ${messageHash.toHexString()}');
+    debugPrint('Tx hash post-sign: ${txHashPostSign.toHexString()}');
+    debugPrint(
+        'Signature: ${enrichedTx.txWithStatus.transaction.signature.signature.toHexString()}');
+    debugPrint('Signature pub key: ${keyPair.publicKey.bytes.toHexString()}');
+
+    // verify signature - client side sanity check
     if (!enrichedTx.verify(keyPair.publicKey)) {
-      throw Exception('failed to verify signature');
+      throw Exception('signature verification failed');
     }
+
+    debugPrint('Tx signed and signature verified successfully!');
 
     return enrichedTx.txWithStatus;
   }

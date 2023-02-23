@@ -5,6 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   desktop_webview_auth
   desktop_window
+  flutter_js
   flutter_secure_storage_linux
 )
 
