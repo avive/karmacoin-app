@@ -16,10 +16,11 @@ abstract class TrnasactionGenerator {
       KarmaCoinUser karmaCoinUser,
       ed.KeyPair keyPair) async {
     PaymentTransactionV1 paymentTx = PaymentTransactionV1(
+        from: AccountId(data: keyPair.publicKey.bytes),
         to: MobileNumber(number: data.mobilePhoneNumber),
         amount: data.kCentsAmount,
-        charTraitId: Int64(data.personalityTrait.index),
-        communityId: Int64.ZERO);
+        charTraitId: data.personalityTrait.index,
+        communityId: 0);
 
     TransactionData txData = TransactionData(
       transactionData: paymentTx.writeToBuffer(),
@@ -152,23 +153,22 @@ abstract class TrnasactionGenerator {
     est.SignedTransactionWithStatus enrichedTx =
         est.SignedTransactionWithStatus(txWithStatus);
 
-    List<int> messageHash = enrichedTx.getHash();
+    List<int> txhash = enrichedTx.getHash();
     enrichedTx.sign(keyPair.privateKey);
-    List<int> txHashPostSign = enrichedTx.getHash();
 
     debugPrint('Deubg signature...');
-    debugPrint('Signed message hash: ${messageHash.toHexString()}');
-    debugPrint('Tx hash post-sign: ${txHashPostSign.toHexString()}');
+    debugPrint('Signed message hash: ${txhash.toShortHexString()}');
     debugPrint(
-        'Signature: ${enrichedTx.txWithStatus.transaction.signature.signature.toHexString()}');
-    debugPrint('Signature pub key: ${keyPair.publicKey.bytes.toHexString()}');
+        'Signature: ${enrichedTx.txWithStatus.transaction.signature.signature.toShortHexString()}');
+    debugPrint(
+        'Signature pub key: ${keyPair.publicKey.bytes.toShortHexString()}');
 
     // verify signature - client side sanity check
     if (!enrichedTx.verify(keyPair.publicKey)) {
       throw Exception('signature verification failed');
     }
 
-    debugPrint('Tx signed and signature verified successfully!');
+    debugPrint('Tx signed and signature verified successfully :-)');
 
     return enrichedTx.txWithStatus;
   }

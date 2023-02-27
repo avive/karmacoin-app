@@ -3,6 +3,8 @@ import 'package:karma_coin/services/api/types.pb.dart' as types;
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:protobuf/protobuf.dart';
 
+// todo: add format
+
 /// An extension class over vt.VerifyNumberRequest to support signing and verification
 class UserVerificationData {
   final types.UserVerificationData data;

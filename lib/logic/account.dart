@@ -453,8 +453,8 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     // all new users get this on signup - we simulate it in clients until
     // we get it from the user's on-chain account
     TraitScore newUserTrait = TraitScore();
-    newUserTrait.score = Int64.ONE;
-    newUserTrait.traitId = Int64(GenesisConfig.signUpCharTraitIndex);
+    newUserTrait.score = 1;
+    newUserTrait.traitId = GenesisConfig.signUpCharTraitIndex;
 
     KarmaCoinUser newKarmaCoinUser = KarmaCoinUser(
       User(
@@ -557,8 +557,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
   /// Returns true iff account logic has all required data to create a new user
   @override
   bool validateDataForNewUserTransaction() {
-    debugPrint(
-        'validating local data for new user tx... store validator response: $_userVerificationData');
+    debugPrint('validating local data for new user tx...');
 
     return _userVerificationData != null &&
         _userVerificationData?.verificationResult ==

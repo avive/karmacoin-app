@@ -20,8 +20,10 @@ class TransactionsBoss extends TransactionsBossInterface {
   List<int>? _accountId;
   Timer? _timer;
 
-  // memory cache
+  // key is hex string of tx hash
   Map<String, dst.SignedTransactionWithStatus> _outgoingTxs = {};
+
+  // key is hex string of tx hash
   Map<String, dst.SignedTransactionWithStatus> _incomingTxs = {};
 
   // transactions db for current local user
@@ -87,8 +89,6 @@ class TransactionsBoss extends TransactionsBossInterface {
       final Directory docsDir = await getApplicationSupportDirectory();
       dir = docsDir.path;
     }
-
-    debugPrint('hive path: $dir');
 
     return dir;
   }
@@ -161,6 +161,9 @@ class TransactionsBoss extends TransactionsBossInterface {
       return;
     }
 
+    debugPrint(
+        'updating txs with txs: ${txs.length} and with ${transactionsEvents?.length} events');
+
     var incomingBox = await _txsBoxCollection?.openBox<String>('incoming');
     var outgoingBox = await _txsBoxCollection?.openBox<String>('outgoing');
     var eventsBox = await _txsBoxCollection?.openBox<String>('events');
@@ -171,7 +174,9 @@ class TransactionsBoss extends TransactionsBossInterface {
         continue;
       }
 
-      String txHash = base64.encode(tx.getHash());
+      String txHash = tx.getHash().toHexString();
+
+      debugPrint('processing tx: ${tx.getHash().toShortHexString()}');
 
       bool isTxFromLocalUser =
           listsEqual(tx.txWithStatus.transaction.signer.data, _accountId);
@@ -233,7 +238,7 @@ class TransactionsBoss extends TransactionsBossInterface {
         // todo: emit event if we got an event for local user signup (success or rejection)
         // rejection can be due to taken user name, etc....
 
-        String txHash = base64.encode(event.transactionHash);
+        String txHash = event.transactionHash.toHexString();
         txEvents[txHash] = event;
 
         TransactionBody tx_body =

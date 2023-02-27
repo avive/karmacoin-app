@@ -100,6 +100,6 @@ class SignedTransactionWithStatus {
   /// Returns the canonical tx hash - used for indexing
   List<int> getHash() {
     // we downgraded to sha256 as blake dart libs such as r_crypto are native only
-    return sha256.convert(txWithStatus.transaction.writeToBuffer()).bytes;
+    return sha256.convert(txWithStatus.transaction.transactionBody).bytes;
   }
 }
