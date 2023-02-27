@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:karma_coin/logic/txs_boss_interface.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
@@ -35,15 +36,61 @@ class TransactionsBoss extends TransactionsBossInterface {
     List<dst.SignedTransactionWithStatus> newOutgoing =
         _outgoingTxs.values.toList();
 
+    int incTxsNotOpenedCount = 0;
+    int outTxsNotOpenedCount = 0;
+    int notOpenedTotal = 0;
+
+    for (dst.SignedTransactionWithStatus tx in newIncoming) {
+      debugPrint('incoming tx: ${tx.getHash().toShortHexString()}');
+
+      if (!tx.openned.value) {
+        incTxsNotOpenedCount += 1;
+        notOpenedTotal += 1;
+      }
+    }
+
+    for (dst.SignedTransactionWithStatus tx in newOutgoing) {
+      debugPrint('outgoing tx: ${tx.getHash().toShortHexString()}');
+
+      if (!tx.openned.value) {
+        outTxsNotOpenedCount += 1;
+        notOpenedTotal += 1;
+      }
+    }
+
     newIncoming
         .sort((a, b) => b.txBody.timestamp.compareTo(a.txBody.timestamp));
     newOutgoing
         .sort((a, b) => b.txBody.timestamp.compareTo(a.txBody.timestamp));
 
+    incomingTxsNotOpenedCount.value = incTxsNotOpenedCount;
+    outcomingTxsNotOpenedCount.value = outTxsNotOpenedCount;
+    notOpenedTxsCount.value = notOpenedTotal;
+
+    debugPrint('incoming txs: ${newIncoming.length}');
+    debugPrint('outgoing txs: ${newOutgoing.length}');
+    debugPrint('incoming txs not openeed: $incTxsNotOpenedCount');
+    debugPrint('outgoing txs not openeed: $outTxsNotOpenedCount');
+    debugPrint('total txs not openeed: $notOpenedTotal');
+
     incomingTxsNotifer.value = newIncoming;
     outgoingTxsNotifer.value = newOutgoing;
 
     notifyListeners();
+  }
+
+  /// Returns the hive db root directory
+  Future<String> _getHivePath() async {
+    String dir = "."; // default to current dir for the web app
+    if (!kIsWeb) {
+      // for apps with app support dir
+      final Directory docsDir = await getApplicationSupportDirectory();
+      dir = docsDir.path;
+    }
+
+    debugPrint('hive path: $dir');
+
+    return dir;
   }
 
   /// Set the local user account id - transactions to and from this accountId will be tracked by the TransactionBoss
@@ -63,13 +110,10 @@ class TransactionsBoss extends TransactionsBossInterface {
     }
 
     if (accountId != null) {
-      final Directory docsDir = await getApplicationDocumentsDirectory();
-      final hivePath = docsDir.path + '/' + 'hive_db';
-
       _txsBoxCollection = await BoxCollection.open(
-          base64Encode(accountId), // db name is local user id
+          accountId.toShortHexString(), // db name is local user id
           {'incoming', 'outgoing', 'events'}, // db boxes
-          path: hivePath); // db path
+          path: await _getHivePath()); // db path
     }
 
     _accountId = accountId;
@@ -209,7 +253,6 @@ class TransactionsBoss extends TransactionsBossInterface {
     }
 
     _updateObservables();
-
     notifyListeners();
   }
 
@@ -220,13 +263,15 @@ class TransactionsBoss extends TransactionsBossInterface {
     var events = await _txsBoxCollection?.openBox<String>('events');
 
     (await incomingBox?.getAllValues())?.forEach((key, value) {
-      _incomingTxs[key] =
+      dst.SignedTransactionWithStatus tx =
           dst.SignedTransactionWithStatus.fromJson(jsonDecode(value));
+      _incomingTxs[key] = tx;
     });
 
     (await outgoingBox?.getAllValues())?.forEach((key, value) {
-      _outgoingTxs[key] =
+      dst.SignedTransactionWithStatus tx =
           dst.SignedTransactionWithStatus.fromJson(jsonDecode(value));
+      _outgoingTxs[key] = tx;
     });
 
     (await events?.getAllValues())?.forEach((key, value) {
