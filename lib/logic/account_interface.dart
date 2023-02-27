@@ -3,13 +3,17 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/services/api/api.pbgrpc.dart';
+import 'package:karma_coin/services/api/types.pb.dart';
 
 abstract class AccountLogicInterface {
   /// Init account logic
   Future<void> init();
 
   // Set the user's karma coin user data and store it
-  Future<void> updateKarmaCoinUserData(KarmaCoinUser karmaCoinUser);
+  Future<void> updateKarmaCoinUser(User user);
+
+  // Persist karma coin user
+  Future<void> persistKarmaCoinUser();
 
   // Set the user reuqested user name
   Future<void> setRequestedUserName(String requestedUserName);
@@ -38,7 +42,7 @@ abstract class AccountLogicInterface {
 
   // Create a new karma coin (not firebase) user from local account data
   // and store it locally. This user's data is going to be updated with on-chain data
-  Future<KarmaCoinUser> createNewKarmaCoinUser();
+  Future<void> createNewKarmaCoinUser();
 
   // Verify user's phone number and account id
   Future<void> verifyPhoneNumber();

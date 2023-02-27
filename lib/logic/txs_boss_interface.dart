@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/data/signed_transaction.dart';
 import 'package:karma_coin/services/api/types.pb.dart' as types;
 
 abstract class TransactionsBossInterface extends ChangeNotifier {
@@ -7,28 +8,30 @@ abstract class TransactionsBossInterface extends ChangeNotifier {
   /// Boss will attempt to load known txs for this account from local store
   Future<void> setAccountId(List<int>? accountId);
 
+  // todo: update unread txs counts - 0 no new unviewed txs. otherwise - number of unviewed txs
+
   /// Add one or more transactions
   /// This is public as it is called to store locally submitted user transactions
-  Future<void> updateWith(List<types.SignedTransactionWithStatus> transactions,
+  Future<void> updateWithTxs(List<SignedTransactionWithStatus> transactions,
       {List<types.TransactionEvent>? transactionsEvents = null});
 
+  Future<void> updateWithTx(SignedTransactionWithStatus transaction);
+
   /// transactions from _accountId indexed by tx hash
-  final ValueNotifier<Map<String, types.SignedTransactionWithStatus>>
-      outgoingTxsNotifer =
-      ValueNotifier<Map<String, types.SignedTransactionWithStatus>>({});
+  final ValueNotifier<List<SignedTransactionWithStatus>> outgoingTxsNotifer =
+      ValueNotifier<List<SignedTransactionWithStatus>>([]);
 
   /// transactions to _accountId indexed by tx hash
-  final ValueNotifier<Map<String, types.SignedTransactionWithStatus>>
-      incomingTxsNotifer =
-      ValueNotifier<Map<String, types.SignedTransactionWithStatus>>({});
+  final ValueNotifier<List<SignedTransactionWithStatus>> incomingTxsNotifer =
+      ValueNotifier<List<SignedTransactionWithStatus>>([]);
 
   /// transactions events for _accountId indexed by tx hash
   final ValueNotifier<Map<String, types.TransactionEvent>> txEventsNotifer =
       ValueNotifier<Map<String, types.TransactionEvent>>({});
 
   /// signup transaction for accountId...
-  final ValueNotifier<types.SignedTransactionWithStatus?> newUserTransaction =
-      ValueNotifier<types.SignedTransactionWithStatus?>(null);
+  final ValueNotifier<SignedTransactionWithStatus?> newUserTransaction =
+      ValueNotifier<SignedTransactionWithStatus?>(null);
 
   /// signup transaction event for accountId...
   final ValueNotifier<types.TransactionEvent?> newUserTransactionEvent =

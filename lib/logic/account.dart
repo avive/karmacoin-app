@@ -19,6 +19,7 @@ import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/verify_number_request.dart' as data;
 import 'package:karma_coin/data/user_verification_data.dart' as vnr;
 import 'package:bip39/bip39.dart' as bip39;
+import 'package:karma_coin/data/signed_transaction.dart' as dst;
 
 class _AccountStoreKeys {
   static String seed = 'seed'; // keypair seed
@@ -142,7 +143,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
         return;
       }
 
-      SignedTransactionWithStatus tx =
+      dst.SignedTransactionWithStatus tx =
           transactionBoss.newUserTransaction.value!;
       // set user as signed if there's a local karma user (user started the signup flow from this device)
       // and that karma user id is same as the one in the transaction
@@ -152,7 +153,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
       }
 
       if (listsEqual(karmaCoinUser.value?.userData.accountId.data,
-          tx.transaction.signer.data)) {
+          tx.txWithStatus.transaction.signer.data)) {
         if (!signedUpOnChain.value) {
           debugPrint('local user signed up on chain!');
 
@@ -180,6 +181,9 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     try {
       debugPrint('Calling api to get updated karma coin user...');
 
+      assert(
+          this.karmaCoinUser.value != null, 'no local karma coin user found');
+
       GetUserInfoByAccountResponse resp = await api.apiServiceClient
           .getUserInfoByAccount(GetUserInfoByAccountRequest(
               accountId: karmaCoinUser.value?.userData.accountId));
@@ -187,7 +191,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
       if (resp.hasUser()) {
         debugPrint('Got back user from api. Updating local user data...');
 
-        await updateKarmaCoinUserData(KarmaCoinUser(resp.user));
+        await karmaCoinUser.value!.updatWithUserData(resp.user);
 
         // User is signed up on chain
         await _setSignedUp(true);
@@ -272,27 +276,34 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
         'keypair set. Account id: ${keyPair.value?.publicKey.bytes.toHexString()}');
   }
 
-  /// Update the local KarmaCoinUser data and persist it
   @override
-  Future<void> updateKarmaCoinUserData(KarmaCoinUser karmaCoinUser) async {
-    debugPrint('updating local karma coin user data from chain via api...');
-    String userData = karmaCoinUser.userData.writeToBuffer().toBase64();
+  Future<void> persistKarmaCoinUser() async {
+    assert(this.karmaCoinUser.value != null, 'no local karma coin user found');
+
+    String userData =
+        this.karmaCoinUser.value!.userData.writeToBuffer().toBase64();
+
     await _secureStorage.write(
         key: _AccountStoreKeys.karmaCoinUser,
         value: userData,
         aOptions: _aOptions);
+  }
 
-    this.karmaCoinUser.value = karmaCoinUser;
+  /// Update the local KarmaCoinUser data and persist it
+  @override
+  Future<void> updateKarmaCoinUser(User user) async {
+    debugPrint('updating local karma coin user data from chain via api...');
 
-    debugPrint('Current balance: ${karmaCoinUser.userData.balance}');
-    debugPrint('Current karma score: ${karmaCoinUser.userData.karmaScore}');
-    debugPrint('Current nonce: ${karmaCoinUser.userData.nonce}');
+    assert(this.karmaCoinUser.value != null, 'no local karma coin user found');
+
+    await this.karmaCoinUser.value!.updatWithUserData(user);
 
     // Update observable values that UI depends on using on-chain data
     // For example, user's baance and karma score in user's home screen
-    karmaCoinUser.balance.value = karmaCoinUser.userData.balance;
-    karmaCoinUser.karmaScore.value = karmaCoinUser.userData.karmaScore;
-    karmaCoinUser.nonce.value = karmaCoinUser.userData.nonce;
+    // debugPrint("updating observable values from chain data...");
+    // karmaCoinUser.balance.value = karmaCoinUser.userData.balance;
+    // karmaCoinUser.karmaScore.value = karmaCoinUser.userData.karmaScore;
+    // karmaCoinUser.nonce.value = karmaCoinUser.userData.nonce;
   }
 
   /// Set local user's phone number
@@ -435,7 +446,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
 
   /// Create a new karma coin user from account data
   @override
-  Future<KarmaCoinUser> createNewKarmaCoinUser() async {
+  Future<void> createNewKarmaCoinUser() async {
     // todo: if we alrteady had anohter karma coin user then we should unregsiter from the transactionsBoss on transactions for this user
     debugPrint('Creating new karmacoin user...');
 
@@ -445,7 +456,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     newUserTrait.score = Int64.ONE;
     newUserTrait.traitId = Int64(GenesisConfig.signUpCharTraitIndex);
 
-    KarmaCoinUser user = KarmaCoinUser(
+    KarmaCoinUser newKarmaCoinUser = KarmaCoinUser(
       User(
         accountId: AccountId(data: _getAccountId()),
         nonce: Int64.ZERO,
@@ -459,9 +470,8 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     );
 
     // store it locally
-    await updateKarmaCoinUserData(user);
-
-    return user;
+    this.karmaCoinUser.value = newKarmaCoinUser;
+    await persistKarmaCoinUser();
   }
 
   /// Verify the user's phone number and account id, store verification response

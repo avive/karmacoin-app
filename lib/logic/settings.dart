@@ -5,11 +5,12 @@ import 'package:karma_coin/common/save_load_mixin.dart';
 
 // todo: add genesis config file and get verifier and net id info from it and not from settings
 
+// todo: migrate from json file to a hive box
+
 /// App settings logic
 class SettingsLogic with ThrottledSaveLoadMixin {
   @override
   String get fileName => 'settings.dat';
-
 
   late final currentLocale = ValueNotifier<String?>(null)
     ..addListener(scheduleSave);

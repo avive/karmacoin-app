@@ -40,12 +40,15 @@ abstract class TrnasactionGenerator {
       debugPrint('failed to submit transaction to api: $e');
     }
 
+    est.SignedTransactionWithStatus enriched =
+        est.SignedTransactionWithStatus(signedTx);
+
     switch (resp.submitTransactionResult) {
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
         debugPrint('Payment transaction submitted to api!');
         signedTx.status = TransactionStatus.TRANSACTION_STATUS_SUBMITTED;
         // store in txboss as outgoing
-        transactionBoss.updateWith([signedTx]);
+        transactionBoss.updateWithTx(enriched);
 
         // Update local balance to reflect outgoing amount so UI is updated
         // it will update again once the user is periodically updated from chain
@@ -59,7 +62,7 @@ abstract class TrnasactionGenerator {
         debugPrint('transaction rejected by api');
 
         // store via txs boss so tx can be resent later by user
-        transactionBoss.updateWith([signedTx]);
+        transactionBoss.updateWithTx(enriched);
     }
 
     return resp;
@@ -94,6 +97,9 @@ abstract class TrnasactionGenerator {
       debugPrint('failed to submit transaction to api: $e');
     }
 
+    est.SignedTransactionWithStatus enriched =
+        est.SignedTransactionWithStatus(signedTx);
+
     switch (resp.submitTransactionResult) {
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
         signedTx.status = TransactionStatus.TRANSACTION_STATUS_SUBMITTED;
@@ -104,7 +110,7 @@ abstract class TrnasactionGenerator {
             .setAccountId(karmaCoinUser.userData.accountId.data);
 
         // store in outgoing txs in boss
-        transactionBoss.updateWith([signedTx]);
+        transactionBoss.updateWithTx(enriched);
 
         // increment user's nonce and store it locally
         await karmaCoinUser.incNonce();
@@ -112,7 +118,7 @@ abstract class TrnasactionGenerator {
         break;
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
         signedTx.status = TransactionStatus.TRANSACTION_STATUS_REJECTED;
-        transactionBoss.updateWith([signedTx]);
+        transactionBoss.updateWithTx(enriched);
 
         debugPrint('transaction rejected by api');
       // todo: store the transactionWithStatus in local storage via tx boss so

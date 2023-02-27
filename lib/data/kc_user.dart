@@ -10,16 +10,55 @@ import '../services/api/types.pb.dart';
 class KarmaCoinUser {
   final User userData;
 
-  // We start with the balance after signup reward
+  /// We start with the balance after signup reward
   final ValueNotifier<Int64> balance =
       ValueNotifier<Int64>(GenesisConfig.kCentsSignupReward);
 
   final ValueNotifier<Int64> nonce = ValueNotifier<Int64>(Int64.ZERO);
 
-  // Expose karma coin
+  /// Expose karma coin
   final ValueNotifier<int> karmaScore = ValueNotifier<int>(1);
 
+  // Expose user name
+  final ValueNotifier<String> userName = ValueNotifier<String>('');
+
+  /// Trait scores
+  final ValueNotifier<List<TraitScore>> traitScores =
+      ValueNotifier<List<TraitScore>>([]);
+
+  /// Mobile number
+  final ValueNotifier<MobileNumber> mobileNumber =
+      ValueNotifier<MobileNumber>(MobileNumber());
+
   KarmaCoinUser(this.userData);
+
+  /// Update user with provided user data in an observable way
+  Future<void> updatWithUserData(User user) async {
+    userData.balance = user.balance;
+    balance.value = user.balance;
+
+    userData.nonce = user.nonce;
+    nonce.value = user.nonce;
+
+    karmaScore.value = user.karmaScore;
+    userData.karmaScore = user.karmaScore;
+
+    userData.userName = user.userName;
+    userName.value = user.userName;
+
+    // accountId.value = user.accountId;
+    userData.accountId = user.accountId;
+
+    userData.mobileNumber = user.mobileNumber;
+    mobileNumber.value = user.mobileNumber;
+
+    userData.traitScores.clear();
+    userData.traitScores.addAll(user.traitScores);
+    traitScores.value.clear();
+    traitScores.value.addAll(user.traitScores);
+
+    await accountLogic.persistKarmaCoinUser();
+  }
 
   /// Increment user nonce in an observable way
   Future<void> incNonce() async {
@@ -32,7 +71,7 @@ class KarmaCoinUser {
     balance.value = newBalance;
 
     // persist changes
-    await accountLogic.updateKarmaCoinUserData(this);
+    await accountLogic.persistKarmaCoinUser();
   }
 
   /// Update nonce in an observable way
@@ -41,7 +80,7 @@ class KarmaCoinUser {
     this.nonce.value = nonce;
 
     // persist changes
-    await accountLogic.updateKarmaCoinUserData(this);
+    await accountLogic.persistKarmaCoinUser();
   }
 
   @override

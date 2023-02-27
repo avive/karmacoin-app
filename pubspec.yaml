@@ -64,7 +64,7 @@ dependencies:
   status_alert: ^1.0.1
   flutter_otp_text_field: ^1.1.1
   flutter_js: ^0.6.0
-
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

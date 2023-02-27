@@ -78,7 +78,8 @@ class AccountSetupController extends ChangeNotifier {
       }
 
       TransactionEvent event = transactionBoss.newUserTransactionEvent.value!;
-      debugPrint('processing transaction event: ${event.toString()}');
+      debugPrint(
+          'processing transaction event: ${event.transactionHash.toShortHexString()}');
       switch (event.result) {
         case ExecutionResult.EXECUTION_RESULT_EXECUTED:
           // no need to check the tx event - if the signup was executed then the user is on-chain

@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/logic/auth.dart';
 import 'package:karma_coin/logic/settings.dart';
@@ -12,6 +14,7 @@ import 'package:karma_coin/logic/txs_boss.dart';
 import 'package:karma_coin/logic/txs_boss_interface.dart';
 import 'package:karma_coin/logic/user_name_availability.dart';
 import 'package:karma_coin/logic/verifier.dart';
+import 'package:path_provider/path_provider.dart';
 import 'account.dart';
 import 'account_interface.dart';
 import 'api.dart';
@@ -89,6 +92,14 @@ class AppLogic with AppLogicInterface {
     if (PlatformInfo.isAndroid) {
       await FlutterDisplayMode.setHighRefreshRate();
     }
+
+    WidgetsFlutterBinding.ensureInitialized();
+    final Directory docsDir = await getApplicationDocumentsDirectory();
+    final path = docsDir.path + '/' + 'hive_db';
+    await Directory(path).create(recursive: true);
+
+    // init Hive
+    Hive.init(path);
 
     // Load app settings
     await settingsLogic.load();
