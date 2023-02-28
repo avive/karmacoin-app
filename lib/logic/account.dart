@@ -20,6 +20,7 @@ import 'package:karma_coin/data/verify_number_request.dart' as data;
 import 'package:karma_coin/data/user_verification_data.dart' as vnr;
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:karma_coin/data/signed_transaction.dart' as dst;
+import 'account_setup_controller.dart';
 
 class _AccountStoreKeys {
   static String seed = 'seed'; // keypair seed
@@ -107,6 +108,8 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
       // start tracking txs for this account...
       await transactionBoss
           .setAccountId(karmaCoinUser.value!.userData.accountId.data);
+    } else {
+      debugPrint('karma coin user not found in secure local store.');
     }
 
     String? verificationData = await _secureStorage.read(
@@ -164,8 +167,9 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
           await _updateLocalKarmaUserFromChain();
 
           debugPrint('Polling for user account data every 60 secs...');
-          _timer = Timer.periodic(const Duration(seconds: 60),
-              (Timer t) async => await _updateLocalKarmaUserFromChain());
+          _timer = Timer.periodic(const Duration(seconds: 60), (Timer t) async {
+            await _updateLocalKarmaUserFromChain();
+          });
         } else {
           debugPrint(
               'already set this user to be chain signed up. ignoring...');
@@ -179,14 +183,16 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
   /// Update the local KarmaCoin user from chain
   Future<void> _updateLocalKarmaUserFromChain() async {
     try {
-      debugPrint('Calling api to get updated karma coin user...');
+      debugPrint('Calling api to get updated karma coin use data...');
 
-      assert(
-          this.karmaCoinUser.value != null, 'no local karma coin user found');
+      if (karmaCoinUser.value == null) {
+        debugPrint('No local karma coin user found. ignoring...');
+        return;
+      }
 
       GetUserInfoByAccountResponse resp = await api.apiServiceClient
           .getUserInfoByAccount(GetUserInfoByAccountRequest(
-              accountId: karmaCoinUser.value?.userData.accountId));
+              accountId: karmaCoinUser.value!.userData.accountId));
 
       if (resp.hasUser()) {
         debugPrint('Got back user from api. Updating local user data...');
@@ -213,7 +219,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     keyPair.value = ed.KeyPair(privateKey, publicKey);
 
     debugPrint(
-        'keypair set. Account id: ${keyPair.value?.publicKey.bytes.toHexString()}. length: ${keyPair.value?.publicKey.bytes.length}');
+        'keypair set. Account id: ${keyPair.value!.publicKey.bytes.toHexString()}. length: ${keyPair.value!.publicKey.bytes.length}');
   }
 
   /// private helper to set keypair from seed. This is an expensive function and should be run in a separate isolate
@@ -287,6 +293,8 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
         key: _AccountStoreKeys.karmaCoinUser,
         value: userData,
         aOptions: _aOptions);
+
+    debugPrint("saved karacoin user data to secure storage");
   }
 
   /// Update the local KarmaCoinUser data and persist it
@@ -297,6 +305,9 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     assert(this.karmaCoinUser.value != null, 'no local karma coin user found');
 
     await this.karmaCoinUser.value!.updatWithUserData(user);
+    KarmaCoinUser newUser = this.karmaCoinUser.value!;
+    this.karmaCoinUser.value = null;
+    this.karmaCoinUser.value = newUser;
 
     // Update observable values that UI depends on using on-chain data
     // For example, user's baance and karma score in user's home screen
@@ -393,6 +404,9 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     accountSecurityWords.value = null;
     karmaCoinUser.value = null;
     _userVerificationData = null;
+
+    // reset account setup state
+    accountSetupController.setStatus(AccountSetupStatus.readyToSignup);
   }
 
   /// Set the account id for a firebase user and store the user's phone number
@@ -426,7 +440,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     }
 
     debugPrint(
-        'User account id: ${keyPair.value!.publicKey.bytes.toHexString()} stored on firebase.');
+        'User account id: ${keyPair.value!.publicKey.bytes.toShortHexString()} stored on firebase.');
   }
 
   List<int>? _getAccountId() {

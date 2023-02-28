@@ -20,7 +20,7 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
       clearText = true;
     });
 
-    Future.delayed(Duration(seconds: 200), () async {
+    Future.delayed(Duration.zero, () async {
       if (mounted) {
         setState(() {
           clearText = false;
@@ -99,7 +99,7 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
                 setState(() {
                   clearText = true;
                 });
-                Future.delayed(Duration(seconds: 200), () async {
+                Future.delayed(Duration(milliseconds: 200), () async {
                   if (mounted) {
                     setState(() {
                       clearText = false;

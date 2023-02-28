@@ -34,6 +34,8 @@ class KarmaCoinUser {
 
   /// Update user with provided user data in an observable way
   Future<void> updatWithUserData(User user) async {
+    userData.accountId = user.accountId;
+
     userData.balance = user.balance;
     balance.value = user.balance;
 

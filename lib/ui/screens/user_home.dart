@@ -2,6 +2,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:intl/intl.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
+import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/services/api/api.pb.dart';
 import 'package:karma_coin/ui/widgets/appreciate.dart';
@@ -128,6 +129,61 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         });
   }
 
+  Widget _getWidgetForUser(BuildContext context) {
+    return ValueListenableBuilder<KarmaCoinUser?>(
+        // todo: how to make this not assert when karmaCoinUser is null?
+        valueListenable: accountLogic.karmaCoinUser,
+        builder: (context, value, child) {
+          if (value == null) {
+            return Container();
+          }
+          return SafeArea(
+            child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Column(
+                        children: [
+                          Text(
+                            'Karma Score',
+                            style: CupertinoTheme.of(context)
+                                .textTheme
+                                .textStyle
+                                .merge(
+                                  TextStyle(fontSize: 32),
+                                ),
+                          ),
+                          _getKarmaScoreWidget(context),
+                          const SizedBox(height: 24),
+                        ],
+                      ),
+                      Column(children: [
+                        Text(
+                          'Balance',
+                          style: CupertinoTheme.of(context)
+                              .textTheme
+                              .textStyle
+                              .merge(
+                                TextStyle(fontSize: 32),
+                              ),
+                        ),
+                        _getBalanceWidget(context),
+                      ]),
+                      const SizedBox(height: 36),
+                      CupertinoButton.filled(
+                        onPressed: () {
+                          Navigator.of(context)
+                              .restorablePush(_activityModelBuilder);
+                        },
+                        child: Text('Appreciate'),
+                      ),
+                      _getAppreciationListener(context),
+                    ])),
+          );
+        });
+  }
+
   Widget _getKarmaScoreWidget(BuildContext context) {
     return ValueListenableBuilder<int>(
         valueListenable: accountLogic.karmaCoinUser.value!.karmaScore,
@@ -148,67 +204,24 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     return CupertinoPageScaffold(
       resizeToAvoidBottomInset: true,
       child: NestedScrollView(
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return <Widget>[
-            CupertinoSliverNavigationBar(
-              trailing: adjustNavigationBarButtonPosition(
-                  CupertinoButton(
-                    onPressed: () {
-                      context.push(ScreenPaths.actions);
-                    },
-                    child: const Icon(CupertinoIcons.ellipsis_circle, size: 24),
-                  ),
-                  0,
-                  -10),
-              largeTitle: Text('Karma Coin'),
-            ),
-          ];
-        },
-        body: SafeArea(
-          child: Padding(
-              padding: const EdgeInsets.all(32),
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Column(
-                      children: [
-                        Text(
-                          'Karma Score',
-                          style: CupertinoTheme.of(context)
-                              .textTheme
-                              .textStyle
-                              .merge(
-                                TextStyle(fontSize: 32),
-                              ),
-                        ),
-                        _getKarmaScoreWidget(context),
-                        const SizedBox(height: 24),
-                      ],
-                    ),
-                    Column(children: [
-                      Text(
-                        'Balance',
-                        style: CupertinoTheme.of(context)
-                            .textTheme
-                            .textStyle
-                            .merge(
-                              TextStyle(fontSize: 32),
-                            ),
-                      ),
-                      _getBalanceWidget(context),
-                    ]),
-                    const SizedBox(height: 36),
-                    CupertinoButton.filled(
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return <Widget>[
+              CupertinoSliverNavigationBar(
+                trailing: adjustNavigationBarButtonPosition(
+                    CupertinoButton(
                       onPressed: () {
-                        Navigator.of(context)
-                            .restorablePush(_activityModelBuilder);
+                        context.push(ScreenPaths.actions);
                       },
-                      child: Text('Appreciate'),
+                      child:
+                          const Icon(CupertinoIcons.ellipsis_circle, size: 24),
                     ),
-                    _getAppreciationListener(context),
-                  ])),
-        ),
-      ),
+                    0,
+                    -10),
+                largeTitle: Text('Karma Coin'),
+              ),
+            ];
+          },
+          body: _getWidgetForUser(context)),
     );
   }
 }

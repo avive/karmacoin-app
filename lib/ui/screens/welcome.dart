@@ -86,25 +86,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             maxWidth: 260,
           );
         },
-        child: const Text('Get Transactions'),
-      ));
-      res.add(const SizedBox(height: 16));
-      res.add(CupertinoButton(
-        onPressed: () {
-// Find the Scaffold in the Widget tree and use it to show a SnackBar!
-          // ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
-          //showCupertinoSnackBar(context: context, message: 'hello');
-          /*showCupertinoModalPopup<void>(
-              context: context,
-              builder: (BuildContext context) {
-                // some UI setting omitted
-                return CupertinoPopupSurface(
-                  child:
-                      Container(color: CupertinoColors.activeBlue, height: 200),
-                );
-              });*/
-        },
         child: const Text('Show snack'),
       ));
       res.add(const SizedBox(height: 16));

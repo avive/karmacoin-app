@@ -2,8 +2,9 @@ import 'package:fixnum/fixnum.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/api/types.pb.dart' as types;
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
-import 'package:karma_coin/services/api/types.pbenum.dart';
 import 'package:crypto/crypto.dart';
+
+import '../services/api/types.pb.dart';
 
 /// An extension class over SignedTransaction that supports signing, verification
 /// and user read app state
@@ -95,6 +96,20 @@ class SignedTransactionWithStatus {
       'txWithStatus': this.txWithStatus.writeToJson(),
       'openned': openned.value,
     };
+  }
+
+  /// Returns the from user which with accountId identical to signer account id
+  User get_from_user() {
+    return txWithStatus.from;
+  }
+
+  /// Returns to user if the transaction is an on-chain payment transaction
+  User? get_to_user() {
+    if (txWithStatus.hasTo()) {
+      return txWithStatus.to;
+    } else {
+      return null;
+    }
   }
 
   /// Returns the canonical tx hash - used for indexing

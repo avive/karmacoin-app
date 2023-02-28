@@ -80,8 +80,16 @@ class _ActionsScreenState extends State<ActionsScreen> {
           CupertinoListTile.notched(
             title: const Text('Sign Out'),
             leading: const Icon(CupertinoIcons.person_badge_minus, size: 28),
-            trailing: const CupertinoListTileChevron(),
-            onTap: () => {},
+            onTap: () async {
+              context.pop();
+              Future.delayed(Duration(milliseconds: 300), () async {
+                context.go(ScreenPaths.welcome);
+                Future.delayed(Duration(milliseconds: 300), () async {
+                  await accountLogic.clear();
+                  await authLogic.signOut();
+                });
+              });
+            },
           ),
         ],
       ),
