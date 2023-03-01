@@ -215,5 +215,6 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
         return CupertinoColors.activeGreen;
       case TransacitonStatus.failed:
         return CupertinoColors.destructiveRed;
+    }
   }
 }
