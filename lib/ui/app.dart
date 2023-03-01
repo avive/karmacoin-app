@@ -39,7 +39,9 @@ class KarmaCoinApp extends StatelessWidget with GetItMixin {
                 // remove brightness to have the app switch between light and dark mode based on system's brightness.
                 //theme: const CupertinoThemeData(brightness: Brightness.light),
 
-                theme: const CupertinoThemeData(),
+                theme: CupertinoThemeData(
+                  primaryColor: CupertinoColors.activeOrange,
+                ),
                 localizationsDelegates: const [
                   ...GlobalMaterialLocalizations.delegates,
                   GlobalWidgetsLocalizations.delegate,

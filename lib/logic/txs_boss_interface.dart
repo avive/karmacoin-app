@@ -18,16 +18,26 @@ abstract class TransactionsBossInterface extends ChangeNotifier {
   Future<void> updateWithTx(SignedTransactionWithStatus transaction);
 
   /// transactions from _accountId indexed by tx hash
-  final ValueNotifier<List<SignedTransactionWithStatus>> outgoingTxsNotifer =
+  final ValueNotifier<List<SignedTransactionWithStatus>>
+      outgoingAppreciationsNotifer =
       ValueNotifier<List<SignedTransactionWithStatus>>([]);
 
   /// transactions to _accountId indexed by tx hash
-  final ValueNotifier<List<SignedTransactionWithStatus>> incomingTxsNotifer =
+  final ValueNotifier<List<SignedTransactionWithStatus>>
+      incomingAppreciationsNotifer =
       ValueNotifier<List<SignedTransactionWithStatus>>([]);
 
-  final ValueNotifier<int> incomingTxsNotOpenedCount = ValueNotifier<int>(0);
-  final ValueNotifier<int> outcomingTxsNotOpenedCount = ValueNotifier<int>(0);
-  final ValueNotifier<int> notOpenedTxsCount = ValueNotifier<int>(0);
+  /// transactions to _accountId indexed by tx hash
+  final ValueNotifier<List<SignedTransactionWithStatus>> accountTxsNotifer =
+      ValueNotifier<List<SignedTransactionWithStatus>>([]);
+
+  final ValueNotifier<int> incomingAppreciationsNotOpenedCount =
+      ValueNotifier<int>(0);
+  final ValueNotifier<int> outcomingAppreciationsNotOpenedCount =
+      ValueNotifier<int>(0);
+  final ValueNotifier<int> notOpenedAppreciationsCount = ValueNotifier<int>(0);
+
+  final ValueNotifier<int> accountTxsNotOpenedCount = ValueNotifier<int>(0);
 
   /// transactions events for _accountId indexed by tx hash
   final ValueNotifier<Map<String, types.TransactionEvent>> txEventsNotifer =

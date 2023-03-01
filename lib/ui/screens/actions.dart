@@ -1,4 +1,5 @@
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/ui/widgets/delete_account_tile.dart';
 
 class ActionsScreen extends StatefulWidget {
   const ActionsScreen({super.key});
@@ -26,11 +27,10 @@ class _ActionsScreenState extends State<ActionsScreen> {
               onTap: () => {},
             ),
             CupertinoListTile.notched(
-              title: const Text('Appreciations'),
-              leading: const Icon(CupertinoIcons.square_list, size: 28),
-              trailing: const CupertinoListTileChevron(),
-              onTap: () => {},
-            ),
+                title: const Text('Appreciations'),
+                leading: const Icon(CupertinoIcons.square_list, size: 28),
+                trailing: const CupertinoListTileChevron(),
+                onTap: () => context.push(ScreenPaths.appreciations)),
           ]),
       CupertinoListSection.insetGrouped(
         header: Text(
@@ -65,6 +65,12 @@ class _ActionsScreenState extends State<ActionsScreen> {
         ),
         children: <CupertinoListTile>[
           CupertinoListTile.notched(
+            title: const Text('Account Details'),
+            leading: const Icon(CupertinoIcons.person, size: 28),
+            trailing: const CupertinoListTileChevron(),
+            onTap: () => {},
+          ),
+          CupertinoListTile.notched(
             title: const Text('Restore Account'),
             leading:
                 const Icon(CupertinoIcons.arrow_counterclockwise, size: 28),
@@ -78,19 +84,12 @@ class _ActionsScreenState extends State<ActionsScreen> {
             onTap: () => {},
           ),
           CupertinoListTile.notched(
-            title: const Text('Sign Out'),
-            leading: const Icon(CupertinoIcons.person_badge_minus, size: 28),
-            onTap: () async {
-              context.pop();
-              Future.delayed(Duration(milliseconds: 300), () async {
-                context.go(ScreenPaths.welcome);
-                Future.delayed(Duration(milliseconds: 300), () async {
-                  await accountLogic.clear();
-                  await authLogic.signOut();
-                });
-              });
-            },
+            title: const Text('Account Operations'),
+            leading: const Icon(CupertinoIcons.doc, size: 28),
+            trailing: const CupertinoListTileChevron(),
+            onTap: () => {},
           ),
+          DeleteAccountTile().build(context) as CupertinoListTile,
         ],
       ),
       CupertinoListSection.insetGrouped(

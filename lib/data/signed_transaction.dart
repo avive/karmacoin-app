@@ -1,10 +1,10 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/data/data_time_extension.dart';
 import 'package:karma_coin/services/api/types.pb.dart' as types;
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:crypto/crypto.dart';
-
-import '../services/api/types.pb.dart';
+import 'package:karma_coin/services/api/types.pb.dart';
 
 /// An extension class over SignedTransaction that supports signing, verification
 /// and user read app state
@@ -51,7 +51,7 @@ class SignedTransactionWithStatus {
     return txBody.timestamp;
   }
 
-  TransactionType get_tx_type() {
+  TransactionType getTxType() {
     return txBody.transactionData.transactionType;
   }
 
@@ -99,12 +99,17 @@ class SignedTransactionWithStatus {
   }
 
   /// Returns the from user which with accountId identical to signer account id
-  User get_from_user() {
+  User getFromUser() {
     return txWithStatus.from;
   }
 
+  String getTimesAgo() {
+    return DateTime.fromMillisecondsSinceEpoch(txBody.timestamp.toInt())
+        .toTimeAgo();
+  }
+
   /// Returns to user if the transaction is an on-chain payment transaction
-  User? get_to_user() {
+  User? getToUser() {
     if (txWithStatus.hasTo()) {
       return txWithStatus.to;
     } else {

@@ -17,7 +17,8 @@ abstract class TrnasactionGenerator {
       ed.KeyPair keyPair) async {
     PaymentTransactionV1 paymentTx = PaymentTransactionV1(
         from: AccountId(data: keyPair.publicKey.bytes),
-        to: MobileNumber(number: data.mobilePhoneNumber),
+        toNumber: MobileNumber(number: data.mobilePhoneNumber),
+        toAccountId: null,
         amount: data.kCentsAmount,
         charTraitId: data.personalityTrait.index,
         communityId: 0);

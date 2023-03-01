@@ -1,5 +1,6 @@
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/ui/screens/actions.dart';
+import 'package:karma_coin/ui/screens/appreciations.dart';
 import 'package:karma_coin/ui/screens/phone_number_input.dart';
 import 'package:karma_coin/ui/screens/sms_code_input.dart';
 import 'package:karma_coin/ui/screens/user_home.dart';
@@ -26,8 +27,11 @@ class ScreenPaths {
   /// Signed up user screen
   static String home = '/home';
 
-  /// A signed up user actions screen
+  /// A signed in user actions screen
   static String actions = '/actions';
+
+  /// User's appreciation (sent and received)
+  static String appreciations = '/appreciations';
 }
 
 /// Shared screen names across the app
@@ -52,6 +56,8 @@ class ScreenNames {
 
   /// A signed up user settings screen
   static String actions = 'actions';
+
+  static String appreciations = 'appreciations';
 }
 
 /// The route configuration
@@ -112,6 +118,12 @@ final GoRouter appRouter = GoRouter(
         path: ScreenPaths.actions,
         builder: (BuildContext context, GoRouterState state) {
           return const ActionsScreen();
+        }),
+    GoRoute(
+        name: ScreenNames.appreciations,
+        path: ScreenPaths.appreciations,
+        builder: (BuildContext context, GoRouterState state) {
+          return const AppreciationsScreen();
         }),
   ],
 );

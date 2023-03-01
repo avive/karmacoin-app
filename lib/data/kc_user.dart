@@ -10,7 +10,7 @@ import '../services/api/types.pb.dart';
 class KarmaCoinUser {
   final User userData;
 
-  /// We start with the balance after signup reward
+  /// Onchain balance. We start with the balance after signup reward
   final ValueNotifier<Int64> balance =
       ValueNotifier<Int64>(GenesisConfig.kCentsSignupReward);
 
@@ -36,6 +36,9 @@ class KarmaCoinUser {
   Future<void> updatWithUserData(User user) async {
     userData.accountId = user.accountId;
 
+    debugPrint('onchain balance: ${user.balance}');
+    debugPrint('onchain karma score: ${user.karmaScore}');
+
     userData.balance = user.balance;
     balance.value = user.balance;
 
@@ -48,7 +51,6 @@ class KarmaCoinUser {
     userData.userName = user.userName;
     userName.value = user.userName;
 
-    // accountId.value = user.accountId;
     userData.accountId = user.accountId;
 
     userData.mobileNumber = user.mobileNumber;

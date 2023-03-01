@@ -7,13 +7,12 @@ abstract class KarmaCoinAmountFormatter {
   static final double _kToUsdExchangeRate = 0.02;
   static final _kCentsDisplayUpperLimit = Int64(10000);
 
-  // Returns formatted KC amount. If amount is small then returns in cents units,
-  // otherwise returns in coins.
+  // Returns formatted KC amount. If amount is small then returns in cents units,otherwise returns in coins.
   static String format(Int64 amount) {
     String centsLabel = amount > 1 ? 'Karma Cents' : 'Karma Cent';
 
     double amountCoins = amount.toDouble() / GenesisConfig.kCentsPerCoin;
-    if (amount < _kCentsDisplayUpperLimit) {
+    if (amount <= _kCentsDisplayUpperLimit) {
       return '${_deicmalFormat.format(amount)} $centsLabel (\$${NumberFormat.currency(
         decimalDigits: 8,
         customPattern: '#.## USD',

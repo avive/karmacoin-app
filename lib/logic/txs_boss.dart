@@ -14,6 +14,11 @@ import 'package:quiver/collection.dart';
 import 'package:karma_coin/data/user_verification_data.dart' as dvd;
 import 'package:karma_coin/data/signed_transaction.dart' as dst;
 
+const _incomingAppreciationsBoxName = 'incomingAppreciations';
+const _outgoingAppreciationsBoxName = 'outgoingAppreciations';
+const _accountTxsBoxName = 'accountTransactions';
+const _txEventsBoxName = 'txEvents';
+
 /// The TransactionsBoss is responsible for managing the transactions this device knows about.
 /// Boss is a cooler name than manager, and it's shorter to type.
 class TransactionsBoss extends TransactionsBossInterface {
@@ -21,10 +26,13 @@ class TransactionsBoss extends TransactionsBossInterface {
   Timer? _timer;
 
   // key is hex string of tx hash
-  Map<String, dst.SignedTransactionWithStatus> _outgoingTxs = {};
+  Map<String, dst.SignedTransactionWithStatus> _outgoingAppreciations = {};
 
   // key is hex string of tx hash
-  Map<String, dst.SignedTransactionWithStatus> _incomingTxs = {};
+  Map<String, dst.SignedTransactionWithStatus> _incomingAppreciations = {};
+
+  // key is hex string of tx hash - signup and update user txs
+  Map<String, dst.SignedTransactionWithStatus> _accountTransactions = {};
 
   // transactions db for current local user
   BoxCollection? _txsBoxCollection;
@@ -33,50 +41,73 @@ class TransactionsBoss extends TransactionsBossInterface {
 
   /// Update observable data with current internal state
   void _updateObservables() {
-    List<dst.SignedTransactionWithStatus> newIncoming =
-        _incomingTxs.values.toList();
-    List<dst.SignedTransactionWithStatus> newOutgoing =
-        _outgoingTxs.values.toList();
+    List<dst.SignedTransactionWithStatus> newIncomingAppreciations =
+        _incomingAppreciations.values.toList();
 
-    int incTxsNotOpenedCount = 0;
-    int outTxsNotOpenedCount = 0;
+    List<dst.SignedTransactionWithStatus> newOutgoingAppreciations =
+        _outgoingAppreciations.values.toList();
+
+    List<dst.SignedTransactionWithStatus> newAccountTxs =
+        _accountTransactions.values.toList();
+
+    int inAppreciationsNotOpenedCount = 0;
+    int outAppreciationsNotOpenedCount = 0;
+    int newAccountTxsNotOpenedCount = 0;
     int notOpenedTotal = 0;
 
-    for (dst.SignedTransactionWithStatus tx in newIncoming) {
+    for (dst.SignedTransactionWithStatus tx in newIncomingAppreciations) {
       debugPrint('incoming tx: ${tx.getHash().toShortHexString()}');
 
       if (!tx.openned.value) {
-        incTxsNotOpenedCount += 1;
+        inAppreciationsNotOpenedCount += 1;
         notOpenedTotal += 1;
       }
     }
 
-    for (dst.SignedTransactionWithStatus tx in newOutgoing) {
+    for (dst.SignedTransactionWithStatus tx in newOutgoingAppreciations) {
       debugPrint('outgoing tx: ${tx.getHash().toShortHexString()}');
 
       if (!tx.openned.value) {
-        outTxsNotOpenedCount += 1;
+        outAppreciationsNotOpenedCount += 1;
         notOpenedTotal += 1;
       }
     }
 
-    newIncoming
+    for (dst.SignedTransactionWithStatus tx in newAccountTxs) {
+      debugPrint('account tx: ${tx.getHash().toShortHexString()}');
+
+      if (!tx.openned.value) {
+        newAccountTxsNotOpenedCount += 1;
+        notOpenedTotal += 1;
+      }
+    }
+
+    newIncomingAppreciations
         .sort((a, b) => b.txBody.timestamp.compareTo(a.txBody.timestamp));
-    newOutgoing
+    newOutgoingAppreciations
+        .sort((a, b) => b.txBody.timestamp.compareTo(a.txBody.timestamp));
+    newAccountTxs
         .sort((a, b) => b.txBody.timestamp.compareTo(a.txBody.timestamp));
 
-    incomingTxsNotOpenedCount.value = incTxsNotOpenedCount;
-    outcomingTxsNotOpenedCount.value = outTxsNotOpenedCount;
-    notOpenedTxsCount.value = notOpenedTotal;
+    incomingAppreciationsNotOpenedCount.value = inAppreciationsNotOpenedCount;
+    outcomingAppreciationsNotOpenedCount.value = outAppreciationsNotOpenedCount;
+    accountTxsNotOpenedCount.value = newAccountTxsNotOpenedCount;
 
-    debugPrint('incoming txs: ${newIncoming.length}');
-    debugPrint('outgoing txs: ${newOutgoing.length}');
-    debugPrint('incoming txs not openeed: $incTxsNotOpenedCount');
-    debugPrint('outgoing txs not openeed: $outTxsNotOpenedCount');
+    notOpenedAppreciationsCount.value = notOpenedTotal;
+
+    debugPrint('incoming txs: ${newIncomingAppreciations.length}');
+    debugPrint('outgoing txs: ${newOutgoingAppreciations.length}');
+    debugPrint('account txs: ${newAccountTxs.length}');
+
+    debugPrint('incoming txs not openeed: $inAppreciationsNotOpenedCount');
+    debugPrint('outgoing txs not openeed: $outAppreciationsNotOpenedCount');
+    debugPrint('account txs not openeed: $newAccountTxsNotOpenedCount');
+
     debugPrint('total txs not openeed: $notOpenedTotal');
 
-    incomingTxsNotifer.value = newIncoming;
-    outgoingTxsNotifer.value = newOutgoing;
+    incomingAppreciationsNotifer.value = newIncomingAppreciations;
+    outgoingAppreciationsNotifer.value = newOutgoingAppreciations;
+    accountTxsNotifer.value = newAccountTxs;
 
     notifyListeners();
   }
@@ -112,15 +143,26 @@ class TransactionsBoss extends TransactionsBossInterface {
     if (accountId != null) {
       _txsBoxCollection = await BoxCollection.open(
           accountId.toShortHexString(), // db name is local user id
-          {'incoming', 'outgoing', 'events'}, // db boxes
+          {
+            // db boxes
+            _incomingAppreciationsBoxName,
+            _outgoingAppreciationsBoxName,
+            _accountTxsBoxName,
+            _txEventsBoxName
+          },
           path: await _getHivePath()); // db path
     }
 
     _accountId = accountId;
-    _outgoingTxs = {};
-    _incomingTxs = {};
-    incomingTxsNotifer.value = [];
-    outgoingTxsNotifer.value = [];
+
+    _outgoingAppreciations = {};
+    _incomingAppreciations = {};
+    _accountTransactions = {};
+
+    incomingAppreciationsNotifer.value = [];
+    outgoingAppreciationsNotifer.value = [];
+    accountTxsNotifer.value = [];
+
     txEventsNotifer.value = {};
 
     newUserTransactionEvent.value = null;
@@ -164,9 +206,13 @@ class TransactionsBoss extends TransactionsBossInterface {
     debugPrint(
         'updating txs with txs: ${txs.length} and with ${transactionsEvents?.length} events');
 
-    var incomingBox = await _txsBoxCollection?.openBox<String>('incoming');
-    var outgoingBox = await _txsBoxCollection?.openBox<String>('outgoing');
-    var eventsBox = await _txsBoxCollection?.openBox<String>('events');
+    var incomingBox =
+        await _txsBoxCollection?.openBox<String>(_incomingAppreciationsBoxName);
+    var outgoingBox =
+        await _txsBoxCollection?.openBox<String>(_outgoingAppreciationsBoxName);
+    var accountBox =
+        await _txsBoxCollection?.openBox<String>(_accountTxsBoxName);
+    var eventsBox = await _txsBoxCollection?.openBox<String>(_txEventsBoxName);
 
     for (dst.SignedTransactionWithStatus tx in txs) {
       if (!tx.verify(ed.PublicKey(tx.txWithStatus.transaction.signer.data))) {
@@ -182,23 +228,38 @@ class TransactionsBoss extends TransactionsBossInterface {
           listsEqual(tx.txWithStatus.transaction.signer.data, _accountId);
 
       bool wasOpenned = false;
-      var exisitngTx =
-          isTxFromLocalUser ? _outgoingTxs[txHash] : _incomingTxs[txHash];
+      var existingTx = null;
+      bool isAppreciation =
+          tx.getTxType() == types.TransactionType.TRANSACTION_TYPE_PAYMENT_V1;
 
-      if (exisitngTx != null) {
-        wasOpenned = exisitngTx.openned.value;
+      if (isAppreciation) {
+        existingTx = isTxFromLocalUser
+            ? _outgoingAppreciations[txHash]
+            : _incomingAppreciations[txHash];
+      } else {
+        existingTx = _accountTransactions[txHash];
+      }
+
+      if (existingTx != null) {
+        wasOpenned = existingTx.openned.value;
       }
 
       tx.openned.value = wasOpenned;
 
-      if (isTxFromLocalUser) {
-        // outgoing tx
-        _outgoingTxs[txHash] = tx;
-        await outgoingBox?.put(txHash, jsonEncode(tx.toJson()));
+      if (isAppreciation) {
+        if (isTxFromLocalUser) {
+          // outgoing tx
+          _outgoingAppreciations[txHash] = tx;
+          await outgoingBox?.put(txHash, jsonEncode(tx.toJson()));
+        } else {
+          // incoming tx
+          _incomingAppreciations[txHash] = tx;
+          await incomingBox?.put(txHash, jsonEncode(tx.toJson()));
+        }
       } else {
-        // incoming tx
-        _incomingTxs[txHash] = tx;
-        await incomingBox?.put(txHash, jsonEncode(tx.toJson()));
+        // account tx
+        _accountTransactions[txHash] = tx;
+        await accountBox?.put(txHash, jsonEncode(tx.toJson()));
       }
 
       // special processing for new user txs
@@ -263,20 +324,30 @@ class TransactionsBoss extends TransactionsBossInterface {
 
   /// Load txs and events from local data file
   Future<void> _loadPersistedData() async {
-    var incomingBox = await _txsBoxCollection?.openBox<String>('incoming');
-    var outgoingBox = await _txsBoxCollection?.openBox<String>('outgoing');
-    var events = await _txsBoxCollection?.openBox<String>('events');
+    var incomingBox =
+        await _txsBoxCollection?.openBox<String>(_incomingAppreciationsBoxName);
+    var outgoingBox =
+        await _txsBoxCollection?.openBox<String>(_outgoingAppreciationsBoxName);
+    var accountTxsBox =
+        await _txsBoxCollection?.openBox<String>(_accountTxsBoxName);
+    var events = await _txsBoxCollection?.openBox<String>(_txEventsBoxName);
 
     (await incomingBox?.getAllValues())?.forEach((key, value) {
       dst.SignedTransactionWithStatus tx =
           dst.SignedTransactionWithStatus.fromJson(jsonDecode(value));
-      _incomingTxs[key] = tx;
+      _incomingAppreciations[key] = tx;
     });
 
     (await outgoingBox?.getAllValues())?.forEach((key, value) {
       dst.SignedTransactionWithStatus tx =
           dst.SignedTransactionWithStatus.fromJson(jsonDecode(value));
-      _outgoingTxs[key] = tx;
+      _outgoingAppreciations[key] = tx;
+    });
+
+    (await accountTxsBox?.getAllValues())?.forEach((key, value) {
+      dst.SignedTransactionWithStatus tx =
+          dst.SignedTransactionWithStatus.fromJson(jsonDecode(value));
+      _accountTransactions[key] = tx;
     });
 
     (await events?.getAllValues())?.forEach((key, value) {
@@ -293,21 +364,24 @@ class TransactionsBoss extends TransactionsBossInterface {
       return;
     }
 
-    try {
-      debugPrint(
-          'fetching transactions for account ${_accountId?.toShortHexString()}');
+    debugPrint(
+        'fetching transactions for account ${_accountId!.toShortHexString()}');
 
+    try {
       api_types.GetTransactionsResponse resp =
           await api.apiServiceClient.getTransactions(
         api_types.GetTransactionsRequest(
-            accountId: types.AccountId(data: _accountId!)),
+          accountId: types.AccountId(data: _accountId!),
+        ),
       );
 
       if (resp.transactions.isNotEmpty) {
         // create new enriched txs from the api response
         List<dst.SignedTransactionWithStatus> enrichedTxs = [];
         for (types.SignedTransactionWithStatus tx in resp.transactions) {
-          enrichedTxs.add(dst.SignedTransactionWithStatus(tx));
+          enrichedTxs.add(
+            dst.SignedTransactionWithStatus(tx),
+          );
         }
 
         debugPrint(
