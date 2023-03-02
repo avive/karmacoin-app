@@ -79,18 +79,21 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
 
   Widget _displayIncomingTxs(BuildContext context) {
     return ValueListenableBuilder<List<SignedTransactionWithStatus>>(
-        // todo: how to make this not assert when karmaCoinUser is null?
-        valueListenable: transactionBoss.incomingAppreciationsNotifer,
-        builder: (context, value, child) {
-          return ListView.builder(
-            itemCount: value.length,
-            itemBuilder: (context, index) {
-              SignedTransactionWithStatus tx =
-                  transactionBoss.incomingAppreciationsNotifer.value[index];
-              return _getAppreciationWidget(context, tx, true);
-            },
-          );
-        });
+      // todo: how to make this not assert when karmaCoinUser is null?
+      valueListenable: transactionBoss.incomingAppreciationsNotifer,
+      builder: (context, value, child) {
+        return ListView.builder(
+          shrinkWrap: true,
+          itemCount: value.length,
+          itemBuilder: (context, index) {
+            SignedTransactionWithStatus tx =
+                transactionBoss.incomingAppreciationsNotifer.value[index];
+            return _getAppreciationWidget(context, tx, true, index);
+            // return Container(key: Key(index.toString()));
+          },
+        );
+      },
+    );
   }
 
   Widget _displayOutgoingTxs(BuildContext context) {
@@ -108,55 +111,58 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
             itemBuilder: (context, index) {
               SignedTransactionWithStatus tx =
                   transactionBoss.outgoingAppreciationsNotifer.value[index];
-              return _getAppreciationWidget(context, tx, false);
+              return _getAppreciationWidget(context, tx, false, index);
             },
           );
         });
   }
 
-  Widget _getAppreciationWidget(
-      BuildContext context, SignedTransactionWithStatus tx, bool incoming) {
-    final types.User sender = tx.getFromUser();
-    final senderPhoneNumber = sender.mobileNumber.number.formatPhoneNumber();
+  Widget _getAppreciationWidget(BuildContext context,
+      SignedTransactionWithStatus tx, bool incoming, int index) {
+    try {
+      final types.User sender = tx.getFromUser();
+      final senderPhoneNumber = sender.mobileNumber.number.formatPhoneNumber();
 
-    final String txHash = tx.getHash().toHexString();
+      final String txHash = tx.getHash().toHexString();
 
-    // Get any event associated with this transaction
-    final types.TransactionEvent? txEvent =
-        transactionBoss.txEventsNotifer.value[txHash];
+      // Get any event associated with this transaction
+      final types.TransactionEvent? txEvent =
+          transactionBoss.txEventsNotifer.value[txHash];
 
-    types.PaymentTransactionV1 appreciation =
-        tx.txData as types.PaymentTransactionV1;
+      types.PaymentTransactionV1 appreciation =
+          tx.txData as types.PaymentTransactionV1;
 
-    String amount = KarmaCoinAmountFormatter.format(appreciation.amount);
+      String amount = KarmaCoinAmountFormatter.format(appreciation.amount);
 
-    TransacitonStatus status = TransacitonStatus.pending;
+      TransacitonStatus status = TransacitonStatus.pending;
 
-    // an incoming appreciation is always confirmed on chain
-    if (incoming) {
-      status = TransacitonStatus.confirmed;
-    }
-
-    if (txEvent != null) {
-      // get the status from the tx event
-      if (txEvent.result == types.ExecutionResult.EXECUTION_RESULT_EXECUTED) {
+      // an incoming appreciation is always confirmed on chain
+      if (incoming) {
         status = TransacitonStatus.confirmed;
-      } else {
-        status = TransacitonStatus.failed;
       }
-    }
 
-    PersonalityTrait? trait = null;
-    String title = 'Karma coins received';
-    String emoji = '🤑';
-    if (appreciation.charTraitId != 0 &&
-        appreciation.charTraitId < PersonalityTraits.length) {
-      trait = PersonalityTraits[appreciation.charTraitId];
-      title = 'You are ${trait.name.toLowerCase()}';
-      emoji = trait.emoji;
-    }
+      if (txEvent != null) {
+        // get the status from the tx event
+        if (txEvent.result == types.ExecutionResult.EXECUTION_RESULT_EXECUTED) {
+          status = TransacitonStatus.confirmed;
+        } else {
+          status = TransacitonStatus.failed;
+        }
+      }
 
-    return CupertinoListTile(
+      PersonalityTrait? trait = null;
+      String title = 'Karma coins payment';
+      String emoji = '🤑';
+
+      if (appreciation.charTraitId != 0 &&
+          appreciation.charTraitId < PersonalityTraits.length) {
+        trait = PersonalityTraits[appreciation.charTraitId];
+        title = 'You are ${trait.name.toLowerCase()}';
+        emoji = trait.emoji;
+      }
+
+      return CupertinoListTile(
+        key: Key(index.toString()),
         padding: EdgeInsets.only(top: 6, bottom: 6, left: 14, right: 14),
         leading: Text(emoji, style: TextStyle(fontSize: 24)),
         title: Text(
@@ -186,35 +192,60 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
                     .textStyle
                     .merge(TextStyle(fontSize: 12))),
             const SizedBox(height: 4),
-            Text(_getStatusDisplayString(status),
-                style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                    TextStyle(
-                        fontSize: 12, color: _getStatusDisplayColor(status)))),
+            Container(
+              height: 16.0,
+              width: 80,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: _getStatusDisplayColor(status),
+              ),
+              child: Center(
+                child: Text(
+                  _getStatusDisplayString(status),
+                  style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                        TextStyle(
+                          fontSize: 9,
+                          color: CupertinoColors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                ),
+              ),
+            ),
           ],
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
-        ));
+        ),
+      );
+    } catch (e) {
+      debugPrint('exception: $e');
+      return Container();
+    }
   }
 
   String _getStatusDisplayString(TransacitonStatus status) {
     switch (status) {
       case TransacitonStatus.pending:
-        return 'Pending';
+        return 'PENDING';
       case TransacitonStatus.confirmed:
-        return 'Confirmed';
+        return 'CONFIRMED';
       case TransacitonStatus.failed:
-        return 'Failed';
+        return 'FAILED';
+      default:
+        return 'UNKNOWN';
     }
   }
 
   Color _getStatusDisplayColor(TransacitonStatus status) {
     switch (status) {
       case TransacitonStatus.pending:
-        return CupertinoColors.systemBlue;
+        return CupertinoColors.systemYellow;
       case TransacitonStatus.confirmed:
         return CupertinoColors.activeGreen;
       case TransacitonStatus.failed:
         return CupertinoColors.destructiveRed;
+      default:
+        return CupertinoColors.systemOrange;
     }
   }
 }

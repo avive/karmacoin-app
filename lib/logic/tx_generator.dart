@@ -149,7 +149,11 @@ abstract class TrnasactionGenerator {
     );
 
     SignedTransactionWithStatus txWithStatus = SignedTransactionWithStatus(
-        transaction: tx, status: TransactionStatus.TRANSACTION_STATUS_UNKNOWN);
+        transaction: tx,
+        status: TransactionStatus.TRANSACTION_STATUS_UNKNOWN,
+        from: karmaCoinUser.userData,
+        // it might be to a non user...
+        to: null);
 
     est.SignedTransactionWithStatus enrichedTx =
         est.SignedTransactionWithStatus(txWithStatus);
