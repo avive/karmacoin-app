@@ -7,7 +7,7 @@ abstract class KarmaCoinAmountFormatter {
   static final double _kToUsdExchangeRate = 0.02;
   static final _kCentsDisplayUpperLimit = Int64(10000);
 
-  // Returns formatted KC amount. If amount is small then returns in cents units,otherwise returns in coins.
+  // Returns formatted KC amount with USD estimate. If amount is small then returns in cents units,otherwise returns in coins.
   static String format(Int64 amount) {
     String centsLabel = amount > 1 ? 'Karma Cents' : 'Karma Cent';
 
@@ -24,6 +24,34 @@ abstract class KarmaCoinAmountFormatter {
         : 'Karma Coin';
 
     return '${_deicmalFormat.format(amount.toDouble() / GenesisConfig.kCentsPerCoin)} $label (\$${NumberFormat.currency(customPattern: '#,###.## USD').format(amountCoins * _kToUsdExchangeRate)})';
+  }
+
+  // Returns formatted KC amount without USD estimate
+  static String formatMinimal(Int64 amount) {
+    String centsLabel = amount > 1 ? 'Karma Cents' : 'Karma Cent';
+
+    if (amount <= _kCentsDisplayUpperLimit) {
+      return '${_deicmalFormat.format(amount)} $centsLabel';
+    }
+
+    String label = amount >= GenesisConfig.kCentsPerCoin * 2
+        ? 'Karma Coins'
+        : 'Karma Coin';
+
+    return '${_deicmalFormat.format(amount.toDouble() / GenesisConfig.kCentsPerCoin)} $label';
+  }
+
+  // Returns formatted KC amount usd estimate only.
+  static String formatUSDEstimate(Int64 amount) {
+    double amountCoins = amount.toDouble() / GenesisConfig.kCentsPerCoin;
+    if (amount <= _kCentsDisplayUpperLimit) {
+      return '${NumberFormat.currency(
+        decimalDigits: 8,
+        customPattern: '#.## USD',
+      ).format(amountCoins * _kToUsdExchangeRate)}';
+    }
+
+    return '${NumberFormat.currency(customPattern: '#,###.## USD').format(amountCoins * _kToUsdExchangeRate)}';
   }
 
   static String getUnitsLabel(Int64 amount) {

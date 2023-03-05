@@ -124,6 +124,27 @@ class TransactionsBoss extends TransactionsBossInterface {
     return dir;
   }
 
+  @override
+  dst.SignedTransactionWithStatus? getTranscation(String txHash) {
+    dst.SignedTransactionWithStatus? res = _incomingAppreciations[txHash];
+    if (res != null) {
+      res.incoming = true;
+      return res;
+    }
+    res = _outgoingAppreciations[txHash];
+    if (res != null) {
+      res.incoming = false;
+      return res;
+    }
+
+    res = _accountTransactions[txHash];
+    if (res != null) {
+      return res;
+    }
+
+    return null;
+  }
+
   /// Set the local user account id - transactions to and from this accountId will be tracked by the TransactionBoss
   /// Boss will attempt to load known txs for this account from local store
   @override
@@ -245,6 +266,7 @@ class TransactionsBoss extends TransactionsBossInterface {
       }
 
       tx.openned.value = wasOpenned;
+      tx.incoming = !isTxFromLocalUser;
 
       if (isAppreciation) {
         if (isTxFromLocalUser) {
@@ -380,7 +402,7 @@ class TransactionsBoss extends TransactionsBossInterface {
         List<dst.SignedTransactionWithStatus> enrichedTxs = [];
         for (types.SignedTransactionWithStatus tx in resp.transactions) {
           enrichedTxs.add(
-            dst.SignedTransactionWithStatus(tx),
+            dst.SignedTransactionWithStatus(tx, false),
           );
         }
 

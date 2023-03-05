@@ -2,7 +2,7 @@ import "dart:convert";
 import "package:hex/hex.dart";
 
 /// Returns a shortened display string for binary data. e.g. 0xE012...01EAF
-extension FormatHex on List<int> {
+extension HexToString on List<int> {
   String toShortHexString() {
     if (length < 4) {
       throw const FormatException('data too short');
@@ -17,5 +17,15 @@ extension FormatHex on List<int> {
 
   String toBase64() {
     return base64.encode(this);
+  }
+}
+
+extension StringToHex on String {
+  List<int> toHex() {
+    if (startsWith("0x")) {
+      return HEX.decode(substring(2));
+    }
+
+    return HEX.decode(this);
   }
 }

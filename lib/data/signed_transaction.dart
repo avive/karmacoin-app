@@ -20,10 +20,15 @@ class SignedTransactionWithStatus {
   @required
   late final dynamic txData;
 
+  // when false - tx is outgoing from local user
+  @required
+  late bool incoming;
+
   // true if user has opened the tx details in the app
   final ValueNotifier<bool> openned = ValueNotifier<bool>(false);
 
-  SignedTransactionWithStatus(this.txWithStatus) {
+  SignedTransactionWithStatus(this.txWithStatus, bool isIncoming) {
+    incoming = isIncoming;
     txBody = types.TransactionBody.fromBuffer(
         txWithStatus.transaction.transactionBody);
 
@@ -85,7 +90,8 @@ class SignedTransactionWithStatus {
     types.SignedTransactionWithStatus tx =
         types.SignedTransactionWithStatus.fromJson(tx_data);
 
-    SignedTransactionWithStatus txWithStatus = SignedTransactionWithStatus(tx);
+    SignedTransactionWithStatus txWithStatus = SignedTransactionWithStatus(
+        tx, value['incoming'] == 'true' || value['incoming'] == true);
     txWithStatus.openned.value = value['openned'];
     return txWithStatus;
   }
@@ -95,6 +101,7 @@ class SignedTransactionWithStatus {
     return {
       'txWithStatus': this.txWithStatus.writeToJson(),
       'openned': openned.value,
+      'incoming': incoming
     };
   }
 
@@ -121,5 +128,25 @@ class SignedTransactionWithStatus {
   List<int> getHash() {
     // we downgraded to sha256 as blake dart libs such as r_crypto are native only
     return sha256.convert(txWithStatus.transaction.transactionBody).bytes;
+  }
+
+  String getTransactionTypeDisplayName() {
+    switch (getTxType()) {
+      case TransactionType.TRANSACTION_TYPE_NEW_USER_V1:
+        return 'Signup transaction';
+      case TransactionType.TRANSACTION_TYPE_PAYMENT_V1:
+        {
+          PaymentTransactionV1 payment = txData as PaymentTransactionV1;
+          if (payment.charTraitId != 0) {
+            return 'Appreciation';
+          } else {
+            return 'Payment transaction';
+          }
+        }
+      case TransactionType.TRANSACTION_TYPE_UPDATE_USER_V1:
+        return 'Account update transaction';
+      default:
+        return 'Unrecognized transaction type';
+    }
   }
 }

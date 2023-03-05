@@ -4,6 +4,9 @@ import 'package:karma_coin/data/signed_transaction.dart';
 import 'package:karma_coin/services/api/types.pb.dart' as types;
 
 abstract class TransactionsBossInterface extends ChangeNotifier {
+  /// Returns tx known by boss if such exists
+  SignedTransactionWithStatus? getTranscation(String txHash);
+
   /// Set the local user account id - transactions to and from this accountId will be tracked by the TransactionBoss
   /// Boss will attempt to load known txs for this account from local store
   Future<void> setAccountId(List<int>? accountId);

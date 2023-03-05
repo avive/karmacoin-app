@@ -43,7 +43,7 @@ abstract class TrnasactionGenerator {
     }
 
     est.SignedTransactionWithStatus enriched =
-        est.SignedTransactionWithStatus(signedTx);
+        est.SignedTransactionWithStatus(signedTx, false);
 
     switch (resp.submitTransactionResult) {
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
@@ -100,7 +100,7 @@ abstract class TrnasactionGenerator {
     }
 
     est.SignedTransactionWithStatus enriched =
-        est.SignedTransactionWithStatus(signedTx);
+        est.SignedTransactionWithStatus(signedTx, false);
 
     switch (resp.submitTransactionResult) {
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
@@ -156,7 +156,7 @@ abstract class TrnasactionGenerator {
         to: null);
 
     est.SignedTransactionWithStatus enrichedTx =
-        est.SignedTransactionWithStatus(txWithStatus);
+        est.SignedTransactionWithStatus(txWithStatus, false);
 
     List<int> txhash = enrichedTx.getHash();
     enrichedTx.sign(keyPair.privateKey);

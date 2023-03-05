@@ -68,7 +68,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
             title: const Text('Account Details'),
             leading: const Icon(CupertinoIcons.person, size: 28),
             trailing: const CupertinoListTileChevron(),
-            onTap: () => {},
+            onTap: () => context.push(ScreenPaths.account),
           ),
           CupertinoListTile.notched(
             title: const Text('Restore Account'),

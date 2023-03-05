@@ -1,8 +1,11 @@
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/ui/screens/actions.dart';
 import 'package:karma_coin/ui/screens/appreciations.dart';
 import 'package:karma_coin/ui/screens/phone_number_input.dart';
 import 'package:karma_coin/ui/screens/sms_code_input.dart';
+import 'package:karma_coin/ui/screens/payment_tx_details.dart';
+import 'package:karma_coin/ui/screens/user_details.dart';
 import 'package:karma_coin/ui/screens/user_home.dart';
 import 'package:karma_coin/ui/screens/welcome.dart';
 import 'package:karma_coin/ui/screens/user_name.dart';
@@ -30,8 +33,14 @@ class ScreenPaths {
   /// A signed in user actions screen
   static String actions = '/actions';
 
+  /// an account screen
+  static String account = '/account';
+
   /// User's appreciation (sent and received)
   static String appreciations = '/appreciations';
+
+  /// Transaction details screen
+  static String transactionDetails = '/tx/:txId';
 }
 
 /// Shared screen names across the app
@@ -49,7 +58,7 @@ class ScreenNames {
   static String userName = 'user-name-input';
 
   /// Guest home screen (playground for now)
-  static String welcome = '/';
+  static String welcome = 'welcome';
 
   /// Signed up user screen
   static String home = 'home';
@@ -57,7 +66,13 @@ class ScreenNames {
   /// A signed up user settings screen
   static String actions = 'actions';
 
+  /// an account screen
+  static String account = 'account';
+
   static String appreciations = 'appreciations';
+
+  /// User's appreciation (sent and received)
+  static String transactionDetails = 'tx';
 }
 
 /// The route configuration
@@ -124,6 +139,29 @@ final GoRouter appRouter = GoRouter(
         path: ScreenPaths.appreciations,
         builder: (BuildContext context, GoRouterState state) {
           return const AppreciationsScreen();
+        }),
+    GoRoute(
+        name: ScreenNames.transactionDetails,
+        path: ScreenPaths.transactionDetails,
+        builder: (BuildContext context, GoRouterState state) {
+          var txId = state.params['txId'];
+          if (txId == null) {
+            // todo: redirect to home screen
+          }
+
+          return TransactionDetailsScreen(Key(txId!), txId);
+        }),
+    GoRoute(
+        name: ScreenNames.account,
+        path: ScreenPaths.account,
+        builder: (BuildContext context, GoRouterState state) {
+          if (state.extra != null) {
+            User user = state.extra as User;
+            return UserDetailsScreen(key: Key(user.userName), user: user);
+          }
+
+          // local user
+          return UserDetailsScreen();
         }),
   ],
 );

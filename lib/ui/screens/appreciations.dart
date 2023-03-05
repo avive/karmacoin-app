@@ -5,10 +5,9 @@ import 'package:karma_coin/data/personality_traits.dart';
 import 'package:karma_coin/data/phone_number_formatter.dart';
 import 'package:karma_coin/data/signed_transaction.dart';
 import 'package:karma_coin/services/api/types.pb.dart' as types;
+import 'package:karma_coin/ui/helpers/transactions.dart';
 
 enum Group { received, sent }
-
-enum TransacitonStatus { pending, confirmed, failed }
 
 class AppreciationsScreen extends StatefulWidget {
   const AppreciationsScreen({super.key});
@@ -105,6 +104,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
             separatorBuilder: (context, index) {
               return Divider(
                 thickness: 1,
+                indent: 58,
               );
             },
             itemCount: value.length,
@@ -136,6 +136,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
 
       TransacitonStatus status = TransacitonStatus.pending;
 
+    
       // an incoming appreciation is always confirmed on chain
       if (incoming) {
         status = TransacitonStatus.confirmed;
@@ -162,6 +163,10 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
       }
 
       return CupertinoListTile(
+        onTap: () {
+          context.pushNamed(ScreenNames.transactionDetails,
+              params: {'txId': txHash});
+        },
         key: Key(index.toString()),
         padding: EdgeInsets.only(top: 6, bottom: 6, left: 14, right: 14),
         leading: Text(emoji, style: TextStyle(fontSize: 24)),
@@ -173,9 +178,9 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
               color: CupertinoTheme.of(context).primaryColor),
         ),
         trailing: const CupertinoListTileChevron(),
-        onTap: () => {},
         subtitle: Column(
           children: [
+            const SizedBox(height: 6),
             Text(
               amount,
               style: CupertinoTheme.of(context).textTheme.textStyle.merge(
@@ -184,24 +189,24 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
                     ),
                   ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 8),
             Text(
                 '${sender.userName} · $senderPhoneNumber  · ${tx.getTimesAgo()}',
                 style: CupertinoTheme.of(context)
                     .textTheme
                     .textStyle
                     .merge(TextStyle(fontSize: 12))),
-            const SizedBox(height: 4),
+            const SizedBox(height: 8),
             Container(
               height: 16.0,
-              width: 80,
+              width: 68,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                color: _getStatusDisplayColor(status),
+                color: getStatusDisplayColor(status),
               ),
               child: Center(
                 child: Text(
-                  _getStatusDisplayString(status),
+                  getStatusDisplayString(status),
                   style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                         TextStyle(
                           fontSize: 9,
@@ -220,32 +225,6 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
     } catch (e) {
       debugPrint('exception: $e');
       return Container();
-    }
-  }
-
-  String _getStatusDisplayString(TransacitonStatus status) {
-    switch (status) {
-      case TransacitonStatus.pending:
-        return 'PENDING';
-      case TransacitonStatus.confirmed:
-        return 'CONFIRMED';
-      case TransacitonStatus.failed:
-        return 'FAILED';
-      default:
-        return 'UNKNOWN';
-    }
-  }
-
-  Color _getStatusDisplayColor(TransacitonStatus status) {
-    switch (status) {
-      case TransacitonStatus.pending:
-        return CupertinoColors.systemYellow;
-      case TransacitonStatus.confirmed:
-        return CupertinoColors.activeGreen;
-      case TransacitonStatus.failed:
-        return CupertinoColors.destructiveRed;
-      default:
-        return CupertinoColors.systemOrange;
     }
   }
 }
