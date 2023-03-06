@@ -1,5 +1,6 @@
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
+import 'package:karma_coin/ui/screens/about.dart';
 import 'package:karma_coin/ui/screens/account_backup.dart';
 import 'package:karma_coin/ui/screens/actions.dart';
 import 'package:karma_coin/ui/screens/appreciations.dart';
@@ -24,6 +25,9 @@ class ScreenPaths {
 
   /// User name input screen
   static String userName = '/username';
+
+  /// About screen
+  static String about = '/about';
 
   /// Security words screen
   static String securityWords = '/security_words';
@@ -73,6 +77,10 @@ class ScreenNames {
   /// an account screen
   static String account = 'account';
 
+  /// about screen
+  static String about = 'about';
+
+  // scruity words screen
   static String securityWords = 'security words';
 
   static String appreciations = 'appreciations';
@@ -176,6 +184,12 @@ final GoRouter appRouter = GoRouter(
         path: ScreenPaths.securityWords,
         builder: (BuildContext context, GoRouterState state) {
           return const BackupAccountScreen();
+        }),
+    GoRoute(
+        name: ScreenNames.about,
+        path: ScreenPaths.about,
+        builder: (BuildContext context, GoRouterState state) {
+          return const AboutScreen();
         }),
   ],
 );

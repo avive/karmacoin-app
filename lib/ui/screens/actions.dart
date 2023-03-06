@@ -131,7 +131,36 @@ class _ActionsScreenState extends State<ActionsScreen> {
           CupertinoListTile.notched(
             title: const Text('Get Support'),
             leading: const Icon(CupertinoIcons.question, size: 28),
-            trailing: const CupertinoListTileChevron(),
+            onTap: () => {},
+          ),
+        ],
+      ),
+      CupertinoListSection.insetGrouped(
+        header: Text(
+          'COMMUNITY',
+          style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                TextStyle(fontSize: 14, color: CupertinoColors.inactiveGray),
+              ),
+        ),
+        children: <CupertinoListTile>[
+          CupertinoListTile.notched(
+            title: const Text('Twitter'),
+            leading: const Icon(CupertinoIcons.globe, size: 28),
+            onTap: () => {},
+          ),
+          CupertinoListTile.notched(
+            title: const Text('Telegram'),
+            leading: const Icon(CupertinoIcons.question, size: 28),
+            onTap: () => {},
+          ),
+          CupertinoListTile.notched(
+            title: const Text('Discord'),
+            leading: const Icon(CupertinoIcons.question, size: 28),
+            onTap: () => {},
+          ),
+          CupertinoListTile.notched(
+            title: const Text('LinkedIn'),
+            leading: const Icon(CupertinoIcons.question, size: 28),
             onTap: () => {},
           ),
         ],
@@ -148,7 +177,10 @@ class _ActionsScreenState extends State<ActionsScreen> {
             title: const Text('About, License and Copyright'),
             leading: const Icon(CupertinoIcons.info, size: 28),
             trailing: const CupertinoListTileChevron(),
-            onTap: () => {},
+            onTap: () => context.push(ScreenPaths.about),
+          ),
+          CupertinoListTile.notched(
+            title: const Text(''),
           ),
         ],
       ),
