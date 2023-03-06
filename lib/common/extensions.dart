@@ -1,5 +1,7 @@
 import "dart:convert";
+import "dart:ffi";
 import "package:hex/hex.dart";
+import "package:intl/intl.dart";
 
 /// Returns a shortened display string for binary data. e.g. 0xE012...01EAF
 extension HexToString on List<int> {
@@ -19,6 +21,27 @@ extension HexToString on List<int> {
     return base64.encode(this);
   }
 }
+
+extension DecimalFormat on num {
+  static final NumberFormat numberFormat = NumberFormat.decimalPattern();
+
+  String format() {
+    return numberFormat.format(this);
+    //final parts = toString().split('.');
+    //return '${numberFormat.format(num.tryParse(parts[0]) ?? 0.0)}.${parts[1]}';
+  }
+}
+
+/*
+extension Int64DecimalFormat on Int64 {
+  static final NumberFormat numberFormat = NumberFormat.decimalPattern();
+
+  String formatInt64() {
+    return numberFormat.format(this);
+    //final parts = toString().split('.');
+    //return '${numberFormat.format(num.tryParse(parts[0]) ?? 0.0)}.${parts[1]}';
+  }
+}*/
 
 extension StringToHex on String {
   List<int> toHex() {

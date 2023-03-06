@@ -1,3 +1,4 @@
+import 'package:karma_coin/common/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/data/personality_traits.dart';
@@ -5,6 +6,7 @@ import 'package:karma_coin/data/phone_number_formatter.dart';
 import 'package:karma_coin/data/signed_transaction.dart';
 import 'package:karma_coin/services/api/types.pb.dart' as types;
 import 'package:karma_coin/ui/helpers/transactions.dart';
+import 'package:karma_coin/ui/widgets/pill.dart';
 
 /// Display transaction details for a a locally available transaction
 class TransactionDetailsScreen extends StatefulWidget {
@@ -83,14 +85,13 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
 
         tiles.add(
           CupertinoListTile.notched(
-              title: Text(title,
-                  style:
-                      CupertinoTheme.of(context).textTheme.navTitleTextStyle),
-              leading: Text(
-                emoji,
-                style: TextStyle(fontSize: 24),
-              ),
-              trailing: const Icon(CupertinoIcons.share, size: 28)),
+            title: Text(title,
+                style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
+            leading: Text(
+              emoji,
+              style: TextStyle(fontSize: 24),
+            ),
+          ),
         );
       }
 
@@ -120,21 +121,27 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
 
       tiles.add(
         CupertinoListTile.notched(
-          title: Text('From',
-              style: CupertinoTheme.of(context).textTheme.textStyle),
-          subtitle: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(sender.userName),
-              Text(sender.accountId.data.toShortHexString()),
-              SizedBox(height: 6),
-            ],
-          ),
-          trailing: Text(senderPhoneNumber,
-              style: CupertinoTheme.of(context).textTheme.textStyle),
-          leading: const Icon(CupertinoIcons.arrow_right, size: 28),
-        ),
+            title: Text('From',
+                style: CupertinoTheme.of(context).textTheme.textStyle),
+            subtitle: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(sender.userName),
+                Text(sender.accountId.data.toShortHexString()),
+                SizedBox(height: 6),
+              ],
+            ),
+            trailing: Text(senderPhoneNumber,
+                style: CupertinoTheme.of(context).textTheme.textStyle),
+            leading: const Icon(CupertinoIcons.arrow_right, size: 28),
+            onTap: () {
+              if (tx.incoming) {
+                context.push(ScreenPaths.account, extra: sender);
+              } else {
+                context.push(ScreenPaths.account);
+              }
+            }),
       );
 
       // todo: can have phone number or just an account id - handle this case
@@ -159,6 +166,17 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
           trailing: Text(recieverPhoneNumber,
               style: CupertinoTheme.of(context).textTheme.textStyle),
           leading: const Icon(CupertinoIcons.arrow_left, size: 28),
+          onTap: () {
+            if (tx.incoming) {
+              context.push(ScreenPaths.account);
+            } else {
+              if (toUser != null) {
+                context.push(ScreenPaths.account, extra: toUser);
+              } else {
+                debugPrint('Missing to user... todo: get from api..');
+              }
+            }
+          },
         ),
       );
 
@@ -176,25 +194,11 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
           title: Text('Status',
               style: CupertinoTheme.of(context).textTheme.textStyle),
           leading: Container(),
-          trailing: Container(
-            height: 20,
-            width: 100,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              color: getStatusDisplayColor(status),
-            ),
-            child: Center(
-              child: Text(
-                getStatusDisplayString(status),
-                style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                      TextStyle(
-                        fontSize: 12,
-                        color: CupertinoColors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-              ),
-            ),
+          trailing: Pill(
+            null,
+            getStatusDisplayString(status),
+            count: 0,
+            backgroundColor: getStatusDisplayColor(status),
           ),
         ),
       );
@@ -218,6 +222,8 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
             CupertinoSliverNavigationBar(
               alwaysShowMiddle: true,
               largeTitle: Text(title),
+              trailing: adjustNavigationBarButtonPosition(
+                  Icon(CupertinoIcons.share, size: 24), 0, 0),
             ),
           ];
         },

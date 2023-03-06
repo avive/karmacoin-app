@@ -74,4 +74,10 @@ abstract class KarmaCoinAmountFormatter {
           .format(amount.toDouble() / GenesisConfig.kCentsPerCoin);
     }
   }
+
+  static String formatKCents(Int64 amount) {
+    String label = amount == 1 ? 'Karma Cent' : 'Karma Cents';
+
+    return '${_deicmalFormat.format(amount)} $label';
+  }
 }

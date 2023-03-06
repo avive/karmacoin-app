@@ -78,13 +78,13 @@ class _ActionsScreenState extends State<ActionsScreen> {
             onTap: () => {},
           ),
           CupertinoListTile.notched(
-            title: const Text('Update Profile'),
+            title: const Text('Edit account'),
             leading: const Icon(CupertinoIcons.person_crop_circle, size: 28),
             trailing: const CupertinoListTileChevron(),
             onTap: () => {},
           ),
           CupertinoListTile.notched(
-            title: const Text('Account Operations'),
+            title: const Text('Operations Log'),
             leading: const Icon(CupertinoIcons.doc, size: 28),
             trailing: const CupertinoListTileChevron(),
             onTap: () => {},
@@ -104,7 +104,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
             title: const Text('Backup Account'),
             leading: const Icon(CupertinoIcons.archivebox, size: 28),
             trailing: const CupertinoListTileChevron(),
-            onTap: () => {},
+            onTap: () => context.push(ScreenPaths.securityWords),
           ),
           CupertinoListTile.notched(
             title: const Text('Enable FaceId'),
@@ -145,14 +145,8 @@ class _ActionsScreenState extends State<ActionsScreen> {
         ),
         children: <CupertinoListTile>[
           CupertinoListTile.notched(
-            title: const Text('About'),
+            title: const Text('About, License and Copyright'),
             leading: const Icon(CupertinoIcons.info, size: 28),
-            trailing: const CupertinoListTileChevron(),
-            onTap: () => {},
-          ),
-          CupertinoListTile.notched(
-            title: const Text('License and Copyright'),
-            leading: const Icon(CupertinoIcons.doc, size: 28),
             trailing: const CupertinoListTileChevron(),
             onTap: () => {},
           ),
