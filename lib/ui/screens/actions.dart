@@ -85,7 +85,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
             onTap: () => {},
           ),
           CupertinoListTile.notched(
-            title: const Text('Operations Log'),
+            title: const Text('Account Operations'),
             leading: const Icon(CupertinoIcons.doc, size: 28),
             trailing: const CupertinoListTileChevron(),
             onTap: () => {},
@@ -193,6 +193,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
     return CupertinoPageScaffold(
       child: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          if (!mounted) return [];
           return <Widget>[
             CupertinoSliverNavigationBar(
               largeTitle: Text('Actions'),

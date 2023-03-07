@@ -49,9 +49,19 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
       }
     }
 
-    Future.delayed(Duration.zero, () {
-      context.push(ScreenPaths.userName);
-    });
+    // attempt auto sign-in in case there's already an account on chain for the
+    // local accountId with this phone number
+    if (await accountLogic.attemptAutoSignIn()) {
+      Future.delayed(Duration.zero, () {
+        debugPrint(
+            'Auto signin - user already signed in with local accountId and verified phone number');
+        context.push(ScreenPaths.home);
+      });
+    } else {
+      Future.delayed(Duration.zero, () {
+        context.push(ScreenPaths.userName);
+      });
+    }
   }
 
   @override

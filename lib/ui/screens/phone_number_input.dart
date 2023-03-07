@@ -21,8 +21,8 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
   bool withLabel = false;
   bool useRtl = false;
 
-  final formKey = GlobalKey<FormState>();
-  final phoneKey = GlobalKey<FormFieldState<PhoneNumber>>();
+  final formKey = UniqueKey(); //GlobalKey<FormState>();
+  final phoneKey = UniqueKey(); //GlobalKey<FormFieldState<PhoneNumber>>();
 
   // country selector ux
   CountrySelectorNavigator selectorNavigator =
@@ -180,9 +180,38 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
               child: Text('Sign Up'),
             ),
             SizedBox(height: 14),
+            _processRestoreAccountFlow(context),
           ]),
         ),
       ),
     );
+  }
+
+  Widget _processRestoreAccountFlow(BuildContext context) {
+    return ValueListenableBuilder<bool?>(
+        valueListenable: appState.triggerSignupAfterRestore,
+        builder: (context, value, child) {
+          if (value == null || value == false) {
+            return Container();
+          }
+
+          appState.triggerSignupAfterRestore.value = false;
+
+          Future.delayed(Duration(milliseconds: 300), () async {
+            if (!mounted) return;
+            StatusAlert.show(
+              context,
+              duration: Duration(seconds: 3),
+              configuration: IconConfiguration(
+                  icon: CupertinoIcons.exclamationmark_triangle),
+              title: 'Restore Account',
+              subtitle: 'Sign up to complete restoration',
+              dismissOnBackgroundTap: true,
+              maxWidth: 260,
+            );
+          });
+
+          return Container();
+        });
   }
 }

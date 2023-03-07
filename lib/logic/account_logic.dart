@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:fixnum/fixnum.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:karma_coin/data/genesis_config.dart';
@@ -13,7 +12,7 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/api/verifier.pbgrpc.dart' as verifier_types;
 import 'package:quiver/collection.dart';
 import 'dart:convert';
-import '../services/api/verifier.pb.dart';
+import 'package:karma_coin/services/api/verifier.pb.dart';
 import 'account_interface.dart';
 import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/verify_number_request.dart' as data;
@@ -180,6 +179,42 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     });
   }
 
+  /// Attempts auto sign in with local phone number and accountId.
+  /// if user with smae accountId is on-chaine with phoneNumber is already onchain
+  /// then update local state with user data from chain and sign-in the user locally
+  @override
+  Future<bool> attemptAutoSignIn() async {
+    try {
+      GetUserInfoByAccountResponse resp = await api.apiServiceClient
+          .getUserInfoByAccount(GetUserInfoByAccountRequest(
+              accountId: AccountId(data: _getAccountId())));
+      if (resp.hasUser()) {
+        User user = resp.user;
+        if (user.mobileNumber.number == this.phoneNumber.value!) {
+          // set requested name to current user name
+          await accountLogic.setRequestedUserName(user.userName);
+
+          // user is already signed up - update local data
+          await createNewKarmaCoinUser();
+
+          // update local user with data from the chain
+          await this.karmaCoinUser.value!.updatWithUserData(user);
+
+          // User is signed up on chain
+          await _setSignedUp(true);
+
+          return true;
+        }
+      }
+
+      return false;
+    } catch (e) {
+      debugPrint(
+          'failed to query api for account by id as part of auto sign-in');
+      return false;
+    }
+  }
+
   /// Update the local KarmaCoin user from chain
   Future<void> _updateLocalKarmaUserFromChain() async {
     try {
@@ -229,24 +264,9 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
         .sublist(0, 32);
   }
 
-  /// Generate a new keypair
-  Future<void> _generateNewKeyPair() async {
-    debugPrint("generating a new account keypair from a new seed...");
-
-    // generate 24 english dict words for 256 bits of entropy we need for ed seed
-    String securityWords = bip39.generateMnemonic(strength: 256);
-
-    // ed seed is 32 bytes so we generate words for crating a 32 bytes seed
-    /*
-    String securityWords = bip39.generateMnemonic(
-        strength: 32,
-        randomBytes: (length) {
-          Random rng = Random.secure();
-          List<int> values =
-              List<int>.generate(length, (i) => rng.nextInt(256));
-          return values as Uint8List;
-        });*/
-
+  /// Set keypair from provided 24 security words
+  @override
+  Future<void> setKeypairFromWords(String securityWords) async {
     debugPrint('account security words: $securityWords');
 
     // we use a passphrase to derive the seed, and we only need 32 bytes of seed
@@ -257,8 +277,10 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     //
     // tood: use an isolate framework which supports web browsers.
     // compute only works on native platforms.
-    //
-    Uint8List seed = await compute(_mnemonicToSeed, securityWords);
+
+    //Uint8List seed = await compute(_mnemonicToSeed, securityWords);
+
+    Uint8List seed = await _mnemonicToSeed(securityWords);
 
     debugPrint('seed length:${seed.length} data: ${seed.toHexString()}');
 
@@ -280,6 +302,16 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
 
     debugPrint(
         'keypair set. Account id: ${keyPair.value?.publicKey.bytes.toHexString()}');
+  }
+
+  /// Generate a new keypair
+  Future<void> _generateNewKeyPair() async {
+    debugPrint("generating a new account keypair from a new seed...");
+
+    // generate 24 english dict words for 256 bits of entropy we need for ed seed
+    String securityWords = bip39.generateMnemonic(strength: 256);
+
+    await setKeypairFromWords(securityWords);
   }
 
   @override
@@ -435,7 +467,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
       // store the account id on firebase
       await user.updateDisplayName(accountIdBase64);
     } catch (e) {
-      debugPrint('Error updating firebase user displayName: $e');
+      debugPrint('Error updating firebase user display name field: $e');
       return;
     }
 

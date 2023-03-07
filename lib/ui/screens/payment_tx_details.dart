@@ -171,11 +171,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
               if (tx.incoming) {
                 context.push(ScreenPaths.account);
               } else {
-                if (toUser != null) {
-                  context.push(ScreenPaths.account, extra: toUser);
-                } else {
-                  debugPrint('Missing to user... todo: get from api..');
-                }
+                context.push(ScreenPaths.account, extra: toUser);
               }
             },
           ),

@@ -16,10 +16,6 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
 
   /// Return the list secionts
   List<CupertinoListSection> _getSections(BuildContext context) {
-    if (accountLogic.accountSecurityWords.value == null) {
-      return [];
-    }
-
     List<CupertinoListTile> tiles = [];
     List<CupertinoListTile> introTiles = [];
 
@@ -57,15 +53,21 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
       ),
     );
 
+    // temp hack to fill the form
+    if (accountLogic.accountSecurityWords.value != null) {
+      backupWords = accountLogic.accountSecurityWords.value!.split(' ');
+    }
+
     for (int i = 0; i < 24; i++) {
       tiles.add(
         CupertinoListTile.notched(
-          key: Key(i.toString()),
+          key: UniqueKey(),
           title: Center(
             child: CupertinoTextFormFieldRow(
+              initialValue: backupWords[i],
               maxLines: 1,
               keyboardType: TextInputType.text,
-              onChanged: (value) => backupWords[i] = value.toLowerCase(),
+              onChanged: (value) => backupWords[i] = value.trim().toLowerCase(),
               placeholder: 'Enter word ${i + 1}',
               validator: (String? value) {
                 if (value == null || value.isEmpty) {
@@ -90,8 +92,8 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
         leading: const Icon(CupertinoIcons.arrow_counterclockwise,
             size: 28, color: CupertinoColors.destructiveRed),
         title: CupertinoButton(
-          onPressed: () {
-            submitUserInput();
+          onPressed: () async {
+            await submitUserInput();
           },
           padding: EdgeInsets.only(left: 0),
           child: Text(
@@ -139,6 +141,7 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
     return CupertinoPageScaffold(
       child: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          if (!mounted) return [];
           return <Widget>[
             CupertinoSliverNavigationBar(
               largeTitle: const Text('Restore Account'),
@@ -158,17 +161,20 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
     );
   }
 
-  void submitUserInput() {
+  Future<void> submitUserInput() async {
     bool valid = true;
     int firstMissingWordIdx = 0;
 
     for (int i = 0; i < 24; i++) {
+      backupWords[i] = backupWords[i].trim().toLowerCase();
+
       if (backupWords[i].isEmpty) {
         valid = false;
         firstMissingWordIdx = i;
         break;
       }
     }
+
     if (!valid) {
       // display error dialog
       StatusAlert.show(
@@ -183,5 +189,41 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
       );
       return;
     }
+    String allWords = "";
+    backupWords.forEach((element) {
+      allWords += element + " ";
+    });
+    allWords = allWords.substring(0, allWords.length - 1);
+    debugPrint('User provided words: "$allWords"');
+
+    // attempt restoration before signing out from current account
+    try {
+      await accountLogic.setKeypairFromWords(allWords);
+    } catch (e) {
+      debugPrint('set keypair error: $e');
+      StatusAlert.show(
+        context,
+        duration: Duration(seconds: 2),
+        configuration:
+            IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
+        title: 'Invalid Words',
+        subtitle: 'Some of the words you have entered are wrong.',
+        dismissOnBackgroundTap: true,
+        maxWidth: 260,
+      );
+      return;
+    }
+
+    appState.triggerSignupAfterRestore.value = true;
+
+    await accountLogic.clear();
+    await authLogic.signOut();
+
+    Navigator.of(context).pop();
+
+    //Future.delayed(Duration(milliseconds: 200), () async {
+    // todo: only if not came from welcome?
+    context.go(ScreenPaths.welcome);
+    //});
   }
 }

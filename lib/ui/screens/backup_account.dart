@@ -59,6 +59,8 @@ class _BackupAccountScreenState extends State<BackupAccountScreen> {
       ),
     );
 
+    debugPrint('Security words: ${accountLogic.accountSecurityWords.value!}');
+
     accountLogic.accountSecurityWords.value!
         .split(' ')
         .asMap()

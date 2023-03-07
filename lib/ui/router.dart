@@ -1,9 +1,9 @@
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/ui/screens/about.dart';
-import 'package:karma_coin/ui/screens/account_backup.dart';
-import 'package:karma_coin/ui/screens/account_restore.dart';
-import 'package:karma_coin/ui/screens/account_restore_intro.dart';
+import 'package:karma_coin/ui/screens/backup_account.dart';
+import 'package:karma_coin/ui/screens/restore_account.dart';
+import 'package:karma_coin/ui/screens/restore_account_intro.dart';
 import 'package:karma_coin/ui/screens/actions.dart';
 import 'package:karma_coin/ui/screens/appreciations.dart';
 import 'package:karma_coin/ui/screens/phone_number_input.dart';

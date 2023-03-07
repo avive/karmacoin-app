@@ -44,7 +44,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       ));
       res.add(const SizedBox(height: 16));
       res.add(CupertinoButton(
-        onPressed: () async {},
+        onPressed: () => context.push(ScreenPaths.restoreAccount),
         child: const Text('Restore Account'),
       ));
     } else {
@@ -91,6 +91,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       res.add(const SizedBox(height: 16));
     }
 
+    res.add(_processRestoreAccountFlow(context));
+
     return res;
   }
 
@@ -121,5 +123,34 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         );
       },
     );
+  }
+
+  Widget _processRestoreAccountFlow(BuildContext context) {
+    return ValueListenableBuilder<bool?>(
+        valueListenable: appState.triggerSignupAfterRestore,
+        builder: (context, value, child) {
+          if (value == null || value == false) {
+            return Container();
+          }
+
+          Future.delayed(Duration(milliseconds: 500), () async {
+            /*
+            StatusAlert.show(
+              context,
+              duration: Duration(seconds: 3),
+              configuration: IconConfiguration(
+                  icon: CupertinoIcons.exclamationmark_triangle),
+              title: 'Restore Account',
+              subtitle: 'To complete restoring, verify your phone number.',
+              dismissOnBackgroundTap: true,
+              maxWidth: 260,
+            );
+            Future.delayed(Duration(milliseconds: 200), () async {*/
+            if (!mounted) return;
+            context.push(ScreenPaths.signup);
+          });
+
+          return Container();
+        });
   }
 }

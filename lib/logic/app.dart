@@ -12,7 +12,7 @@ import 'package:karma_coin/logic/txs_boss.dart';
 import 'package:karma_coin/logic/txs_boss_interface.dart';
 import 'package:karma_coin/logic/user_name_availability.dart';
 import 'package:karma_coin/logic/verifier.dart';
-import 'account.dart';
+import 'account_logic.dart';
 import 'account_interface.dart';
 import 'api.dart';
 import 'auth_interface.dart';

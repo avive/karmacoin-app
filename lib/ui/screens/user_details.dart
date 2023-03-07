@@ -137,7 +137,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
     techSectionTiles.add(
       CupertinoListTile.notched(
           padding: EdgeInsets.only(top: 12, bottom: 12, left: 12, right: 14),
-          title: Text('Counter',
+          title: Text('Transactions Counter',
               style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
           trailing: Text(user!.nonce.toString(),
               style: CupertinoTheme.of(context).textTheme.textStyle),

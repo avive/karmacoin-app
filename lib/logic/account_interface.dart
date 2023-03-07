@@ -44,24 +44,29 @@ abstract class AccountLogicInterface {
   // and store it locally. This user's data is going to be updated with on-chain data
   Future<void> createNewKarmaCoinUser();
 
-  // Verify user's phone number and account id
+  /// Verify user's phone number and account id
   Future<void> verifyPhoneNumber();
 
-  // Submit a new user transaction to the chain with local user data
+  /// Set keypaird from seed words
+  Future<void> setKeypairFromWords(String securityWords);
+
+  Future<bool> attemptAutoSignIn();
+
+  /// Submit a new user transaction to the chain with local user data
   Future<SubmitTransactionResponse> submitNewUserTransacation();
 
-  // Submit a payemnt/apprecition transaction
+  /// Submit a payemnt/apprecition transaction
   Future<SubmitTransactionResponse> submitPaymentTransaction(
       PaymentTransactionData data);
 
   final ValueNotifier<KarmaCoinUser?> karmaCoinUser =
       ValueNotifier<KarmaCoinUser?>(null);
 
-  // Local mode - KarmaUser was created locally, signup tx submitted and accepted but not confirmed yet... we use this to allow user to start appreicating other users as soon as it signs up...
-  // user name should be taken from KarmaUser.
+  /// Local mode - KarmaUser was created locally, signup tx submitted and accepted but not confirmed yet... we use this to allow user to start appreicating other users as soon as it signs up...
+  /// user name should be taken from KarmaUser.
   final ValueNotifier<bool> localMode = ValueNotifier<bool>(true);
 
-  // Local authenticated user's phone number
+  /// Local authenticated user's phone number
   final ValueNotifier<String?> phoneNumber = ValueNotifier<String?>(null);
 
   bool validateDataForNewKarmCoinUser();
