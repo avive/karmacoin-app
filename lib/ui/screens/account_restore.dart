@@ -1,16 +1,18 @@
 import 'package:karma_coin/common_libs.dart';
+import 'package:status_alert/status_alert.dart';
 
-/// Display user details for provided user or for local user
-class BackupAccountScreen extends StatefulWidget {
+class RestoreAccountScreen extends StatefulWidget {
   /// Set user to display details for or null for local user
-  const BackupAccountScreen({super.key});
+  const RestoreAccountScreen({super.key});
 
   @override
-  State<BackupAccountScreen> createState() => _BackupAccountScreenState();
+  State<RestoreAccountScreen> createState() => _RestoreAccountScreenState();
 }
 
-class _BackupAccountScreenState extends State<BackupAccountScreen> {
-  _BackupAccountScreenState();
+class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
+  List<String> backupWords = List<String>.generate(24, (int index) => '');
+
+  _RestoreAccountScreenState();
 
   /// Return the list secionts
   List<CupertinoListSection> _getSections(BuildContext context) {
@@ -18,11 +20,8 @@ class _BackupAccountScreenState extends State<BackupAccountScreen> {
       return [];
     }
 
-    List<CupertinoListTile> introTiles = [];
     List<CupertinoListTile> tiles = [];
-
-    String accountId = accountLogic.karmaCoinUser.value!.userData.accountId.data
-        .toShortHexString();
+    List<CupertinoListTile> introTiles = [];
 
     introTiles.add(
       CupertinoListTile.notched(
@@ -33,8 +32,8 @@ class _BackupAccountScreenState extends State<BackupAccountScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Write down the numbered backup words displayed below on a piece of paper, and put it with your important documents.\n\nYou will be able to restore account $accountId with these words.',
-                maxLines: 10,
+                'Enter your account\'s 24 security words from your words list backup.',
+                maxLines: 3,
                 style: CupertinoTheme.of(context)
                     .textTheme
                     .tabLabelTextStyle
@@ -54,23 +53,29 @@ class _BackupAccountScreenState extends State<BackupAccountScreen> {
             ],
           ),
         ),
-        leading: const Icon(CupertinoIcons.archivebox, size: 28),
-        // todo: number format
+        leading: const Icon(CupertinoIcons.info, size: 28),
       ),
     );
 
-    accountLogic.accountSecurityWords.value!
-        .split(' ')
-        .asMap()
-        .forEach((index, value) {
+    for (int i = 0; i < 24; i++) {
       tiles.add(
         CupertinoListTile.notched(
-          title: Text(value,
-              style: CupertinoTheme.of(context)
-                  .textTheme
-                  .navTitleTextStyle
-                  .merge(TextStyle(fontSize: 18))),
-          leading: Text((index + 1).toString(),
+          key: Key(i.toString()),
+          title: Center(
+            child: CupertinoTextFormFieldRow(
+              maxLines: 1,
+              keyboardType: TextInputType.text,
+              onChanged: (value) => backupWords[i] = value.toLowerCase(),
+              placeholder: 'Enter word ${i + 1}',
+              validator: (String? value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a word';
+                }
+                return null;
+              },
+            ),
+          ),
+          leading: Text((i + 1).toString(),
               style: CupertinoTheme.of(context)
                   .textTheme
                   .navTitleTextStyle
@@ -78,13 +83,23 @@ class _BackupAccountScreenState extends State<BackupAccountScreen> {
           // todo: number format
         ),
       );
-    });
+    }
 
     tiles.add(
       CupertinoListTile.notched(
-        title: Container(
-          height: 64,
-          child: const Text(''),
+        leading: const Icon(CupertinoIcons.arrow_counterclockwise,
+            size: 28, color: CupertinoColors.destructiveRed),
+        title: CupertinoButton(
+          onPressed: () {
+            submitUserInput();
+          },
+          padding: EdgeInsets.only(left: 0),
+          child: Text(
+            'Restore Account',
+            style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                  TextStyle(color: CupertinoColors.destructiveRed),
+                ),
+          ),
         ),
       ),
     );
@@ -92,7 +107,7 @@ class _BackupAccountScreenState extends State<BackupAccountScreen> {
     return [
       CupertinoListSection.insetGrouped(
           header: Text(
-            'About',
+            'INSTRUCTIONS',
             style: CupertinoTheme.of(context).textTheme.tabLabelTextStyle.merge(
                   TextStyle(
                       fontSize: 14,
@@ -105,7 +120,7 @@ class _BackupAccountScreenState extends State<BackupAccountScreen> {
           children: introTiles),
       CupertinoListSection.insetGrouped(
           header: Text(
-            'Backup Words',
+            'SECURITY WORDS',
             style: CupertinoTheme.of(context).textTheme.tabLabelTextStyle.merge(
                   TextStyle(
                       fontSize: 14,
@@ -126,7 +141,7 @@ class _BackupAccountScreenState extends State<BackupAccountScreen> {
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             CupertinoSliverNavigationBar(
-              largeTitle: const Text('Backup Account'),
+              largeTitle: const Text('Restore Account'),
             ),
           ];
         },
@@ -141,5 +156,32 @@ class _BackupAccountScreenState extends State<BackupAccountScreen> {
         ),
       ),
     );
+  }
+
+  void submitUserInput() {
+    bool valid = true;
+    int firstMissingWordIdx = 0;
+
+    for (int i = 0; i < 24; i++) {
+      if (backupWords[i].isEmpty) {
+        valid = false;
+        firstMissingWordIdx = i;
+        break;
+      }
+    }
+    if (!valid) {
+      // display error dialog
+      StatusAlert.show(
+        context,
+        duration: Duration(seconds: 2),
+        configuration:
+            IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
+        title: 'Missing Input',
+        subtitle: 'Please enter word ${firstMissingWordIdx + 1} and try again.',
+        dismissOnBackgroundTap: true,
+        maxWidth: 260,
+      );
+      return;
+    }
   }
 }

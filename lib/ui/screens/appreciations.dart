@@ -136,7 +136,6 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
 
       TransacitonStatus status = TransacitonStatus.pending;
 
-    
       // an incoming appreciation is always confirmed on chain
       if (incoming) {
         status = TransacitonStatus.confirmed;
@@ -199,7 +198,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
             const SizedBox(height: 8),
             Container(
               height: 16.0,
-              width: 68,
+              width: 80,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 color: getStatusDisplayColor(status),
@@ -209,9 +208,9 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
                   getStatusDisplayString(status),
                   style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                         TextStyle(
-                          fontSize: 9,
+                          fontSize: 10,
                           color: CupertinoColors.white,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
                 ),

@@ -1,5 +1,6 @@
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/ui/widgets/delete_account_tile.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class ActionsScreen extends StatefulWidget {
   const ActionsScreen({super.key});
@@ -75,10 +76,10 @@ class _ActionsScreenState extends State<ActionsScreen> {
             leading:
                 const Icon(CupertinoIcons.arrow_counterclockwise, size: 28),
             trailing: const CupertinoListTileChevron(),
-            onTap: () => {},
+            onTap: () => context.push(ScreenPaths.restoreAccountIntro),
           ),
           CupertinoListTile.notched(
-            title: const Text('Edit account'),
+            title: const Text('Update account'),
             leading: const Icon(CupertinoIcons.person_crop_circle, size: 28),
             trailing: const CupertinoListTileChevron(),
             onTap: () => {},
@@ -145,22 +146,22 @@ class _ActionsScreenState extends State<ActionsScreen> {
         children: <CupertinoListTile>[
           CupertinoListTile.notched(
             title: const Text('Twitter'),
-            leading: const Icon(CupertinoIcons.globe, size: 28),
+            leading: const FaIcon(FontAwesomeIcons.twitter, size: 24),
             onTap: () => {},
           ),
           CupertinoListTile.notched(
             title: const Text('Telegram'),
-            leading: const Icon(CupertinoIcons.question, size: 28),
+            leading: const FaIcon(FontAwesomeIcons.telegram, size: 24),
             onTap: () => {},
           ),
           CupertinoListTile.notched(
             title: const Text('Discord'),
-            leading: const Icon(CupertinoIcons.question, size: 28),
+            leading: const FaIcon(FontAwesomeIcons.discord, size: 24),
             onTap: () => {},
           ),
           CupertinoListTile.notched(
             title: const Text('LinkedIn'),
-            leading: const Icon(CupertinoIcons.question, size: 28),
+            leading: const FaIcon(FontAwesomeIcons.linkedin, size: 24),
             onTap: () => {},
           ),
         ],

@@ -1,3 +1,4 @@
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:karma_coin/common_libs.dart';
 
 /// Display user details for provided user or for local user
@@ -19,6 +20,7 @@ class _AboutScreenState extends State<AboutScreen> {
     tiles.add(
       CupertinoListTile.notched(
         title: Text('Karma Coin Website'),
+        leading: Icon(CupertinoIcons.compass),
         subtitle: CupertinoButton(
           padding: EdgeInsets.only(left: 0),
           child: Text('https://karmaco.in'),
@@ -30,9 +32,10 @@ class _AboutScreenState extends State<AboutScreen> {
     tiles.add(
       CupertinoListTile.notched(
         title: Text('License'),
+        leading: Icon(CupertinoIcons.doc),
         subtitle: CupertinoButton(
           padding: EdgeInsets.only(left: 0),
-          child: Text('Karma Coin License'),
+          child: Text('The Karma Coin License'),
           onPressed: () {},
         ),
       ),
@@ -41,6 +44,7 @@ class _AboutScreenState extends State<AboutScreen> {
     tiles.add(
       CupertinoListTile.notched(
         title: Text('Copyright'),
+        leading: FaIcon(FontAwesomeIcons.copyright, size: 22),
         subtitle: Text('(c) 2023 Karma Coin Authors'),
         // todo: number format
       ),
@@ -49,6 +53,7 @@ class _AboutScreenState extends State<AboutScreen> {
     tiles.add(
       CupertinoListTile.notched(
         title: Text('App Version'),
+        leading: Icon(CupertinoIcons.app),
         subtitle: Text('0.1.11'),
         // todo: number format
       ),
@@ -57,6 +62,7 @@ class _AboutScreenState extends State<AboutScreen> {
     tiles.add(
       CupertinoListTile.notched(
         title: Text('Powered by Karmachain'),
+        leading: FaIcon(FontAwesomeIcons.sun, size: 22),
         subtitle: CupertinoButton(
           padding: EdgeInsets.only(left: 0),
           child: Text('https://karmacha.in'),
@@ -67,8 +73,22 @@ class _AboutScreenState extends State<AboutScreen> {
 
     tiles.add(
       CupertinoListTile.notched(
-        title: Text('Made with ❤️ and ☯️ in 🌎'),
-        // todo: number format
+        title: Text('100% Open Source'),
+        leading: FaIcon(FontAwesomeIcons.code, size: 20),
+        subtitle: CupertinoButton(
+          padding: EdgeInsets.only(left: 0),
+          child: Text('https://github.com/karma-coin'),
+          onPressed: () {},
+        ),
+      ),
+    );
+
+    tiles.add(
+      CupertinoListTile.notched(
+        title: Container(
+          height: 64,
+          child: Text('Made with ❤️ and ☯️ in 🌎'),
+        ),
       ),
     );
 

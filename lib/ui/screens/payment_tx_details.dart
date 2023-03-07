@@ -150,35 +150,48 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
 
       // payment tx always have a receiver with at least a phone number
       // todo: if user to exists in the tx then we know the receiver's nickname and can display it....
-      tiles.add(
-        CupertinoListTile.notched(
-          title:
-              Text('To', style: CupertinoTheme.of(context).textTheme.textStyle),
-          subtitle: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(toUserName),
-              Text(toUserAccount),
-              SizedBox(height: 6),
-            ],
-          ),
-          trailing: Text(recieverPhoneNumber,
-              style: CupertinoTheme.of(context).textTheme.textStyle),
-          leading: const Icon(CupertinoIcons.arrow_left, size: 28),
-          onTap: () {
-            if (tx.incoming) {
-              context.push(ScreenPaths.account);
-            } else {
-              if (toUser != null) {
-                context.push(ScreenPaths.account, extra: toUser);
+      if (toUser != null) {
+        tiles.add(
+          CupertinoListTile.notched(
+            title: Text('To',
+                style: CupertinoTheme.of(context).textTheme.textStyle),
+            subtitle: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(toUserName),
+                Text(toUserAccount),
+                SizedBox(height: 6),
+              ],
+            ),
+            trailing: Text(recieverPhoneNumber,
+                style: CupertinoTheme.of(context).textTheme.textStyle),
+            leading: const Icon(CupertinoIcons.arrow_left, size: 28),
+            onTap: () {
+              if (tx.incoming) {
+                context.push(ScreenPaths.account);
               } else {
-                debugPrint('Missing to user... todo: get from api..');
+                if (toUser != null) {
+                  context.push(ScreenPaths.account, extra: toUser);
+                } else {
+                  debugPrint('Missing to user... todo: get from api..');
+                }
               }
-            }
-          },
-        ),
-      );
+            },
+          ),
+        );
+      } else {
+        // unknown receiver user (tx by phone num)
+        tiles.add(
+          CupertinoListTile.notched(
+            title: Text('To',
+                style: CupertinoTheme.of(context).textTheme.textStyle),
+            trailing: Text(recieverPhoneNumber,
+                style: CupertinoTheme.of(context).textTheme.textStyle),
+            leading: const Icon(CupertinoIcons.arrow_left, size: 28),
+          ),
+        );
+      }
 
       tiles.add(
         CupertinoListTile.notched(

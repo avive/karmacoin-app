@@ -2,6 +2,8 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/ui/screens/about.dart';
 import 'package:karma_coin/ui/screens/account_backup.dart';
+import 'package:karma_coin/ui/screens/account_restore.dart';
+import 'package:karma_coin/ui/screens/account_restore_intro.dart';
 import 'package:karma_coin/ui/screens/actions.dart';
 import 'package:karma_coin/ui/screens/appreciations.dart';
 import 'package:karma_coin/ui/screens/phone_number_input.dart';
@@ -31,6 +33,12 @@ class ScreenPaths {
 
   /// Security words screen
   static String securityWords = '/security_words';
+
+  // Restore account screen
+  static String restoreAccountIntro = '/restore';
+
+  // Restore account screen
+  static String restoreAccount = '/restore-words';
 
   /// Guest home screen (playground for now)
   static String welcome = '/';
@@ -67,6 +75,12 @@ class ScreenNames {
 
   /// Guest home screen (playground for now)
   static String welcome = 'welcome';
+
+  // Restore account intro screen
+  static String restoreAccountIntro = 'restore account';
+
+  // Restore account screen
+  static String restoreAccount = 'restore account words';
 
   /// Signed up user screen
   static String home = 'home';
@@ -190,6 +204,18 @@ final GoRouter appRouter = GoRouter(
         path: ScreenPaths.about,
         builder: (BuildContext context, GoRouterState state) {
           return const AboutScreen();
+        }),
+    GoRoute(
+        name: ScreenNames.restoreAccountIntro,
+        path: ScreenPaths.restoreAccountIntro,
+        builder: (BuildContext context, GoRouterState state) {
+          return const RestoreAccountIntroScreen();
+        }),
+    GoRoute(
+        name: ScreenNames.restoreAccount,
+        path: ScreenPaths.restoreAccount,
+        builder: (BuildContext context, GoRouterState state) {
+          return const RestoreAccountScreen();
         }),
   ],
 );
