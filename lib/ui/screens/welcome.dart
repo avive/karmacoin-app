@@ -69,7 +69,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       res.add(const SizedBox(height: 16));
       res.add(CupertinoButton(
         onPressed: () async {
-          context.go(ScreenPaths.home);
+          pushNamedAndRemoveUntil(ScreenPaths.home);
         },
         child: const Text('User Home'),
       ));

@@ -5,10 +5,12 @@ import 'package:phone_form_field/phone_form_field.dart';
 import 'package:status_alert/status_alert.dart';
 
 class PhoneInputScreen extends StatefulWidget {
-  const PhoneInputScreen({super.key});
+  final String title;
+
+  PhoneInputScreen({super.key, this.title = 'Sign Up'});
 
   @override
-  State<PhoneInputScreen> createState() => _PhoneInputScreenState();
+  State<PhoneInputScreen> createState() => _PhoneInputScreenState(title);
 }
 
 class _PhoneInputScreenState extends State<PhoneInputScreen> {
@@ -20,6 +22,9 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
   bool isCountryChipPersistent = false;
   bool withLabel = false;
   bool useRtl = false;
+  final String title;
+
+  _PhoneInputScreenState(this.title);
 
   final formKey = UniqueKey(); //GlobalKey<FormState>();
   final phoneKey = UniqueKey(); //GlobalKey<FormFieldState<PhoneNumber>>();
@@ -88,6 +93,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
         });
       },
       verificationFailed: (FirebaseAuthException e) async {
+        debugPrint('firebase auth exception: $e');
         if (e.code == 'invalid-phone-number') {
           StatusAlert.show(
             context,
@@ -100,11 +106,13 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
           return;
         }
 
+        // todo: check for more codes to give better error messages to users....
+
         StatusAlert.show(
           context,
           duration: Duration(seconds: 2),
           title: 'Oopps',
-          subtitle: 'Internal validation error. Please try again later.',
+          subtitle: 'No Internet connection. Please try again later.',
           configuration: IconConfiguration(icon: CupertinoIcons.stop_circle),
           maxWidth: 260,
         );
@@ -113,6 +121,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
         // store verficationId in app state
         debugPrint('verification code id: $verificationId');
         appState.phoneAuthVerificationCodeId = verificationId;
+        accountLogic.phoneNumber.value = number;
 
         Future.delayed(Duration.zero, () {
           context.push(ScreenPaths.verify);
@@ -135,8 +144,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             CupertinoSliverNavigationBar(
-              largeTitle: Text('Sign Up'),
-              leading: Container(),
+              largeTitle: Text(title),
             ),
           ];
         },
@@ -177,7 +185,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                 debugPrint('sign up..');
                 await _beginSignup();
               },
-              child: Text('Sign Up'),
+              child: Text(title),
             ),
             SizedBox(height: 14),
             _processRestoreAccountFlow(context),
@@ -191,24 +199,25 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
     return ValueListenableBuilder<bool?>(
         valueListenable: appState.triggerSignupAfterRestore,
         builder: (context, value, child) {
-          if (value == null || value == false) {
+          if (value == null || value == false || !mounted) {
             return Container();
           }
 
-          appState.triggerSignupAfterRestore.value = false;
-
-          Future.delayed(Duration(milliseconds: 300), () async {
-            if (!mounted) return;
-            StatusAlert.show(
-              context,
-              duration: Duration(seconds: 3),
-              configuration: IconConfiguration(
-                  icon: CupertinoIcons.exclamationmark_triangle),
-              title: 'Restore Account',
-              subtitle: 'Sign up to complete restoration',
-              dismissOnBackgroundTap: true,
-              maxWidth: 260,
-            );
+          Future.delayed(Duration.zero, () {
+            appState.triggerSignupAfterRestore.value = false;
+            Future.delayed(Duration(milliseconds: 300), () async {
+              if (!mounted) return;
+              StatusAlert.show(
+                context,
+                duration: Duration(seconds: 1),
+                configuration: IconConfiguration(
+                    icon: CupertinoIcons.exclamationmark_triangle),
+                title: 'Restore Account',
+                subtitle: 'Sign up to complete restoration',
+                dismissOnBackgroundTap: true,
+                maxWidth: 260,
+              );
+            });
           });
 
           return Container();

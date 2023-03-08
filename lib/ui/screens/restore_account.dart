@@ -56,6 +56,10 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
     // temp hack to fill the form
     if (accountLogic.accountSecurityWords.value != null) {
       backupWords = accountLogic.accountSecurityWords.value!.split(' ');
+    } else {
+      backupWords =
+          'marriage hair defense warm chest estate property short olive elevator cat wall key ankle artefact lobster steak wage predict illegal sort either demise advance'
+              .split(' ');
     }
 
     for (int i = 0; i < 24; i++) {
@@ -214,16 +218,20 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
       return;
     }
 
-    appState.triggerSignupAfterRestore.value = true;
-
     await accountLogic.clear();
     await authLogic.signOut();
+    // set keypair based on seed restore from words
+    await accountLogic.setKeypairFromWords(allWords);
 
-    Navigator.of(context).pop();
+    // enable validation of input for signup with dummy empty user name
+    await accountLogic.setRequestedUserName("");
 
-    //Future.delayed(Duration(milliseconds: 200), () async {
+    // only trigger after the above to continue the flow
+    appState.triggerSignupAfterRestore.value = true;
+
+    //Future.delayed(Duration.zero, () async {
     // todo: only if not came from welcome?
-    context.go(ScreenPaths.welcome);
+    context.push(ScreenPaths.signup, extra: 'Verify Number');
     //});
   }
 }

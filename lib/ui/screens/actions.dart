@@ -1,6 +1,7 @@
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/ui/widgets/delete_account_tile.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:badges/badges.dart' as badges;
 
 class ActionsScreen extends StatefulWidget {
   const ActionsScreen({super.key});
@@ -10,6 +11,33 @@ class ActionsScreen extends StatefulWidget {
 }
 
 class _ActionsScreenState extends State<ActionsScreen> {
+  Widget _getAppreciationsIcon(BuildContext context) {
+    return ValueListenableBuilder<int>(
+        valueListenable: txsBoss.incomingAppreciationsNotOpenedCount,
+        builder: (context, value, child) {
+          return ValueListenableBuilder<int>(
+              valueListenable: txsBoss.outcomingAppreciationsNotOpenedCount,
+              builder: (context, value1, child) {
+                if (value + value1 > 0) {
+                  final label = (value + value1).toString();
+                  return badges.Badge(
+                      badgeStyle: badges.BadgeStyle(
+                          badgeColor: CupertinoColors.systemGreen),
+                      position: badges.BadgePosition.topEnd(top: -10, end: -6),
+                      badgeContent: Text(label,
+                          style: CupertinoTheme.of(context)
+                              .textTheme
+                              .tabLabelTextStyle
+                              .merge(TextStyle(
+                                  fontSize: 12, color: CupertinoColors.white))),
+                      child: const Icon(CupertinoIcons.square_list, size: 28));
+                } else {
+                  return const Icon(CupertinoIcons.square_list, size: 28);
+                }
+              });
+        });
+  }
+
   /// Return the list secionts
   List<CupertinoListSection> _getSections(BuildContext context) {
     return [
@@ -29,7 +57,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
             ),
             CupertinoListTile.notched(
                 title: const Text('Appreciations'),
-                leading: const Icon(CupertinoIcons.square_list, size: 28),
+                leading: _getAppreciationsIcon(context),
                 trailing: const CupertinoListTileChevron(),
                 onTap: () => context.push(ScreenPaths.appreciations)),
           ]),

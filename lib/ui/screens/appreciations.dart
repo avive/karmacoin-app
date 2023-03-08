@@ -6,6 +6,7 @@ import 'package:karma_coin/data/phone_number_formatter.dart';
 import 'package:karma_coin/data/signed_transaction.dart';
 import 'package:karma_coin/services/api/types.pb.dart' as types;
 import 'package:karma_coin/ui/helpers/transactions.dart';
+import 'package:badges/badges.dart' as badges;
 
 enum Group { received, sent }
 
@@ -18,6 +19,54 @@ class AppreciationsScreen extends StatefulWidget {
 
 class _AppreciationsScreenState extends State<AppreciationsScreen> {
   Group _selectedSegment = Group.received;
+
+  Widget _getRecivedLabel(BuildContext context) {
+    return ValueListenableBuilder<int>(
+        valueListenable: txsBoss.incomingAppreciationsNotOpenedCount,
+        builder: (context, value, child) {
+          if (value > 0) {
+            final label = (value).toString();
+            return badges.Badge(
+              badgeStyle:
+                  badges.BadgeStyle(badgeColor: CupertinoColors.systemGreen),
+              position: badges.BadgePosition.topEnd(top: -2, end: -30),
+              badgeContent: Text(label,
+                  style: CupertinoTheme.of(context)
+                      .textTheme
+                      .tabLabelTextStyle
+                      .merge(TextStyle(
+                          fontSize: 12, color: CupertinoColors.white))),
+              child: const Text('Recieved'),
+            );
+          } else {
+            return const Text('Recieved');
+          }
+        });
+  }
+
+  Widget _getSentLabel(BuildContext context) {
+    return ValueListenableBuilder<int>(
+        valueListenable: txsBoss.outcomingAppreciationsNotOpenedCount,
+        builder: (context, value, child) {
+          if (value > 0) {
+            final label = value.toString();
+            return badges.Badge(
+              badgeStyle:
+                  badges.BadgeStyle(badgeColor: CupertinoColors.systemGreen),
+              position: badges.BadgePosition.topEnd(top: -2, end: -30),
+              badgeContent: Text(label,
+                  style: CupertinoTheme.of(context)
+                      .textTheme
+                      .tabLabelTextStyle
+                      .merge(TextStyle(
+                          fontSize: 12, color: CupertinoColors.white))),
+              child: const Text('Sent'),
+            );
+          } else {
+            return const Text('Sent');
+          }
+        });
+  }
 
   @override
   build(BuildContext context) {
@@ -41,14 +90,14 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
                     }
                   });
                 },
-                children: const <Group, Widget>{
+                children: <Group, Widget>{
                   Group.received: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Text('Received'),
+                    padding: EdgeInsets.symmetric(horizontal: 24),
+                    child: _getRecivedLabel(context),
                   ),
                   Group.sent: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Text('Sent'),
+                    padding: EdgeInsets.symmetric(horizontal: 24),
+                    child: _getSentLabel(context),
                   ),
                 },
               ),
@@ -79,14 +128,14 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
   Widget _displayIncomingTxs(BuildContext context) {
     return ValueListenableBuilder<List<SignedTransactionWithStatus>>(
       // todo: how to make this not assert when karmaCoinUser is null?
-      valueListenable: transactionBoss.incomingAppreciationsNotifer,
+      valueListenable: txsBoss.incomingAppreciationsNotifer,
       builder: (context, value, child) {
         return ListView.builder(
           shrinkWrap: true,
           itemCount: value.length,
           itemBuilder: (context, index) {
             SignedTransactionWithStatus tx =
-                transactionBoss.incomingAppreciationsNotifer.value[index];
+                txsBoss.incomingAppreciationsNotifer.value[index];
             return _getAppreciationWidget(context, tx, true, index);
             // return Container(key: Key(index.toString()));
           },
@@ -98,7 +147,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
   Widget _displayOutgoingTxs(BuildContext context) {
     return ValueListenableBuilder<List<SignedTransactionWithStatus>>(
         // todo: how to make this not assert when karmaCoinUser is null?
-        valueListenable: transactionBoss.outgoingAppreciationsNotifer,
+        valueListenable: txsBoss.outgoingAppreciationsNotifer,
         builder: (context, value, child) {
           return ListView.separated(
             separatorBuilder: (context, index) {
@@ -110,7 +159,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
             itemCount: value.length,
             itemBuilder: (context, index) {
               SignedTransactionWithStatus tx =
-                  transactionBoss.outgoingAppreciationsNotifer.value[index];
+                  txsBoss.outgoingAppreciationsNotifer.value[index];
               return _getAppreciationWidget(context, tx, false, index);
             },
           );
@@ -127,7 +176,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
 
       // Get any event associated with this transaction
       final types.TransactionEvent? txEvent =
-          transactionBoss.txEventsNotifer.value[txHash];
+          txsBoss.txEventsNotifer.value[txHash];
 
       types.PaymentTransactionV1 appreciation =
           tx.txData as types.PaymentTransactionV1;

@@ -27,8 +27,13 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
   late final types.TransactionEvent? transactionEvent;
 
   _TransactionDetailsScreenState(this.txHash) {
-    transaction = transactionBoss.getTranscation(this.txHash);
-    transactionEvent = transactionBoss.txEventsNotifer.value[this.txHash];
+    transaction = txsBoss.getTranscation(this.txHash);
+    if (transaction == null) {
+      return;
+    }
+
+    transactionEvent = txsBoss.txEventsNotifer.value[this.txHash];
+    transaction!.openned.value = true;
 
     // todo: do more pre-processing
   }

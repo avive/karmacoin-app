@@ -55,7 +55,7 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
       Future.delayed(Duration.zero, () {
         debugPrint(
             'Auto signin - user already signed in with local accountId and verified phone number');
-        context.push(ScreenPaths.home);
+        pushNamedAndRemoveUntil(ScreenPaths.home);
       });
     } else {
       Future.delayed(Duration.zero, () {

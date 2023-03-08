@@ -103,6 +103,23 @@ class ScreenNames {
   static String transactionDetails = 'tx';
 }
 
+popUntil(String path) {
+  String currentRoute = appRouter.location;
+  while (appRouter.canPop() && path != currentRoute) {
+    currentRoute = appRouter.location;
+    if (path != currentRoute) {
+      appRouter.pop();
+    }
+  }
+}
+
+void pushNamedAndRemoveUntil(String path) {
+  while (appRouter.canPop()) {
+    appRouter.pop();
+  }
+  appRouter.go(path);
+}
+
 /// The route configuration
 final GoRouter appRouter = GoRouter(
   refreshListenable: accountSetupController,
@@ -115,7 +132,11 @@ final GoRouter appRouter = GoRouter(
       name: ScreenNames.signup,
       path: ScreenPaths.signup,
       builder: (BuildContext context, GoRouterState state) {
-        return const PhoneInputScreen();
+        String title = 'Sign Up';
+        if (state.extra != null) {
+          title = state.extra as String;
+        }
+        return PhoneInputScreen(title: title);
       },
     ),
     GoRoute(

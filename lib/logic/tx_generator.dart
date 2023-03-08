@@ -50,7 +50,7 @@ abstract class TrnasactionGenerator {
         debugPrint('Payment transaction submitted to api!');
         signedTx.status = TransactionStatus.TRANSACTION_STATUS_SUBMITTED;
         // store in txboss as outgoing
-        transactionBoss.updateWithTx(enriched);
+        txsBoss.updateWithTx(enriched);
 
         // Update local balance to reflect outgoing amount so UI is updated
         // it will update again once the user is periodically updated from chain
@@ -64,7 +64,7 @@ abstract class TrnasactionGenerator {
         debugPrint('transaction rejected by api');
 
         // store via txs boss so tx can be resent later by user
-        transactionBoss.updateWithTx(enriched);
+        txsBoss.updateWithTx(enriched);
     }
 
     return resp;
@@ -108,11 +108,10 @@ abstract class TrnasactionGenerator {
         debugPrint('tx submission acccepted by api - entering local mode...');
 
         // start tracking txs for this account...
-        await transactionBoss
-            .setAccountId(karmaCoinUser.userData.accountId.data);
+        await txsBoss.setAccountId(karmaCoinUser.userData.accountId.data);
 
         // store in outgoing txs in boss
-        transactionBoss.updateWithTx(enriched);
+        txsBoss.updateWithTx(enriched);
 
         // increment user's nonce and store it locally
         await karmaCoinUser.incNonce();
@@ -120,7 +119,7 @@ abstract class TrnasactionGenerator {
         break;
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
         signedTx.status = TransactionStatus.TRANSACTION_STATUS_REJECTED;
-        transactionBoss.updateWithTx(enriched);
+        txsBoss.updateWithTx(enriched);
 
         debugPrint('transaction rejected by api');
       // todo: store the transactionWithStatus in local storage via tx boss so

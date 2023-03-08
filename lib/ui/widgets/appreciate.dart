@@ -12,6 +12,8 @@ import 'package:karma_coin/ui/widgets/traits_picker.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:status_alert/status_alert.dart';
 
+// todo: prevent user from appreciating itself!!!
+
 class AppreciateWidget extends StatefulWidget {
   const AppreciateWidget({super.key});
 

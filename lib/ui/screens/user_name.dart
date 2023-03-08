@@ -75,7 +75,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
               appState.signedUpInCurentSession.value = true;
               Future.delayed(Duration.zero, () {
                 debugPrint('going to user home...');
-                context.go(ScreenPaths.home);
+                pushNamedAndRemoveUntil(ScreenPaths.home);
               });
             }
           }

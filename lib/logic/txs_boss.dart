@@ -95,13 +95,16 @@ class TransactionsBoss extends TransactionsBossInterface {
 
     notOpenedAppreciationsCount.value = notOpenedTotal;
 
-    debugPrint('incoming txs: ${newIncomingAppreciations.length}');
-    debugPrint('outgoing txs: ${newOutgoingAppreciations.length}');
-    debugPrint('account txs: ${newAccountTxs.length}');
+    debugPrint('incoming appreciations: ${newIncomingAppreciations.length}');
+    debugPrint('outgoing appreciations: ${newOutgoingAppreciations.length}');
+    debugPrint('outgoing account txs: ${newAccountTxs.length}');
 
-    debugPrint('incoming txs not openeed: $inAppreciationsNotOpenedCount');
-    debugPrint('outgoing txs not openeed: $outAppreciationsNotOpenedCount');
-    debugPrint('account txs not openeed: $newAccountTxsNotOpenedCount');
+    debugPrint(
+        'incoming appreciations not openeed: $inAppreciationsNotOpenedCount');
+    debugPrint(
+        'outgoing appreciations not openeed: $outAppreciationsNotOpenedCount');
+    debugPrint(
+        'outgoing account txs not openeed: $newAccountTxsNotOpenedCount');
 
     debugPrint('total txs not openeed: $notOpenedTotal');
 

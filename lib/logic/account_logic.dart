@@ -105,8 +105,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
       await _updateLocalKarmaUserFromChain();
 
       // start tracking txs for this account...
-      await transactionBoss
-          .setAccountId(karmaCoinUser.value!.userData.accountId.data);
+      await txsBoss.setAccountId(karmaCoinUser.value!.userData.accountId.data);
     } else {
       debugPrint('karma coin user not found in secure local store.');
     }
@@ -139,14 +138,13 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
 
   /// Register on new user tx and tx ecent, and update state accordingly
   void _registerTransactions() {
-    transactionBoss.newUserTransaction.addListener(() async {
+    txsBoss.newUserTransaction.addListener(() async {
       // listen to new user transaction
-      if (transactionBoss.newUserTransaction.value == null) {
+      if (txsBoss.newUserTransaction.value == null) {
         return;
       }
 
-      dst.SignedTransactionWithStatus tx =
-          transactionBoss.newUserTransaction.value!;
+      dst.SignedTransactionWithStatus tx = txsBoss.newUserTransaction.value!;
       // set user as signed if there's a local karma user (user started the signup flow from this device)
       // and that karma user id is same as the one in the transaction
       if (karmaCoinUser.value == null) {
@@ -185,12 +183,18 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
   @override
   Future<bool> attemptAutoSignIn() async {
     try {
+      List<int>? id = _getAccountId();
+      assert(id != null, 'expected account id');
+      debugPrint('Account id param: ${id!.toHexString()}');
       GetUserInfoByAccountResponse resp = await api.apiServiceClient
-          .getUserInfoByAccount(GetUserInfoByAccountRequest(
-              accountId: AccountId(data: _getAccountId())));
+          .getUserInfoByAccount(
+              GetUserInfoByAccountRequest(accountId: AccountId(data: id)));
+
       if (resp.hasUser()) {
         User user = resp.user;
+        debugPrint('${user.mobileNumber.number}, ${this.phoneNumber.value!}');
         if (user.mobileNumber.number == this.phoneNumber.value!) {
+          debugPrint('auto signing user');
           // set requested name to current user name
           await accountLogic.setRequestedUserName(user.userName);
 
@@ -206,11 +210,11 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
           return true;
         }
       }
-
+      debugPrint('Can\'t auto sign user');
       return false;
     } catch (e) {
       debugPrint(
-          'failed to query api for account by id as part of auto sign-in');
+          'failed to query api for account by id as part of auto sign-in: $e');
       return false;
     }
   }
@@ -254,14 +258,17 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     keyPair.value = ed.KeyPair(privateKey, publicKey);
 
     debugPrint(
-        'keypair set. Account id: ${keyPair.value!.publicKey.bytes.toHexString()}. length: ${keyPair.value!.publicKey.bytes.length}');
+        'keypair set. Account id (pub key): ${keyPair.value!.publicKey.bytes.toHexString()}. length: ${keyPair.value!.publicKey.bytes.length}');
   }
 
   /// private helper to set keypair from seed. This is an expensive function and should be run in a separate isolate
   Uint8List _mnemonicToSeed(String securityWords) {
-    return bip39
+    Uint8List seed = bip39
         .mnemonicToSeed(securityWords, passphrase: 'karmacoin')
         .sublist(0, 32);
+
+    debugPrint('Seed from words [${securityWords}]: ${seed.toHexString()}');
+    return seed;
   }
 
   /// Set keypair from provided 24 security words
@@ -282,7 +289,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
 
     Uint8List seed = await _mnemonicToSeed(securityWords);
 
-    debugPrint('seed length:${seed.length} data: ${seed.toHexString()}');
+    debugPrint('seed length:${seed.length} seed: ${seed.toHexString()}');
 
     // store seed and seed security words on store
     await _secureStorage.write(
@@ -301,7 +308,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     _setKeyPairFromSeed(seed);
 
     debugPrint(
-        'keypair set. Account id: ${keyPair.value?.publicKey.bytes.toHexString()}');
+        'keypair set. Account id from seed: ${keyPair.value?.publicKey.bytes.toHexString()}');
   }
 
   /// Generate a new keypair
@@ -401,7 +408,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     }
 
     // stop tracking txs for local user
-    await transactionBoss.setAccountId(null);
+    await txsBoss.setAccountId(null);
 
     await _secureStorage.delete(
         key: _AccountStoreKeys.seed, aOptions: _aOptions);

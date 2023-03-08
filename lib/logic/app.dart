@@ -19,17 +19,26 @@ import 'auth_interface.dart';
 
 /// Add syntax sugar for quickly accessing the main "logic" controllers in the app
 AppLogic get appLogic => GetIt.I.get<AppLogic>();
+
 Api get api => GetIt.I.get<Api>();
+
 Verifier get verifier => GetIt.I.get<Verifier>();
+
 SettingsLogic get settingsLogic => GetIt.I.get<SettingsLogic>();
+
 AuthLogicInterface get authLogic => GetIt.I.get<AuthLogicInterface>();
+
 AccountLogicInterface get accountLogic => GetIt.I.get<AccountLogicInterface>();
+
 UserNameAvailabilityLogic get userNameAvailabilityLogic =>
     GetIt.I.get<UserNameAvailabilityLogic>();
+
 AccountSetupController get accountSetupController =>
     GetIt.I.get<AccountSetupController>();
-TransactionsBossInterface get transactionBoss =>
+
+TransactionsBossInterface get txsBoss =>
     GetIt.I.get<TransactionsBossInterface>();
+
 AppState get appState => GetIt.I.get<AppState>();
 
 mixin AppLogicInterface {

@@ -76,12 +76,12 @@ class AccountSetupController extends ChangeNotifier {
 
   Future<void> _registerSignupTxEvent() async {
     debugPrint('Registering signup tx event listener...');
-    transactionBoss.newUserTransactionEvent.addListener(() async {
-      if (transactionBoss.newUserTransactionEvent.value == null) {
+    txsBoss.newUserTransactionEvent.addListener(() async {
+      if (txsBoss.newUserTransactionEvent.value == null) {
         return;
       }
 
-      TransactionEvent event = transactionBoss.newUserTransactionEvent.value!;
+      TransactionEvent event = txsBoss.newUserTransactionEvent.value!;
       debugPrint(
           'processing transaction event: ${event.transactionHash.toShortHexString()}');
       switch (event.result) {
