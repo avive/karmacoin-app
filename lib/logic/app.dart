@@ -106,7 +106,7 @@ class AppLogic with AppLogicInterface {
     //}
 
     // Load app settings
-    await settingsLogic.load();
+    await settingsLogic.init();
 
     // Init the account logic
     await accountLogic.init();

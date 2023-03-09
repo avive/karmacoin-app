@@ -67,12 +67,12 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
 
     debugPrint('Phone number: ${controller.value.toString()}');
     String number = '+${controller.value!.countryCode}${controller.value!.nsn}';
-    debugPrint('Phone number one string: $number');
+    debugPrint('Phone number canonical string: $number');
 
     await FirebaseAuth.instance.verifyPhoneNumber(
       phoneNumber: number,
       verificationCompleted: (PhoneAuthCredential credential) async {
-        // android auto verification
+        debugPrint('android auto verification');
 
         try {
           await FirebaseAuth.instance.signInWithCredential(credential);
@@ -88,7 +88,11 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
           );
           return;
         }
+
+        accountLogic.phoneNumber.value = number;
+
         Future.delayed(Duration.zero, () {
+          debugPrint('navigate to user name...');
           context.push(ScreenPaths.userName);
         });
       },
@@ -130,6 +134,8 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
       codeAutoRetrievalTimeout: (String verificationId) {
         // andorid auto resolution timed out - show auth code screen
         appState.phoneAuthVerificationCodeId = verificationId;
+        accountLogic.phoneNumber.value = number;
+
         Future.delayed(Duration.zero, () {
           context.push(ScreenPaths.verify);
         });

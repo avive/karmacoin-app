@@ -8,7 +8,6 @@
 
 #include <desktop_webview_auth/desktop_webview_auth_plugin.h>
 #include <desktop_window/desktop_window_plugin.h>
-#include <flutter_js/flutter_js_plugin.h>
 #include <flutter_secure_storage_windows/flutter_secure_storage_windows_plugin.h>
 
 void RegisterPlugins(flutter::PluginRegistry* registry) {
@@ -16,8 +15,6 @@ void RegisterPlugins(flutter::PluginRegistry* registry) {
       registry->GetRegistrarForPlugin("DesktopWebviewAuthPlugin"));
   DesktopWindowPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("DesktopWindowPlugin"));
-  FlutterJsPluginRegisterWithRegistrar(
-      registry->GetRegistrarForPlugin("FlutterJsPlugin"));
   FlutterSecureStorageWindowsPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("FlutterSecureStorageWindowsPlugin"));
 }

@@ -1,5 +1,6 @@
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/common/save_load_mixin.dart';
+import 'package:karma_coin/common/platform_info.dart';
 
 // todo: add settings interface
 
@@ -11,6 +12,17 @@ import 'package:karma_coin/common/save_load_mixin.dart';
 class SettingsLogic with ThrottledSaveLoadMixin {
   @override
   String get fileName => 'settings.dat';
+
+  Future<void> init() async {
+    await load();
+
+    if (await PlatformInfo.isRunningOnAndroidEmulator()) {
+      debugPrint('Running in Android emulator');
+      // on android emulator, use the host machine ip address
+      apiHostName.value = '10.0.2.2';
+      verifierHostName.value = '10.0.2.2';
+    }
+  }
 
   late final currentLocale = ValueNotifier<String?>(null)
     ..addListener(scheduleSave);
