@@ -96,7 +96,13 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
             ),
             leading: Text(
               emoji,
-              style: TextStyle(fontSize: 24),
+              style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                  TextStyle(
+                      fontSize: 24,
+                      color: CupertinoTheme.of(context)
+                          .textTheme
+                          .textStyle
+                          .color)),
             ),
           ),
         );

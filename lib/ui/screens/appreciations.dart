@@ -223,7 +223,15 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
         },
         key: Key(index.toString()),
         padding: EdgeInsets.only(top: 6, bottom: 6, left: 14, right: 14),
-        leading: Text(emoji, style: TextStyle(fontSize: 24)),
+        leading: Text(
+          emoji,
+          style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                TextStyle(
+                    fontSize: 24,
+                    color:
+                        CupertinoTheme.of(context).textTheme.textStyle.color),
+              ),
+        ),
         title: Text(
           title,
           style: TextStyle(
