@@ -1,6 +1,8 @@
 PODS:
   - desktop_webview_auth (0.0.1):
     - Flutter
+  - device_info_plus (0.0.1):
+    - Flutter
   - Firebase/Auth (10.3.0):
     - Firebase/CoreOnly
     - FirebaseAuth (~> 10.3.0)
@@ -34,8 +36,6 @@ PODS:
   - FirebaseDynamicLinks (10.3.0):
     - FirebaseCore (~> 10.0)
   - Flutter (1.0.0)
-  - flutter_js (0.1.0):
-    - Flutter
   - flutter_native_splash (0.0.1):
     - Flutter
   - flutter_secure_storage (6.0.0):
@@ -66,11 +66,11 @@ PODS:
 
 DEPENDENCIES:
   - desktop_webview_auth (from `.symlinks/plugins/desktop_webview_auth/ios`)
+  - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_dynamic_links (from `.symlinks/plugins/firebase_dynamic_links/ios`)
   - Flutter (from `Flutter`)
-  - flutter_js (from `.symlinks/plugins/flutter_js/ios`)
   - flutter_native_splash (from `.symlinks/plugins/flutter_native_splash/ios`)
   - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/ios`)
@@ -90,6 +90,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   desktop_webview_auth:
     :path: ".symlinks/plugins/desktop_webview_auth/ios"
+  device_info_plus:
+    :path: ".symlinks/plugins/device_info_plus/ios"
   firebase_auth:
     :path: ".symlinks/plugins/firebase_auth/ios"
   firebase_core:
@@ -98,8 +100,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_dynamic_links/ios"
   Flutter:
     :path: Flutter
-  flutter_js:
-    :path: ".symlinks/plugins/flutter_js/ios"
   flutter_native_splash:
     :path: ".symlinks/plugins/flutter_native_splash/ios"
   flutter_secure_storage:
@@ -111,6 +111,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   desktop_webview_auth: d645139460ef203d50bd0cdb33356785dd939cce
+  device_info_plus: e5c5da33f982a436e103237c0c85f9031142abed
   Firebase: f92fc551ead69c94168d36c2b26188263860acd9
   firebase_auth: 3bab991fe1df91c2f948156e9dee976e01a19ab9
   firebase_core: bf59c32d2e53814f558efa20840c1902fa2fe461
@@ -120,7 +121,6 @@ SPEC CHECKSUMS:
   FirebaseCoreInternal: 29b76f784d607df8b2a1259d73c3f04f1210137b
   FirebaseDynamicLinks: 51c81d07bd63155bb56d76b0abdda79c8a3d8d02
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
-  flutter_js: 95929d4e146e8ceb1c8e1889d8c2065c5d840076
   flutter_native_splash: 52501b97d1c0a5f898d687f1646226c1f93c56ef
   flutter_secure_storage: 23fc622d89d073675f2eaa109381aefbcf5a49be
   GoogleUtilities: bad72cb363809015b1f7f19beb1f1cd23c589f95

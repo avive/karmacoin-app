@@ -7,18 +7,18 @@
         
         
         {
-            "name": "karma-coin-app",
+            "name": "Karma Coin",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "karma-coin-app (profile mode)",
+            "name": "Karma Coin (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "karma-coin-app (release mode)",
+            "name": "Karma Coin (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"

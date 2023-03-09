@@ -31,7 +31,10 @@ class PlatformInfo {
       await InternetConnectionChecker().hasConnection;
   static Future<bool> get isDisconnected async => (await isConnected) == false;
 
-  static isRunningOnAndroidEmulator() async {
+  static Future<bool> isRunningOnAndroidEmulator() async {
+    if (!isAndroid) {
+      return false;
+    }
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
     return !androidInfo.isPhysicalDevice;

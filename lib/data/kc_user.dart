@@ -58,8 +58,8 @@ class KarmaCoinUser {
 
     userData.traitScores.clear();
     userData.traitScores.addAll(user.traitScores);
-    traitScores.value.clear();
-    traitScores.value.addAll(user.traitScores);
+
+    traitScores.value = user.traitScores;
 
     await accountLogic.persistKarmaCoinUser();
   }

@@ -138,7 +138,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     return ValueListenableBuilder<List<TraitScore>>(
         valueListenable: accountLogic.karmaCoinUser.value!.traitScores,
         builder: (context, value, child) {
-          return TraitsScoresWheel(value);
+          return TraitsScoresWheel();
         });
   }
 
@@ -150,56 +150,51 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           if (value == null) {
             return Container();
           }
-          return SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(0),
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Column(
-                      children: [
-                        _getKarmaScoreWidget(context),
-                        Text(
-                          'Karma Score',
-                          style: CupertinoTheme.of(context)
-                              .textTheme
-                              .textStyle
-                              .merge(
+          return Padding(
+            padding: const EdgeInsets.all(0),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Column(
+                    children: [
+                      _getKarmaScoreWidget(context),
+                      Text(
+                        'Karma Score',
+                        style: CupertinoTheme.of(context)
+                            .textTheme
+                            .textStyle
+                            .merge(
+                              TextStyle(
+                                  fontSize: 24,
+                                  color: CupertinoColors.activeGreen),
+                            ),
+                      ),
+                      const SizedBox(height: 24),
+                      TraitsScoresWheel(),
+                    ],
+                  ),
+                  Column(children: [
+                    Text(
+                      'Balance',
+                      style:
+                          CupertinoTheme.of(context).textTheme.textStyle.merge(
                                 TextStyle(
                                     fontSize: 24,
-                                    color: CupertinoColors.activeGreen),
+                                    color: CupertinoColors.activeBlue),
                               ),
-                        ),
-                        const SizedBox(height: 24),
-                        _getTraitsScoreWidget(context),
-                      ],
                     ),
-                    Column(children: [
-                      /*
-                          Text(
-                            'Balance',
-                            style: CupertinoTheme.of(context)
-                                .textTheme
-                                .textStyle
-                                .merge(
-                                  TextStyle(
-                                      fontSize: 24,
-                                      color: CupertinoColors.activeBlue),
-                                ),
-                          ),*/
-                      _getBalanceWidget(context),
-                    ]),
-                    // const SizedBox(height: 24),
-                    CupertinoButton.filled(
-                      onPressed: () {
-                        Navigator.of(context)
-                            .restorablePush(_activityModelBuilder);
-                      },
-                      child: Text('Appreciate'),
-                    ),
-                    _getAppreciationListener(context),
+                    _getBalanceWidget(context),
                   ]),
-            ),
+                  // const SizedBox(height: 24),
+                  CupertinoButton.filled(
+                    onPressed: () {
+                      Navigator.of(context)
+                          .restorablePush(_activityModelBuilder);
+                    },
+                    child: Text('Appreciate'),
+                  ),
+                  _getAppreciationListener(context),
+                ]),
           );
         });
   }
@@ -226,28 +221,27 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   build(BuildContext context) {
     return CupertinoPageScaffold(
       resizeToAvoidBottomInset: true,
-      child: NestedScrollView(
-          physics: const NeverScrollableScrollPhysics(),
-          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-            return <Widget>[
-              CupertinoSliverNavigationBar(
-                alwaysShowMiddle: false,
-                trailing: adjustNavigationBarButtonPosition(
-                    CupertinoButton(
-                      onPressed: () {
-                        context.push(ScreenPaths.actions);
-                      },
-                      child:
-                          const Icon(CupertinoIcons.ellipsis_circle, size: 24),
-                    ),
-                    0,
-                    0),
-                largeTitle: Center(child: Text('Karma Coin')),
-                padding: EdgeInsetsDirectional.zero,
-              ),
-            ];
-          },
-          body: _getWidgetForUser(context)),
+      child: CustomScrollView(
+          physics: const NeverScrollableScrollPhysics(), // add
+          slivers: [
+            CupertinoSliverNavigationBar(
+              alwaysShowMiddle: false,
+              trailing: adjustNavigationBarButtonPosition(
+                  CupertinoButton(
+                    onPressed: () {
+                      context.push(ScreenPaths.actions);
+                    },
+                    child: const Icon(CupertinoIcons.ellipsis_circle, size: 24),
+                  ),
+                  0,
+                  0),
+              largeTitle: Center(child: Text('Karma Coin')),
+              padding: EdgeInsetsDirectional.zero,
+            ),
+            SliverFillRemaining(
+              child: _getWidgetForUser(context),
+            ),
+          ]),
     );
   }
 }
