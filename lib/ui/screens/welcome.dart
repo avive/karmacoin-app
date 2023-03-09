@@ -107,7 +107,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 (BuildContext context, bool innerBoxIsScrolled) {
               return <Widget>[
                 CupertinoSliverNavigationBar(
-                  largeTitle: Text('Karma Coin'),
+                  largeTitle: Center(child: Text('Karma Coin')),
                 )
               ];
             },

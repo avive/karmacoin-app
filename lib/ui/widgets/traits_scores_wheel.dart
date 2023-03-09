@@ -1,7 +1,6 @@
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/personality_traits.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
-import 'package:badges/badges.dart' as badges;
 
 class TraitsScoresWheel extends StatefulWidget {
   @required
@@ -56,19 +55,27 @@ class _TraitsScoresWheelState extends State<TraitsScoresWheel> {
             children: List<Widget>.generate(items.length, (int index) {
               TraitScore score = items[index];
               PersonalityTrait trait = PersonalityTraits[score.traitId];
-
+              String label = '${trait.emoji} ${trait.name}';
+              if (score.score > 1) {
+                label = label + ' x{score.score}';
+              }
               return Center(
                 child: Column(children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      //SizedBox(width: 14),
-                      // todo: add pill with count to the right of the text field
-                      Text(
-                        trait.emoji + ' ' + trait.name,
-                      ),
-                    ],
-                  )
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    //SizedBox(width: 14),
+                    // todo: add pill with count to the right of the text field
+                    Text(
+                      label,
+                      style:
+                          CupertinoTheme.of(context).textTheme.textStyle.merge(
+                                TextStyle(
+                                    color: CupertinoTheme.of(context)
+                                        .textTheme
+                                        .textStyle
+                                        .color),
+                              ),
+                    ),
+                  ]),
                 ]),
               );
             }),

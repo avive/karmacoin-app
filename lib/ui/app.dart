@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/ui/helpers/behaviors.dart';
 import 'package:keyboard_dismisser/keyboard_dismisser.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -29,6 +30,7 @@ class KarmaCoinApp extends StatelessWidget with GetItMixin {
             child: Theme(
               data: ThemeData(brightness: platformBrightness),
               child: CupertinoApp.router(
+                scrollBehavior: MouseDragScrollBehavior(),
                 routerConfig: appRouter,
                 debugShowCheckedModeBanner: false,
                 useInheritedMediaQuery: true,

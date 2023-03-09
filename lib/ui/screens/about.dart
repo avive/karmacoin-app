@@ -19,6 +19,7 @@ class _AboutScreenState extends State<AboutScreen> {
 
     tiles.add(
       CupertinoListTile.notched(
+        padding: EdgeInsets.only(top: 6, bottom: 6, left: 12),
         title: Text('Karma Coin Website'),
         leading: Icon(CupertinoIcons.compass),
         subtitle: CupertinoButton(
@@ -31,6 +32,7 @@ class _AboutScreenState extends State<AboutScreen> {
 
     tiles.add(
       CupertinoListTile.notched(
+        padding: EdgeInsets.only(top: 6, bottom: 6, left: 12),
         title: Text('License'),
         leading: Icon(CupertinoIcons.doc),
         subtitle: CupertinoButton(
@@ -43,6 +45,8 @@ class _AboutScreenState extends State<AboutScreen> {
 
     tiles.add(
       CupertinoListTile.notched(
+        padding: EdgeInsets.only(top: 6, bottom: 12, left: 12),
+
         title: Text('Copyright'),
         leading: FaIcon(FontAwesomeIcons.copyright, size: 22),
         subtitle: Text('(c) 2023 Karma Coin Authors'),
@@ -52,6 +56,8 @@ class _AboutScreenState extends State<AboutScreen> {
 
     tiles.add(
       CupertinoListTile.notched(
+        padding: EdgeInsets.only(top: 6, bottom: 12, left: 12),
+
         title: Text('App Version'),
         leading: Icon(CupertinoIcons.app),
         subtitle: Text('0.1.11'),
@@ -61,8 +67,9 @@ class _AboutScreenState extends State<AboutScreen> {
 
     tiles.add(
       CupertinoListTile.notched(
+        padding: EdgeInsets.only(top: 6, bottom: 6, left: 12),
         title: Text('Powered by Karmachain'),
-        leading: FaIcon(FontAwesomeIcons.sun, size: 22),
+        leading: const Icon(CupertinoIcons.sunrise, size: 26),
         subtitle: CupertinoButton(
           padding: EdgeInsets.only(left: 0),
           child: Text('https://karmacha.in'),
@@ -73,6 +80,7 @@ class _AboutScreenState extends State<AboutScreen> {
 
     tiles.add(
       CupertinoListTile.notched(
+        padding: EdgeInsets.only(top: 6, bottom: 6, left: 12),
         title: Text('100% Open Source'),
         leading: FaIcon(FontAwesomeIcons.code, size: 20),
         subtitle: CupertinoButton(

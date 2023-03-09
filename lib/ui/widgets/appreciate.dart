@@ -23,7 +23,7 @@ class AppreciateWidget extends StatefulWidget {
 
 class _AppreciateWidgetState extends State<AppreciateWidget> {
   late PhoneController phoneController;
-  TraitsPickerWidget traitsPicker = TraitsPickerWidget(PersonalityTraits, 27);
+  TraitsPickerWidget traitsPicker = TraitsPickerWidget(PersonalityTraits, 6);
   bool outlineBorder = false;
   bool mobileOnly = true;
   bool shouldFormat = true;
@@ -193,6 +193,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
         slivers: [
           CupertinoSliverNavigationBar(
             stretch: true,
+            padding: EdgeInsetsDirectional.zero,
             leading: Container(),
             trailing: adjustNavigationBarButtonPosition(
                 CupertinoButton(
@@ -202,14 +203,13 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                   child: const Icon(CupertinoIcons.xmark_circle, size: 24),
                 ),
                 0,
-                -10),
-            largeTitle: Text('New Appreciation'),
+                0),
+            largeTitle: Center(child: Text('Appreciate')),
           ),
           SliverFillRemaining(
             hasScrollBody: false,
             child: Padding(
-              padding:
-                  EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
+              padding: EdgeInsets.only(left: 0, right: 0, top: 16, bottom: 16),
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -244,7 +244,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                     ),
                     SizedBox(height: 16),
                     traitsPicker,
-                    SizedBox(height: 16),
+                    SizedBox(height: 2),
                     Column(
                       children: [
                         Text('Amount to send',
@@ -277,9 +277,9 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                               builder: (context, value, child) =>
                                   Text(KarmaCoinAmountFormatter.format(value))),
                         ),
-                        SizedBox(height: 16),
+                        SizedBox(height: 6),
                         CupertinoButton(
-                          child: Text('Add thank you note'),
+                          child: Text('Add a thank you note'),
                           onPressed: () {
                             // todo: show personal note taker...
                           },

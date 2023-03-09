@@ -254,7 +254,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
           // todo: push update username screen
         },
         child: adjustNavigationBarButtonPosition(
-            Icon(CupertinoIcons.pencil, size: 24), 0, -6),
+            Icon(CupertinoIcons.pencil, size: 24), 0, 0),
       );
     }
 

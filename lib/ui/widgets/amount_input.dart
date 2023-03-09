@@ -74,7 +74,7 @@ class _AmountInputWidgetState extends State<AmountInputWidget> {
                   child: const Icon(CupertinoIcons.xmark_circle, size: 24),
                 ),
                 0,
-                -10),
+                0),
             largeTitle: Text(title),
           ),
           SliverFillRemaining(
