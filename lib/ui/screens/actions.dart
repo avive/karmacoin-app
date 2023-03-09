@@ -22,7 +22,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
                   final label = (value + value1).toString();
                   return badges.Badge(
                       badgeStyle: badges.BadgeStyle(
-                          badgeColor: CupertinoColors.systemGreen),
+                          badgeColor: CupertinoColors.systemBlue),
                       position: badges.BadgePosition.topEnd(top: -10, end: -6),
                       badgeContent: Text(label,
                           style: CupertinoTheme.of(context)

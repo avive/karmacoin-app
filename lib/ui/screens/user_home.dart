@@ -5,9 +5,10 @@ import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/services/api/api.pb.dart';
+import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/ui/widgets/appreciate.dart';
-
 import 'package:karma_coin/common/widget_utils.dart';
+import 'package:karma_coin/ui/widgets/traits_scores_wheel.dart';
 import 'package:status_alert/status_alert.dart';
 
 class UserHomeScreen extends StatefulWidget {
@@ -114,18 +115,30 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 child: Text(
                   KarmaCoinAmountFormatter.formatAmount(value),
                   style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                        TextStyle(fontSize: 120),
+                        TextStyle(
+                            fontSize: 60,
+                            color: CupertinoColors.activeBlue,
+                            fontWeight: FontWeight.w500),
                       ),
                 ),
               ),
               Text(
                 KarmaCoinAmountFormatter.getUnitsLabel(value),
                 style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                      TextStyle(fontSize: 24),
+                      TextStyle(
+                          fontSize: 24, color: CupertinoColors.activeBlue),
                     ),
               ),
             ],
           );
+        });
+  }
+
+  Widget _getTraitsScoreWidget(BuildContext context) {
+    return ValueListenableBuilder<List<TraitScore>>(
+        valueListenable: accountLogic.karmaCoinUser.value!.traitScores,
+        builder: (context, value, child) {
+          return TraitsScoresWheel(value);
         });
   }
 
@@ -137,40 +150,48 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           if (value == null) {
             return Container();
           }
-          return SafeArea(
+          return CupertinoButton(
+            padding: EdgeInsets.zero,
+            onPressed: () => context.push(ScreenPaths.account),
             child: Padding(
-                padding: const EdgeInsets.all(32),
+                padding: const EdgeInsets.all(0),
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       Column(
                         children: [
+                          _getKarmaScoreWidget(context),
                           Text(
                             'Karma Score',
                             style: CupertinoTheme.of(context)
                                 .textTheme
                                 .textStyle
                                 .merge(
-                                  TextStyle(fontSize: 32),
+                                  TextStyle(
+                                      fontSize: 24,
+                                      color: CupertinoColors.activeGreen),
                                 ),
                           ),
-                          _getKarmaScoreWidget(context),
                           const SizedBox(height: 24),
+                          _getTraitsScoreWidget(context),
                         ],
                       ),
                       Column(children: [
-                        Text(
-                          'Balance',
-                          style: CupertinoTheme.of(context)
-                              .textTheme
-                              .textStyle
-                              .merge(
-                                TextStyle(fontSize: 32),
-                              ),
-                        ),
+                        /*
+                          Text(
+                            'Balance',
+                            style: CupertinoTheme.of(context)
+                                .textTheme
+                                .textStyle
+                                .merge(
+                                  TextStyle(
+                                      fontSize: 24,
+                                      color: CupertinoColors.activeBlue),
+                                ),
+                          ),*/
                         _getBalanceWidget(context),
                       ]),
-                      const SizedBox(height: 36),
+                      // const SizedBox(height: 24),
                       CupertinoButton.filled(
                         onPressed: () {
                           Navigator.of(context)
@@ -192,7 +213,10 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             child: Text(
               NumberFormat.compact().format(value),
               style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                    TextStyle(fontSize: 120),
+                    TextStyle(
+                        fontSize: 80,
+                        color: CupertinoColors.activeGreen,
+                        fontWeight: FontWeight.w500),
                   ),
             ),
           );

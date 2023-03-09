@@ -90,8 +90,10 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
 
         tiles.add(
           CupertinoListTile.notched(
-            title: Text(title,
-                style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
+            title: Text(
+              title,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+            ),
             leading: Text(
               emoji,
               style: TextStyle(fontSize: 24),
@@ -203,6 +205,18 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
           leading: Container(),
         ),
       );
+      tiles.add(
+        CupertinoListTile.notched(
+          title: Text('Counter',
+              style: CupertinoTheme.of(context).textTheme.textStyle),
+
+          // todo: format with thousands seperator
+          trailing: Text(tx.getNonce().toString(),
+              style: CupertinoTheme.of(context).textTheme.textStyle),
+          leading: Container(),
+        ),
+      );
+
       tiles.add(
         CupertinoListTile.notched(
           title: Text('Status',

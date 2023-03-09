@@ -115,6 +115,10 @@ class SignedTransactionWithStatus {
         .toTimeAgo();
   }
 
+  Int64 getNonce() {
+    return txBody.nonce;
+  }
+
   /// Returns to user if the transaction is an on-chain payment transaction
   User? getToUser() {
     if (txWithStatus.hasTo()) {

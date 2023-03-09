@@ -89,6 +89,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   // validate input data and show alers if invalid
   bool _validateData() {
     debugPrint('validate data... ${phoneController.value}');
+
     if (phoneController.value == null ||
         phoneController.value!.countryCode.isEmpty ||
         phoneController.value!.nsn.isEmpty) {
@@ -96,7 +97,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
         context,
         duration: Duration(seconds: 2),
         title: 'Oops...',
-        subtitle: 'Please enter receiver\'s mobile phone number',
+        subtitle: 'Please enter receiver\'s mobile phone number.',
         configuration:
             IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
         maxWidth: 260,
@@ -124,9 +125,24 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
         context,
         duration: Duration(seconds: 2),
         title: 'Oops...',
-        subtitle: 'Please login to your account',
+        subtitle: 'Please login to your account.',
         configuration:
             IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
+        maxWidth: 260,
+      );
+      return false;
+    }
+
+    String number =
+        '+${phoneController.value!.countryCode}${phoneController.value!.nsn}';
+
+    if (user.mobileNumber.value.number == number) {
+      StatusAlert.show(
+        context,
+        duration: Duration(seconds: 2),
+        title: 'Ooops',
+        subtitle: 'You can\'t appreciate yourself.',
+        configuration: IconConfiguration(icon: CupertinoIcons.xmark_circle),
         maxWidth: 260,
       );
       return false;

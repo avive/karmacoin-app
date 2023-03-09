@@ -28,7 +28,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
             final label = (value).toString();
             return badges.Badge(
               badgeStyle:
-                  badges.BadgeStyle(badgeColor: CupertinoColors.systemGreen),
+                  badges.BadgeStyle(badgeColor: CupertinoColors.systemBlue),
               position: badges.BadgePosition.topEnd(top: -2, end: -30),
               badgeContent: Text(label,
                   style: CupertinoTheme.of(context)
@@ -52,7 +52,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
             final label = value.toString();
             return badges.Badge(
               badgeStyle:
-                  badges.BadgeStyle(badgeColor: CupertinoColors.systemGreen),
+                  badges.BadgeStyle(badgeColor: CupertinoColors.systemBlue),
               position: badges.BadgePosition.topEnd(top: -2, end: -30),
               badgeContent: Text(label,
                   style: CupertinoTheme.of(context)
@@ -210,6 +210,12 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
         emoji = trait.emoji;
       }
 
+      // title font weight based on openned state
+      FontWeight titleWeight = FontWeight.w400;
+      if (!tx.openned.value) {
+        titleWeight = FontWeight.w600;
+      }
+
       return CupertinoListTile(
         onTap: () {
           context.pushNamed(ScreenNames.transactionDetails,
@@ -221,30 +227,29 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
         title: Text(
           title,
           style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: CupertinoTheme.of(context).primaryColor),
+            fontSize: 20,
+            fontWeight: titleWeight,
+          ),
         ),
         trailing: const CupertinoListTileChevron(),
         subtitle: Column(
           children: [
-            const SizedBox(height: 6),
+            const SizedBox(height: 2),
             Text(
               amount,
-              style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                    TextStyle(
-                      fontSize: 14,
-                    ),
-                  ),
+              style: CupertinoTheme.of(context)
+                  .textTheme
+                  .tabLabelTextStyle
+                  .merge(TextStyle(fontSize: 14)),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 2),
             Text(
                 '${sender.userName} · $senderPhoneNumber  · ${tx.getTimesAgo()}',
                 style: CupertinoTheme.of(context)
                     .textTheme
-                    .textStyle
-                    .merge(TextStyle(fontSize: 12))),
-            const SizedBox(height: 8),
+                    .tabLabelTextStyle
+                    .merge(TextStyle(fontSize: 14))),
+            const SizedBox(height: 6),
             Container(
               height: 16.0,
               width: 80,

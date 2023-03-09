@@ -1,4 +1,4 @@
-import '../../common_libs.dart';
+import 'package:karma_coin/common_libs.dart';
 
 class Pill extends StatelessWidget {
   late final String title;
