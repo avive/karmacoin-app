@@ -90,6 +90,9 @@ class AccountSetupController extends ChangeNotifier {
 
           if (_status != AccountSetupStatus.signedUp) {
             setStatus(AccountSetupStatus.signedUp);
+            appState.signedUpInCurentSession.value = true;
+            debugPrint('*** going to user home...');
+            appRouter.go(ScreenPaths.home);
           }
           break;
         case ExecutionResult.EXECUTION_RESULT_INVALID:

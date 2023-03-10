@@ -1,5 +1,4 @@
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/logic/account_setup_controller.dart';
 import 'package:karma_coin/logic/user_name_availability.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:status_alert/status_alert.dart';
@@ -14,6 +13,11 @@ class SetUserNameScreen extends StatefulWidget {
 
 class _SetUserNameScreenState extends State<SetUserNameScreen> {
   final _textController = TextEditingController(text: "avive");
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,33 +50,11 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
                         },
                         child: const Text('Next'),
                       ),
-                      _getAccountStatusObserver(context),
                     ]),
               ),
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _getAccountStatusObserver(BuildContext context) {
-    if (!mounted) return Container();
-    return ChangeNotifierProvider.value(
-      value: accountSetupController,
-      child: Consumer<AccountSetupController>(
-        builder: (context, state, child) {
-          if (state.status == AccountSetupStatus.signedUp) {
-            if (mounted) {
-              appState.signedUpInCurentSession.value = true;
-              Future.delayed(Duration.zero, () {
-                debugPrint('going to user home...');
-                context.go(ScreenPaths.home);
-              });
-            }
-          }
-          return Container();
-        },
       ),
     );
   }
