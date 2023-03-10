@@ -42,8 +42,14 @@ class KarmaCoinUser {
     userData.balance = user.balance;
     balance.value = user.balance;
 
-    userData.nonce = user.nonce;
-    nonce.value = user.nonce;
+    if (userData.nonce < user.nonce) {
+      debugPrint('Updating user nonce from chain to ${user.nonce}');
+      userData.nonce = user.nonce;
+      nonce.value = user.nonce;
+    } else {
+      debugPrint(
+          'Keeping bigger local user nonce of ${userData.nonce} instead of ${user.nonce}');
+    }
 
     karmaScore.value = user.karmaScore;
     userData.karmaScore = user.karmaScore;

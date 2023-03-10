@@ -12,8 +12,7 @@ class KarmaCoinApp extends StatelessWidget with GetItMixin {
   Widget build(BuildContext context) {
     debugPrint('KarmaCoinApp build');
 
-    // This app is designed only to work vertically, so we limit
-    // orientations to portrait up and down.
+    // limit orientations to portrait up and down.
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
@@ -35,14 +34,8 @@ class KarmaCoinApp extends StatelessWidget with GetItMixin {
                 debugShowCheckedModeBanner: false,
                 useInheritedMediaQuery: true,
                 title: 'Karma Coin',
-
-                // for now we work in light brightness mode only due to widgets
-                // color issues in the firebase_ui_auth package
-                // remove brightness to have the app switch between light and dark mode based on system's brightness.
-                //theme: const CupertinoThemeData(brightness: Brightness.light),
-
                 theme: CupertinoThemeData(
-                  primaryColor: CupertinoColors.activeOrange,
+                  primaryColor: CupertinoColors.activeGreen,
                 ),
                 localizationsDelegates: const [
                   ...GlobalMaterialLocalizations.delegates,

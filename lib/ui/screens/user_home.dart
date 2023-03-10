@@ -5,9 +5,8 @@ import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/services/api/api.pb.dart';
-import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/ui/widgets/appreciate.dart';
-import 'package:karma_coin/common/widget_utils.dart';
+import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/ui/widgets/traits_scores_wheel.dart';
 import 'package:status_alert/status_alert.dart';
 
@@ -35,19 +34,25 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
   void _postFrameCallback(BuildContext context) {
     debugPrint('post frame handler');
-    if (appState.signedUpInCurentSession.value) {
-      appState.signedUpInCurentSession.value = false;
-      StatusAlert.show(
-        context,
-        duration: Duration(seconds: 4),
-        title: 'Signed up',
-        subtitle: 'Welcome to Karma Coin!',
-        configuration:
-            IconConfiguration(icon: CupertinoIcons.check_mark_circled),
-        maxWidth: 260,
-      );
-      return;
-    }
+
+    Future.delayed(Duration.zero, () async {
+      if (!await checkInternetConnection(context)) {
+        return;
+      }
+
+      if (appState.signedUpInCurentSession.value) {
+        appState.signedUpInCurentSession.value = false;
+        StatusAlert.show(
+          context,
+          duration: Duration(seconds: 4),
+          title: 'Signed up',
+          subtitle: 'Welcome to Karma Coin!',
+          configuration:
+              IconConfiguration(icon: CupertinoIcons.check_mark_circled),
+          maxWidth: 260,
+        );
+      }
+    });
   }
 
   Widget _getAppreciationListener(BuildContext context) {
@@ -134,14 +139,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         });
   }
 
-  Widget _getTraitsScoreWidget(BuildContext context) {
-    return ValueListenableBuilder<List<TraitScore>>(
-        valueListenable: accountLogic.karmaCoinUser.value!.traitScores,
-        builder: (context, value, child) {
-          return TraitsScoresWheel();
-        });
-  }
-
   Widget _getWidgetForUser(BuildContext context) {
     return ValueListenableBuilder<KarmaCoinUser?>(
         // todo: how to make this not assert when karmaCoinUser is null?
@@ -187,7 +184,10 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   ]),
                   // const SizedBox(height: 24),
                   CupertinoButton.filled(
-                    onPressed: () {
+                    onPressed: () async {
+                      if (!await checkInternetConnection(context)) {
+                        return;
+                      }
                       Navigator.of(context)
                           .restorablePush(_activityModelBuilder);
                     },
@@ -219,29 +219,34 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
   @override
   build(BuildContext context) {
-    return CupertinoPageScaffold(
-      resizeToAvoidBottomInset: true,
-      child: CustomScrollView(
-          physics: const NeverScrollableScrollPhysics(), // add
-          slivers: [
-            CupertinoSliverNavigationBar(
-              alwaysShowMiddle: false,
-              trailing: adjustNavigationBarButtonPosition(
-                  CupertinoButton(
-                    onPressed: () {
-                      context.push(ScreenPaths.actions);
-                    },
-                    child: const Icon(CupertinoIcons.ellipsis_circle, size: 24),
-                  ),
-                  0,
-                  0),
-              largeTitle: Center(child: Text('Karma Coin')),
-              padding: EdgeInsetsDirectional.zero,
-            ),
-            SliverFillRemaining(
-              child: _getWidgetForUser(context),
-            ),
-          ]),
+    return Title(
+      color: CupertinoColors.black, // This is required
+      title: 'Karma Coin - Home',
+      child: CupertinoPageScaffold(
+        resizeToAvoidBottomInset: true,
+        child: CustomScrollView(
+            physics: const NeverScrollableScrollPhysics(), // add
+            slivers: [
+              CupertinoSliverNavigationBar(
+                alwaysShowMiddle: false,
+                trailing: adjustNavigationBarButtonPosition(
+                    CupertinoButton(
+                      onPressed: () {
+                        context.push(ScreenPaths.actions);
+                      },
+                      child:
+                          const Icon(CupertinoIcons.ellipsis_circle, size: 24),
+                    ),
+                    0,
+                    0),
+                largeTitle: Center(child: Text('Karma Coin')),
+                padding: EdgeInsetsDirectional.zero,
+              ),
+              SliverFillRemaining(
+                child: _getWidgetForUser(context),
+              ),
+            ]),
+      ),
     );
   }
 }

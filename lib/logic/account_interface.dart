@@ -3,14 +3,14 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/services/api/api.pbgrpc.dart';
-import 'package:karma_coin/services/api/types.pb.dart';
+// import 'package:karma_coin/services/api/types.pb.dart';
 
 abstract class AccountLogicInterface {
   /// Init account logic
   Future<void> init();
 
   // Set the user's karma coin user data and store it
-  Future<void> updateKarmaCoinUser(User user);
+  // Future<void> updateKarmaCoinUser(User user);
 
   // Persist karma coin user
   Future<void> persistKarmaCoinUser();
@@ -64,7 +64,7 @@ abstract class AccountLogicInterface {
 
   /// Local mode - KarmaUser was created locally, signup tx submitted and accepted but not confirmed yet... we use this to allow user to start appreicating other users as soon as it signs up...
   /// user name should be taken from KarmaUser.
-  final ValueNotifier<bool> localMode = ValueNotifier<bool>(true);
+  final ValueNotifier<bool> localMode = ValueNotifier<bool>(false);
 
   /// Local authenticated user's phone number
   final ValueNotifier<String?> phoneNumber = ValueNotifier<String?>(null);

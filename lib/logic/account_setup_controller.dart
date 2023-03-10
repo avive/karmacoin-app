@@ -90,14 +90,13 @@ class AccountSetupController extends ChangeNotifier {
 
           if (_status != AccountSetupStatus.signedUp) {
             setStatus(AccountSetupStatus.signedUp);
-            // appState.snackType.value = SnackType.Success;
-            // appState.snackMessage.value = 'You are signed up to Karma Coin!';
           }
           break;
         case ExecutionResult.EXECUTION_RESULT_INVALID:
           switch (event.info) {
             case ExecutionInfo.EXECUTION_INFO_NICKNAME_NOT_AVAILABLE:
-              // another user was able to signup with the reuqested user name - rare but can happen
+              // another user was able to signup with the reuqested user name
+              // this is a rare but possible case
               // todo: show UI to pick another user name and submit a new transaction
               setStatus(AccountSetupStatus.userNameTaken);
 
@@ -143,16 +142,5 @@ class AccountSetupController extends ChangeNotifier {
     }
 
     debugPrint('new user transaction accepted by api');
-
-    // todo: this is for popup widgets that should be displayed once
-    // we get some signup errors via the signup tx event - in this case
-    // we need to ask the user to pick a new nickname and try again...
-    // currently the account setup screen goes away as soon as the tx
-    // is submitted and accepted so the user can start to use the app and
-    // appreciate
-
-    // from time tx is submitted until client knows it failed or it was procsessed
-    // we are in local-mode. In localMode account.isChainSignedUp = false but we have alocal KarmaCoinUser
-    // and user should be able to send transactions. We store them locally and submit them when user is on chain
   }
 }

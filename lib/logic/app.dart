@@ -119,27 +119,13 @@ class AppLogic with AppLogicInterface {
     }
 
     if (accountLogic.signedUpOnChain.value == true) {
-      debugPrint("User has signed up (new user tx on chain)");
+      debugPrint("user has signed up (new user tx on chain)");
     }
 
     // Flag bootStrap as complete
     isBootstrapComplete = true;
 
-    // temp test api connection
-    /*
-    try {
-      GetUserInfoByUserNameResponse resp = await api.apiServiceClient
-          .getUserInfoByUserName(
-              GetUserInfoByUserNameRequest(userName: "avive"));
-
-      if (resp.hasUser()) {
-        debugPrint('api result: user name is not available');
-      } else {
-        debugPrint('api result: user name is available');
-      }
-    } catch (e) {
-      debugPrint('api error checking user name availability: $e');
-    }*/
+    debugPrint('bootstrap completed');
   }
 
   @override

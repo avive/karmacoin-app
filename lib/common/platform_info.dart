@@ -27,9 +27,17 @@ class PlatformInfo {
   static bool get isAndroid => defaultTargetPlatform == TargetPlatform.android;
   static bool get isIOS => defaultTargetPlatform == TargetPlatform.iOS;
 
-  static Future<bool> get isConnected async =>
-      await InternetConnectionChecker().hasConnection;
-  static Future<bool> get isDisconnected async => (await isConnected) == false;
+  /// returns true if the device is connected to the internet or
+  /// if the app is running on the web
+  static Future<bool> isConnected() async {
+    if (kIsWeb) {
+      return true;
+    }
+    return await InternetConnectionChecker().hasConnection;
+  }
+
+  static Future<bool> get isDisconnected async =>
+      (await isConnected()) == false;
 
   static Future<bool> isRunningOnAndroidEmulator() async {
     if (!isAndroid) {

@@ -55,6 +55,7 @@ abstract class TrnasactionGenerator {
         // Update local balance to reflect outgoing amount so UI is updated
         // it will update again once the user is periodically updated from chain
         karmaCoinUser.balance.value -= data.kCentsAmount;
+        // inc nonce locally so user can keep submitting txs
         await karmaCoinUser.incNonce();
 
         break;

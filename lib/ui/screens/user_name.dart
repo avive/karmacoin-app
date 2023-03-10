@@ -1,6 +1,8 @@
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/account_setup_controller.dart';
 import 'package:karma_coin/logic/user_name_availability.dart';
+import 'package:karma_coin/ui/helpers/widget_utils.dart';
+import 'package:status_alert/status_alert.dart';
 
 class SetUserNameScreen extends StatefulWidget {
   const SetUserNameScreen({super.key, required this.title});
@@ -12,14 +14,6 @@ class SetUserNameScreen extends StatefulWidget {
 
 class _SetUserNameScreenState extends State<SetUserNameScreen> {
   final _textController = TextEditingController(text: "avive");
-  final _formKey = GlobalKey<FormState>();
-  bool _userHomePushed = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _userHomePushed = false;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,48 +28,46 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
           ];
         },
         body: SafeArea(
-          child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-            Form(
-              key: _formKey,
-              child: Padding(
-                padding: EdgeInsets.all(24),
-                child: Center(
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        _getTextField(context),
-                        const SizedBox(height: 14),
-                        _getAvailabilityStatus(context),
-                        const SizedBox(height: 14),
-                        CupertinoButton.filled(
-                          onPressed: () async {
-                            await _submitName();
-                          },
-                          child: const Text('Next'),
-                        ),
-                        _getAccountStatusObserver(context),
-                      ]),
-                ),
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: 500),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      _getTextField(context),
+                      const SizedBox(height: 14),
+                      _getAvailabilityStatus(context),
+                      const SizedBox(height: 14),
+                      CupertinoButton.filled(
+                        onPressed: () async {
+                          await _submitName(context);
+                        },
+                        child: const Text('Next'),
+                      ),
+                      _getAccountStatusObserver(context),
+                    ]),
               ),
             ),
-          ]),
+          ),
         ),
       ),
     );
   }
 
   Widget _getAccountStatusObserver(BuildContext context) {
+    if (!mounted) return Container();
     return ChangeNotifierProvider.value(
       value: accountSetupController,
       child: Consumer<AccountSetupController>(
         builder: (context, state, child) {
           if (state.status == AccountSetupStatus.signedUp) {
-            if (mounted && !_userHomePushed) {
-              _userHomePushed = true;
+            if (mounted) {
               appState.signedUpInCurentSession.value = true;
               Future.delayed(Duration.zero, () {
                 debugPrint('going to user home...');
-                pushNamedAndRemoveUntil(ScreenPaths.home);
+                context.go(ScreenPaths.home);
               });
             }
           }
@@ -86,6 +78,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
   }
 
   Widget _getAvailabilityStatus(BuildContext context) {
+    if (!mounted) return Container();
     return ChangeNotifierProvider.value(
       value: userNameAvailabilityLogic,
       child: Consumer<UserNameAvailabilityLogic>(
@@ -116,16 +109,13 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
     );
   }
 
-  Future<void> _submitName() async {
-    if (!_formKey.currentState!.validate()) {
-      // if (!mounted) return;
-      //caffoldMessenger.of(context).showSnackBar(
-      //    const SnackBar(content: Text('Invalid user name')));
+  Future<void> _submitName(BuildContext context) async {
+    if (!await checkInternetConnection(context)) {
       return;
     }
 
     // check once again for availbility...
-    // await userNameAvailabilityLogic.check(_textController.text);
+    await userNameAvailabilityLogic.check(_textController.text);
 
     if (userNameAvailabilityLogic.status ==
         UserNameAvailabilityStatus.available) {
@@ -135,42 +125,54 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
       debugPrint('starting signup flow...');
 
       await accountSetupController.signUpUser();
+    } else {
+      debugPrint('Name not available - show warning');
+      StatusAlert.show(
+        context,
+        duration: Duration(seconds: 2),
+        title: 'Name Unavailable',
+        subtitle: 'Please try another name.',
+        configuration:
+            IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
+        maxWidth: 270,
+      );
     }
   }
 
   Widget _getTextField(BuildContext context) {
-    return CupertinoTextField(
-      prefix: const Icon(
-        CupertinoIcons.person_solid,
-        color: CupertinoColors.lightBackgroundGray,
-        size: 28,
-      ),
-      autofocus: true,
-      autocorrect: false,
-      clearButtonMode: OverlayVisibilityMode.editing,
-      placeholder: 'Enter your user name',
-      style: CupertinoTheme.of(context).textTheme.textStyle,
-      textAlign: TextAlign.center,
-      padding: const EdgeInsets.all(16.0),
-      onSubmitted: (value) async {
-        await _submitName();
-      },
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            width: 0,
-            // todo: from theme
-            color: CupertinoColors.inactiveGray,
+    return Title(
+      color: CupertinoColors.black, // This is required
+      title: 'Karma Coin - User Name',
+      child: CupertinoTextField(
+        prefix: const Icon(
+          CupertinoIcons.person_solid,
+          color: CupertinoColors.lightBackgroundGray,
+          size: 28,
+        ),
+        autofocus: true,
+        autocorrect: false,
+        clearButtonMode: OverlayVisibilityMode.editing,
+        placeholder: 'Enter your user name',
+        style: CupertinoTheme.of(context).textTheme.textStyle,
+        textAlign: TextAlign.center,
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              width: 0,
+              // todo: from theme
+              color: CupertinoColors.inactiveGray,
+            ),
           ),
         ),
+        onChanged: (value) async {
+          if (value.isNotEmpty) {
+            // check availability on text change
+            await userNameAvailabilityLogic.check(value);
+          }
+        },
+        controller: _textController,
       ),
-      onChanged: (value) async {
-        if (value.isNotEmpty) {
-          // check availability on text change
-          await userNameAvailabilityLogic.check(value);
-        }
-      },
-      controller: _textController,
     );
   }
 

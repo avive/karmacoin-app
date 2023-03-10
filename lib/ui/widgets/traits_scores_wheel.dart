@@ -54,7 +54,7 @@ class _TraitsScoresWheelState extends State<TraitsScoresWheel> {
                     PersonalityTrait trait = PersonalityTraits[score.traitId];
                     String label = '${trait.emoji} ${trait.name}';
                     if (score.score > 1) {
-                      label = label + ' x{score.score}';
+                      label = label + ' x${score.score}';
                     }
                     return Center(
                       child: Column(children: [

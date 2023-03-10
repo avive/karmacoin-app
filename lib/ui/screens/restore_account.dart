@@ -142,24 +142,28 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
 
   @override
   build(BuildContext context) {
-    return CupertinoPageScaffold(
-      child: NestedScrollView(
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          if (!mounted) return [];
-          return <Widget>[
-            CupertinoSliverNavigationBar(
-              largeTitle: const Text('Restore Account'),
-            ),
-          ];
-        },
-        body: MediaQuery.removePadding(
-          context: context,
-          removeTop: false,
-          child: ListView(
-              padding: EdgeInsets.zero,
-              shrinkWrap: true,
-              primary: true,
-              children: _getSections(context)),
+    return Title(
+      color: CupertinoColors.black,
+      title: 'Karma Coin - Restore Account',
+      child: CupertinoPageScaffold(
+        child: NestedScrollView(
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            if (!mounted) return [];
+            return <Widget>[
+              CupertinoSliverNavigationBar(
+                largeTitle: const Text('Restore Account'),
+              ),
+            ];
+          },
+          body: MediaQuery.removePadding(
+            context: context,
+            removeTop: false,
+            child: ListView(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                primary: true,
+                children: _getSections(context)),
+          ),
         ),
       ),
     );

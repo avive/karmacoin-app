@@ -1,5 +1,5 @@
 import 'package:fixnum/fixnum.dart';
-import 'package:karma_coin/common/widget_utils.dart';
+import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:flutter/material.dart';
 import 'package:karma_coin/data/kc_user.dart';
@@ -87,8 +87,12 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   }
 
   // validate input data and show alers if invalid
-  bool _validateData() {
+  Future<bool> _validateData(BuildContext context) async {
     debugPrint('validate data... ${phoneController.value}');
+
+    if (!await checkInternetConnection(context)) {
+      return false;
+    }
 
     if (phoneController.value == null ||
         phoneController.value!.countryCode.isEmpty ||
@@ -289,7 +293,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                     SizedBox(height: 16),
                     CupertinoButton.filled(
                       onPressed: () async {
-                        if (_validateData()) {
+                        if (await _validateData(context)) {
                           await _sendAppreciation(context);
                         }
                       },

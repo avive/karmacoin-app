@@ -70,47 +70,51 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
 
   @override
   build(BuildContext context) {
-    return CupertinoPageScaffold(
-      child: NestedScrollView(
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return <Widget>[
-            CupertinoSliverNavigationBar(
-              largeTitle: Text('Appreciations'),
-              middle: CupertinoSlidingSegmentedControl<Group>(
-                // Provide horizontal padding around the children.
-                // padding: const EdgeInsets.symmetric(horizontal: 12),
-                // This represents a currently selected segmented control.
+    return Title(
+      color: CupertinoColors.black, // This is required
+      title: 'Karma Coin - Appreciations',
+      child: CupertinoPageScaffold(
+        child: NestedScrollView(
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return <Widget>[
+              CupertinoSliverNavigationBar(
+                largeTitle: Text('Appreciations'),
+                middle: CupertinoSlidingSegmentedControl<Group>(
+                  // Provide horizontal padding around the children.
+                  // padding: const EdgeInsets.symmetric(horizontal: 12),
+                  // This represents a currently selected segmented control.
 
-                groupValue: _selectedSegment,
-                // Callback that sets the selected segmented control.
-                onValueChanged: (Group? value) {
-                  setState(() {
-                    if (value != null) {
-                      _selectedSegment = value;
-                    }
-                  });
-                },
-                children: <Group, Widget>{
-                  Group.received: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 24),
-                    child: _getRecivedLabel(context),
-                  ),
-                  Group.sent: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 24),
-                    child: _getSentLabel(context),
-                  ),
-                },
+                  groupValue: _selectedSegment,
+                  // Callback that sets the selected segmented control.
+                  onValueChanged: (Group? value) {
+                    setState(() {
+                      if (value != null) {
+                        _selectedSegment = value;
+                      }
+                    });
+                  },
+                  children: <Group, Widget>{
+                    Group.received: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 24),
+                      child: _getRecivedLabel(context),
+                    ),
+                    Group.sent: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 24),
+                      child: _getSentLabel(context),
+                    ),
+                  },
+                ),
               ),
+            ];
+          },
+          body: SafeArea(
+            child: CupertinoScrollbar(
+              thickness: 6.0,
+              thicknessWhileDragging: 10.0,
+              radius: const Radius.circular(34.0),
+              radiusWhileDragging: Radius.zero,
+              child: _getList(context),
             ),
-          ];
-        },
-        body: SafeArea(
-          child: CupertinoScrollbar(
-            thickness: 6.0,
-            thicknessWhileDragging: 10.0,
-            radius: const Radius.circular(34.0),
-            radiusWhileDragging: Radius.zero,
-            child: _getList(context),
           ),
         ),
       ),
@@ -200,7 +204,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
       }
 
       PersonalityTrait? trait = null;
-      String title = 'Karma coins payment';
+      String title = 'Karma Coins payment';
       String emoji = '🤑';
 
       if (appreciation.charTraitId != 0 &&

@@ -16,9 +16,6 @@ import 'package:karma_coin/ui/screens/user_name.dart';
 
 /// Shared paths / urls used across the app
 class ScreenPaths {
-  /// Splash screen
-  static String splash = '/splash';
-
   /// Signup with phone number flow first screen
   static String signup = '/signup';
 
@@ -61,9 +58,6 @@ class ScreenPaths {
 
 /// Shared screen names across the app
 class ScreenNames {
-  /// Splash screen
-  static String splash = 'splash';
-
   /// Signup with phone number flow first screen
   static String signup = 'signup';
 
@@ -120,12 +114,23 @@ void pushNamedAndRemoveUntil(String path) {
   appRouter.go(path);
 }
 
+String _getInitialLocation() {
+  if (accountLogic.signedUpOnChain.value || accountLogic.localMode.value) {
+    debugPrint('Signup or local mode - go to user home..');
+    return ScreenPaths.home;
+  } else {
+    debugPrint('Show welcome screen..');
+    return ScreenPaths.welcome;
+  }
+}
+
 /// The route configuration
 final GoRouter appRouter = GoRouter(
   refreshListenable: accountSetupController,
   redirect: (context, state) {
     return null;
   },
+  initialLocation: _getInitialLocation(),
   routes: <RouteBase>[
     GoRoute(
       // signup first screen
@@ -153,14 +158,6 @@ final GoRouter appRouter = GoRouter(
         path: ScreenPaths.home,
         builder: (BuildContext context, GoRouterState state) {
           return const UserHomeScreen();
-        }),
-    GoRoute(
-        // Splash screen
-        name: ScreenNames.splash,
-        path: ScreenPaths.splash,
-        builder: (BuildContext context, GoRouterState state) {
-          // todo: return karmacoin loading screen...
-          return Container(color: CupertinoTheme.of(context).primaryColor);
         }),
     GoRoute(
         // User name input screen

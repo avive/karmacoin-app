@@ -1,4 +1,4 @@
-import 'package:karma_coin/common/widget_utils.dart';
+import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/data/personality_traits.dart';
@@ -258,24 +258,28 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
       );
     }
 
-    return CupertinoPageScaffold(
-      child: NestedScrollView(
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return <Widget>[
-            CupertinoSliverNavigationBar(
-              largeTitle: Text(user!.userName),
-              trailing: trailingWidget,
-            ),
-          ];
-        },
-        body: MediaQuery.removePadding(
-          context: context,
-          removeTop: false,
-          child: ListView(
-              padding: EdgeInsets.zero,
-              shrinkWrap: true,
-              primary: true,
-              children: _getSections(context)),
+    return Title(
+      color: CupertinoColors.black, // This is required
+      title: 'Karma Coin - Account Details',
+      child: CupertinoPageScaffold(
+        child: NestedScrollView(
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return <Widget>[
+              CupertinoSliverNavigationBar(
+                largeTitle: Text(user!.userName),
+                trailing: trailingWidget,
+              ),
+            ];
+          },
+          body: MediaQuery.removePadding(
+            context: context,
+            removeTop: false,
+            child: ListView(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                primary: true,
+                children: _getSections(context)),
+          ),
         ),
       ),
     );

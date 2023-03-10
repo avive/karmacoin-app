@@ -1,4 +1,4 @@
-import 'package:karma_coin/common/widget_utils.dart';
+import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/data/personality_traits.dart';
@@ -208,7 +208,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
               Text('Id', style: CupertinoTheme.of(context).textTheme.textStyle),
           trailing: Text(txHash.toHex().toShortHexString(),
               style: CupertinoTheme.of(context).textTheme.textStyle),
-          leading: Container(),
+          leading: const Icon(CupertinoIcons.checkmark_seal, size: 28),
         ),
       );
       tiles.add(
@@ -219,7 +219,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
           // todo: format with thousands seperator
           trailing: Text(tx.getNonce().toString(),
               style: CupertinoTheme.of(context).textTheme.textStyle),
-          leading: Container(),
+          leading: const Icon(CupertinoIcons.number, size: 28),
         ),
       );
 
@@ -227,7 +227,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
         CupertinoListTile.notched(
           title: Text('Status',
               style: CupertinoTheme.of(context).textTheme.textStyle),
-          leading: Container(),
+          leading: const Icon(CupertinoIcons.check_mark, size: 28),
           trailing: Pill(
             null,
             getStatusDisplayString(status),
@@ -249,26 +249,30 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
     if (transaction != null) {
       title = transaction!.getTransactionTypeDisplayName();
     }
-    return CupertinoPageScaffold(
-      child: NestedScrollView(
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return <Widget>[
-            CupertinoSliverNavigationBar(
-              alwaysShowMiddle: true,
-              largeTitle: Text(title),
-              trailing: adjustNavigationBarButtonPosition(
-                  Icon(CupertinoIcons.share, size: 24), 0, 0),
-            ),
-          ];
-        },
-        body: MediaQuery.removePadding(
-          context: context,
-          removeTop: false,
-          child: ListView(
-              padding: EdgeInsets.zero,
-              shrinkWrap: true,
-              primary: true,
-              children: _getSections(context)),
+    return Title(
+      color: CupertinoColors.black, // This is required
+      title: 'Karma Coin - Appreciation Details',
+      child: CupertinoPageScaffold(
+        child: NestedScrollView(
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return <Widget>[
+              CupertinoSliverNavigationBar(
+                alwaysShowMiddle: true,
+                largeTitle: Text(title),
+                trailing: adjustNavigationBarButtonPosition(
+                    Icon(CupertinoIcons.share, size: 24), 0, 0),
+              ),
+            ];
+          },
+          body: MediaQuery.removePadding(
+            context: context,
+            removeTop: false,
+            child: ListView(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                primary: true,
+                children: _getSections(context)),
+          ),
         ),
       ),
     );

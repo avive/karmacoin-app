@@ -1,6 +1,6 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/common/widget_utils.dart';
+import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'decimal_input.dart';
 import 'numerical_amount_input.dart';

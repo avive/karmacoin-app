@@ -2,7 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:karma_coin/ui/app.dart';
+import 'package:karma_coin/ui/widgets/app.dart';
 import 'package:url_strategy/url_strategy.dart';
 import 'firebase_options.dart';
 import 'logic/app.dart';
@@ -22,10 +22,11 @@ void main() async {
     PhoneAuthProvider(),
   ]);
 
-  // remove # from web routes for go router
+  // this removes the # from web routes for go router
   setPathUrlStrategy();
 
-  runApp(KarmaCoinApp());
   await appLogic.bootstrap();
+  
+  runApp(KarmaCoinApp());
   FlutterNativeSplash.remove();
 }

@@ -6,7 +6,7 @@ class DeleteAccountTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoListTile.notched(
-      title: const Text('Delete Account'),
+      title: const Text('Delete App Data'),
       leading: const Icon(CupertinoIcons.delete, size: 28),
       onTap: () {
         _displayWarning(context);
@@ -19,9 +19,9 @@ void _displayWarning(BuildContext context) {
   showCupertinoModalPopup<void>(
     context: context,
     builder: (BuildContext context) => CupertinoAlertDialog(
-      title: const Text('Account Deletion'),
+      title: const Text('Delete App Data'),
       content: const Text(
-          '\nAre you sure you want to backup your account data and delete your account?'),
+          '\nAre you sure that you backed up your account, you want to delete all local account data and sign out?'),
       actions: <CupertinoDialogAction>[
         CupertinoDialogAction(
           /// This parameter indicates this action is the default,
@@ -38,8 +38,10 @@ void _displayWarning(BuildContext context) {
           /// the action's text color to red.
           isDestructiveAction: true,
           onPressed: () async {
-            Navigator.pop(context);
-            context.pop();
+            if (context.canPop()) {
+              Navigator.pop(context);
+              context.pop();
+            }
             Future.delayed(Duration(milliseconds: 300), () async {
               context.go(ScreenPaths.welcome);
               Future.delayed(Duration(milliseconds: 300), () async {

@@ -1,7 +1,6 @@
-import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:status_alert/status_alert.dart';
+import 'package:karma_coin/ui/helpers/widget_utils.dart';
 
 /// temp screen with some
 class WelcomeScreen extends StatefulWidget {
@@ -13,29 +12,41 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _postFrameCallback(context));
+  }
+
+  void _postFrameCallback(BuildContext context) {
+    Future.delayed(Duration.zero, () async {
+      await checkInternetConnection(context);
+    });
+  }
+
   List<Widget> _getWidgets(BuildContext context, User? user) {
     List<Widget> res = <Widget>[];
 
     CupertinoTextThemeData textTheme = CupertinoTheme.of(context).textTheme;
 
-    if (user == null) {
-      res.add(const SizedBox(height: 16));
-      res.add(Image.asset('assets/images/logo_400.png', width: 160));
-      res.add(const SizedBox(height: 32));
-      res.add(
-          Text('Welcome to Karma Coin', style: textTheme.navTitleTextStyle));
-      res.add(const SizedBox(height: 16));
-      res.add(
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 64.0),
-          child: Text(
-            'An easy-to-use cryptocurrency designed for appreciation, tipping and communities.',
-            style: textTheme.textStyle,
-            textAlign: TextAlign.center,
-          ),
+    res.add(const SizedBox(height: 16));
+    res.add(Image.asset('assets/images/logo_400.png', width: 160));
+    res.add(const SizedBox(height: 32));
+    res.add(Text('Welcome to Karma Coin', style: textTheme.navTitleTextStyle));
+    res.add(const SizedBox(height: 16));
+    res.add(
+      Padding(
+        padding: EdgeInsets.symmetric(horizontal: 64.0),
+        child: Text(
+          'An easy-to-use cryptocurrency designed for appreciation, tipping and communities.',
+          style: textTheme.textStyle,
+          textAlign: TextAlign.center,
         ),
-      );
-      res.add(const SizedBox(height: 32));
+      ),
+    );
+    res.add(const SizedBox(height: 32));
+    if (user == null) {
       res.add(CupertinoButton.filled(
         onPressed: () {
           context.push(ScreenPaths.signup);
@@ -43,53 +54,18 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         child: const Text('Sign Up'),
       ));
       res.add(const SizedBox(height: 16));
-      res.add(CupertinoButton(
-        onPressed: () => context.push(ScreenPaths.restoreAccount),
-        child: const Text('Restore Account'),
-      ));
     } else {
-      res.add(Text('User signed in.',
-          style: CupertinoTheme.of(context).textTheme.textStyle));
-
-      if (user.displayName != null) {
-        String accountId = base64.decode(user.displayName!).toShortHexString();
-        res.add(
-          Text(accountId,
-              style: CupertinoTheme.of(context).textTheme.textStyle),
-        );
-      }
-      res.add(const SizedBox(height: 14));
       res.add(CupertinoButton.filled(
-        onPressed: () async {
-          await accountLogic.clear();
-          await authLogic.signOut();
-        },
-        child: const Text('Sign out'),
-      ));
-      res.add(const SizedBox(height: 16));
-      res.add(CupertinoButton(
-        onPressed: () async {
-          pushNamedAndRemoveUntil(ScreenPaths.home);
-        },
+        onPressed: () => context.go(ScreenPaths.home),
         child: const Text('User Home'),
       ));
       res.add(const SizedBox(height: 16));
-
-      res.add(CupertinoButton(
-        onPressed: () {
-          StatusAlert.show(
-            context,
-            duration: Duration(seconds: 2),
-            title: 'Title',
-            subtitle: 'Subtitle',
-            configuration: IconConfiguration(icon: CupertinoIcons.check_mark),
-            maxWidth: 260,
-          );
-        },
-        child: const Text('Show snack'),
-      ));
-      res.add(const SizedBox(height: 16));
     }
+
+    res.add(CupertinoButton(
+      onPressed: () => context.push(ScreenPaths.restoreAccount),
+      child: const Text('Restore Account'),
+    ));
 
     res.add(_processRestoreAccountFlow(context));
 
@@ -101,26 +77,29 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
-        return CupertinoPageScaffold(
-          child: NestedScrollView(
-            headerSliverBuilder:
-                (BuildContext context, bool innerBoxIsScrolled) {
-              return <Widget>[
-                CupertinoSliverNavigationBar(
-                  largeTitle: Center(child: Text('Karma Coin')),
-                )
-              ];
-            },
-            body: SafeArea(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: _getWidgets(context, snapshot.data),
+        return Title(
+            color: CupertinoColors.black, // This is required
+            title: 'Karma Coin - Welcome',
+            child: CupertinoPageScaffold(
+              child: NestedScrollView(
+                headerSliverBuilder:
+                    (BuildContext context, bool innerBoxIsScrolled) {
+                  return <Widget>[
+                    CupertinoSliverNavigationBar(
+                      largeTitle: Center(child: Text('Karma Coin')),
+                    )
+                  ];
+                },
+                body: SafeArea(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: _getWidgets(context, snapshot.data),
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-        );
+            ));
       },
     );
   }
@@ -133,19 +112,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             return Container();
           }
 
-          Future.delayed(Duration(milliseconds: 500), () async {
-            /*
-            StatusAlert.show(
-              context,
-              duration: Duration(seconds: 3),
-              configuration: IconConfiguration(
-                  icon: CupertinoIcons.exclamationmark_triangle),
-              title: 'Restore Account',
-              subtitle: 'To complete restoring, verify your phone number.',
-              dismissOnBackgroundTap: true,
-              maxWidth: 260,
-            );
-            Future.delayed(Duration(milliseconds: 200), () async {*/
+          Future.delayed(Duration(milliseconds: 200), () async {
             if (!mounted) return;
             context.push(ScreenPaths.signup);
           });

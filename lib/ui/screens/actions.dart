@@ -107,7 +107,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
             onTap: () => context.push(ScreenPaths.restoreAccountIntro),
           ),
           CupertinoListTile.notched(
-            title: const Text('Update account'),
+            title: const Text('Update Account'),
             leading: const Icon(CupertinoIcons.person_crop_circle, size: 28),
             trailing: const CupertinoListTileChevron(),
             onTap: () => {},

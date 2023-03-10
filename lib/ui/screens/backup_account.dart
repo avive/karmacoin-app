@@ -123,23 +123,27 @@ class _BackupAccountScreenState extends State<BackupAccountScreen> {
 
   @override
   build(BuildContext context) {
-    return CupertinoPageScaffold(
-      child: NestedScrollView(
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return <Widget>[
-            CupertinoSliverNavigationBar(
-              largeTitle: const Text('Backup Account'),
-            ),
-          ];
-        },
-        body: MediaQuery.removePadding(
-          context: context,
-          removeTop: false,
-          child: ListView(
-              padding: EdgeInsets.zero,
-              shrinkWrap: true,
-              primary: true,
-              children: _getSections(context)),
+    return Title(
+      color: CupertinoColors.black, // This is required
+      title: 'Karma Coin - Backup Account',
+      child: CupertinoPageScaffold(
+        child: NestedScrollView(
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return <Widget>[
+              CupertinoSliverNavigationBar(
+                largeTitle: const Text('Backup Account'),
+              ),
+            ];
+          },
+          body: MediaQuery.removePadding(
+            context: context,
+            removeTop: false,
+            child: ListView(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                primary: true,
+                children: _getSections(context)),
+          ),
         ),
       ),
     );

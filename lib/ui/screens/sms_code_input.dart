@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
+import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:status_alert/status_alert.dart';
 
 class SmsCodeInputScreen extends StatefulWidget {
@@ -12,25 +13,26 @@ class SmsCodeInputScreen extends StatefulWidget {
 }
 
 class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
-  bool clearText = false;
+  bool isWorking = false;
   String code = '';
 
-  Future<void> _submitCode() async {
-    setState(() {
-      clearText = true;
-    });
+  initState() {
+    super.initState();
+    isWorking = false;
+  }
 
-    Future.delayed(Duration.zero, () async {
-      if (mounted) {
-        setState(() {
-          clearText = false;
-        });
-      }
-    });
+  Future<void> _submitCode(BuildContext context) async {
+    if (!await checkInternetConnection(context)) {
+      return;
+    }
 
     // Create a PhoneAuthCredential with the code
     PhoneAuthCredential credential = PhoneAuthProvider.credential(
         verificationId: appState.phoneAuthVerificationCodeId, smsCode: code);
+
+    setState(() {
+      isWorking = true;
+    });
 
     // Sign the user in (or link) with the credential
     try {
@@ -45,6 +47,11 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
           configuration: IconConfiguration(icon: CupertinoIcons.bookmark),
           maxWidth: 260,
         );
+
+        setState(() {
+          isWorking = false;
+        });
+
         return;
       }
     }
@@ -52,6 +59,10 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
     // attempt auto sign-in in case there's already an account on chain for the
     // local accountId with this phone number
     if (await accountLogic.attemptAutoSignIn()) {
+      setState(() {
+        isWorking = false;
+      });
+
       Future.delayed(Duration.zero, () {
         debugPrint(
             'Auto signin - user already signed in with local accountId and verified phone number');
@@ -64,62 +75,74 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
     }
   }
 
+  Widget _getIndicator(BuildContext context) {
+    if (isWorking) {
+      return CupertinoActivityIndicator(
+        radius: 20,
+        animating: true,
+      );
+    } else {
+      return Container();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      child: NestedScrollView(
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return <Widget>[
-            CupertinoSliverNavigationBar(
-              largeTitle: Text('Verifiction Code'),
-              leading: Container(),
-            ),
-          ];
-        },
-        body: SafeArea(
-          child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-            Text('Enter the verification code sent to your phone'),
-            SizedBox(height: 16),
-            Material(
-              child: OtpTextField(
-                numberOfFields: 6,
-                autoFocus: true,
-                borderColor: Color(0xFF512DA8),
-                //set to true to show as box or false to show as dash
-                showFieldAsBox: true,
-                clearText: false,
-                //runs when a code is typed in
-                onCodeChanged: (String verificationCode) {
-                  setState(() {
-                    code = verificationCode;
-                  });
-                },
-                //runs when every textfield is filled
-                onSubmit: (String verificationCode) async {
-                  setState(() {
-                    code = verificationCode;
-                  });
-                  await _submitCode();
-                }, // end onSubmit
+    return Title(
+      color: CupertinoColors.black, // This is required
+      title: 'Karma Coin - Verify Number',
+      child: CupertinoPageScaffold(
+        child: NestedScrollView(
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return <Widget>[
+              CupertinoSliverNavigationBar(
+                largeTitle: Text('Verifiction Code'),
+                leading: Container(),
+              ),
+            ];
+          },
+          body: SafeArea(
+            child: Padding(
+              padding: EdgeInsets.all(24),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 360),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Text(
+                            'Enter the verification code sent to your phone'),
+                        SizedBox(height: 16),
+                        Material(
+                          child: OtpTextField(
+                            numberOfFields: 6,
+                            autoFocus: true,
+                            borderColor: Color(0xFF512DA8),
+                            //set to true to show as box or false to show as dash
+                            showFieldAsBox: true,
+                            clearText: false,
+                            //runs when a code is typed in
+                            onCodeChanged: (String verificationCode) {
+                              setState(() {
+                                code = verificationCode;
+                              });
+                            },
+                            //runs when every textfield is filled
+                            onSubmit: (String verificationCode) async {
+                              setState(() {
+                                code = verificationCode;
+                              });
+                              await _submitCode(context);
+                            }, // end onSubmit
+                          ),
+                        ),
+                        SizedBox(height: 36),
+                        _getIndicator(context),
+                      ]),
+                ),
               ),
             ),
-            SizedBox(height: 14),
-            CupertinoButton(
-              onPressed: () async {
-                setState(() {
-                  clearText = true;
-                });
-                Future.delayed(Duration(milliseconds: 200), () async {
-                  if (mounted) {
-                    setState(() {
-                      clearText = false;
-                    });
-                  }
-                });
-              },
-              child: const Text('Clear code'),
-            ),
-          ]),
+          ),
         ),
       ),
     );

@@ -106,6 +106,9 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
 
       // start tracking txs for this account...
       await txsBoss.setAccountId(karmaCoinUser.value!.userData.accountId.data);
+
+      debugPrint(
+          'Local mode: ${localMode.value}. Signed up on chain: ${signedUpOnChain.value}.');
     } else {
       debugPrint('karma coin user not found in secure local store.');
     }
@@ -158,9 +161,6 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
           debugPrint('local user signed up on chain!');
 
           // Update karma coin user local data with the on-chain data
-
-          // todo: set this on schedule - update every 60 seconds...
-
           await _updateLocalKarmaUserFromChain();
 
           debugPrint('Polling for user account data every 60 secs...');
@@ -177,9 +177,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     });
   }
 
-  /// Attempts auto sign in with local phone number and accountId.
-  /// if user with smae accountId is on-chaine with phoneNumber is already onchain
-  /// then update local state with user data from chain and sign-in the user locally
+  /// Attempts auto sign in with local phone number and accountId. if user with same accountId is on-chain with phoneNumber is already onchain then update local state with user data from chain and sign-in the user locally
   @override
   Future<bool> attemptAutoSignIn() async {
     try {
@@ -202,6 +200,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
           await createNewKarmaCoinUser();
 
           // update local user with data from the chain
+          // including chain nonce
           await this.karmaCoinUser.value!.updatWithUserData(user);
 
           // User is signed up on chain
@@ -334,26 +333,6 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
         aOptions: _aOptions);
 
     debugPrint("saved karacoin user data to secure storage");
-  }
-
-  /// Update the local KarmaCoinUser data and persist it
-  @override
-  Future<void> updateKarmaCoinUser(User user) async {
-    debugPrint('updating local karma coin user data from chain via api...');
-
-    assert(this.karmaCoinUser.value != null, 'no local karma coin user found');
-
-    await this.karmaCoinUser.value!.updatWithUserData(user);
-    KarmaCoinUser newUser = this.karmaCoinUser.value!;
-    this.karmaCoinUser.value = null;
-    this.karmaCoinUser.value = newUser;
-
-    // Update observable values that UI depends on using on-chain data
-    // For example, user's baance and karma score in user's home screen
-    // debugPrint("updating observable values from chain data...");
-    // karmaCoinUser.balance.value = karmaCoinUser.userData.balance;
-    // karmaCoinUser.karmaScore.value = karmaCoinUser.userData.karmaScore;
-    // karmaCoinUser.nonce.value = karmaCoinUser.userData.nonce;
   }
 
   /// Set local user's phone number

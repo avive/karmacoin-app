@@ -144,7 +144,7 @@ class SignedTransactionWithStatus {
           if (payment.charTraitId != 0) {
             return 'Appreciation';
           } else {
-            return 'Payment transaction';
+            return 'Payment';
           }
         }
       case TransactionType.TRANSACTION_TYPE_UPDATE_USER_V1:

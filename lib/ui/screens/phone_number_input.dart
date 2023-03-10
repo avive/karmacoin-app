@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:status_alert/status_alert.dart';
 
@@ -26,9 +27,6 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
 
   _PhoneInputScreenState(this.title);
 
-  final formKey = UniqueKey(); //GlobalKey<FormState>();
-  final phoneKey = UniqueKey(); //GlobalKey<FormFieldState<PhoneNumber>>();
-
   // country selector ux
   CountrySelectorNavigator selectorNavigator =
       const CountrySelectorNavigator.draggableBottomSheet();
@@ -39,7 +37,6 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
     controller =
         PhoneController(PhoneNumber(isoCode: IsoCode.IL, nsn: "549805381"));
     validator = PhoneValidator.validMobile();
-    // controller.addListener(() => setState(() {}));
   }
 
   @override
@@ -49,7 +46,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
     super.dispose();
   }
 
-  Future<void> _beginSignup() async {
+  Future<void> _beginSignup(BuildContext context) async {
     bool isValid =
         controller.value?.isValid(type: PhoneNumberType.mobile) ?? false;
 
@@ -62,6 +59,10 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
         configuration: IconConfiguration(icon: CupertinoIcons.stop_circle),
         maxWidth: 260,
       );
+      return;
+    }
+
+    if (!await checkInternetConnection(context)) {
       return;
     }
 
@@ -145,57 +146,75 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      child: NestedScrollView(
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return <Widget>[
-            CupertinoSliverNavigationBar(
-              largeTitle: Text(title),
-            ),
-          ];
-        },
-        body: SafeArea(
-          child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-            Material(
-              child: Container(
-                padding:
-                    EdgeInsets.only(left: 36, right: 36, top: 16, bottom: 32),
-                child: Form(
-                  key: formKey,
-                  child: PhoneFormField(
-                    key: phoneKey,
-                    controller: controller,
-                    shouldFormat: shouldFormat && !useRtl,
-                    autofocus: true,
-                    autofillHints: const [AutofillHints.telephoneNumber],
-                    flagSize: 18,
-                    countrySelectorNavigator: selectorNavigator,
-                    defaultCountry: IsoCode.US,
-                    validator: PhoneValidator.compose([
-                      PhoneValidator.validMobile(),
-                    ]),
-                    decoration: InputDecoration(
-                      label: withLabel ? const Text('Your phone number') : null,
-                      border: outlineBorder
-                          ? const OutlineInputBorder()
-                          : const UnderlineInputBorder(),
-                      hintText: withLabel ? '' : 'Your mobile phone number',
-                    ),
-                  ),
+    return Title(
+      color: CupertinoColors.black, // This is required
+      title: 'Karma Coin - Phone Number',
+      child: CupertinoPageScaffold(
+        child: NestedScrollView(
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return <Widget>[
+              CupertinoSliverNavigationBar(
+                largeTitle: Text(title),
+              ),
+            ];
+          },
+          body: SafeArea(
+            child: Padding(
+              padding: EdgeInsets.all(24),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 360),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Text('Enter your phone number'),
+                        SizedBox(height: 16),
+                        Material(
+                          child: Container(
+                            child: Form(
+                              child: PhoneFormField(
+                                controller: controller,
+                                shouldFormat: shouldFormat && !useRtl,
+                                autofocus: true,
+                                autofillHints: const [
+                                  AutofillHints.telephoneNumber
+                                ],
+                                flagSize: 18,
+                                countrySelectorNavigator: selectorNavigator,
+                                defaultCountry: IsoCode.US,
+                                validator: PhoneValidator.compose([
+                                  PhoneValidator.validMobile(),
+                                ]),
+                                decoration: InputDecoration(
+                                  label: withLabel
+                                      ? const Text('Your phone number')
+                                      : null,
+                                  border: outlineBorder
+                                      ? const OutlineInputBorder()
+                                      : const UnderlineInputBorder(),
+                                  hintText: withLabel
+                                      ? ''
+                                      : 'Your mobile phone number',
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 36),
+                        CupertinoButton.filled(
+                          onPressed: () async {
+                            debugPrint('sign up..');
+                            await _beginSignup(context);
+                          },
+                          child: Text(title),
+                        ),
+                        SizedBox(height: 14),
+                        _processRestoreAccountFlow(context),
+                      ]),
                 ),
               ),
             ),
-            SizedBox(height: 36),
-            CupertinoButton.filled(
-              onPressed: () async {
-                debugPrint('sign up..');
-                await _beginSignup();
-              },
-              child: Text(title),
-            ),
-            SizedBox(height: 14),
-            _processRestoreAccountFlow(context),
-          ]),
+          ),
         ),
       ),
     );
