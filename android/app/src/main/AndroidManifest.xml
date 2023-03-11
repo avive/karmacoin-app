@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="in.karmaco.app">
    <application xmlns:tools="http://schemas.android.com/tools"
-        android:label="Karma Coin"
+        android:label="KarmaCoin"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:networkSecurityConfig="@xml/network_security_config"
@@ -35,14 +35,14 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-
-            <!-- Provide required visibility configuration for API level 30 and above -->
-            <queries>
-                <intent>
-                    <action android:name="android.intent.action.VIEW" />
-                    <category android:name="android.intent.category.BROWSABLE" />
-                    <data android:scheme="https" />
-                </intent>            
-            </queries>    
+    
     </application>
+       <!-- Provide required visibility configuration for API level 30 and above -->        
+      <queries>
+            <intent>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+            </intent>            
+        </queries>  
 </manifest>

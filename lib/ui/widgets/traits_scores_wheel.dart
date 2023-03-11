@@ -26,12 +26,6 @@ class _TraitsScoresWheelState extends State<TraitsScoresWheel> {
           return Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              /*
-                 Text('Received Appreciations',
-                    style: CupertinoTheme.of(context)
-                .textTheme
-                .pickerTextStyle
-                .merge(TextStyle(fontSize: 14))),*/
               Container(
                 height: _kItemExtent * 5,
                 padding: EdgeInsets.zero,
@@ -61,8 +55,6 @@ class _TraitsScoresWheelState extends State<TraitsScoresWheel> {
                         Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              //SizedBox(width: 14),
-                              // todo: add pill with count to the right of the text field
                               Text(
                                 label,
                                 style: CupertinoTheme.of(context)
