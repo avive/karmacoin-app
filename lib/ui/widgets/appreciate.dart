@@ -12,8 +12,6 @@ import 'package:karma_coin/ui/widgets/traits_picker.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:status_alert/status_alert.dart';
 
-// todo: prevent user from appreciating itself!!!
-
 class AppreciateWidget extends StatefulWidget {
   const AppreciateWidget({super.key});
 
@@ -38,14 +36,11 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   final formKey = GlobalKey<FormState>();
   final phoneKey = GlobalKey<FormFieldState<PhoneNumber>>();
 
-  _AppreciateWidgetState();
-
   @override
   initState() {
     super.initState();
     phoneController =
         PhoneController(PhoneNumber(isoCode: IsoCode.IL, nsn: "549805380"));
-    // phoneController.addListener(() => setState(() {}));
   }
 
   @override
@@ -75,7 +70,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     });
   }
 
-  // for payemnt
+  // for fee
   static Route<void> _feeAmountInputModelBuilder(
       BuildContext context, Object? arguments) {
     return CupertinoModalPopupRoute<void>(builder: (BuildContext context) {
@@ -86,7 +81,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     });
   }
 
-  // validate input data and show alers if invalid
+  // validate input data and show alert if invalid
   Future<bool> _validateData(BuildContext context) async {
     debugPrint('validate data... ${phoneController.value}');
 
@@ -182,6 +177,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
         appState.selectedPersonalityTrait.value,
         0,
         number,
+        '',
         '');
 
     debugPrint(

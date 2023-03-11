@@ -173,9 +173,6 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
   Widget _getAppreciationWidget(BuildContext context,
       SignedTransactionWithStatus tx, bool incoming, int index) {
     try {
-      final types.User sender = tx.getFromUser();
-      final senderPhoneNumber = sender.mobileNumber.number.formatPhoneNumber();
-
       final String txHash = tx.getHash().toHexString();
 
       // Get any event associated with this transaction
@@ -220,6 +217,34 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
         titleWeight = FontWeight.w600;
       }
 
+      String detailsLabel;
+      if (tx.incoming) {
+        final types.User sender = tx.getFromUser();
+        final senderPhoneNumber =
+            sender.mobileNumber.number.formatPhoneNumber();
+        detailsLabel = 'From · ${sender.userName} · $senderPhoneNumber ';
+      } else {
+        final types.User? receiver = tx.getToUser();
+
+        detailsLabel = 'To ';
+
+        if (receiver != null) {
+          detailsLabel += ' ${receiver.userName} · ';
+        }
+
+        if (appreciation.toAccountId.data.isNotEmpty) {
+          detailsLabel +=
+              '${appreciation.toAccountId.data.toShortHexString()} · ';
+        }
+        if (appreciation.toNumber.number.isNotEmpty) {
+          final toPhoneNumber =
+              appreciation.toNumber.number.formatPhoneNumber();
+          detailsLabel += '$toPhoneNumber · ';
+        }
+      }
+
+      detailsLabel += '${tx.getTimesAgo()}';
+
       return CupertinoListTile(
         onTap: () {
           context.pushNamed(ScreenNames.transactionDetails,
@@ -255,8 +280,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
                   .merge(TextStyle(fontSize: 14)),
             ),
             const SizedBox(height: 2),
-            Text(
-                '${sender.userName} · $senderPhoneNumber  · ${tx.getTimesAgo()}',
+            Text(detailsLabel,
                 style: CupertinoTheme.of(context)
                     .textTheme
                     .tabLabelTextStyle

@@ -9,18 +9,21 @@ class PaymentTransactionData {
   PersonalityTrait personalityTrait = PersonalityTraits[0];
   int communityId = 0;
   String mobilePhoneNumber = '';
-  String personalMessage = '';
+  String thankYouMessage = '';
+  String destinationAddress = '';
 
   PaymentTransactionData(
-      this.kCentsAmount,
-      this.kCentsFeeAmount,
-      this.personalityTrait,
-      this.communityId,
-      this.mobilePhoneNumber,
-      this.personalMessage);
+    this.kCentsAmount,
+    this.kCentsFeeAmount,
+    this.personalityTrait,
+    this.communityId,
+    this.mobilePhoneNumber,
+    this.destinationAddress,
+    this.thankYouMessage,
+  );
 
   @override
   String toString() {
-    return 'Amount: $kCentsAmount, Fee: $kCentsFeeAmount, Trait: $personalityTrait, Community: $communityId, Mobile: $mobilePhoneNumber, Message: $personalMessage';
+    return 'Amount: $kCentsAmount, Fee: $kCentsFeeAmount, Trait: $personalityTrait, Community: $communityId, To number: $mobilePhoneNumber, To address: $destinationAddress, Message: $thankYouMessage';
   }
 }

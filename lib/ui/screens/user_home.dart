@@ -63,19 +63,28 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             return Container();
           }
 
+          debugPrint('Data: $value');
+
+          String sendingTitle = 'Sending Appreciation...';
+          String sentTitle = 'Appreciaiton Sent';
+
+          if (value.personalityTrait.index == 0) {
+            sendingTitle = 'Sending Karma Coins...';
+            sentTitle = 'Karma Coins Sent';
+          }
+
           // show sending alert
           Future.delayed(Duration.zero, () async {
             StatusAlert.show(context,
                 duration: Duration(seconds: 2),
-                title: 'Sending appreciation...',
+                title: sendingTitle,
                 configuration:
                     IconConfiguration(icon: CupertinoIcons.wand_stars),
                 dismissOnBackgroundTap: true,
                 maxWidth: 240);
 
             SubmitTransactionResponse resp =
-                await accountLogic.submitPaymentTransaction(
-                    appState.paymentTransactionData.value!);
+                await accountLogic.submitPaymentTransaction(value);
 
             switch (resp.submitTransactionResult) {
               case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
@@ -84,7 +93,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   duration: Duration(seconds: 2),
                   configuration: IconConfiguration(
                       icon: CupertinoIcons.check_mark_circled),
-                  title: 'Apreciaiton Sent',
+                  title: sentTitle,
                   dismissOnBackgroundTap: true,
                   maxWidth: 260,
                 );

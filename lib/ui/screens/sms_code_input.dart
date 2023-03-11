@@ -106,13 +106,14 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
               padding: EdgeInsets.all(24),
               child: Center(
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: 360),
+                  constraints: BoxConstraints(maxWidth: 480),
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text('Enter the verification code sent to your phone',
-                            style:
-                                CupertinoTheme.of(context).textTheme.textStyle),
+                            style: CupertinoTheme.of(context)
+                                .textTheme
+                                .navTitleTextStyle),
                         SizedBox(height: 16),
                         Material(
                           child: OtpTextField(

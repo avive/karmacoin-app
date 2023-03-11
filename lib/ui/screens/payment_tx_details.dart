@@ -46,6 +46,9 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
 
     SignedTransactionWithStatus tx = transaction!;
 
+    types.PaymentTransactionV1 paymentData =
+        tx.txData as types.PaymentTransactionV1;
+
     List<CupertinoListTile> tiles = [];
     final types.User sender = tx.getFromUser();
     final senderPhoneNumber = sender.mobileNumber.number.formatPhoneNumber();
@@ -61,10 +64,21 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
 
     String toUserName = "";
     String toUserAccount = "";
+    String toUserPhoneNumber = "";
+
     types.User? toUser = tx.getToUser();
     if (toUser != null) {
+      // pull user name and account id
       toUserName = toUser.userName;
       toUserAccount = toUser.accountId.data.toShortHexString();
+    }
+
+    if (paymentData.toAccountId.hasData()) {
+      toUserAccount = paymentData.toAccountId.data.toShortHexString();
+    }
+
+    if (paymentData.toNumber.number.isNotEmpty) {
+      toUserPhoneNumber = paymentData.toNumber.number.formatPhoneNumber();
     }
 
     if (transactionEvent != null) {
@@ -77,166 +91,157 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
       }
     }
 
-    final types.TransactionType txType = tx.getTxType();
-    if (txType == types.TransactionType.TRANSACTION_TYPE_PAYMENT_V1) {
-      types.PaymentTransactionV1 appreciation =
-          tx.txData as types.PaymentTransactionV1;
+    if (paymentData.charTraitId != 0 &&
+        paymentData.charTraitId < PersonalityTraits.length) {
+      PersonalityTrait trait = PersonalityTraits[paymentData.charTraitId];
+      String title = 'You are ${trait.name.toLowerCase()}';
+      String emoji = trait.emoji;
 
-      if (appreciation.charTraitId != 0 &&
-          appreciation.charTraitId < PersonalityTraits.length) {
-        PersonalityTrait trait = PersonalityTraits[appreciation.charTraitId];
-        String title = 'You are ${trait.name.toLowerCase()}';
-        String emoji = trait.emoji;
-
-        tiles.add(
-          CupertinoListTile.notched(
-            title: Text(
-              title,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
-            ),
-            leading: Text(
-              emoji,
-              style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                  TextStyle(
-                      fontSize: 24,
-                      color: CupertinoTheme.of(context)
-                          .textTheme
-                          .textStyle
-                          .color)),
-            ),
+      tiles.add(
+        CupertinoListTile.notched(
+          title: Text(
+            title,
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
           ),
-        );
-      }
-
-      String amount =
-          KarmaCoinAmountFormatter.formatMinimal(appreciation.amount);
-      String usdEstimate =
-          KarmaCoinAmountFormatter.formatUSDEstimate(appreciation.amount);
-
-      tiles.add(
-        CupertinoListTile.notched(
-          title: Text(amount,
-              style: CupertinoTheme.of(context).textTheme.textStyle),
-          subtitle: Text(usdEstimate),
-          leading: const Icon(CupertinoIcons.money_dollar, size: 28),
-        ),
-      );
-
-      tiles.add(
-        CupertinoListTile.notched(
-          trailing: Text(tx.getTimesAgo(),
-              style: CupertinoTheme.of(context).textTheme.textStyle),
-          title: Text(operationLabel,
-              style: CupertinoTheme.of(context).textTheme.textStyle),
-          leading: const Icon(CupertinoIcons.clock, size: 28),
-        ),
-      );
-
-      tiles.add(
-        CupertinoListTile.notched(
-            title: Text('From',
-                style: CupertinoTheme.of(context).textTheme.textStyle),
-            subtitle: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(sender.userName),
-                Text(sender.accountId.data.toShortHexString()),
-                SizedBox(height: 6),
-              ],
-            ),
-            trailing: Text(senderPhoneNumber,
-                style: CupertinoTheme.of(context).textTheme.textStyle),
-            leading: const Icon(CupertinoIcons.arrow_right, size: 28),
-            onTap: () {
-              if (tx.incoming) {
-                context.push(ScreenPaths.account, extra: sender);
-              } else {
-                context.push(ScreenPaths.account);
-              }
-            }),
-      );
-
-      // todo: can have phone number or just an account id - handle this case
-      final recieverPhoneNumber =
-          appreciation.toNumber.number.formatPhoneNumber();
-
-      // payment tx always have a receiver with at least a phone number
-      // todo: if user to exists in the tx then we know the receiver's nickname and can display it....
-      if (toUser != null) {
-        tiles.add(
-          CupertinoListTile.notched(
-            title: Text('To',
-                style: CupertinoTheme.of(context).textTheme.textStyle),
-            subtitle: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(toUserName),
-                Text(toUserAccount),
-                SizedBox(height: 6),
-              ],
-            ),
-            trailing: Text(recieverPhoneNumber,
-                style: CupertinoTheme.of(context).textTheme.textStyle),
-            leading: const Icon(CupertinoIcons.arrow_left, size: 28),
-            onTap: () {
-              if (tx.incoming) {
-                context.push(ScreenPaths.account);
-              } else {
-                context.push(ScreenPaths.account, extra: toUser);
-              }
-            },
-          ),
-        );
-      } else {
-        // unknown receiver user (tx by phone num)
-        tiles.add(
-          CupertinoListTile.notched(
-            title: Text('To',
-                style: CupertinoTheme.of(context).textTheme.textStyle),
-            trailing: Text(recieverPhoneNumber,
-                style: CupertinoTheme.of(context).textTheme.textStyle),
-            leading: const Icon(CupertinoIcons.arrow_left, size: 28),
-          ),
-        );
-      }
-
-      tiles.add(
-        CupertinoListTile.notched(
-          title:
-              Text('Id', style: CupertinoTheme.of(context).textTheme.textStyle),
-          trailing: Text(txHash.toHex().toShortHexString(),
-              style: CupertinoTheme.of(context).textTheme.textStyle),
-          leading: const Icon(CupertinoIcons.checkmark_seal, size: 28),
-        ),
-      );
-      tiles.add(
-        CupertinoListTile.notched(
-          title: Text('Counter',
-              style: CupertinoTheme.of(context).textTheme.textStyle),
-
-          // todo: format with thousands seperator
-          trailing: Text(tx.getNonce().toString(),
-              style: CupertinoTheme.of(context).textTheme.textStyle),
-          leading: const Icon(CupertinoIcons.number, size: 28),
-        ),
-      );
-
-      tiles.add(
-        CupertinoListTile.notched(
-          title: Text('Status',
-              style: CupertinoTheme.of(context).textTheme.textStyle),
-          leading: const Icon(CupertinoIcons.check_mark, size: 28),
-          trailing: Pill(
-            null,
-            getStatusDisplayString(status),
-            count: 0,
-            backgroundColor: getStatusDisplayColor(status),
+          leading: Text(
+            emoji,
+            style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                TextStyle(
+                    fontSize: 24,
+                    color:
+                        CupertinoTheme.of(context).textTheme.textStyle.color)),
           ),
         ),
       );
     }
+
+    String amount = KarmaCoinAmountFormatter.formatMinimal(paymentData.amount);
+    String usdEstimate =
+        KarmaCoinAmountFormatter.formatUSDEstimate(paymentData.amount);
+
+    tiles.add(
+      CupertinoListTile.notched(
+        title:
+            Text(amount, style: CupertinoTheme.of(context).textTheme.textStyle),
+        subtitle: Text(usdEstimate),
+        leading: const Icon(CupertinoIcons.money_dollar, size: 28),
+      ),
+    );
+
+    tiles.add(
+      CupertinoListTile.notched(
+        trailing: Text(tx.getTimesAgo(),
+            style: CupertinoTheme.of(context).textTheme.textStyle),
+        title: Text(operationLabel,
+            style: CupertinoTheme.of(context).textTheme.textStyle),
+        leading: const Icon(CupertinoIcons.clock, size: 28),
+      ),
+    );
+
+    tiles.add(
+      CupertinoListTile.notched(
+          title: Text('From',
+              style: CupertinoTheme.of(context).textTheme.textStyle),
+          subtitle: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(sender.userName),
+              Text(sender.accountId.data.toShortHexString()),
+              SizedBox(height: 6),
+            ],
+          ),
+          trailing: Text(senderPhoneNumber,
+              style: CupertinoTheme.of(context).textTheme.textStyle),
+          leading: const Icon(CupertinoIcons.arrow_right, size: 28),
+          onTap: () {
+            if (tx.incoming) {
+              context.push(ScreenPaths.account, extra: sender);
+            } else {
+              context.push(ScreenPaths.account);
+            }
+          }),
+    );
+
+    // trailing label of the receiver row
+    String reciverRowTrailingLabel = toUserPhoneNumber;
+    if (toUserPhoneNumber.isEmpty) {
+      reciverRowTrailingLabel = toUserAccount;
+    }
+
+    List<Widget> recieverSubtitleWidgets = [];
+    if (toUserName.isNotEmpty) {
+      recieverSubtitleWidgets.add(Text(toUserName));
+    }
+    if (toUserAccount.isNotEmpty && toUserPhoneNumber.isNotEmpty) {
+      // add to account unless it is added to the right when no phone is available...
+      recieverSubtitleWidgets.add(Text(toUserAccount));
+    }
+
+    recieverSubtitleWidgets.add(const SizedBox(height: 6));
+
+    // payment tx always have a receiver with at least a phone number
+    // todo: if user to exists in the tx then we know the receiver's nickname and can display it....
+
+    tiles.add(
+      CupertinoListTile.notched(
+        title:
+            Text('To', style: CupertinoTheme.of(context).textTheme.textStyle),
+        subtitle: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: recieverSubtitleWidgets,
+        ),
+        trailing: Text(reciverRowTrailingLabel,
+            style: CupertinoTheme.of(context).textTheme.textStyle),
+        leading: const Icon(CupertinoIcons.arrow_left, size: 28),
+        onTap: () {
+          if (toUser == null) {
+            return;
+          }
+          if (tx.incoming) {
+            context.push(ScreenPaths.account);
+          } else {
+            context.push(ScreenPaths.account, extra: toUser);
+          }
+        },
+      ),
+    );
+
+    tiles.add(
+      CupertinoListTile.notched(
+        title:
+            Text('Id', style: CupertinoTheme.of(context).textTheme.textStyle),
+        trailing: Text(txHash.toHex().toShortHexString(),
+            style: CupertinoTheme.of(context).textTheme.textStyle),
+        leading: const Icon(CupertinoIcons.checkmark_seal, size: 28),
+      ),
+    );
+    tiles.add(
+      CupertinoListTile.notched(
+        title: Text('Counter',
+            style: CupertinoTheme.of(context).textTheme.textStyle),
+
+        // todo: format with thousands seperator
+        trailing: Text(tx.getNonce().toString(),
+            style: CupertinoTheme.of(context).textTheme.textStyle),
+        leading: const Icon(CupertinoIcons.number, size: 28),
+      ),
+    );
+
+    tiles.add(
+      CupertinoListTile.notched(
+        title: Text('Status',
+            style: CupertinoTheme.of(context).textTheme.textStyle),
+        leading: const Icon(CupertinoIcons.check_mark, size: 28),
+        trailing: Pill(
+          null,
+          getStatusDisplayString(status),
+          count: 0,
+          backgroundColor: getStatusDisplayColor(status),
+        ),
+      ),
+    );
 
     return [
       CupertinoListSection.insetGrouped(header: Container(), children: tiles)

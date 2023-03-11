@@ -7,6 +7,8 @@ enum FeeType { Payment, Fee }
 
 enum CoinKind { kCents, kCoins }
 
+enum Destination { AccountAddress, PhoneNumber }
+
 // misc runtime state such as kc amount input. Includes lifted up state from widgets
 class AppState {
   /// user amount entry value in kcents for current appreciation
@@ -16,6 +18,16 @@ class AppState {
   //// user fee amount entry value in kcents for current appreciation
   /// we default fees to 1 Kcent
   final ValueNotifier<Int64> kCentsFeeAmount = ValueNotifier(Int64.ONE);
+
+  //// Account address of send KC transaction destination
+  final ValueNotifier<String> sendDestinationAddress = ValueNotifier('');
+
+  //// Mobile phone number canonical format for send KC transaction destination
+  final ValueNotifier<String> sendDestinationPhoneNumber = ValueNotifier('');
+
+//// Mobile phone number canonical format for send KC transaction destination
+  final ValueNotifier<Destination> sendDestination =
+      ValueNotifier(Destination.AccountAddress);
 
   /// set to true when a new user appreciation was sucessfully submitted via the api
   final ValueNotifier<bool> appreciationSent = ValueNotifier(false);

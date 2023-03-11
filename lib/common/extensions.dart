@@ -43,6 +43,7 @@ extension Int64DecimalFormat on Int64 {
 }*/
 
 extension StringToHex on String {
+  /// Returns a hex list of values for hex string in form of 0x1FE021... or 1FE021...
   List<int> toHex() {
     if (startsWith("0x")) {
       return HEX.decode(substring(2));

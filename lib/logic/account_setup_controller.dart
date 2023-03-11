@@ -92,7 +92,7 @@ class AccountSetupController extends ChangeNotifier {
             setStatus(AccountSetupStatus.signedUp);
             appState.signedUpInCurentSession.value = true;
             debugPrint('*** going to user home...');
-            appRouter.go(ScreenPaths.home);
+            pushNamedAndRemoveUntil(ScreenPaths.home);
           }
           break;
         case ExecutionResult.EXECUTION_RESULT_INVALID:
@@ -102,7 +102,6 @@ class AccountSetupController extends ChangeNotifier {
               // this is a rare but possible case
               // todo: show UI to pick another user name and submit a new transaction
               setStatus(AccountSetupStatus.userNameTaken);
-
               break;
             // todo: update protos and add case that there's already an on-chain acount for the accountId
             case ExecutionInfo.EXECUTION_INFO_ACCOUNT_CREATED:

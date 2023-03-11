@@ -168,8 +168,9 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text('Enter your phone number',
-                            style:
-                                CupertinoTheme.of(context).textTheme.textStyle),
+                            style: CupertinoTheme.of(context)
+                                .textTheme
+                                .navTitleTextStyle),
                         SizedBox(height: 16),
                         Material(
                           child: Container(

@@ -53,7 +53,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
               title: const Text('Send Karma Coins'),
               leading: const Icon(CupertinoIcons.money_dollar_circle, size: 28),
               trailing: const CupertinoListTileChevron(),
-              onTap: () => {},
+              onTap: () => context.push(ScreenPaths.send),
             ),
             CupertinoListTile.notched(
                 title: const Text('Appreciations'),
@@ -152,11 +152,10 @@ class _ActionsScreenState extends State<ActionsScreen> {
         ),
         children: <CupertinoListTile>[
           CupertinoListTile.notched(
-            title: const Text('Send Feedback'),
-            leading: const Icon(CupertinoIcons.ellipses_bubble, size: 28),
-            trailing: const CupertinoListTileChevron(),
-            onTap: () => {},
-          ),
+              title: const Text('Send Feedback'),
+              leading: const Icon(CupertinoIcons.ellipses_bubble, size: 28),
+              trailing: const CupertinoListTileChevron(),
+              onTap: () => {}),
           CupertinoListTile.notched(
             title: const Text('Get Support'),
             leading: const Icon(CupertinoIcons.question, size: 28),

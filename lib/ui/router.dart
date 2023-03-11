@@ -13,6 +13,7 @@ import 'package:karma_coin/ui/screens/user_details.dart';
 import 'package:karma_coin/ui/screens/user_home.dart';
 import 'package:karma_coin/ui/screens/welcome.dart';
 import 'package:karma_coin/ui/screens/user_name.dart';
+import 'package:karma_coin/ui/widgets/send.dart';
 
 /// Shared paths / urls used across the app
 class ScreenPaths {
@@ -27,6 +28,9 @@ class ScreenPaths {
 
   /// About screen
   static String about = '/about';
+
+  /// Send KC screen
+  static String send = '/send';
 
   /// Security words screen
   static String securityWords = '/security_words';
@@ -75,6 +79,9 @@ class ScreenNames {
 
   // Restore account screen
   static String restoreAccount = 'restore account words';
+
+  /// Send KC screen
+  static String send = 'send';
 
   /// Signed up user screen
   static String home = 'home';
@@ -234,6 +241,12 @@ final GoRouter appRouter = GoRouter(
         path: ScreenPaths.restoreAccount,
         builder: (BuildContext context, GoRouterState state) {
           return const RestoreAccountScreen();
+        }),
+    GoRoute(
+        name: ScreenNames.send,
+        path: ScreenPaths.send,
+        builder: (BuildContext context, GoRouterState state) {
+          return const SendWidget();
         }),
   ],
 );

@@ -1,11 +1,11 @@
 import 'package:karma_coin/common_libs.dart';
 
 class Pill extends StatelessWidget {
-  late final String title;
-  late final int count;
-  late final Color backgroundColor;
+  final String title;
+  final int count;
+  final Color backgroundColor;
 
-  Pill(Key? key, this.title,
+  const Pill(Key? key, this.title,
       {this.count = 1, this.backgroundColor = CupertinoColors.activeBlue})
       : super(key: key);
 
