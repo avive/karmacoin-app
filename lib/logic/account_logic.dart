@@ -122,6 +122,11 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
 
     _registerFirebase();
     _registerTransactions();
+
+    debugPrint('Polling for user account data every 60 secs...');
+    _timer = Timer.periodic(const Duration(seconds: 60), (Timer t) async {
+      await _updateLocalKarmaUserFromChain();
+    });
   }
 
   /// Register on firebase user changes and update account logic when user changes
@@ -139,7 +144,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     });
   }
 
-  /// Register on new user tx and tx ecent, and update state accordingly
+  /// Register on new user tx and tx event, and update state accordingly
   void _registerTransactions() {
     txsBoss.newUserTransaction.addListener(() async {
       // listen to new user transaction
@@ -162,11 +167,6 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
 
           // Update karma coin user local data with the on-chain data
           await _updateLocalKarmaUserFromChain();
-
-          debugPrint('Polling for user account data every 60 secs...');
-          _timer = Timer.periodic(const Duration(seconds: 60), (Timer t) async {
-            await _updateLocalKarmaUserFromChain();
-          });
         } else {
           debugPrint(
               'already set this user to be chain signed up. ignoring...');
@@ -598,7 +598,22 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
         keyPair.value != null;
   }
 
-  /// todo: this should move to TransactionsGenerator class
+  @override
+
+  /// Submit update user transaction
+  Future<SubmitTransactionResponse> submitUpdateUserNameTransacation(
+      String requestedUserName) async {
+    SubmitTransactionResponse resp = await submitUpdateUserTransacationImpl(
+        null, karmaCoinUser.value!, requestedUserName, null, keyPair.value!);
+
+    if (resp.submitTransactionResult ==
+        SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED) {
+      // get updated user info from chain
+      await _updateLocalKarmaUserFromChain();
+    }
+
+    return resp;
+  }
 
   /// Submit a new user transaction to the network using the last verifier response
   /// Throws an exception if failed to sent tx to an api provider or it rejected it
@@ -610,17 +625,11 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     SubmitTransactionResponse resp = await submitNewUserTransacationImpl(
         _userVerificationData!, karmaCoinUser.value!, keyPair.value!);
 
-    switch (resp.submitTransactionResult) {
-      case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
-        debugPrint('tx submission acccepted by api - entering local mode...');
-
-        // we are now in local mode
-        _setLocalMode(true);
-
-        break;
-      default:
-        // no need ot handle other states
-        break;
+    if (resp.submitTransactionResult ==
+        SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED) {
+      // we are now in local mode
+      debugPrint('tx submission acccepted by api - entering local mode...');
+      _setLocalMode(true);
     }
 
     return resp;

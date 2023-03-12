@@ -23,8 +23,11 @@ class ScreenPaths {
   // sms code verification screen
   static String verify = '/verify';
 
-  /// User name input screen
-  static String userName = '/username';
+  /// New user name input screen
+  static String newUserName = '/username';
+
+  /// Update user name input screen
+  static String updateUserName = '/update-user-name';
 
   /// About screen
   static String about = '/about';
@@ -69,7 +72,10 @@ class ScreenNames {
   static String verify = 'verify';
 
   /// User name input screen
-  static String userName = 'user-name-input';
+  static String newUserName = 'new-user-name';
+
+  /// Update user name input screen
+  static String updateUserName = 'update-user-name';
 
   /// Guest home screen (playground for now)
   static String welcome = 'welcome';
@@ -167,12 +173,21 @@ final GoRouter appRouter = GoRouter(
           return const UserHomeScreen();
         }),
     GoRoute(
-        // User name input screen
-        name: ScreenNames.userName,
-        path: ScreenPaths.userName,
+        // New User name input screen
+        name: ScreenNames.newUserName,
+        path: ScreenPaths.newUserName,
         builder: (BuildContext context, GoRouterState state) {
           debugPrint('userName route builder called');
-          return SetUserNameScreen(title: 'Your User Name');
+          return SetUserNameScreen(
+              title: 'Your User Name', operation: Operation.SignUp);
+        }),
+    GoRoute(
+        // New User name input screen
+        name: ScreenNames.updateUserName,
+        path: ScreenPaths.updateUserName,
+        builder: (BuildContext context, GoRouterState state) {
+          return SetUserNameScreen(
+              title: 'Change User Name', operation: Operation.UpdateUserName);
         }),
     GoRoute(
         // Initial app screen (playground for now)

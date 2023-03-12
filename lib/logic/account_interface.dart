@@ -52,6 +52,10 @@ abstract class AccountLogicInterface {
 
   Future<bool> attemptAutoSignIn();
 
+  /// Submit update user transaction
+  Future<SubmitTransactionResponse> submitUpdateUserNameTransacation(
+      String requestedUserName);
+
   /// Submit a new user transaction to the chain with local user data
   Future<SubmitTransactionResponse> submitNewUserTransacation();
 

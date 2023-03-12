@@ -7,8 +7,7 @@ import 'package:karma_coin/services/api/api.pbgrpc.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/signed_transaction.dart' as est;
 
-/// Transaction generator is responsible for creating and submitting transactions to the Karmachain
-/// it is designed to be mixed-into account logic
+/// Transaction generator is responsible for creating and submitting transactions to the Karmachain. it is designed to be mixed-into account_logic
 abstract class TrnasactionGenerator {
   /// Submit an appreciation / payment txs to Karmachain
   Future<SubmitTransactionResponse> submitPaymentTransacationImpl(
@@ -70,6 +69,7 @@ abstract class TrnasactionGenerator {
 
         // store via txs boss so tx can be resent later by user
         txsBoss.updateWithTx(enriched);
+        break;
     }
 
     return resp;
@@ -127,8 +127,72 @@ abstract class TrnasactionGenerator {
         txsBoss.updateWithTx(enriched);
 
         debugPrint('transaction rejected by api');
-      // todo: store the transactionWithStatus in local storage via tx boss so
-      // it can be submitted later
+        // todo: store the transactionWithStatus in local storage via tx boss so
+        // it can be submitted later
+        break;
+    }
+
+    return resp;
+  }
+
+  /// Submit a new update user transaction to update user name or phone number
+  /// requestedUserName should be provided to update the user name.
+  /// To update phone number, newMoibleNumber and corresponding verification code should be provided
+  Future<SubmitTransactionResponse> submitUpdateUserTransacationImpl(
+      UserVerificationData? data,
+      KarmaCoinUser karmaCoinUser,
+      String? requestedUserName,
+      MobileNumber? newMobileNumber,
+      ed.KeyPair keyPair) async {
+    //
+    // Create the update tx
+    UpdateUserTransactionV1 tx = UpdateUserTransactionV1(
+        nickname: requestedUserName,
+        mobileNumber: newMobileNumber,
+        userVerificationData: data);
+
+    TransactionData txData = TransactionData(
+      transactionData: tx.writeToBuffer(),
+      transactionType: TransactionType.TRANSACTION_TYPE_UPDATE_USER_V1,
+    );
+
+    SignedTransactionWithStatus signedTx =
+        _createSignedTransaction(txData, karmaCoinUser, keyPair);
+
+    SubmitTransactionResponse resp = SubmitTransactionResponse();
+
+    debugPrint('submitting update tx via the api...');
+
+    try {
+      resp = await api.apiServiceClient.submitTransaction(
+          SubmitTransactionRequest(transaction: signedTx.transaction));
+    } catch (e) {
+      debugPrint('failed to submit transaction to api: $e');
+      throw e;
+      // todo: show throw here so ui can handle this error
+    }
+
+    est.SignedTransactionWithStatus enriched =
+        est.SignedTransactionWithStatus(signedTx, false);
+
+    switch (resp.submitTransactionResult) {
+      case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
+        signedTx.status = TransactionStatus.TRANSACTION_STATUS_SUBMITTED;
+        debugPrint('tx submission acccepted by api...');
+
+        // increment user's nonce and store it locally
+        await karmaCoinUser.incNonce();
+
+        // phone and user name will be updated locally next time the user is updated from chain
+        break;
+      case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
+        signedTx.status = TransactionStatus.TRANSACTION_STATUS_REJECTED;
+        txsBoss.updateWithTx(enriched);
+
+        debugPrint('transaction rejected by api');
+        // todo: store the transactionWithStatus in local storage via tx boss so
+        // it can be submitted later
+        break;
     }
 
     return resp;

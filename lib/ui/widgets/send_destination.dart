@@ -56,8 +56,8 @@ class _SendDestinationState extends State<SendDestination> {
           // Provide horizontal padding around the children.
           padding: const EdgeInsets.symmetric(horizontal: 12),
           // This represents a currently selected segmented control.
-          thumbColor: CupertinoColors.white,
-          backgroundColor: CupertinoColors.extraLightBackgroundGray,
+          // thumbColor: CupertinoColors.white,
+          //backgroundColor: CupertinoColors.extraLightBackgroundGray,
           groupValue: _selectedSegment,
           // Callback that sets the selected segmented control.
           onValueChanged: (Destination? value) {
@@ -71,11 +71,21 @@ class _SendDestinationState extends State<SendDestination> {
           children: <Destination, Widget>{
             Destination.AccountAddress: Padding(
               padding: EdgeInsets.symmetric(horizontal: 24),
-              child: const Text('Account'),
+              child: Text('Account',
+                  style: CupertinoTheme.of(context)
+                      .textTheme
+                      .textStyle
+                      .merge(TextStyle(fontSize: 14))),
             ),
             Destination.PhoneNumber: Padding(
               padding: EdgeInsets.symmetric(horizontal: 24),
-              child: const Text('Phone Number'),
+              child: Text(
+                'Phone Number',
+                style: CupertinoTheme.of(context)
+                    .textTheme
+                    .textStyle
+                    .merge(TextStyle(fontSize: 15)),
+              ),
             ),
           },
         ),

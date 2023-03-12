@@ -70,7 +70,7 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
       });
     } else {
       Future.delayed(Duration.zero, () {
-        context.push(ScreenPaths.userName);
+        context.push(ScreenPaths.newUserName);
       });
     }
   }

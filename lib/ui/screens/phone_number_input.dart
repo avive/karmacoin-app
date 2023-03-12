@@ -94,7 +94,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
 
         Future.delayed(Duration.zero, () {
           debugPrint('navigate to user name...');
-          context.push(ScreenPaths.userName);
+          context.push(ScreenPaths.newUserName);
         });
       },
       verificationFailed: (FirebaseAuthException e) async {

@@ -25,6 +25,12 @@ class UserNameAvailabilityLogic extends ChangeNotifier {
     _status = UserNameAvailabilityStatus.checking;
     notifyListeners();
 
+    if (userName.isEmpty) {
+      _status = UserNameAvailabilityStatus.unavailable;
+      notifyListeners();
+      return;
+    }
+
     // todo - call the api to check if the user name is available
 
     try {
