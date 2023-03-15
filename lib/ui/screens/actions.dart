@@ -1,4 +1,5 @@
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/ui/widgets/communities_list.dart';
 import 'package:karma_coin/ui/widgets/delete_account_tile.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:badges/badges.dart' as badges;
@@ -39,7 +40,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
   }
 
   /// Return the list secionts
-  List<CupertinoListSection> _getSections(BuildContext context) {
+  List<Widget> _getSections(BuildContext context) {
     return [
       CupertinoListSection.insetGrouped(
           header: Text(
@@ -68,22 +69,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
                 TextStyle(fontSize: 14, color: CupertinoColors.inactiveGray),
               ),
         ),
-        children: <CupertinoListTile>[
-          CupertinoListTile.notched(
-            title: const Text('Karma Coiners'),
-            leading: const Icon(CupertinoIcons.circle_grid_3x3,
-                size: 28, color: CupertinoColors.activeOrange),
-            trailing: const CupertinoListTileChevron(),
-            onTap: () => {},
-          ),
-          CupertinoListTile.notched(
-            leading: const Icon(CupertinoIcons.add, size: 28),
-            trailing: const CupertinoListTileChevron(),
-            title: const Text(
-              'Join a Community',
-            ),
-          ),
-        ],
+        children: <Widget>[CommunitiesListSection()],
       ),
       CupertinoListSection.insetGrouped(
         header: Text(

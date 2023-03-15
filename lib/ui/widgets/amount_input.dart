@@ -64,7 +64,6 @@ class _AmountInputWidgetState extends State<AmountInputWidget> {
       child: CustomScrollView(
         slivers: [
           CupertinoSliverNavigationBar(
-            stretch: true,
             leading: Container(),
             trailing: adjustNavigationBarButtonPosition(
                 CupertinoButton(

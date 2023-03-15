@@ -2,6 +2,7 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/ui/screens/about.dart';
 import 'package:karma_coin/ui/screens/backup_account.dart';
+import 'package:karma_coin/ui/screens/community_home.dart';
 import 'package:karma_coin/ui/screens/restore_account.dart';
 import 'package:karma_coin/ui/screens/restore_account_intro.dart';
 import 'package:karma_coin/ui/screens/actions.dart';
@@ -10,7 +11,7 @@ import 'package:karma_coin/ui/screens/phone_number_input.dart';
 import 'package:karma_coin/ui/screens/sms_code_input.dart';
 import 'package:karma_coin/ui/screens/payment_tx_details.dart';
 import 'package:karma_coin/ui/screens/user_details.dart';
-import 'package:karma_coin/ui/screens/user_home.dart';
+import 'package:karma_coin/ui/screens/home.dart';
 import 'package:karma_coin/ui/screens/welcome.dart';
 import 'package:karma_coin/ui/screens/user_name.dart';
 import 'package:karma_coin/ui/widgets/send.dart';
@@ -40,6 +41,9 @@ class ScreenPaths {
 
   // Restore account screen
   static String restoreAccountIntro = '/restore';
+
+  // Giraffes community home
+  static String girrafesHomeScreen = '/community/giraffes';
 
   // Restore account screen
   static String restoreAccount = '/restore-words';
@@ -85,6 +89,9 @@ class ScreenNames {
 
   // Restore account screen
   static String restoreAccount = 'restore account words';
+
+  // Giraffes community home
+  static String girrafesHomeScreen = 'grateful-giraffes';
 
   /// Send KC screen
   static String send = 'send';
@@ -262,6 +269,12 @@ final GoRouter appRouter = GoRouter(
         path: ScreenPaths.send,
         builder: (BuildContext context, GoRouterState state) {
           return const SendWidget();
+        }),
+    GoRoute(
+        name: ScreenNames.girrafesHomeScreen,
+        path: ScreenPaths.girrafesHomeScreen,
+        builder: (BuildContext context, GoRouterState state) {
+          return CommunityHomeScreen(Key("1"), 1);
         }),
   ],
 );

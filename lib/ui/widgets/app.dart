@@ -35,7 +35,7 @@ class KarmaCoinApp extends StatelessWidget with GetItMixin {
                 useInheritedMediaQuery: true,
                 title: 'Karma Coin',
                 theme: CupertinoThemeData(
-                  primaryColor: CupertinoColors.activeGreen,
+                  primaryColor: CupertinoColors.activeOrange,
                 ),
                 localizationsDelegates: const [
                   ...GlobalMaterialLocalizations.delegates,

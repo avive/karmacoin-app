@@ -1,10 +1,10 @@
 import 'package:fixnum/fixnum.dart';
+import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:flutter/material.dart';
 import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
-import 'package:karma_coin/data/personality_traits.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/ui/widgets/amount_input.dart';
@@ -13,21 +13,32 @@ import 'package:phone_form_field/phone_form_field.dart';
 import 'package:status_alert/status_alert.dart';
 
 class AppreciateWidget extends StatefulWidget {
-  const AppreciateWidget({super.key});
+  final int communitId;
+  const AppreciateWidget(Key? key, this.communitId) : super(key: key);
 
   @override
-  State<AppreciateWidget> createState() => _AppreciateWidgetState();
+  State<AppreciateWidget> createState() => _AppreciateWidgetState(communitId);
 }
 
 class _AppreciateWidgetState extends State<AppreciateWidget> {
+  final int communityId;
   late PhoneController phoneController;
-  TraitsPickerWidget traitsPicker = TraitsPickerWidget(PersonalityTraits, 6);
+  late final TraitsPickerWidget traitsPicker;
   bool outlineBorder = false;
   bool mobileOnly = true;
   bool shouldFormat = true;
   bool isCountryChipPersistent = false;
   bool withLabel = true;
   bool useRtl = false;
+
+  _AppreciateWidgetState(this.communityId) {
+    if (communityId == 0) {
+      traitsPicker = TraitsPickerWidget(GenesisConfig.PersonalityTraits, 6);
+    } else {
+      traitsPicker = TraitsPickerWidget(
+          GenesisConfig.CommunityPersonalityTraits[communityId]!, 6);
+    }
+  }
 
   // country selector ux
   CountrySelectorNavigator selectorNavigator =
@@ -186,14 +197,32 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     context.pop();
   }
 
+  Color _getNavBarBackgroundColor() {
+    if (communityId == 0) {
+      return CupertinoTheme.of(context).barBackgroundColor;
+    } else {
+      return GenesisConfig.CommunityColors[communityId]!.backgroundColor;
+    }
+  }
+
+  TextStyle _getNavBarTitleStyle() {
+    if (communityId == 0) {
+      return CupertinoTheme.of(context).textTheme.navLargeTitleTextStyle;
+    } else {
+      return CupertinoTheme.of(context).textTheme.navLargeTitleTextStyle.merge(
+          TextStyle(
+              color: GenesisConfig.CommunityColors[communityId]!.textColor));
+    }
+  }
+
   @override
   build(BuildContext context) {
     return CupertinoPageScaffold(
       child: CustomScrollView(
         slivers: [
           CupertinoSliverNavigationBar(
-            stretch: true,
             padding: EdgeInsetsDirectional.zero,
+            backgroundColor: _getNavBarBackgroundColor(),
             leading: Container(),
             trailing: adjustNavigationBarButtonPosition(
                 CupertinoButton(
@@ -204,7 +233,8 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                 ),
                 0,
                 0),
-            largeTitle: Center(child: Text('Appreciate')),
+            largeTitle: Center(
+                child: Text('Appreciate', style: _getNavBarTitleStyle())),
           ),
           SliverFillRemaining(
             hasScrollBody: false,
@@ -279,7 +309,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                         ),
                         SizedBox(height: 6),
                         CupertinoButton(
-                          child: Text('Add a thank you note'),
+                          child: const Text('Add a thank you note'),
                           onPressed: () {
                             // todo: show personal note taker...
                           },
@@ -287,19 +317,43 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                       ],
                     ),
                     SizedBox(height: 16),
-                    CupertinoButton.filled(
-                      onPressed: () async {
-                        if (await _validateData(context)) {
-                          await _sendAppreciation(context);
-                        }
-                      },
-                      child: Text('Appreciate'),
-                    ),
+                    _getAppreciateButton(context),
                     SizedBox(height: 14),
                   ]),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _getAppreciateButton(BuildContext context) {
+    if (communityId == 0) {
+      return CupertinoButton.filled(
+        onPressed: () async {
+          if (await _validateData(context)) {
+            await _sendAppreciation(context);
+          }
+        },
+        child: const Text('Appreciate'),
+      );
+    }
+
+    CommunityDesignTheme theme = GenesisConfig.CommunityColors[communityId]!;
+
+    return CupertinoButton(
+      color: GenesisConfig.CommunityColors[communityId]!.backgroundColor,
+      onPressed: () async {
+        if (await _validateData(context)) {
+          await _sendAppreciation(context);
+        }
+      },
+      child: Text(
+        'Appreciate',
+        style: CupertinoTheme.of(context)
+            .textTheme
+            .textStyle
+            .merge(TextStyle(color: theme.textColor)),
       ),
     );
   }

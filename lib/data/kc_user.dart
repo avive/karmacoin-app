@@ -1,7 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:karma_coin/data/genesis_config.dart';
-import '../common_libs.dart';
-import '../services/api/types.pb.dart';
+import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/services/api/types.pb.dart';
 
 /// An enriched KC user class supporting observable data and persistence.
 /// Setting data will persist the data to local secure storage and notify all listeners
@@ -16,15 +16,19 @@ class KarmaCoinUser {
 
   final ValueNotifier<Int64> nonce = ValueNotifier<Int64>(Int64.ZERO);
 
-  /// Expose karma coin
+  /// Main Karma Score
   final ValueNotifier<int> karmaScore = ValueNotifier<int>(1);
 
   // Expose user name
   final ValueNotifier<String> userName = ValueNotifier<String>('');
 
-  /// Trait scores
-  final ValueNotifier<List<TraitScore>> traitScores =
-      ValueNotifier<List<TraitScore>>([]);
+  /// Trait scores - index by community i
+  final ValueNotifier<Map<int, List<TraitScore>>> traitScores =
+      ValueNotifier<Map<int, List<TraitScore>>>({0: []});
+
+  // Expose user name
+  final ValueNotifier<List<CommunityMembership>> communities =
+      ValueNotifier<List<CommunityMembership>>([]);
 
   /// Mobile number
   final ValueNotifier<MobileNumber> mobileNumber =
@@ -33,7 +37,7 @@ class KarmaCoinUser {
   KarmaCoinUser(this.userData);
 
   /// Update user with provided user data in an observable way
-  Future<void> updatWithUserData(User user) async {
+  Future<void> updatWithUserData(User user, bool persist) async {
     userData.accountId = user.accountId;
 
     debugPrint('onchain balance: ${user.balance}');
@@ -62,12 +66,56 @@ class KarmaCoinUser {
     userData.mobileNumber = user.mobileNumber;
     mobileNumber.value = user.mobileNumber;
 
+    // todo: consider community scores and global ones separately
+
     userData.traitScores.clear();
     userData.traitScores.addAll(user.traitScores);
 
-    traitScores.value = user.traitScores;
+    Map<int, List<TraitScore>> newScores = {};
+    for (TraitScore score in user.traitScores) {
+      if (newScores[score.communityId] == null) {
+        newScores[score.communityId] = [score];
+      } else {
+        newScores[score.communityId]?.add(score);
+      }
+    }
 
-    await accountLogic.persistKarmaCoinUser();
+    // hack giraffes appreciations for demo purposes
+
+    newScores[1] = [
+      TraitScore(traitId: 10, score: 5, communityId: 1),
+      TraitScore(traitId: 4, score: 1, communityId: 1),
+      TraitScore(traitId: 3, score: 1, communityId: 1),
+      TraitScore(traitId: 11, score: 2, communityId: 1),
+      TraitScore(traitId: 15, score: 1, communityId: 1),
+      TraitScore(traitId: 18, score: 3, communityId: 1),
+      TraitScore(traitId: 39, score: 1, communityId: 1),
+      TraitScore(traitId: 42, score: 1, communityId: 1),
+      TraitScore(traitId: 60, score: 4, communityId: 1)
+    ];
+
+    traitScores.value = newScores;
+
+    for (List<TraitScore> scores in newScores.values) {
+      for (TraitScore score in scores) {
+        debugPrint('*** Trait score: ${score} in comm ${score.communityId}');
+      }
+    }
+
+    // hack karma score for giraffes for demo purposes
+    user.communityMemberships[0].karmaScore = 15;
+
+    userData.communityMemberships.clear();
+    userData.communityMemberships.addAll(user.communityMemberships);
+    communities.value = user.communityMemberships;
+
+    for (CommunityMembership membership in user.communityMemberships) {
+      debugPrint('*** Community membership: ${membership}');
+    }
+
+    if (persist) {
+      await accountLogic.persistKarmaCoinUser();
+    }
   }
 
   /// Increment user nonce in an observable way

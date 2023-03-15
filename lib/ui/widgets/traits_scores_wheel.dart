@@ -1,18 +1,26 @@
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/personality_traits.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 
 class TraitsScoresWheel extends StatefulWidget {
-  const TraitsScoresWheel({super.key});
+  @required
+  late final int communityId;
+
+  TraitsScoresWheel(Key? key, this.communityId) : super(key: key);
 
   @override
-  State<TraitsScoresWheel> createState() => _TraitsScoresWheelState();
+  State<TraitsScoresWheel> createState() =>
+      _TraitsScoresWheelState(communityId);
 }
 
 const double _kItemExtent = 32.0;
 
 class _TraitsScoresWheelState extends State<TraitsScoresWheel> {
-  _TraitsScoresWheelState();
+  @required
+  late final int communityId;
+
+  _TraitsScoresWheelState(this.communityId);
 
   // ignore: unused_field
   @required
@@ -20,9 +28,10 @@ class _TraitsScoresWheelState extends State<TraitsScoresWheel> {
 
   @override
   build(BuildContext context) {
-    return ValueListenableBuilder<List<TraitScore>>(
+    return ValueListenableBuilder<Map<int, List<TraitScore>>>(
         valueListenable: accountLogic.karmaCoinUser.value!.traitScores,
         builder: (context, value, child) {
+          List<TraitScore> scores = value[communityId] ?? [];
           return Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -43,9 +52,10 @@ class _TraitsScoresWheelState extends State<TraitsScoresWheel> {
                       selectedItemIndex = index;
                     });
                   },
-                  children: List<Widget>.generate(value.length, (int index) {
-                    TraitScore score = value[index];
-                    PersonalityTrait trait = PersonalityTraits[score.traitId];
+                  children: List<Widget>.generate(scores.length, (int index) {
+                    TraitScore score = scores[index];
+                    PersonalityTrait trait =
+                        GenesisConfig.PersonalityTraits[score.traitId];
                     String label = '${trait.emoji} ${trait.name}';
                     if (score.score > 1) {
                       label = label + ' x${score.score}';

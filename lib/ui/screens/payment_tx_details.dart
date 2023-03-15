@@ -1,3 +1,4 @@
+import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
@@ -92,8 +93,9 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
     }
 
     if (paymentData.charTraitId != 0 &&
-        paymentData.charTraitId < PersonalityTraits.length) {
-      PersonalityTrait trait = PersonalityTraits[paymentData.charTraitId];
+        paymentData.charTraitId < GenesisConfig.PersonalityTraits.length) {
+      PersonalityTrait trait =
+          GenesisConfig.PersonalityTraits[paymentData.charTraitId];
       String title = 'You are ${trait.name.toLowerCase()}';
       String emoji = trait.emoji;
 
@@ -262,7 +264,6 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
               CupertinoSliverNavigationBar(
-                alwaysShowMiddle: true,
                 largeTitle: Text(title),
                 trailing: adjustNavigationBarButtonPosition(
                     Icon(CupertinoIcons.share, size: 24), 0, 0),
@@ -290,8 +291,9 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
           tx.txData as types.PaymentTransactionV1;
 
       if (appreciation.charTraitId != 0 &&
-          appreciation.charTraitId < PersonalityTraits.length) {
-        PersonalityTrait trait = PersonalityTraits[appreciation.charTraitId];
+          appreciation.charTraitId < GenesisConfig.PersonalityTraits.length) {
+        PersonalityTrait trait =
+            GenesisConfig.PersonalityTraits[appreciation.charTraitId];
         return '${trait.emoji} You are ${trait.name.toLowerCase()}';
       } else {
         return '🤑 Payment';

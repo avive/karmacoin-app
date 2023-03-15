@@ -98,8 +98,10 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
 
     if (karmaCoinUserData != null) {
       debugPrint('loading karma coin user from secure local store...');
-      karmaCoinUser.value =
-          KarmaCoinUser(User.fromBuffer(base64.decode(karmaCoinUserData)));
+      User user = User.fromBuffer(base64.decode(karmaCoinUserData));
+      karmaCoinUser.value = KarmaCoinUser(user);
+
+      await karmaCoinUser.value!.updatWithUserData(user, false);
 
       // Get updated user data from chain and store it locally
       await _updateLocalKarmaUserFromChain();
@@ -201,7 +203,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
 
           // update local user with data from the chain
           // including chain nonce
-          await this.karmaCoinUser.value!.updatWithUserData(user);
+          await this.karmaCoinUser.value!.updatWithUserData(user, true);
 
           // User is signed up on chain
           await _setSignedUp(true);
@@ -235,7 +237,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
       if (resp.hasUser()) {
         debugPrint('Got back user from api. Updating local user data...');
 
-        await karmaCoinUser.value!.updatWithUserData(resp.user);
+        await karmaCoinUser.value!.updatWithUserData(resp.user, true);
 
         // User is signed up on chain
         await _setSignedUp(true);
@@ -486,6 +488,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     // we get it from the user's on-chain account
     TraitScore newUserTrait = TraitScore();
     newUserTrait.score = 1;
+    newUserTrait.communityId = 0;
     newUserTrait.traitId = GenesisConfig.signUpCharTraitIndex;
 
     KarmaCoinUser newKarmaCoinUser = KarmaCoinUser(
@@ -496,6 +499,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
         mobileNumber: MobileNumber(number: phoneNumber.value!),
         balance: GenesisConfig.kCentsSignupReward,
         karmaScore: 1,
+        communityMemberships: [],
         traitScores: [newUserTrait],
         preKeys: [],
       ),

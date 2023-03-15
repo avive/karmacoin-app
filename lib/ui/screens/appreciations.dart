@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/data/personality_traits.dart';
 import 'package:karma_coin/data/phone_number_formatter.dart';
@@ -205,8 +206,8 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
       String emoji = '🤑';
 
       if (appreciation.charTraitId != 0 &&
-          appreciation.charTraitId < PersonalityTraits.length) {
-        trait = PersonalityTraits[appreciation.charTraitId];
+          appreciation.charTraitId < GenesisConfig.PersonalityTraits.length) {
+        trait = GenesisConfig.PersonalityTraits[appreciation.charTraitId];
         title = 'You are ${trait.name.toLowerCase()}';
         emoji = trait.emoji;
       }

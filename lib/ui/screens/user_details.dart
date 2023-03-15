@@ -1,3 +1,4 @@
+import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
@@ -147,7 +148,12 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
     List<CupertinoListTile> karmaTiles = [];
 
     for (TraitScore score in user!.traitScores) {
-      PersonalityTrait trait = PersonalityTraits[score.traitId];
+      PersonalityTrait trait = GenesisConfig.PersonalityTraits[score.traitId];
+
+      if (score.communityId != 0) {
+        // we only display global traits here and not community ones
+        continue;
+      }
 
       karmaTiles.add(
         CupertinoListTile.notched(

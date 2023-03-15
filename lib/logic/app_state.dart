@@ -1,6 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
+import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/personality_traits.dart';
 
 enum FeeType { Payment, Fee }
@@ -48,5 +49,5 @@ class AppState {
 
   /// Last user selected personality trait from ui
   final ValueNotifier<PersonalityTrait> selectedPersonalityTrait =
-      ValueNotifier(PersonalityTraits[0]);
+      ValueNotifier(GenesisConfig.PersonalityTraits[0]);
 }

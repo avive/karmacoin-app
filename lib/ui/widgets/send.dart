@@ -178,7 +178,6 @@ class _SendWidgetState extends State<SendWidget> {
       child: CustomScrollView(
         slivers: [
           CupertinoSliverNavigationBar(
-            stretch: true,
             padding: EdgeInsetsDirectional.zero,
             largeTitle: Center(child: Text('Send Karma Coins')),
           ),

@@ -1,10 +1,12 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:intl/intl.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/services/api/api.pb.dart';
+import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/ui/widgets/appreciate.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/ui/widgets/traits_scores_wheel.dart';
@@ -21,7 +23,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   static Route<void> _activityModelBuilder(
       BuildContext context, Object? arguments) {
     return CupertinoModalPopupRoute<void>(builder: (BuildContext context) {
-      return AppreciateWidget();
+      return AppreciateWidget(null, arguments as int);
     });
   }
 
@@ -59,7 +61,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     return ValueListenableBuilder<PaymentTransactionData?>(
         valueListenable: appState.paymentTransactionData,
         builder: (context, value, child) {
-          if (value == null) {
+          // we only care about non-community appreciations here
+
+          if (value == null || value.communityId != 0) {
             return Container();
           }
 
@@ -130,7 +134,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   KarmaCoinAmountFormatter.formatAmount(value),
                   style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                         TextStyle(
-                            fontSize: 60,
+                            fontSize: 80,
                             color: CupertinoColors.activeBlue,
                             fontWeight: FontWeight.w500),
                       ),
@@ -176,10 +180,11 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                             ),
                       ),
                       const SizedBox(height: 24),
-                      TraitsScoresWheel(),
+                      TraitsScoresWheel(null, 0),
                     ],
                   ),
                   Column(children: [
+                    /*
                     Text(
                       'Balance',
                       style:
@@ -188,9 +193,12 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                     fontSize: 24,
                                     color: CupertinoColors.activeBlue),
                               ),
-                    ),
+                    ),*/
                     _getBalanceWidget(context),
                   ]),
+
+                  _getCommunityWidget(context),
+
                   // const SizedBox(height: 24),
                   CupertinoButton.filled(
                     onPressed: () async {
@@ -198,13 +206,43 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                         return;
                       }
                       Navigator.of(context)
-                          .restorablePush(_activityModelBuilder);
+                          .restorablePush(_activityModelBuilder, arguments: 0);
                     },
                     child: Text('Appreciate'),
                   ),
                   _getAppreciationListener(context),
                 ]),
           );
+        });
+  }
+
+  Widget _getCommunityWidget(BuildContext context) {
+    return ValueListenableBuilder<List<CommunityMembership>>(
+        valueListenable: accountLogic.karmaCoinUser.value!.communities,
+        builder: (context, value, child) {
+          if (value.isEmpty) {
+            return Container();
+          }
+
+          return ListView.builder(
+              shrinkWrap: true,
+              itemCount: value.length,
+              itemBuilder: (context, index) {
+                CommunityMembership membership = value[index];
+                if (membership.communityId != 1) {
+                  // only 1 community for now
+                  return Container();
+                }
+
+                return CupertinoButton(
+                  onPressed: () => context.push(GenesisConfig
+                      .CommunityHomeScreenPaths[membership.communityId]!),
+                  child: Image(
+                      height: 86,
+                      image: AssetImage(GenesisConfig
+                          .CommunityTileAssets[membership.communityId]!)),
+                );
+              });
         });
   }
 
@@ -234,15 +272,22 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       child: CupertinoPageScaffold(
         resizeToAvoidBottomInset: true,
         child: CustomScrollView(
-            physics: const NeverScrollableScrollPhysics(), // add
+            physics: const NeverScrollableScrollPhysics(),
             slivers: [
               CupertinoSliverNavigationBar(
-                alwaysShowMiddle: false,
+                // border: Border.all(color: Colors.transparent),
+                // backgroundColor: Colors.transparent,
+                // backgroundColor: CupertinoColors.activeOrange,
+                leading: adjustNavigationBarButtonPosition(
+                    CupertinoButton(
+                      onPressed: () => context.push(ScreenPaths.actions),
+                      child: const Icon(CupertinoIcons.person_3, size: 38),
+                    ),
+                    0,
+                    -6),
                 trailing: adjustNavigationBarButtonPosition(
                     CupertinoButton(
-                      onPressed: () {
-                        context.push(ScreenPaths.actions);
-                      },
+                      onPressed: () => context.push(ScreenPaths.actions),
                       child:
                           const Icon(CupertinoIcons.ellipsis_circle, size: 24),
                     ),
