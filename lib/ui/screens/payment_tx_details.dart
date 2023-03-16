@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
@@ -40,15 +41,13 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
   }
 
   /// Return the list secionts
-  List<CupertinoListSection> _getSections(BuildContext context) {
+  List<CupertinoListSection> _getSections(
+      BuildContext context, types.PaymentTransactionV1 paymentData) {
     if (transaction == null) {
       return [];
     }
 
     SignedTransactionWithStatus tx = transaction!;
-
-    types.PaymentTransactionV1 paymentData =
-        tx.txData as types.PaymentTransactionV1;
 
     List<CupertinoListTile> tiles = [];
     final types.User sender = tx.getFromUser();
@@ -252,12 +251,27 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
 
   @override
   build(BuildContext context) {
-    String title = 'Transaction Details';
-    if (transaction != null) {
-      title = transaction!.getTransactionTypeDisplayName();
+    if (transaction == null) {
+      return Container();
     }
+
+    SignedTransactionWithStatus tx = transaction!;
+    types.PaymentTransactionV1 paymentData =
+        tx.txData as types.PaymentTransactionV1;
+
+    if (paymentData.communityId == 0) {
+      return _buildGenericWidget(context, paymentData);
+    } else {
+      return _buildCommunityWidget(context, paymentData);
+    }
+  }
+
+  Widget _buildGenericWidget(
+      BuildContext context, types.PaymentTransactionV1 paymentData) {
+    String title = transaction!.getTransactionTypeDisplayName();
+
     return Title(
-      color: CupertinoColors.black, // This is required
+      color: CupertinoColors.black,
       title: 'Karma Coin - Appreciation Details',
       child: CupertinoPageScaffold(
         child: NestedScrollView(
@@ -277,7 +291,65 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
                 padding: EdgeInsets.zero,
                 shrinkWrap: true,
                 primary: true,
-                children: _getSections(context)),
+                children: _getSections(context, paymentData)),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCommunityWidget(
+      BuildContext context, types.PaymentTransactionV1 paymentData) {
+    CommunityDesignTheme theme =
+        GenesisConfig.CommunityColors[paymentData.communityId]!;
+
+    String emoji = GenesisConfig.Communities[paymentData.communityId]!.emoji;
+
+    return Title(
+      color: CupertinoColors.black, // This is required
+      title: 'Karma Coin - Appreciation Details',
+      child: CupertinoPageScaffold(
+        resizeToAvoidBottomInset: true,
+        navigationBar: CupertinoNavigationBar(
+          padding: EdgeInsetsDirectional.zero,
+          border: Border.all(color: Colors.transparent),
+          middle: Text(
+            '$emoji Appreciation',
+            style: CupertinoTheme.of(context).textTheme.navTitleTextStyle.merge(
+                  TextStyle(fontSize: 24, color: theme.textColor),
+                ),
+          ),
+          // Try removing opacity to observe the lack of a blur effect and of sliding content.
+          backgroundColor: theme.backgroundColor,
+          //middle: const Text(''),
+          trailing: adjustNavigationBarButtonPosition(
+              CupertinoButton(
+                onPressed: () => {},
+                child: const Icon(CupertinoIcons.share, size: 24),
+              ),
+              0,
+              -6),
+        ),
+        child: SafeArea(
+          // todo: add column and the community big tile here
+          child: MediaQuery.removePadding(
+            context: context,
+            removeTop: false,
+            child: Column(
+              children: [
+                Image(
+                    width: double.infinity,
+                    fit: BoxFit.fill,
+                    image: AssetImage(GenesisConfig
+                        .CommunityBannerAssets[paymentData.communityId]!)),
+                ListView(
+                  padding: EdgeInsets.zero,
+                  shrinkWrap: true,
+                  primary: true,
+                  children: _getSections(context, paymentData),
+                ),
+              ],
+            ),
           ),
         ),
       ),

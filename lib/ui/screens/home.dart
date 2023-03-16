@@ -1,4 +1,5 @@
 import 'package:fixnum/fixnum.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/genesis_config.dart';
@@ -20,6 +21,8 @@ class UserHomeScreen extends StatefulWidget {
 }
 
 class _UserHomeScreenState extends State<UserHomeScreen> {
+  static Color purple = Color.fromARGB(255, 88, 40, 138);
+
   static Route<void> _activityModelBuilder(
       BuildContext context, Object? arguments) {
     return CupertinoModalPopupRoute<void>(builder: (BuildContext context) {
@@ -163,26 +166,17 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           return Padding(
             padding: const EdgeInsets.all(0),
             child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Column(
                     children: [
                       _getKarmaScoreWidget(context),
-                      Text(
-                        'Karma Score',
-                        style: CupertinoTheme.of(context)
-                            .textTheme
-                            .textStyle
-                            .merge(
-                              TextStyle(
-                                  fontSize: 24,
-                                  color: CupertinoColors.activeGreen),
-                            ),
-                      ),
-                      const SizedBox(height: 24),
                       TraitsScoresWheel(null, 0),
+                      _getKarmaCoinWidget(context),
+                      //_getBalanceWidget(context),
                     ],
                   ),
+                  /*
                   Column(children: [
                     /*
                     Text(
@@ -196,8 +190,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     ),*/
                     _getBalanceWidget(context),
                   ]),
+                  */
 
-                  _getCommunityWidget(context),
+                  // _getCommunityWidget(context),
 
                   // const SizedBox(height: 24),
                   CupertinoButton.filled(
@@ -250,15 +245,102 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     return ValueListenableBuilder<int>(
         valueListenable: accountLogic.karmaCoinUser.value!.karmaScore,
         builder: (context, value, child) {
-          return FittedBox(
-            child: Text(
-              NumberFormat.compact().format(value),
-              style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                    TextStyle(
-                        fontSize: 80,
-                        color: CupertinoColors.activeGreen,
-                        fontWeight: FontWeight.w500),
-                  ),
+          return Container(
+            height: 210,
+            width: 210,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: purple,
+              border: Border.all(width: 3, color: Colors.orange),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8, right: 8),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    FittedBox(
+                      child: Text(
+                        NumberFormat.compact().format(value),
+                        style: CupertinoTheme.of(context)
+                            .textTheme
+                            .textStyle
+                            .merge(
+                              TextStyle(
+                                  fontSize: 80,
+                                  color: Colors.orange,
+                                  fontWeight: FontWeight.w400),
+                            ),
+                      ),
+                    ),
+                    Text(
+                      '☥ Karma Score',
+                      style:
+                          CupertinoTheme.of(context).textTheme.textStyle.merge(
+                                TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.orange,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
+  Widget _getKarmaCoinWidget(BuildContext context) {
+    return ValueListenableBuilder<Int64>(
+        valueListenable: accountLogic.karmaCoinUser.value!.balance,
+        builder: (context, value, child) {
+          String balance = KarmaCoinAmountFormatter.formatAmount(value);
+          String unitsLabel = KarmaCoinAmountFormatter.getUnitsLabel(value);
+
+          return Container(
+            height: 210,
+            width: 210,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: purple,
+              border: Border.all(width: 3, color: Colors.orange),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8, right: 8),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    FittedBox(
+                      child: Text(
+                        balance,
+                        style: CupertinoTheme.of(context)
+                            .textTheme
+                            .textStyle
+                            .merge(
+                              TextStyle(
+                                  fontSize: 70,
+                                  color: Colors.orange,
+                                  fontWeight: FontWeight.w400),
+                            ),
+                      ),
+                    ),
+                    Text(
+                      '☥ $unitsLabel',
+                      style:
+                          CupertinoTheme.of(context).textTheme.textStyle.merge(
+                                TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.orange,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           );
         });
@@ -275,6 +357,52 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             physics: const NeverScrollableScrollPhysics(),
             slivers: [
               CupertinoSliverNavigationBar(
+                border: Border(
+                  bottom: BorderSide(color: Colors.orange, width: 2),
+                ),
+                backgroundColor: Color.fromARGB(255, 88, 40, 138),
+                // backgroundColor: CupertinoColors.activeOrange,
+                leading: adjustNavigationBarButtonPosition(
+                    CupertinoButton(
+                      onPressed: () => context.push(ScreenPaths.actions),
+                      child: const Icon(CupertinoIcons.person_3, size: 38),
+                    ),
+                    0,
+                    -6),
+                trailing: adjustNavigationBarButtonPosition(
+                    CupertinoButton(
+                      onPressed: () => context.push(ScreenPaths.actions),
+                      child:
+                          const Icon(CupertinoIcons.ellipsis_circle, size: 24),
+                    ),
+                    0,
+                    0),
+                largeTitle: Center(
+                  child: Text(
+                    'KARMA COIN',
+                    style: CupertinoTheme.of(context)
+                        .textTheme
+                        .navLargeTitleTextStyle
+                        .merge(TextStyle(
+                          //color: Colors.white,
+                          fontSize: 30,
+                          fontWeight: FontWeight.w400,
+                        )),
+                  ),
+                ),
+                padding: EdgeInsetsDirectional.zero,
+              ),
+              SliverFillRemaining(
+                child: _getWidgetForUser(context),
+              ),
+            ]),
+      ),
+      /*
+        child: CustomScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            slivers: [
+              CupertinoSliverNavigationBar(
+                
                 // border: Border.all(color: Colors.transparent),
                 // backgroundColor: Colors.transparent,
                 // backgroundColor: CupertinoColors.activeOrange,
@@ -299,8 +427,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               SliverFillRemaining(
                 child: _getWidgetForUser(context),
               ),
-            ]),
-      ),
+            ]),*/
     );
   }
 }

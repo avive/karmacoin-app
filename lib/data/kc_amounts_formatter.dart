@@ -4,6 +4,7 @@ import 'package:karma_coin/data/genesis_config.dart';
 
 abstract class KarmaCoinAmountFormatter {
   static final NumberFormat _deicmalFormat = NumberFormat("#,###.#####");
+
   static final double _kToUsdExchangeRate = 0.02;
   static final _kCentsDisplayUpperLimit = Int64(10000);
 

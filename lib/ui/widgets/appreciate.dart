@@ -186,7 +186,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
         appState.kCentsAmount.value,
         appState.kCentsFeeAmount.value,
         appState.selectedPersonalityTrait.value,
-        0,
+        communityId,
         number,
         '',
         '');
@@ -213,6 +213,13 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
           TextStyle(
               color: GenesisConfig.CommunityColors[communityId]!.textColor));
     }
+  }
+
+  String _getSendToTitle() {
+    if (communityId == 1) {
+      return 'Receiver\'s  phone number';
+    } else
+      return 'Send to';
   }
 
   @override
@@ -244,7 +251,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text('Send to',
+                    Text(_getSendToTitle(),
                         style: CupertinoTheme.of(context)
                             .textTheme
                             .pickerTextStyle),

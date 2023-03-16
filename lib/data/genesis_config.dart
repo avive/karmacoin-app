@@ -1,8 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:karma_coin/data/personality_traits.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
-
-import '../common_libs.dart';
+import 'package:karma_coin/common_libs.dart';
 
 class CommunityDesignTheme {
   Color backgroundColor;

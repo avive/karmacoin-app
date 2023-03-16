@@ -24,7 +24,7 @@ abstract class TrnasactionGenerator {
             : null,
         amount: data.kCentsAmount,
         charTraitId: data.personalityTrait.index,
-        communityId: 0);
+        communityId: data.communityId);
 
     TransactionData txData = TransactionData(
       transactionData: paymentTx.writeToBuffer(),

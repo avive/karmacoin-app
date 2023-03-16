@@ -272,6 +272,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
         trailing: const CupertinoListTileChevron(),
         subtitle: Column(
           children: [
+            _getCommunityDetails(context, appreciation),
             const SizedBox(height: 2),
             Text(
               amount,
@@ -316,5 +317,22 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
       debugPrint('exception: $e');
       return Container();
     }
+  }
+
+  Widget _getCommunityDetails(
+      BuildContext context, types.PaymentTransactionV1 appreciation) {
+    if (appreciation.communityId == 0) {
+      return Container();
+    }
+
+    types.Community community =
+        GenesisConfig.Communities[appreciation.communityId]!;
+    String label = '${community.emoji} a ${community.name} appreciation';
+
+    return Text(label,
+        style: CupertinoTheme.of(context)
+            .textTheme
+            .tabLabelTextStyle
+            .merge(TextStyle(fontSize: 14)));
   }
 }
