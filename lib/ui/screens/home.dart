@@ -11,6 +11,7 @@ import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/ui/widgets/appreciate.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/ui/widgets/traits_scores_wheel.dart';
+import 'package:pull_down_button/pull_down_button.dart';
 import 'package:status_alert/status_alert.dart';
 
 class UserHomeScreen extends StatefulWidget {
@@ -126,35 +127,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         });
   }
 
-  Widget _getBalanceWidget(BuildContext context) {
-    return ValueListenableBuilder<Int64>(
-        valueListenable: accountLogic.karmaCoinUser.value!.balance,
-        builder: (context, value, child) {
-          return Column(
-            children: [
-              FittedBox(
-                child: Text(
-                  KarmaCoinAmountFormatter.formatAmount(value),
-                  style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                        TextStyle(
-                            fontSize: 80,
-                            color: CupertinoColors.activeBlue,
-                            fontWeight: FontWeight.w500),
-                      ),
-                ),
-              ),
-              Text(
-                KarmaCoinAmountFormatter.getUnitsLabel(value),
-                style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                      TextStyle(
-                          fontSize: 24, color: CupertinoColors.activeBlue),
-                    ),
-              ),
-            ],
-          );
-        });
-  }
-
   Widget _getWidgetForUser(BuildContext context) {
     return ValueListenableBuilder<KarmaCoinUser?>(
         // todo: how to make this not assert when karmaCoinUser is null?
@@ -167,9 +139,26 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             padding: const EdgeInsets.all(0),
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Column(
                     children: [
+                      FittedBox(
+                        child: Text(
+                          'MORE BOUNCE TO THE OUNCE',
+                          textAlign: TextAlign.center,
+                          style: CupertinoTheme.of(context)
+                              .textTheme
+                              .textStyle
+                              .merge(
+                                TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w400,
+                                    color: CupertinoColors.activeOrange),
+                              ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
                       _getKarmaScoreWidget(context),
                       TraitsScoresWheel(null, 0),
                       _getKarmaCoinWidget(context),
@@ -251,7 +240,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: purple,
-              border: Border.all(width: 3, color: Colors.orange),
+              border: Border.all(width: 4, color: Colors.orange),
             ),
             child: Padding(
               padding: const EdgeInsets.only(left: 8, right: 8),
@@ -268,14 +257,14 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                             .textStyle
                             .merge(
                               TextStyle(
-                                  fontSize: 80,
+                                  fontSize: 70,
                                   color: Colors.orange,
                                   fontWeight: FontWeight.w400),
                             ),
                       ),
                     ),
                     Text(
-                      '☥ Karma Score',
+                      'Karma Score',
                       style:
                           CupertinoTheme.of(context).textTheme.textStyle.merge(
                                 TextStyle(
@@ -305,7 +294,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: purple,
-              border: Border.all(width: 3, color: Colors.orange),
+              border: Border.all(width: 4, color: Colors.orange),
             ),
             child: Padding(
               padding: const EdgeInsets.only(left: 8, right: 8),
@@ -329,7 +318,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       ),
                     ),
                     Text(
-                      '☥ $unitsLabel',
+                      '$unitsLabel',
                       style:
                           CupertinoTheme.of(context).textTheme.textStyle.merge(
                                 TextStyle(
@@ -341,6 +330,49 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   ],
                 ),
               ),
+            ),
+          );
+        });
+  }
+
+  Widget _getCommunitiesPullDownMenuItems(BuildContext context) {
+    return ValueListenableBuilder<List<CommunityMembership>>(
+        valueListenable: accountLogic.karmaCoinUser.value!.communities,
+        builder: (context, value, child) {
+          if (value.isEmpty) {
+            return Container();
+          }
+
+          List<PullDownMenuEntry> items = [
+            PullDownMenuTitle(
+              title: const Text('Your Communities'),
+            ),
+          ];
+
+          for (CommunityMembership membership in value) {
+            Community? community =
+                GenesisConfig.Communities[membership.communityId];
+            if (community == null) {
+              continue;
+            }
+
+            items.add(
+              PullDownMenuItem(
+                title: community.emoji + ' ' + community.name,
+                onTap: () => context.push(
+                    GenesisConfig.CommunityHomeScreenPaths[community.id]!),
+              ),
+            );
+            items.add(const PullDownMenuDivider());
+          }
+
+          return PullDownButton(
+            itemBuilder: (context) => items,
+            position: PullDownMenuPosition.under,
+            buttonBuilder: (context, showMenu) => CupertinoButton(
+              onPressed: showMenu,
+              padding: EdgeInsets.only(left: 10, top: 10),
+              child: const Icon(CupertinoIcons.person_3, size: 38),
             ),
           );
         });
@@ -362,13 +394,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 ),
                 backgroundColor: Color.fromARGB(255, 88, 40, 138),
                 // backgroundColor: CupertinoColors.activeOrange,
-                leading: adjustNavigationBarButtonPosition(
-                    CupertinoButton(
-                      onPressed: () => context.push(ScreenPaths.actions),
-                      child: const Icon(CupertinoIcons.person_3, size: 38),
-                    ),
-                    0,
-                    -6),
+                leading: _getCommunitiesPullDownMenuItems(context),
                 trailing: adjustNavigationBarButtonPosition(
                     CupertinoButton(
                       onPressed: () => context.push(ScreenPaths.actions),
@@ -379,12 +405,12 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     0),
                 largeTitle: Center(
                   child: Text(
-                    'KARMA COIN',
+                    '☥ KARMA COIN',
                     style: CupertinoTheme.of(context)
                         .textTheme
                         .navLargeTitleTextStyle
                         .merge(TextStyle(
-                          //color: Colors.white,
+                          color: Colors.white,
                           fontSize: 30,
                           fontWeight: FontWeight.w400,
                         )),

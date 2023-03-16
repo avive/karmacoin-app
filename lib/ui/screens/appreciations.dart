@@ -257,7 +257,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
           emoji,
           style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                 TextStyle(
-                    fontSize: 24,
+                    fontSize: 26,
                     color:
                         CupertinoTheme.of(context).textTheme.textStyle.color),
               ),
@@ -288,8 +288,9 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
                     .tabLabelTextStyle
                     .merge(TextStyle(fontSize: 14))),
             const SizedBox(height: 6),
+            // todo: change to pill widget
             Container(
-              height: 16.0,
+              height: 18.0,
               width: 80,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
@@ -300,9 +301,9 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
                   getStatusDisplayString(status),
                   style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                         TextStyle(
-                          fontSize: 10,
+                          fontSize: 11,
                           color: CupertinoColors.white,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                 ),

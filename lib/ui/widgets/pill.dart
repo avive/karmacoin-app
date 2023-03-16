@@ -12,7 +12,7 @@ class Pill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 20,
+      height: 18,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
         color: backgroundColor,
@@ -26,7 +26,7 @@ class Pill extends StatelessWidget {
               title,
               style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                     TextStyle(
-                      fontSize: 12,
+                      fontSize: 11,
                       color: CupertinoColors.white,
                       fontWeight: FontWeight.w600,
                     ),

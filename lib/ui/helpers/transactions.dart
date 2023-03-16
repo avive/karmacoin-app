@@ -21,7 +21,7 @@ String getStatusDisplayString(TransacitonStatus status) {
 Color getStatusDisplayColor(TransacitonStatus status) {
   switch (status) {
     case TransacitonStatus.pending:
-      return CupertinoColors.systemYellow;
+      return CupertinoColors.systemOrange;
     case TransacitonStatus.confirmed:
       return CupertinoColors.activeGreen;
     case TransacitonStatus.failed:
