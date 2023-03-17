@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 
@@ -86,7 +87,23 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     (BuildContext context, bool innerBoxIsScrolled) {
                   return <Widget>[
                     CupertinoSliverNavigationBar(
-                      largeTitle: Center(child: Text('Karma Coin')),
+                      border: Border(),
+                      //border: Border(
+                      //  bottom: BorderSide(color: Colors.orange, width: 2),
+                      //),
+                      backgroundColor: Color.fromARGB(255, 88, 40, 138),
+                      largeTitle: Center(
+                          child: Text(
+                        'KARMA COIN',
+                        style: CupertinoTheme.of(context)
+                            .textTheme
+                            .navLargeTitleTextStyle
+                            .merge(TextStyle(
+                              color: Colors.white,
+                              fontSize: 30,
+                              fontWeight: FontWeight.w400,
+                            )),
+                      )),
                     )
                   ];
                 },

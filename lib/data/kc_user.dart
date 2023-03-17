@@ -56,6 +56,8 @@ class KarmaCoinUser {
     }
 
     karmaScore.value = user.karmaScore;
+
+    debugPrint('*** Updating karma score from chaint to ${user.karmaScore}');
     userData.karmaScore = user.karmaScore;
 
     userData.userName = user.userName;
@@ -81,7 +83,7 @@ class KarmaCoinUser {
     }
 
     // hack giraffes appreciations for demo purposes
-
+    /*
     newScores[1] = [
       TraitScore(traitId: 10, score: 5, communityId: 1),
       TraitScore(traitId: 4, score: 1, communityId: 1),
@@ -93,6 +95,7 @@ class KarmaCoinUser {
       TraitScore(traitId: 42, score: 1, communityId: 1),
       TraitScore(traitId: 60, score: 4, communityId: 1)
     ];
+    */
 
     traitScores.value = newScores;
 

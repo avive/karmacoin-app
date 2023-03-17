@@ -257,7 +257,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
           emoji,
           style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                 TextStyle(
-                    fontSize: 26,
+                    fontSize: 24,
                     color:
                         CupertinoTheme.of(context).textTheme.textStyle.color),
               ),

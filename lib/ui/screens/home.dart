@@ -242,7 +242,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: purple,
-              border: Border.all(width: 4, color: Colors.orange),
+              border:
+                  Border.all(width: 6, color: Color.fromARGB(255, 255, 184, 0)),
             ),
             child: Padding(
               padding: const EdgeInsets.only(left: 8, right: 8),
@@ -260,19 +261,19 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                             .merge(
                               TextStyle(
                                   fontSize: 64,
-                                  color: Colors.orange,
+                                  color: Color.fromARGB(255, 255, 184, 0),
                                   fontWeight: FontWeight.w400),
                             ),
                       ),
                     ),
                     Text(
-                      'Karma Score',
+                      'KARMA SCORE',
                       style:
                           CupertinoTheme.of(context).textTheme.textStyle.merge(
                                 TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.orange,
-                                    fontWeight: FontWeight.w400),
+                                    fontSize: 12,
+                                    color: Color.fromARGB(255, 255, 184, 0),
+                                    fontWeight: FontWeight.w600),
                               ),
                     ),
                   ],
@@ -296,7 +297,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: purple,
-              border: Border.all(width: 4, color: Colors.orange),
+              border:
+                  Border.all(width: 6, color: Color.fromARGB(255, 255, 184, 0)),
             ),
             child: Padding(
               padding: const EdgeInsets.only(left: 8, right: 8),
@@ -314,19 +316,19 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                             .merge(
                               TextStyle(
                                   fontSize: 64,
-                                  color: Colors.orange,
+                                  color: Color.fromARGB(255, 255, 184, 0),
                                   fontWeight: FontWeight.w400),
                             ),
                       ),
                     ),
                     Text(
-                      '$unitsLabel',
+                      '$unitsLabel'.toUpperCase(),
                       style:
                           CupertinoTheme.of(context).textTheme.textStyle.merge(
                                 TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.orange,
-                                    fontWeight: FontWeight.w400),
+                                    fontSize: 12,
+                                    color: Color.fromARGB(255, 255, 184, 0),
+                                    fontWeight: FontWeight.w600),
                               ),
                     ),
                   ],
@@ -392,8 +394,10 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             slivers: [
               CupertinoSliverNavigationBar(
                 border: Border(
-                  bottom: BorderSide(color: Colors.orange, width: 2),
+                  bottom: BorderSide(
+                      color: Color.fromARGB(255, 255, 184, 0), width: 2),
                 ),
+
                 backgroundColor: Color.fromARGB(255, 88, 40, 138),
                 // backgroundColor: CupertinoColors.activeOrange,
                 leading: _getCommunitiesPullDownMenuItems(context),

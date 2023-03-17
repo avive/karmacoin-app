@@ -123,12 +123,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     }
 
     _registerFirebase();
-    _registerTransactions();
-
-    debugPrint('Polling for user account data every 60 secs...');
-    _timer = Timer.periodic(const Duration(seconds: 60), (Timer t) async {
-      await _updateLocalKarmaUserFromChain();
-    });
+    _registerCallbacks();
   }
 
   /// Register on firebase user changes and update account logic when user changes
@@ -147,7 +142,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
   }
 
   /// Register on new user tx and tx event, and update state accordingly
-  void _registerTransactions() {
+  void _registerCallbacks() {
     txsBoss.newUserTransaction.addListener(() async {
       // listen to new user transaction
       if (txsBoss.newUserTransaction.value == null) {
@@ -176,6 +171,11 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
       } else {
         debugPrint('signup tx by another user. ignoring...');
       }
+    });
+
+    debugPrint('Polling for user account data every 60 secs...');
+    _timer = Timer.periodic(const Duration(seconds: 60), (Timer t) async {
+      await _updateLocalKarmaUserFromChain();
     });
   }
 
