@@ -103,7 +103,7 @@ class KarmaCoinUser {
     }
 
     // hack karma score for giraffes for demo purposes
-    user.communityMemberships[0].karmaScore = 15;
+    //user.communityMemberships[0].karmaScore = 15;
 
     userData.communityMemberships.clear();
     userData.communityMemberships.addAll(user.communityMemberships);

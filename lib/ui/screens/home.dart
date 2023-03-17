@@ -138,11 +138,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           return Padding(
             padding: const EdgeInsets.all(0),
             child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      /*
                       FittedBox(
                         child: Text(
                           'MORE BOUNCE TO THE OUNCE',
@@ -157,8 +159,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                     color: CupertinoColors.activeOrange),
                               ),
                         ),
-                      ),
-                      const SizedBox(height: 24),
+                      ),*/
+                      const SizedBox(height: 20),
                       _getKarmaScoreWidget(context),
                       TraitsScoresWheel(null, 0),
                       _getKarmaCoinWidget(context),
@@ -183,7 +185,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
                   // _getCommunityWidget(context),
 
-                  // const SizedBox(height: 24),
+                  const SizedBox(height: 24),
                   CupertinoButton.filled(
                     onPressed: () async {
                       if (!await checkInternetConnection(context)) {
@@ -235,8 +237,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         valueListenable: accountLogic.karmaCoinUser.value!.karmaScore,
         builder: (context, value, child) {
           return Container(
-            height: 210,
-            width: 210,
+            height: 140,
+            width: 140,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: purple,
@@ -257,7 +259,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                             .textStyle
                             .merge(
                               TextStyle(
-                                  fontSize: 70,
+                                  fontSize: 64,
                                   color: Colors.orange,
                                   fontWeight: FontWeight.w400),
                             ),
@@ -268,7 +270,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       style:
                           CupertinoTheme.of(context).textTheme.textStyle.merge(
                                 TextStyle(
-                                    fontSize: 20,
+                                    fontSize: 14,
                                     color: Colors.orange,
                                     fontWeight: FontWeight.w400),
                               ),
@@ -289,8 +291,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           String unitsLabel = KarmaCoinAmountFormatter.getUnitsLabel(value);
 
           return Container(
-            height: 210,
-            width: 210,
+            height: 140,
+            width: 140,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: purple,
@@ -311,7 +313,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                             .textStyle
                             .merge(
                               TextStyle(
-                                  fontSize: 70,
+                                  fontSize: 64,
                                   color: Colors.orange,
                                   fontWeight: FontWeight.w400),
                             ),
@@ -322,7 +324,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       style:
                           CupertinoTheme.of(context).textTheme.textStyle.merge(
                                 TextStyle(
-                                    fontSize: 20,
+                                    fontSize: 14,
                                     color: Colors.orange,
                                     fontWeight: FontWeight.w400),
                               ),
