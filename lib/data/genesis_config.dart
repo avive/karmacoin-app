@@ -84,8 +84,8 @@ class GenesisConfig {
     PersonalityTrait(0, '', ''),
     // user gets it for on signup
     PersonalityTrait(1, 'a Karma Grower', '💚'),
-    // user gets one point in this for every tx sent
-    PersonalityTrait(2, 'a Karma Appreciator', '🙏'),
+    // user gets one point in this for every payment tx (w/o appreciation) sent by a user and executed
+    PersonalityTrait(2, 'a Karma Spender', '🙏'),
     PersonalityTrait(3, 'Kind', '🤗'),
     PersonalityTrait(4, 'Helpful', '🤗'),
     PersonalityTrait(5, 'an Uber Geek', '🤓'),
