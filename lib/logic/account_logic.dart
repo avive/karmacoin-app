@@ -55,7 +55,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     debugPrint('initalizing account logic...');
 
     // Uncommet to start w/o any local data
-    // await clear();
+    //await clear();
 
     // load data from store
     String? seedData = await _secureStorage.read(

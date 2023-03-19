@@ -15,7 +15,7 @@ class Api {
     final clientChannel = GrpcOrGrpcWebClientChannel.toSingleEndpoint(
       host: settingsLogic.apiHostName.value,
       port: settingsLogic.apiHostPort.value,
-      transportSecure: false,
+      transportSecure: settingsLogic.apiSecureConnection.value,
     );
 
     apiServiceClient = ApiServiceClient(clientChannel);

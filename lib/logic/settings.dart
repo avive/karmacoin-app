@@ -4,8 +4,6 @@ import 'package:karma_coin/common/platform_info.dart';
 
 // todo: add settings interface
 
-// todo: add genesis config file and get verifier and net id info from it and not from settings
-
 // todo: migrate from json file to a hive box
 
 /// App settings logic
@@ -13,14 +11,30 @@ class SettingsLogic with ThrottledSaveLoadMixin {
   @override
   String get fileName => 'settings.dat';
 
+  /// Set to true to work against localhost servers. Otherwise production servers are used
+  final bool localMode = false;
+
   Future<void> init() async {
     await load();
 
-    if (await PlatformInfo.isRunningOnAndroidEmulator()) {
-      debugPrint('Running in Android emulator');
-      // on android emulator, use the host machine ip address
-      apiHostName.value = '10.0.2.2';
-      verifierHostName.value = '10.0.2.2';
+    if (localMode) {
+      debugPrint("Wroking against local servers");
+      if (await PlatformInfo.isRunningOnAndroidEmulator()) {
+        debugPrint('Running in Android emulator');
+        // on android emulator, use the host machine ip address
+        apiHostName.value = '10.0.2.2';
+        verifierHostName.value = '10.0.2.2';
+      }
+      apiSecureConnection.value = false;
+      verifierSecureConnection.value = false;
+    } else {
+      debugPrint('Working against production servers');
+      apiHostName.value = '35.239.110.128'; //'api1.karmaco.in';
+      apiHostPort.value = 9080;
+      apiSecureConnection.value = false;
+      verifierHostName.value = '35.239.110.128'; //'api1.karmaco.in';
+      verifierHostPort.value = 9080;
+      verifierSecureConnection.value = false;
     }
   }
 
@@ -69,6 +83,8 @@ class SettingsLogic with ThrottledSaveLoadMixin {
     verifierSecureConnection.value = value['apiSecureConnection'] ?? false;
 
     requestedUserName.value = value['requestedUserName'] ?? 'GoodKarma1';
+
+    /// todo: move to genesis
     verifierAccountId.value = value['verifierAccountId'] ??
         'a885bf7ac670b0f01a3551740020e115641005a93f59472002bfd1dc665f4a4e';
   }

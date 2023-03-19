@@ -47,21 +47,22 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       ),
     );
     res.add(const SizedBox(height: 32));
-    if (user == null) {
-      res.add(CupertinoButton.filled(
-        onPressed: () {
-          context.push(ScreenPaths.signup);
-        },
-        child: const Text('Sign Up'),
-      ));
-      res.add(const SizedBox(height: 16));
+    //if (user == null) {
+    res.add(CupertinoButton.filled(
+      onPressed: () {
+        context.push(ScreenPaths.signup);
+      },
+      child: const Text('Sign Up'),
+    ));
+    res.add(const SizedBox(height: 16));
+    /*
     } else {
       res.add(CupertinoButton.filled(
         onPressed: () => context.go(ScreenPaths.home),
         child: const Text('User Home'),
       ));
       res.add(const SizedBox(height: 16));
-    }
+    }*/
 
     res.add(CupertinoButton(
       onPressed: () => context.push(ScreenPaths.restoreAccount),
