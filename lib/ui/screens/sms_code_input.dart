@@ -111,6 +111,7 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text('Enter the verification code sent to your phone',
+                            textAlign: TextAlign.center,
                             style: CupertinoTheme.of(context)
                                 .textTheme
                                 .navTitleTextStyle),

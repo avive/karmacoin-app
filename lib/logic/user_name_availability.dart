@@ -48,6 +48,7 @@ class UserNameAvailabilityLogic extends ChangeNotifier {
       debugPrint('error checking user name availability: $e');
       _status = UserNameAvailabilityStatus.error;
       notifyListeners();
+      return;
     }
 
     debugPrint('api result: user name is available');

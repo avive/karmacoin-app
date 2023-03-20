@@ -135,7 +135,8 @@ void pushNamedAndRemoveUntil(String path) {
 }
 
 String _getInitialLocation() {
-  if (accountLogic.signedUpOnChain.value || accountLogic.localMode.value) {
+  if (accountLogic.karmaCoinUser.value != null &&
+      (accountLogic.signedUpOnChain.value || accountLogic.localMode.value)) {
     debugPrint('Signup or local mode - go to user home..');
     return ScreenPaths.home;
   } else {

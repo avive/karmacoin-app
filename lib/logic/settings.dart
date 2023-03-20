@@ -12,7 +12,7 @@ class SettingsLogic with ThrottledSaveLoadMixin {
   String get fileName => 'settings.dat';
 
   /// Set to true to work against localhost servers. Otherwise production servers are used
-  final bool localMode = false;
+  final bool localMode = true;
 
   Future<void> init() async {
     await load();
@@ -24,6 +24,9 @@ class SettingsLogic with ThrottledSaveLoadMixin {
         // on android emulator, use the host machine ip address
         apiHostName.value = '10.0.2.2';
         verifierHostName.value = '10.0.2.2';
+      } else {
+        apiHostName.value = '127.0.0.1';
+        verifierHostName.value = '127.0.0.1';
       }
       apiSecureConnection.value = false;
       verifierSecureConnection.value = false;

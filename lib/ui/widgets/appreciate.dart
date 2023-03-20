@@ -153,7 +153,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
         title: 'Ooops',
         subtitle: 'You can\'t appreciate yourself.',
         configuration: IconConfiguration(icon: CupertinoIcons.xmark_circle),
-        maxWidth: 260,
+        maxWidth: 270,
       );
       return false;
     }
@@ -167,7 +167,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
         title: '',
         subtitle: 'Insufficient balance. Consider sending less.',
         configuration: IconConfiguration(icon: CupertinoIcons.xmark_circle),
-        maxWidth: 260,
+        maxWidth: 270,
       );
       return false;
     }
@@ -246,9 +246,9 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
           SliverFillRemaining(
             hasScrollBody: false,
             child: Padding(
-              padding: EdgeInsets.only(left: 0, right: 0, top: 16, bottom: 16),
+              padding: EdgeInsets.only(left: 0, right: 0, top: 6, bottom: 6),
               child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(_getSendToTitle(),
@@ -279,9 +279,9 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 16),
+                    SizedBox(height: 6),
                     traitsPicker,
-                    SizedBox(height: 2),
+                    SizedBox(height: 6),
                     Column(
                       children: [
                         Text('Amount to send',
@@ -295,10 +295,17 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                           },
                           child: ValueListenableBuilder<Int64>(
                               valueListenable: appState.kCentsAmount,
-                              builder: (context, value, child) =>
-                                  Text(KarmaCoinAmountFormatter.format(value))),
+                              builder: (context, value, child) => Text(
+                                    KarmaCoinAmountFormatter.format(value),
+                                    style: CupertinoTheme.of(context)
+                                        .textTheme
+                                        .actionTextStyle
+                                        .merge(
+                                          TextStyle(fontSize: 15),
+                                        ),
+                                  )),
                         ),
-                        SizedBox(height: 16),
+                        SizedBox(height: 6),
                         Text('Network fee',
                             style: CupertinoTheme.of(context)
                                 .textTheme
@@ -311,21 +318,36 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                           },
                           child: ValueListenableBuilder<Int64>(
                               valueListenable: appState.kCentsFeeAmount,
-                              builder: (context, value, child) =>
-                                  Text(KarmaCoinAmountFormatter.format(value))),
+                              builder: (context, value, child) => Text(
+                                    KarmaCoinAmountFormatter.format(value),
+                                    style: CupertinoTheme.of(context)
+                                        .textTheme
+                                        .actionTextStyle
+                                        .merge(
+                                          TextStyle(fontSize: 15),
+                                        ),
+                                  )),
                         ),
-                        SizedBox(height: 6),
+                        //SizedBox(height: 2),
                         CupertinoButton(
-                          child: const Text('Add a thank you note'),
+                          child: Text(
+                            'Add a thank you note',
+                            style: CupertinoTheme.of(context)
+                                .textTheme
+                                .actionTextStyle
+                                .merge(
+                                  TextStyle(fontSize: 15),
+                                ),
+                          ),
                           onPressed: () {
                             // todo: show personal note taker...
                           },
                         ),
                       ],
                     ),
-                    SizedBox(height: 16),
+                    //SizedBox(height: 6),
                     _getAppreciateButton(context),
-                    SizedBox(height: 14),
+                    SizedBox(height: 1),
                   ]),
             ),
           ),

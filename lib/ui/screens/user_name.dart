@@ -101,17 +101,22 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
             case UserNameAvailabilityStatus.available:
               return const Text(
                 'Name available',
+                textAlign: TextAlign.center,
                 style: const TextStyle(color: CupertinoColors.activeGreen),
               );
             case UserNameAvailabilityStatus.unavailable:
               return const Text(
-                'Name unavailable',
+                'Name unavailable. Try another one',
+                textAlign: TextAlign.center,
                 style: const TextStyle(color: CupertinoColors.systemRed),
               );
             case UserNameAvailabilityStatus.error:
               return const Text(
-                'Error checking name availability - please try again later',
-                style: TextStyle(color: CupertinoColors.systemRed),
+                'Server error. Please try again later.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: CupertinoColors.systemRed,
+                ),
               );
           }
         },
@@ -138,7 +143,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
     }
 
     // check once again for availbility...
-    await userNameAvailabilityLogic.check(_textController.text);
+    // await userNameAvailabilityLogic.check(_textController.text);
 
     if (userNameAvailabilityLogic.status ==
         UserNameAvailabilityStatus.available) {
@@ -147,7 +152,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
 
       switch (operation) {
         case Operation.SignUp:
-          debugPrint('starting signup flow...');
+          debugPrint('>>> astarting signup flow...');
           await accountSetupController.signUpUser();
           break;
         case Operation.UpdateUserName:
@@ -162,7 +167,6 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
                   context,
                   duration: Duration(seconds: 2),
                   title: 'Name updated',
-                  //subtitle: 'Operation failed. Try again later.',
                   configuration:
                       IconConfiguration(icon: CupertinoIcons.wand_rays),
                   maxWidth: 270,
@@ -174,7 +178,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
                 StatusAlert.show(
                   context,
                   duration: Duration(seconds: 2),
-                  title: 'Oops',
+                  title: 'Server Error',
                   subtitle: 'Operation failed. Try again later.',
                   configuration: IconConfiguration(
                       icon: CupertinoIcons.exclamationmark_triangle),

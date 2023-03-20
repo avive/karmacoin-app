@@ -37,7 +37,7 @@ class _TraitsPickerWidgetState extends State<TraitsPickerWidget> {
         Text('You are',
             style: CupertinoTheme.of(context).textTheme.pickerTextStyle),
         Container(
-          height: _kItemExtent * 7,
+          height: _kItemExtent * 5,
           padding: EdgeInsets.zero,
           child: CupertinoPicker(
             magnification: 1.5,
