@@ -60,7 +60,7 @@ class _SendWidgetState extends State<SendWidget> {
         subtitle: 'Please login to your account.',
         configuration:
             IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
-        maxWidth: 260,
+        maxWidth: StatusAlertWidth,
       );
       return false;
     }
@@ -76,7 +76,7 @@ class _SendWidgetState extends State<SendWidget> {
             subtitle: 'Invalid receiver\'s Karma Coin address.',
             configuration: IconConfiguration(
                 icon: CupertinoIcons.exclamationmark_triangle),
-            maxWidth: 260,
+            maxWidth: StatusAlertWidth,
           );
           return false;
         }
@@ -89,7 +89,7 @@ class _SendWidgetState extends State<SendWidget> {
             title: 'Ooops',
             subtitle: 'You can\'t send coin to your account.',
             configuration: IconConfiguration(icon: CupertinoIcons.xmark_circle),
-            maxWidth: 260,
+            maxWidth: StatusAlertWidth,
           );
           return false;
         }
@@ -105,7 +105,7 @@ class _SendWidgetState extends State<SendWidget> {
             subtitle: 'Invalid receiver\'s phone number.',
             configuration: IconConfiguration(
                 icon: CupertinoIcons.exclamationmark_triangle),
-            maxWidth: 260,
+            maxWidth: StatusAlertWidth,
           );
           return false;
         }
@@ -121,7 +121,7 @@ class _SendWidgetState extends State<SendWidget> {
         subtitle: 'Please enter a non-zero Karma Coin amount',
         configuration:
             IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
-        maxWidth: 260,
+        maxWidth: StatusAlertWidth,
       );
       return false;
     }
@@ -135,7 +135,7 @@ class _SendWidgetState extends State<SendWidget> {
         title: '',
         subtitle: 'Insufficient balance. Consider sending less.',
         configuration: IconConfiguration(icon: CupertinoIcons.xmark_circle),
-        maxWidth: 260,
+        maxWidth: StatusAlertWidth,
       );
       return false;
     }

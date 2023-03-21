@@ -64,7 +64,7 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
           subtitle: 'Welcome to Karma Coin!',
           configuration:
               IconConfiguration(icon: CupertinoIcons.check_mark_circled),
-          maxWidth: 260,
+          maxWidth: StatusAlertWidth,
         );
       }*/
     });
@@ -97,7 +97,7 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
                 configuration:
                     IconConfiguration(icon: CupertinoIcons.wand_stars),
                 dismissOnBackgroundTap: true,
-                maxWidth: 240);
+                maxWidth: StatusAlertWidth);
 
             SubmitTransactionResponse resp =
                 await accountLogic.submitPaymentTransaction(value);
@@ -111,7 +111,7 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
                       icon: CupertinoIcons.check_mark_circled),
                   title: sentTitle,
                   dismissOnBackgroundTap: true,
-                  maxWidth: 260,
+                  maxWidth: StatusAlertWidth,
                 );
                 break;
               case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
@@ -123,7 +123,7 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
                   title: 'Internal Error',
                   subtitle: 'Sorry, please try again later.',
                   dismissOnBackgroundTap: true,
-                  maxWidth: 260,
+                  maxWidth: StatusAlertWidth,
                 );
                 break;
             }

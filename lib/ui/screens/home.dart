@@ -55,7 +55,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           subtitle: 'Welcome to Karma Coin!',
           configuration:
               IconConfiguration(icon: CupertinoIcons.check_mark_circled),
-          maxWidth: 260,
+          maxWidth: StatusAlertWidth,
         );
       }
     });
@@ -89,7 +89,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 configuration:
                     IconConfiguration(icon: CupertinoIcons.wand_stars),
                 dismissOnBackgroundTap: true,
-                maxWidth: 240);
+                maxWidth: StatusAlertWidth);
 
             SubmitTransactionResponse resp =
                 await accountLogic.submitPaymentTransaction(value);
@@ -103,7 +103,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       icon: CupertinoIcons.check_mark_circled),
                   title: sentTitle,
                   dismissOnBackgroundTap: true,
-                  maxWidth: 260,
+                  maxWidth: StatusAlertWidth,
                 );
                 break;
               case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
@@ -115,7 +115,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   title: 'Internal Error',
                   subtitle: 'Sorry, please try again later.',
                   dismissOnBackgroundTap: true,
-                  maxWidth: 260,
+                  maxWidth: StatusAlertWidth,
                 );
                 break;
             }
@@ -202,6 +202,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         });
   }
 
+  /*
   Widget _getCommunityWidget(BuildContext context) {
     return ValueListenableBuilder<List<CommunityMembership>>(
         valueListenable: accountLogic.karmaCoinUser.value!.communities,
@@ -230,7 +231,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 );
               });
         });
-  }
+  }*/
 
   Widget _getKarmaScoreWidget(BuildContext context) {
     return ValueListenableBuilder<int>(

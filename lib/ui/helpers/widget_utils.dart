@@ -1,9 +1,11 @@
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:status_alert/status_alert.dart';
 
-import '../../common_libs.dart';
+import 'package:karma_coin/common_libs.dart';
 
 // common widget helper functions
+
+const StatusAlertWidth = 270.0;
 
 Widget adjustNavigationBarButtonPosition(Widget button, double x, double y) {
   return Container(
@@ -24,7 +26,7 @@ Future<bool> checkInternetConnection(BuildContext context) async {
         configuration:
             IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
         dismissOnBackgroundTap: true,
-        maxWidth: 260);
+        maxWidth: StatusAlertWidth);
   }
 
   return isConnected;

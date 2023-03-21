@@ -133,7 +133,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
         subtitle: 'Please enter user name',
         configuration:
             IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
-        maxWidth: 270,
+        maxWidth: StatusAlertWidth,
       );
       return;
     }
@@ -169,7 +169,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
                   title: 'Name updated',
                   configuration:
                       IconConfiguration(icon: CupertinoIcons.wand_rays),
-                  maxWidth: 270,
+                  maxWidth: StatusAlertWidth,
                 );
                 debugPrint(
                     'Update user name transaction submitted and accepted');
@@ -182,7 +182,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
                   subtitle: 'Operation failed. Try again later.',
                   configuration: IconConfiguration(
                       icon: CupertinoIcons.exclamationmark_triangle),
-                  maxWidth: 270,
+                  maxWidth: StatusAlertWidth,
                 );
                 break;
             }
@@ -196,7 +196,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
               subtitle: 'Operation failed. Try again later.',
               configuration: IconConfiguration(
                   icon: CupertinoIcons.exclamationmark_triangle),
-              maxWidth: 270,
+              maxWidth: StatusAlertWidth,
             );
           }
           break;
@@ -210,7 +210,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
         subtitle: 'Please try another name.',
         configuration:
             IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
-        maxWidth: 270,
+        maxWidth: StatusAlertWidth,
       );
     }
   }

@@ -12,7 +12,7 @@ class SettingsLogic with ThrottledSaveLoadMixin {
   String get fileName => 'settings.dat';
 
   /// Set to true to work against localhost servers. Otherwise production servers are used
-  final bool localMode = true;
+  final bool localMode = false;
 
   Future<void> init() async {
     await load();
@@ -32,12 +32,12 @@ class SettingsLogic with ThrottledSaveLoadMixin {
       verifierSecureConnection.value = false;
     } else {
       debugPrint('Working against production servers');
-      apiHostName.value = '35.239.110.128'; //'api1.karmaco.in';
-      apiHostPort.value = 9080;
-      apiSecureConnection.value = false;
-      verifierHostName.value = '35.239.110.128'; //'api1.karmaco.in';
-      verifierHostPort.value = 9080;
-      verifierSecureConnection.value = false;
+      apiHostName.value = 'api.karmaco.in';
+      apiHostPort.value = 443;
+      apiSecureConnection.value = true;
+      verifierHostName.value = 'api.karmaco.in';
+      verifierHostPort.value = 443;
+      verifierSecureConnection.value = true;
     }
   }
 

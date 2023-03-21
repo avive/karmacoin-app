@@ -45,7 +45,7 @@ class _AboutScreenState extends State<AboutScreen> {
                   configuration: IconConfiguration(
                       icon: CupertinoIcons.exclamationmark_triangle),
                   dismissOnBackgroundTap: true,
-                  maxWidth: 260);
+                  maxWidth: StatusAlertWidth);
             }
           },
         ),
@@ -73,7 +73,7 @@ class _AboutScreenState extends State<AboutScreen> {
                   configuration: IconConfiguration(
                       icon: CupertinoIcons.exclamationmark_triangle),
                   dismissOnBackgroundTap: true,
-                  maxWidth: 260);
+                  maxWidth: StatusAlertWidth);
             }
           },
         ),
@@ -136,7 +136,7 @@ class _AboutScreenState extends State<AboutScreen> {
                   configuration: IconConfiguration(
                       icon: CupertinoIcons.exclamationmark_triangle),
                   dismissOnBackgroundTap: true,
-                  maxWidth: 260);
+                  maxWidth: StatusAlertWidth);
             }
           },
         ),

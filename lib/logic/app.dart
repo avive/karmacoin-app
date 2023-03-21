@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
@@ -120,6 +122,16 @@ class AppLogic with AppLogicInterface {
 
     if (accountLogic.signedUpOnChain.value == true) {
       debugPrint("user has signed up (new user tx on chain)");
+    }
+
+    WidgetsFlutterBinding.ensureInitialized();
+
+    if (!kIsWeb) {
+      // this is only for native clients. Web uses browser certs
+      ByteData data =
+          await PlatformAssetBundle().load('assets/ca/lets-encrypt-r3.pem');
+      SecurityContext.defaultContext
+          .setTrustedCertificatesBytes(data.buffer.asUint8List());
     }
 
     // Flag bootStrap as complete

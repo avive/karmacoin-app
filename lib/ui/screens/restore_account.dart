@@ -1,4 +1,5 @@
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:status_alert/status_alert.dart';
 
 class RestoreAccountScreen extends StatefulWidget {
@@ -193,7 +194,7 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
         title: 'Missing Input',
         subtitle: 'Please enter word ${firstMissingWordIdx + 1} and try again.',
         dismissOnBackgroundTap: true,
-        maxWidth: 260,
+        maxWidth: StatusAlertWidth,
       );
       return;
     }
@@ -217,7 +218,7 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
         title: 'Invalid Words',
         subtitle: 'Some of the words you have entered are wrong.',
         dismissOnBackgroundTap: true,
-        maxWidth: 260,
+        maxWidth: StatusAlertWidth,
       );
       return;
     }

@@ -57,7 +57,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
         title: 'Oopps',
         subtitle: 'Please enter your mobile phone number.',
         configuration: IconConfiguration(icon: CupertinoIcons.stop_circle),
-        maxWidth: 260,
+        maxWidth: StatusAlertWidth,
       );
       return;
     }
@@ -66,15 +66,16 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
       return;
     }
 
-    debugPrint('Phone number: ${controller.value.toString()}');
+    debugPrint(
+        'Starting signup flow... Phone number: ${controller.value.toString()}');
     String number = '+${controller.value!.countryCode}${controller.value!.nsn}';
-    debugPrint('Phone number canonical string: $number');
+    debugPrint(
+        'Phone number canonical string: $number. Calling firebase api...');
 
     await FirebaseAuth.instance.verifyPhoneNumber(
       phoneNumber: number,
       verificationCompleted: (PhoneAuthCredential credential) async {
-        debugPrint('android auto verification');
-
+        debugPrint('android auto verification callback');
         try {
           await FirebaseAuth.instance.signInWithCredential(credential);
         } catch (e) {
@@ -85,7 +86,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
             title: 'Oopps',
             subtitle: 'The phone number you entered is invalid.',
             configuration: IconConfiguration(icon: CupertinoIcons.stop_circle),
-            maxWidth: 260,
+            maxWidth: StatusAlertWidth,
           );
           return;
         }
@@ -106,7 +107,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
             title: 'Oopps',
             subtitle: 'The phone number you entered is invalid.',
             configuration: IconConfiguration(icon: CupertinoIcons.stop_circle),
-            maxWidth: 260,
+            maxWidth: StatusAlertWidth,
           );
           return;
         }
@@ -119,7 +120,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
           title: 'Oopps',
           subtitle: 'No Internet connection. Please try again later.',
           configuration: IconConfiguration(icon: CupertinoIcons.stop_circle),
-          maxWidth: 260,
+          maxWidth: StatusAlertWidth,
         );
       },
       codeSent: (String verificationId, int? resendToken) async {
@@ -206,7 +207,6 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                         SizedBox(height: 36),
                         CupertinoButton.filled(
                           onPressed: () async {
-                            debugPrint('sign up..');
                             await _beginSignup(context);
                           },
                           child: Text(title),
@@ -243,7 +243,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                 title: 'Restore Account',
                 subtitle: 'Sign up to complete restoration',
                 dismissOnBackgroundTap: true,
-                maxWidth: 260,
+                maxWidth: StatusAlertWidth,
               );
             });
           });

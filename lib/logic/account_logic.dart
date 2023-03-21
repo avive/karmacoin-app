@@ -226,7 +226,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
       debugPrint('Calling api to get updated karma coin use data...');
 
       if (karmaCoinUser.value == null) {
-        debugPrint('No local karma coin user found. ignoring...');
+        // debugPrint('No local karma coin user found. ignoring...');
         return;
       }
 

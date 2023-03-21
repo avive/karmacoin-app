@@ -45,7 +45,7 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
           title: 'Verificaiton Error',
           subtitle: 'Invalid code provided. Please try again.',
           configuration: IconConfiguration(icon: CupertinoIcons.bookmark),
-          maxWidth: 260,
+          maxWidth: StatusAlertWidth,
         );
 
         setState(() {

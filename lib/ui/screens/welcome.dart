@@ -31,11 +31,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
     CupertinoTextThemeData textTheme = CupertinoTheme.of(context).textTheme;
 
-    res.add(const SizedBox(height: 16));
+    res.add(const SizedBox(height: 12));
     res.add(Image.asset('assets/images/logo_400.png', width: 160));
-    res.add(const SizedBox(height: 32));
+    res.add(const SizedBox(height: 24));
     res.add(Text('Welcome to Karma Coin', style: textTheme.navTitleTextStyle));
-    res.add(const SizedBox(height: 16));
+    res.add(const SizedBox(height: 12));
     res.add(
       Padding(
         padding: EdgeInsets.symmetric(horizontal: 64.0),
@@ -46,7 +46,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         ),
       ),
     );
-    res.add(const SizedBox(height: 32));
+    res.add(const SizedBox(height: 12));
     //if (user == null) {
     res.add(CupertinoButton.filled(
       onPressed: () {
@@ -54,7 +54,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       },
       child: const Text('Sign Up'),
     ));
-    res.add(const SizedBox(height: 16));
+    res.add(const SizedBox(height: 12));
     /*
     } else {
       res.add(CupertinoButton.filled(

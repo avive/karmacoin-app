@@ -110,7 +110,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
         subtitle: 'Please enter receiver\'s mobile phone number.',
         configuration:
             IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
-        maxWidth: 260,
+        maxWidth: StatusAlertWidth,
       );
       return false;
     }
@@ -123,7 +123,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
         subtitle: 'Please enter a non-zero Karma Coin amount',
         configuration:
             IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
-        maxWidth: 260,
+        maxWidth: StatusAlertWidth,
       );
       return false;
     }
@@ -138,7 +138,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
         subtitle: 'Please login to your account.',
         configuration:
             IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
-        maxWidth: 260,
+        maxWidth: StatusAlertWidth,
       );
       return false;
     }
@@ -153,7 +153,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
         title: 'Ooops',
         subtitle: 'You can\'t appreciate yourself.',
         configuration: IconConfiguration(icon: CupertinoIcons.xmark_circle),
-        maxWidth: 270,
+        maxWidth: StatusAlertWidth,
       );
       return false;
     }
@@ -167,7 +167,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
         title: '',
         subtitle: 'Insufficient balance. Consider sending less.',
         configuration: IconConfiguration(icon: CupertinoIcons.xmark_circle),
-        maxWidth: 270,
+        maxWidth: StatusAlertWidth,
       );
       return false;
     }

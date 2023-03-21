@@ -18,6 +18,7 @@ class Api {
       transportSecure: settingsLogic.apiSecureConnection.value,
     );
 
+
     apiServiceClient = ApiServiceClient(clientChannel);
   }
 }
