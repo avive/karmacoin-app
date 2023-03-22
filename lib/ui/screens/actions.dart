@@ -1,8 +1,15 @@
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/ui/widgets/communities_list.dart';
 import 'package:karma_coin/ui/widgets/delete_account_tile.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:badges/badges.dart' as badges;
+
+const _supportUrl = 'https://karmaco.in/docs/support';
+const _twitterUrl = 'https://twitter.com/TeamKarmaCoin';
+const _tgramUrl = 'https://t.me/karmacoinapp/13';
+const _linkedInUrl = 'https://www.linkedin.com/company/karmacoin';
+const _blogUrl = 'https://connect.karmaco.in';
 
 class ActionsScreen extends StatefulWidget {
   const ActionsScreen({super.key});
@@ -151,7 +158,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
           CupertinoListTile.notched(
             title: const Text('Get Support'),
             leading: const Icon(CupertinoIcons.question, size: 28),
-            onTap: () => {},
+            onTap: () async => {await openUrl(context, _supportUrl)},
           ),
         ],
       ),
@@ -166,22 +173,29 @@ class _ActionsScreenState extends State<ActionsScreen> {
           CupertinoListTile.notched(
             title: const Text('Twitter'),
             leading: const FaIcon(FontAwesomeIcons.twitter, size: 24),
-            onTap: () => {},
+            onTap: () async => {await openUrl(context, _twitterUrl)},
           ),
           CupertinoListTile.notched(
             title: const Text('Telegram'),
             leading: const FaIcon(FontAwesomeIcons.telegram, size: 24),
-            onTap: () => {},
+            onTap: () async => {await openUrl(context, _tgramUrl)},
           ),
+          /*
           CupertinoListTile.notched(
             title: const Text('Discord'),
             leading: const FaIcon(FontAwesomeIcons.discord, size: 24),
-            onTap: () => {},
+            onTap: () async => {await openUrl(context, _supportUrl)},
+          ),
+          */
+          CupertinoListTile.notched(
+            title: const Text('Blog'),
+            leading: const FaIcon(FontAwesomeIcons.blog, size: 24),
+            onTap: () async => {await openUrl(context, _blogUrl)},
           ),
           CupertinoListTile.notched(
             title: const Text('LinkedIn'),
             leading: const FaIcon(FontAwesomeIcons.linkedin, size: 24),
-            onTap: () => {},
+            onTap: () async => {await openUrl(context, _linkedInUrl)},
           ),
         ],
       ),
