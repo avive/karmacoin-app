@@ -238,8 +238,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         valueListenable: accountLogic.karmaCoinUser.value!.karmaScore,
         builder: (context, value, child) {
           return Container(
-            height: 140,
-            width: 140,
+            height: 180,
+            width: 180,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: purple,
@@ -293,8 +293,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           String unitsLabel = KarmaCoinAmountFormatter.getUnitsLabel(value);
 
           return Container(
-            height: 140,
-            width: 140,
+            height: 180,
+            width: 180,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: purple,
