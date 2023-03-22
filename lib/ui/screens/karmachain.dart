@@ -115,14 +115,22 @@ class _KarmachainState extends State<Karmachain> {
     DateTime last_block_time =
         DateTime.fromMillisecondsSinceEpoch(chain_data!.lastBlockTime.toInt());
 
-    String blockDisp = DateFormat().format(last_block_time);
+    //String blockDisp = DateFormat().format(last_block_time);
 
     tiles.add(
       CupertinoListTile.notched(
-        title: Text('Last block #${chain_data!.tipHeight}'),
+        title: Text('Blocks'),
         leading: const FaIcon(FontAwesomeIcons.link, size: 20),
-        subtitle: Text(blockDisp),
-        trailing: Text(last_block_time.toTimeAgo(),
+        trailing: Text('${chain_data!.tipHeight}',
+            style: CupertinoTheme.of(context).textTheme.textStyle),
+      ),
+    );
+
+    tiles.add(
+      CupertinoListTile.notched(
+        title: Text('Current block'),
+        leading: const FaIcon(FontAwesomeIcons.square, size: 20),
+        trailing: Text('${last_block_time.toTimeAgo()}',
             style: CupertinoTheme.of(context).textTheme.textStyle),
       ),
     );
