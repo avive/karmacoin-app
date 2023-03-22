@@ -41,8 +41,8 @@ class _KarmachainState extends State<Karmachain> {
         setState(() {
           chain_data = c_data.stats;
           genesis_data = g_data;
-          debugPrint(chain_data.toString());
-          debugPrint(genesis_data.toString());
+          // debugPrint(chain_data.toString());
+          // debugPrint(genesis_data.toString());
         });
       } catch (e) {
         if (!mounted) return;
