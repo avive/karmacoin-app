@@ -12,8 +12,16 @@ class CommunityDesignTheme {
 class GenesisConfig {
   static final kCentsPerCoin = 1000000;
 
+  /// Karmachain netId. 1 is testnet 1
+  static final netId = 1;
+
+  static final netName = "Karmachain Testnet 1";
+
   /// Signup reward in kCents (phase I reward)
   static final kCentsSignupReward = Int64(10 * kCentsPerCoin);
+
+  /// Default user tx fee
+  static final kCentsDefaultFee = Int64.ONE;
 
   /// Default personality trait index for trait picket
   static final defaultAppreciationTraitIndex = 27;

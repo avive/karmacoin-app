@@ -1,5 +1,6 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
+import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
@@ -205,8 +206,9 @@ abstract class TrnasactionGenerator {
     // create a new transaction body
     TransactionBody txBody = TransactionBody(
       nonce: karmaCoinUser.nonce.value + 1,
-      fee: Int64.ONE, // todo: get default tx fee from genesis
-      netId: 1, // todo: get from genesis config
+      fee: GenesisConfig
+          .kCentsDefaultFee, // todo: get default tx fee from genesis
+      netId: GenesisConfig.netId,
       timestamp: Int64(DateTime.now().millisecondsSinceEpoch),
       transactionData: data,
     );

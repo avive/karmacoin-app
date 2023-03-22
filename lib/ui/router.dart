@@ -3,6 +3,7 @@ import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/ui/screens/about.dart';
 import 'package:karma_coin/ui/screens/backup_account.dart';
 import 'package:karma_coin/ui/screens/community_home.dart';
+import 'package:karma_coin/ui/screens/karmachain.dart';
 import 'package:karma_coin/ui/screens/restore_account.dart';
 import 'package:karma_coin/ui/screens/restore_account_intro.dart';
 import 'package:karma_coin/ui/screens/actions.dart';
@@ -32,6 +33,9 @@ class ScreenPaths {
 
   /// About screen
   static String about = '/about';
+
+  // about karmachain screen
+  static String karmaChain = '/karmachain';
 
   /// Send KC screen
   static String send = '/send';
@@ -101,6 +105,9 @@ class ScreenNames {
 
   /// A signed up user settings screen
   static String actions = 'actions';
+
+  /// Chain info
+  static String karmaChain = 'karmachain';
 
   /// an account screen
   static String account = 'account';
@@ -252,6 +259,12 @@ final GoRouter appRouter = GoRouter(
         path: ScreenPaths.about,
         builder: (BuildContext context, GoRouterState state) {
           return const AboutScreen();
+        }),
+    GoRoute(
+        name: ScreenNames.karmaChain,
+        path: ScreenPaths.karmaChain,
+        builder: (BuildContext context, GoRouterState state) {
+          return const Karmachain();
         }),
     GoRoute(
         name: ScreenNames.restoreAccountIntro,
