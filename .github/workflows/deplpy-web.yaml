@@ -22,6 +22,8 @@ jobs:
       #      run: flutter test
       - name: Enable flutter web
         run: flutter config --enable-web
+      - name: clear flutter cache
+        run: flutter clean
       - name: 'Build Web App'
         run: flutter build web --release
       - name: deploy
@@ -29,4 +31,3 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build/web
-          

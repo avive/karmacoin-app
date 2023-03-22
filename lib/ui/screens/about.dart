@@ -2,8 +2,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:status_alert/status_alert.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 /// Display user details for provided user or for local user
 class AboutScreen extends StatefulWidget {
@@ -54,20 +52,7 @@ class _AboutScreenState extends State<AboutScreen> {
           padding: EdgeInsets.only(left: 0),
           child: const Text(_websiteUrl),
           onPressed: () async {
-            if (!await checkInternetConnection(context)) {
-              return;
-            }
-
-            final Uri _url = Uri.parse(_websiteUrl);
-            if (!await launchUrl(_url)) {
-              StatusAlert.show(context,
-                  duration: Duration(seconds: 4),
-                  title: 'Failed to open url',
-                  configuration: IconConfiguration(
-                      icon: CupertinoIcons.exclamationmark_triangle),
-                  dismissOnBackgroundTap: true,
-                  maxWidth: StatusAlertWidth);
-            }
+            await openUrl(context, _websiteUrl);
           },
         ),
       ),
@@ -82,20 +67,7 @@ class _AboutScreenState extends State<AboutScreen> {
           padding: EdgeInsets.only(left: 0),
           child: const Text('The Karma Coin License'),
           onPressed: () async {
-            if (!await checkInternetConnection(context)) {
-              return;
-            }
-
-            final Uri _url = Uri.parse(_licenseUrl);
-            if (!await launchUrl(_url)) {
-              StatusAlert.show(context,
-                  duration: Duration(seconds: 4),
-                  title: 'Failed to open url',
-                  configuration: IconConfiguration(
-                      icon: CupertinoIcons.exclamationmark_triangle),
-                  dismissOnBackgroundTap: true,
-                  maxWidth: StatusAlertWidth);
-            }
+            await openUrl(context, _licenseUrl);
           },
         ),
       ),
@@ -145,20 +117,7 @@ class _AboutScreenState extends State<AboutScreen> {
           padding: EdgeInsets.only(left: 0),
           child: const Text(_githubUrl),
           onPressed: () async {
-            if (!await checkInternetConnection(context)) {
-              return;
-            }
-
-            final Uri _url = Uri.parse(_githubUrl);
-            if (!await launchUrl(_url)) {
-              StatusAlert.show(context,
-                  duration: Duration(seconds: 4),
-                  title: 'Failed to open url',
-                  configuration: IconConfiguration(
-                      icon: CupertinoIcons.exclamationmark_triangle),
-                  dismissOnBackgroundTap: true,
-                  maxWidth: StatusAlertWidth);
-            }
+            await openUrl(context, _githubUrl);
           },
         ),
       ),

@@ -233,20 +233,7 @@ class _KarmachainState extends State<Karmachain> {
           padding: EdgeInsets.only(left: 0),
           child: const Text(_githubUrl),
           onPressed: () async {
-            if (!await checkInternetConnection(context)) {
-              return;
-            }
-
-            final Uri _url = Uri.parse(_githubUrl);
-            if (!await launchUrl(_url)) {
-              StatusAlert.show(context,
-                  duration: Duration(seconds: 4),
-                  title: 'Failed to open url',
-                  configuration: IconConfiguration(
-                      icon: CupertinoIcons.exclamationmark_triangle),
-                  dismissOnBackgroundTap: true,
-                  maxWidth: StatusAlertWidth);
-            }
+            await openUrl(context, _githubUrl);
           },
         ),
       ),
@@ -274,13 +261,13 @@ class _KarmachainState extends State<Karmachain> {
   build(BuildContext context) {
     return Title(
       color: CupertinoColors.black, // This is required
-      title: 'Karma Coin Karmachain',
+      title: 'Karma Coin - Karmachain',
       child: CupertinoPageScaffold(
         child: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
               CupertinoSliverNavigationBar(
-                largeTitle: const Text('Karfmachain'),
+                largeTitle: const Text('Karmachain'),
               ),
             ];
           },
