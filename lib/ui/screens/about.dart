@@ -15,6 +15,7 @@ class AboutScreen extends StatefulWidget {
 const _websiteUrl = 'https://karmaco.in';
 const _githubUrl = 'https://github.com/karma-coin';
 const _licenseUrl = 'https://karmaco.in/docs/license';
+const _karmaChainUrl = 'https://karmaco.in/karmachain';
 
 class _AboutScreenState extends State<AboutScreen> {
   String appName = "Karma Coin";
@@ -102,8 +103,10 @@ class _AboutScreenState extends State<AboutScreen> {
         leading: const Icon(CupertinoIcons.sunrise, size: 26),
         subtitle: CupertinoButton(
           padding: EdgeInsets.only(left: 0),
-          child: const Text('https://karmacha.in'),
-          onPressed: () {},
+          child: const Text(_karmaChainUrl),
+          onPressed: () async {
+            await openUrl(context, _karmaChainUrl);
+          },
         ),
       ),
     );

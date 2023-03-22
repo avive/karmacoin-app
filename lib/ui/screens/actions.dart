@@ -5,6 +5,8 @@ import 'package:karma_coin/ui/widgets/delete_account_tile.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:badges/badges.dart' as badges;
 
+const _privacyUrl = 'https://karmaco.in/docs/privacy';
+
 const _supportUrl = 'https://karmaco.in/docs/support';
 const _twitterUrl = 'https://twitter.com/TeamKarmaCoin';
 const _tgramUrl = 'https://t.me/karmacoinapp/13';
@@ -159,6 +161,11 @@ class _ActionsScreenState extends State<ActionsScreen> {
             title: const Text('Get Support'),
             leading: const Icon(CupertinoIcons.question, size: 28),
             onTap: () async => {await openUrl(context, _supportUrl)},
+          ),
+          CupertinoListTile.notched(
+            title: const Text('Privacy Statement'),
+            leading: const Icon(CupertinoIcons.lock_circle, size: 28),
+            onTap: () async => {await openUrl(context, _privacyUrl)},
           ),
         ],
       ),
