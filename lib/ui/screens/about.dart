@@ -127,7 +127,7 @@ class _AboutScreenState extends State<AboutScreen> {
       CupertinoListTile.notched(
         title: Container(
           height: 64,
-          child: const Text('Made with ❤️ and ☯️ in 🌎'),
+          child: const Text('Made with ❤️ in 🌎 by team Karma Coin'),
         ),
       ),
     );

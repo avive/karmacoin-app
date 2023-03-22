@@ -19,6 +19,7 @@ class Karmachain extends StatefulWidget {
 }
 
 const _githubUrl = 'https://github.com/karma-coin/karmacoin-server';
+const _githubNextrUrl = 'https://github.com/karma-coin/karmachain';
 
 class _KarmachainState extends State<Karmachain> {
   _KarmachainState();
@@ -78,6 +79,14 @@ class _KarmachainState extends State<Karmachain> {
         ),
       ];
     }
+
+    tiles.add(
+      CupertinoListTile.notched(
+          title: const Text('Version'),
+          leading: const FaIcon(FontAwesomeIcons.hashtag, size: 20),
+          trailing: Text('Karmachain 1.0',
+              style: CupertinoTheme.of(context).textTheme.textStyle)),
+    );
 
     tiles.add(
       CupertinoListTile.notched(
@@ -241,9 +250,24 @@ class _KarmachainState extends State<Karmachain> {
 
     tiles.add(
       CupertinoListTile.notched(
+        padding: EdgeInsets.only(top: 6, bottom: 6, left: 12),
+        title: const Text('Karmachain 2.0 (next version)'),
+        leading: const FaIcon(FontAwesomeIcons.handSparkles, size: 18),
+        subtitle: CupertinoButton(
+          padding: EdgeInsets.only(left: 0),
+          child: const Text(_githubNextrUrl),
+          onPressed: () async {
+            await openUrl(context, _githubNextrUrl);
+          },
+        ),
+      ),
+    );
+
+    tiles.add(
+      CupertinoListTile.notched(
         title: Container(
           height: 64,
-          child: const Text('Made with ❤️ and ☯️ in 🌎'),
+          child: const Text('Made with ❤️ in 🌎 by team Karma Coin'),
         ),
       ),
     );
