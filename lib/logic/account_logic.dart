@@ -69,6 +69,36 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
       Uint8List seed = Uint8List.fromList(base64.decode(seedData));
       _setKeyPairFromSeed(seed);
       accountSecurityWords.value = seedWordsData;
+
+      var localModeData = await _secureStorage.read(
+          key: _AccountStoreKeys.localMode, aOptions: _aOptions);
+
+      if (localModeData != null) {
+        localMode.value = localModeData.toLowerCase() == 'true';
+      }
+
+      String? karmaCoinUserData = await _secureStorage.read(
+          key: _AccountStoreKeys.karmaCoinUser, aOptions: _aOptions);
+
+      if (karmaCoinUserData != null) {
+        debugPrint('loading karma coin user from secure local store...');
+        User user = User.fromBuffer(base64.decode(karmaCoinUserData));
+        karmaCoinUser.value = KarmaCoinUser(user);
+
+        await karmaCoinUser.value!.updatWithUserData(user, false);
+
+        // Get updated user data from chain and store it locally
+        await _updateLocalKarmaUserFromChain();
+
+        // start tracking txs for this account...
+        await txsBoss
+            .setAccountId(karmaCoinUser.value!.userData.accountId.data);
+
+        debugPrint(
+            'Local mode: ${localMode.value}. Signed up on chain: ${signedUpOnChain.value}.');
+      } else {
+        debugPrint('karma coin user not found in secure local store.');
+      }
     } else {
       debugPrint('seed and security words not found in secure local store.');
     }
@@ -84,35 +114,6 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
 
     if (isSignedUpData != null) {
       signedUpOnChain.value = isSignedUpData.toLowerCase() == 'true';
-    }
-
-    var localModeData = await _secureStorage.read(
-        key: _AccountStoreKeys.localMode, aOptions: _aOptions);
-
-    if (localModeData != null) {
-      localMode.value = localModeData.toLowerCase() == 'true';
-    }
-
-    String? karmaCoinUserData = await _secureStorage.read(
-        key: _AccountStoreKeys.karmaCoinUser, aOptions: _aOptions);
-
-    if (karmaCoinUserData != null) {
-      debugPrint('loading karma coin user from secure local store...');
-      User user = User.fromBuffer(base64.decode(karmaCoinUserData));
-      karmaCoinUser.value = KarmaCoinUser(user);
-
-      await karmaCoinUser.value!.updatWithUserData(user, false);
-
-      // Get updated user data from chain and store it locally
-      await _updateLocalKarmaUserFromChain();
-
-      // start tracking txs for this account...
-      await txsBoss.setAccountId(karmaCoinUser.value!.userData.accountId.data);
-
-      debugPrint(
-          'Local mode: ${localMode.value}. Signed up on chain: ${signedUpOnChain.value}.');
-    } else {
-      debugPrint('karma coin user not found in secure local store.');
     }
 
     String? verificationData = await _secureStorage.read(

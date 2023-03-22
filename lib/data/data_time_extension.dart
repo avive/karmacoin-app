@@ -4,8 +4,8 @@ extension DateHelpers on DateTime {
   String toTimeAgo({bool isIntervalNumericVisible = true}) {
     final now = DateTime.now();
     final durationSinceNow = now.difference(this);
-
     final inDays = durationSinceNow.inDays;
+    
     if (inDays >= 1) {
       return (inDays / 7).floor() >= 1
           ? isIntervalNumericVisible

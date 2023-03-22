@@ -90,7 +90,7 @@ class _KarmachainState extends State<Karmachain> {
     DateTime genesis_time = DateTime.fromMillisecondsSinceEpoch(
         genesis_data!.genesisTime.toInt() * 1000);
 
-    String dateDisp = DateFormat().format(genesis_time);
+    //String dateDisp = DateFormat().format(genesis_time);
 
     tiles.add(
       CupertinoListTile.notched(
