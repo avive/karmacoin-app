@@ -16,6 +16,8 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           channel: 'stable'
+      - name: 'Clear flutter cache'
+        run: flutter clean   
       - name: 'Run flutter pub get'
         run: flutter pub get
       #    - name: 'Run Test(s)'
