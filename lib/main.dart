@@ -23,10 +23,10 @@ void main() async {
   ]);
 
   // this removes the # from web routes for go router
-  setPathUrlStrategy();
+  // setPathUrlStrategy();
 
   await appLogic.bootstrap();
-  
+
   runApp(KarmaCoinApp());
   FlutterNativeSplash.remove();
 }
