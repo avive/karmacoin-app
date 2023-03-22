@@ -274,13 +274,13 @@ class _KarmachainState extends State<Karmachain> {
   build(BuildContext context) {
     return Title(
       color: CupertinoColors.black, // This is required
-      title: 'Karma Coin Blockchain',
+      title: 'Karma Coin Karmachain',
       child: CupertinoPageScaffold(
         child: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
               CupertinoSliverNavigationBar(
-                largeTitle: const Text('Blockchain'),
+                largeTitle: const Text('Karfmachain'),
               ),
             ];
           },
