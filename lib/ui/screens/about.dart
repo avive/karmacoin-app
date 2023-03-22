@@ -1,6 +1,7 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:status_alert/status_alert.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -18,6 +19,26 @@ const _githubUrl = 'https://github.com/karma-coin';
 const _licenseUrl = 'https://karmaco.in/docs/license';
 
 class _AboutScreenState extends State<AboutScreen> {
+  String appName = "Karma Coin";
+  String packageName = "Karma Coin";
+  String version = "";
+  String buildNumber = "";
+
+  @override
+  void initState() {
+    super.initState();
+
+    Future.delayed(Duration.zero, () async {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      setState(() {
+        appName = packageInfo.appName;
+        packageName = packageInfo.packageName;
+        version = packageInfo.version;
+        buildNumber = packageInfo.buildNumber;
+      });
+    });
+  }
+
   _AboutScreenState();
 
   /// Return the list secionts
@@ -97,7 +118,7 @@ class _AboutScreenState extends State<AboutScreen> {
 
         title: const Text('App Version'),
         leading: const Icon(CupertinoIcons.app),
-        subtitle: const Text('0.1.11'),
+        subtitle: Text('$version Build $buildNumber'),
         // todo: number format
       ),
     );
