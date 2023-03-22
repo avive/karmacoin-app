@@ -195,7 +195,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
         children: <CupertinoListTile>[
           CupertinoListTile.notched(
             title: const Text('Blockchain info'),
-            leading: const Icon(CupertinoIcons.building_2_fill, size: 24),
+            leading: const Icon(CupertinoIcons.building_2_fill, size: 28),
             trailing: const CupertinoListTileChevron(),
             onTap: () => context.push(ScreenPaths.karmaChain),
           ),
