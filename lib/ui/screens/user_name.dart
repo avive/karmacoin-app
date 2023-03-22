@@ -23,7 +23,8 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
   final Operation operation;
   final String title;
 
-  final _textController = TextEditingController(text: "avive");
+  String deafaultName = settingsLogic.devMode ? "avive" : "";
+  late final _textController = TextEditingController(text: deafaultName);
 
   @override
   void initState() {

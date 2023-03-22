@@ -26,8 +26,11 @@ class _SendDestinationState extends State<SendDestination> {
 
     // some defaults for dev mode to reduce typing in interactive testing...
 
+    String defaultNumber = settingsLogic.devMode ? "549805380" : "";
+    IsoCode code = settingsLogic.devMode ? IsoCode.IL : IsoCode.US;
+
     _phoneController =
-        PhoneController(PhoneNumber(isoCode: IsoCode.IL, nsn: "549805380"));
+        PhoneController(PhoneNumber(isoCode: code, nsn: defaultNumber));
     _accountAddressTextController = TextEditingController(
         text:
             "0xdf35d76f13a7d2b3ca949909737f211e1927132e210f676e8738fe1ba9dcfbb3");

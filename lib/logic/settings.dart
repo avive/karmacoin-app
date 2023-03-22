@@ -11,8 +11,13 @@ class SettingsLogic with ThrottledSaveLoadMixin {
   @override
   String get fileName => 'settings.dat';
 
+  // constants - should come from config
+
   /// Set to true to work against localhost servers. Otherwise production servers are used
   final bool localMode = false;
+
+  // dev mode has some text field input shortcuts to save time in dev
+  final bool devMode = false;
 
   Future<void> init() async {
     await load();

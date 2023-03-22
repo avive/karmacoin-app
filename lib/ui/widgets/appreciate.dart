@@ -50,8 +50,12 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   @override
   initState() {
     super.initState();
+
+    String defaultNumber = settingsLogic.devMode ? "549805380" : "";
+    IsoCode code = settingsLogic.devMode ? IsoCode.IL : IsoCode.US;
+
     phoneController =
-        PhoneController(PhoneNumber(isoCode: IsoCode.IL, nsn: "549805380"));
+        PhoneController(PhoneNumber(isoCode: code, nsn: defaultNumber));
   }
 
   @override

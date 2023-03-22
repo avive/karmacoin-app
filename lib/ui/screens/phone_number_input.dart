@@ -34,8 +34,11 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
   @override
   initState() {
     super.initState();
-    controller =
-        PhoneController(PhoneNumber(isoCode: IsoCode.IL, nsn: "549805381"));
+
+    String defaultNuber = settingsLogic.devMode ? "549805381" : "";
+    IsoCode code = settingsLogic.devMode ? IsoCode.IL : IsoCode.US;
+
+    controller = PhoneController(PhoneNumber(isoCode: code, nsn: defaultNuber));
     validator = PhoneValidator.validMobile();
   }
 
