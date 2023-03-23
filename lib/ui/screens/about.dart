@@ -46,14 +46,14 @@ class _AboutScreenState extends State<AboutScreen> {
 
     tiles.add(
       CupertinoListTile.notched(
-        padding: EdgeInsets.only(top: 6, bottom: 6, left: 12),
+        padding: const EdgeInsets.only(top: 6, bottom: 6, left: 12),
         title: const Text('Karma Coin Website'),
         leading: const Icon(CupertinoIcons.compass),
         subtitle: CupertinoButton(
-          padding: EdgeInsets.only(left: 0),
+          padding: const EdgeInsets.only(left: 0),
           child: const Text(_websiteUrl),
           onPressed: () async {
-            await openUrl(context, _websiteUrl);
+            await openUrl(_websiteUrl);
           },
         ),
       ),
@@ -61,33 +61,33 @@ class _AboutScreenState extends State<AboutScreen> {
 
     tiles.add(
       CupertinoListTile.notched(
-        padding: EdgeInsets.only(top: 6, bottom: 6, left: 12),
+        padding: const EdgeInsets.only(top: 6, bottom: 6, left: 12),
         title: const Text('License'),
         leading: const Icon(CupertinoIcons.doc),
         subtitle: CupertinoButton(
-          padding: EdgeInsets.only(left: 0),
+          padding: const EdgeInsets.only(left: 0),
           child: const Text('The Karma Coin License'),
           onPressed: () async {
-            await openUrl(context, _licenseUrl);
+            await openUrl(_licenseUrl);
           },
         ),
       ),
     );
 
     tiles.add(
-      CupertinoListTile.notched(
+      const CupertinoListTile.notched(
         padding: EdgeInsets.only(top: 6, bottom: 12, left: 12),
 
-        title: const Text('Copyright'),
-        leading: const FaIcon(FontAwesomeIcons.copyright, size: 22),
-        subtitle: const Text('(c) 2023 Karma Coin Authors'),
+        title: Text('Copyright'),
+        leading: FaIcon(FontAwesomeIcons.copyright, size: 22),
+        subtitle: Text('(c) 2023 Karma Coin Authors'),
         // todo: number format
       ),
     );
 
     tiles.add(
       CupertinoListTile.notched(
-        padding: EdgeInsets.only(top: 6, bottom: 12, left: 12),
+        padding: const EdgeInsets.only(top: 6, bottom: 12, left: 12),
 
         title: const Text('App Version'),
         leading: const Icon(CupertinoIcons.app),
@@ -98,14 +98,14 @@ class _AboutScreenState extends State<AboutScreen> {
 
     tiles.add(
       CupertinoListTile.notched(
-        padding: EdgeInsets.only(top: 6, bottom: 6, left: 12),
+        padding: const EdgeInsets.only(top: 6, bottom: 6, left: 12),
         title: const Text('Powered by Karmachain'),
         leading: const Icon(CupertinoIcons.sunrise, size: 26),
         subtitle: CupertinoButton(
-          padding: EdgeInsets.only(left: 0),
+          padding: const EdgeInsets.only(left: 0),
           child: const Text(_karmaChainUrl),
           onPressed: () async {
-            await openUrl(context, _karmaChainUrl);
+            await openUrl(_karmaChainUrl);
           },
         ),
       ),
@@ -113,24 +113,24 @@ class _AboutScreenState extends State<AboutScreen> {
 
     tiles.add(
       CupertinoListTile.notched(
-        padding: EdgeInsets.only(top: 6, bottom: 6, left: 12),
+        padding: const EdgeInsets.only(top: 6, bottom: 6, left: 12),
         title: const Text('100% Open Source'),
         leading: const FaIcon(FontAwesomeIcons.code, size: 20),
         subtitle: CupertinoButton(
-          padding: EdgeInsets.only(left: 0),
+          padding: const EdgeInsets.only(left: 0),
           child: const Text(_githubUrl),
           onPressed: () async {
-            await openUrl(context, _githubUrl);
+            await openUrl(_githubUrl);
           },
         ),
       ),
     );
 
     tiles.add(
-      CupertinoListTile.notched(
-        title: Container(
+      const CupertinoListTile.notched(
+        title: SizedBox(
           height: 64,
-          child: const Text('Made with ❤️ in 🌎 by team Karma Coin'),
+          child: Text('Made with ❤️ in 🌎 by team Karma Coin'),
         ),
       ),
     );
@@ -153,8 +153,8 @@ class _AboutScreenState extends State<AboutScreen> {
         child: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
-              CupertinoSliverNavigationBar(
-                largeTitle: const Text('About Karma Coin'),
+              const CupertinoSliverNavigationBar(
+                largeTitle: Text('About Karma Coin'),
               ),
             ];
           },

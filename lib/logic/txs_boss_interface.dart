@@ -16,7 +16,7 @@ abstract class TransactionsBossInterface extends ChangeNotifier {
   /// Add one or more transactions
   /// This is public as it is called to store locally submitted user transactions
   Future<void> updateWithTxs(List<SignedTransactionWithStatus> transactions,
-      {List<types.TransactionEvent>? transactionsEvents = null});
+      {List<types.TransactionEvent>? transactionsEvents});
 
   Future<void> updateWithTx(SignedTransactionWithStatus transaction);
 

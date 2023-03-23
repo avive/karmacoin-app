@@ -212,8 +212,8 @@ class TransactionsBoss extends TransactionsBossInterface {
   }
 
   @override
-  Future<void> updateWithTx(dst.SignedTransactionWithStatus tx) async {
-    await updateWithTxs([tx]);
+  Future<void> updateWithTx(dst.SignedTransactionWithStatus transaction) async {
+    await updateWithTxs([transaction]);
   }
 
   /// Add one or more transactions
@@ -222,7 +222,7 @@ class TransactionsBoss extends TransactionsBossInterface {
   /// knows that the user is on-chain
   @override
   Future<void> updateWithTxs(List<dst.SignedTransactionWithStatus> txs,
-      {List<types.TransactionEvent>? transactionsEvents = null}) async {
+      {List<types.TransactionEvent>? transactionsEvents}) async {
     if (txs.isEmpty) {
       return;
     }
@@ -252,7 +252,7 @@ class TransactionsBoss extends TransactionsBossInterface {
           listsEqual(tx.txWithStatus.transaction.signer.data, _accountId);
 
       bool wasOpenned = false;
-      var existingTx = null;
+      dynamic existingTx;
       bool isAppreciation =
           tx.getTxType() == types.TransactionType.TRANSACTION_TYPE_PAYMENT_V1;
 
@@ -327,10 +327,10 @@ class TransactionsBoss extends TransactionsBossInterface {
         String txHash = event.transactionHash.toHexString();
         txEvents[txHash] = event;
 
-        TransactionBody tx_body =
+        TransactionBody txBody =
             TransactionBody.fromBuffer(event.transaction.transactionBody);
 
-        if (tx_body.transactionData.transactionType ==
+        if (txBody.transactionData.transactionType ==
             types.TransactionType.TRANSACTION_TYPE_NEW_USER_V1) {
           if (listsEqual(event.transaction.signer.data, _accountId)) {
             debugPrint('Found new user transaction event for local user');

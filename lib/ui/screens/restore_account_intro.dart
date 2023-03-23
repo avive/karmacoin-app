@@ -25,7 +25,7 @@ class _RestoreAccountIntroScreenState extends State<RestoreAccountIntroScreen> {
     introTiles.add(
       CupertinoListTile.notched(
         title: Padding(
-          padding: EdgeInsets.only(top: 16, bottom: 0),
+          padding: const EdgeInsets.only(top: 16, bottom: 0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,8 +47,8 @@ class _RestoreAccountIntroScreenState extends State<RestoreAccountIntroScreen> {
               ),
               CupertinoButton(
                   onPressed: () {},
-                  padding: EdgeInsets.only(left: 0),
-                  child: Text('Learn more...'))
+                  padding: const EdgeInsets.only(left: 0),
+                  child: const Text('Learn more...'))
             ],
           ),
         ),
@@ -63,11 +63,11 @@ class _RestoreAccountIntroScreenState extends State<RestoreAccountIntroScreen> {
             size: 28, color: CupertinoColors.destructiveRed),
         title: CupertinoButton(
           onPressed: () => _displayWarning(context),
-          padding: EdgeInsets.only(left: 0),
+          padding: const EdgeInsets.only(left: 0),
           child: Text(
             'Restore an Old Account',
             style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                  TextStyle(color: CupertinoColors.destructiveRed),
+                  const TextStyle(color: CupertinoColors.destructiveRed),
                 ),
           ),
         ),
@@ -79,8 +79,8 @@ class _RestoreAccountIntroScreenState extends State<RestoreAccountIntroScreen> {
           leading: const Icon(CupertinoIcons.archivebox, size: 28),
           title: CupertinoButton(
               onPressed: () => context.push(ScreenPaths.securityWords),
-              padding: EdgeInsets.only(left: 0),
-              child: Text('Backup Current Account'))),
+              padding: const EdgeInsets.only(left: 0),
+              child: const Text('Backup Current Account'))),
     );
 
     return [
@@ -88,7 +88,7 @@ class _RestoreAccountIntroScreenState extends State<RestoreAccountIntroScreen> {
           header: Text(
             'WARNING',
             style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                  TextStyle(
+                  const TextStyle(
                       fontSize: 14, color: CupertinoColors.destructiveRed),
                 ),
           ),
@@ -118,8 +118,8 @@ class _RestoreAccountIntroScreenState extends State<RestoreAccountIntroScreen> {
         child: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
-              CupertinoSliverNavigationBar(
-                largeTitle: const Text('Restore Account'),
+              const CupertinoSliverNavigationBar(
+                largeTitle: Text('Restore Account'),
               ),
             ];
           },
@@ -162,7 +162,7 @@ class _RestoreAccountIntroScreenState extends State<RestoreAccountIntroScreen> {
             onPressed: () async {
               Navigator.pop(context);
               context.pop();
-              Future.delayed(Duration(milliseconds: 300), () async {
+              Future.delayed(const Duration(milliseconds: 300), () async {
                 context.push(ScreenPaths.restoreAccount);
               });
             },

@@ -4,11 +4,11 @@ import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/personality_traits.dart';
 
-enum FeeType { Payment, Fee }
+enum FeeType { payment, fee }
 
 enum CoinKind { kCents, kCoins }
 
-enum Destination { AccountAddress, PhoneNumber }
+enum Destination { accountAddress, phoneNumber }
 
 // misc runtime state such as kc amount input. Includes lifted up state from widgets
 class AppState {
@@ -28,7 +28,7 @@ class AppState {
 
 //// Mobile phone number canonical format for send KC transaction destination
   final ValueNotifier<Destination> sendDestination =
-      ValueNotifier(Destination.AccountAddress);
+      ValueNotifier(Destination.accountAddress);
 
   /// set to true when a new user appreciation was sucessfully submitted via the api
   final ValueNotifier<bool> appreciationSent = ValueNotifier(false);
@@ -49,5 +49,5 @@ class AppState {
 
   /// Last user selected personality trait from ui
   final ValueNotifier<PersonalityTrait> selectedPersonalityTrait =
-      ValueNotifier(GenesisConfig.PersonalityTraits[0]);
+      ValueNotifier(GenesisConfig.personalityTraits[0]);
 }

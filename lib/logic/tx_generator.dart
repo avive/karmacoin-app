@@ -169,7 +169,7 @@ abstract class TrnasactionGenerator {
           SubmitTransactionRequest(transaction: signedTx.transaction));
     } catch (e) {
       debugPrint('failed to submit transaction to api: $e');
-      throw e;
+      rethrow;
       // todo: show throw here so ui can handle this error
     }
 

@@ -1,4 +1,5 @@
 import 'package:fixnum/fixnum.dart';
+import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
@@ -13,15 +14,15 @@ import 'package:phone_form_field/phone_form_field.dart';
 import 'package:status_alert/status_alert.dart';
 
 class AppreciateWidget extends StatefulWidget {
-  final int communitId;
-  const AppreciateWidget(Key? key, this.communitId) : super(key: key);
+  final int communityId;
+
+  const AppreciateWidget({super.key, this.communityId = 0});
 
   @override
-  State<AppreciateWidget> createState() => _AppreciateWidgetState(communitId);
+  State<AppreciateWidget> createState() => _AppreciateWidgetState();
 }
 
 class _AppreciateWidgetState extends State<AppreciateWidget> {
-  final int communityId;
   late PhoneController phoneController;
   late final TraitsPickerWidget traitsPicker;
   bool outlineBorder = false;
@@ -31,21 +32,12 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   bool withLabel = true;
   bool useRtl = false;
 
-  _AppreciateWidgetState(this.communityId) {
-    if (communityId == 0) {
-      traitsPicker = TraitsPickerWidget(GenesisConfig.PersonalityTraits, 6);
-    } else {
-      traitsPicker = TraitsPickerWidget(
-          GenesisConfig.CommunityPersonalityTraits[communityId]!, 6);
-    }
-  }
-
   // country selector ux
   CountrySelectorNavigator selectorNavigator =
       const CountrySelectorNavigator.draggableBottomSheet();
 
-  final formKey = GlobalKey<FormState>();
-  final phoneKey = GlobalKey<FormFieldState<PhoneNumber>>();
+  //final formKey = GlobalKey<FormState>();
+  //final phoneKey = GlobalKey<FormFieldState<PhoneNumber>>();
 
   @override
   initState() {
@@ -53,6 +45,14 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
 
     String defaultNumber = settingsLogic.devMode ? "549805380" : "";
     IsoCode code = settingsLogic.devMode ? IsoCode.IL : IsoCode.US;
+
+    if (widget.communityId == 0) {
+      traitsPicker =
+          TraitsPickerWidget(null, GenesisConfig.personalityTraits, 6);
+    } else {
+      traitsPicker = TraitsPickerWidget(null,
+          GenesisConfig.communityPersonalityTraits[widget.communityId]!, 6);
+    }
 
     phoneController =
         PhoneController(PhoneNumber(isoCode: code, nsn: defaultNumber));
@@ -78,9 +78,9 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   static Route<void> _paymentAmountInputModelBuilder(
       BuildContext context, Object? arguments) {
     return CupertinoModalPopupRoute<void>(builder: (BuildContext context) {
-      return AmountInputWidget(
+      return const AmountInputWidget(
           coinKind: CoinKind.kCoins,
-          feeType: FeeType.Payment,
+          feeType: FeeType.payment,
           title: 'Amount to send');
     });
   }
@@ -89,61 +89,76 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   static Route<void> _feeAmountInputModelBuilder(
       BuildContext context, Object? arguments) {
     return CupertinoModalPopupRoute<void>(builder: (BuildContext context) {
-      return AmountInputWidget(
+      return const AmountInputWidget(
           coinKind: CoinKind.kCents,
-          feeType: FeeType.Fee,
+          feeType: FeeType.fee,
           title: 'Network fee');
     });
   }
 
   // validate input data and show alert if invalid
-  Future<bool> _validateData(BuildContext context) async {
+  Future<bool> _validateData() async {
     debugPrint('validate data... ${phoneController.value}');
 
-    if (!await checkInternetConnection(context)) {
-      return false;
+    bool isConnected = await PlatformInfo.isConnected();
+
+    if (!isConnected && context.mounted) {
+      StatusAlert.show(context,
+          duration: const Duration(seconds: 4),
+          title: 'No Internet',
+          subtitle: 'Check your connection',
+          configuration: const IconConfiguration(
+              icon: CupertinoIcons.exclamationmark_triangle),
+          dismissOnBackgroundTap: true,
+          maxWidth: statusAlertWidth);
     }
 
     if (phoneController.value == null ||
         phoneController.value!.countryCode.isEmpty ||
         phoneController.value!.nsn.isEmpty) {
-      StatusAlert.show(
-        context,
-        duration: Duration(seconds: 2),
-        title: 'Oops...',
-        subtitle: 'Please enter receiver\'s mobile phone number.',
-        configuration:
-            IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
-        maxWidth: StatusAlertWidth,
-      );
+      if (context.mounted) {
+        StatusAlert.show(
+          context,
+          duration: const Duration(seconds: 2),
+          title: 'Oops...',
+          subtitle: 'Please enter receiver\'s mobile phone number.',
+          configuration: const IconConfiguration(
+              icon: CupertinoIcons.exclamationmark_triangle),
+          maxWidth: statusAlertWidth,
+        );
+      }
       return false;
     }
 
     if (appState.kCentsAmount.value == Int64.ZERO) {
-      StatusAlert.show(
-        context,
-        duration: Duration(seconds: 2),
-        title: 'Oops...',
-        subtitle: 'Please enter a non-zero Karma Coin amount',
-        configuration:
-            IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
-        maxWidth: StatusAlertWidth,
-      );
+      if (context.mounted) {
+        StatusAlert.show(
+          context,
+          duration: const Duration(seconds: 2),
+          title: 'Oops...',
+          subtitle: 'Please enter a non-zero Karma Coin amount',
+          configuration: const IconConfiguration(
+              icon: CupertinoIcons.exclamationmark_triangle),
+          maxWidth: statusAlertWidth,
+        );
+      }
       return false;
     }
 
     KarmaCoinUser? user = accountLogic.karmaCoinUser.value;
 
     if (user == null) {
-      StatusAlert.show(
-        context,
-        duration: Duration(seconds: 2),
-        title: 'Oops...',
-        subtitle: 'Please login to your account.',
-        configuration:
-            IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
-        maxWidth: StatusAlertWidth,
-      );
+      if (context.mounted) {
+        StatusAlert.show(
+          context,
+          duration: const Duration(seconds: 2),
+          title: 'Oops...',
+          subtitle: 'Please login to your account.',
+          configuration: const IconConfiguration(
+              icon: CupertinoIcons.exclamationmark_triangle),
+          maxWidth: statusAlertWidth,
+        );
+      }
       return false;
     }
 
@@ -151,35 +166,41 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
         '+${phoneController.value!.countryCode}${phoneController.value!.nsn}';
 
     if (user.mobileNumber.value.number == number) {
-      StatusAlert.show(
-        context,
-        duration: Duration(seconds: 2),
-        title: 'Ooops',
-        subtitle: 'You can\'t appreciate yourself.',
-        configuration: IconConfiguration(icon: CupertinoIcons.xmark_circle),
-        maxWidth: StatusAlertWidth,
-      );
+      if (context.mounted) {
+        StatusAlert.show(
+          context,
+          duration: const Duration(seconds: 2),
+          title: 'Ooops',
+          subtitle: 'You can\'t appreciate yourself.',
+          configuration:
+              const IconConfiguration(icon: CupertinoIcons.xmark_circle),
+          maxWidth: statusAlertWidth,
+        );
+      }
       return false;
     }
 
     debugPrint('user balance: ${user.balance.value}');
 
     if (user.balance.value < appState.kCentsAmount.value) {
-      StatusAlert.show(
-        context,
-        duration: Duration(seconds: 2),
-        title: '',
-        subtitle: 'Insufficient balance. Consider sending less.',
-        configuration: IconConfiguration(icon: CupertinoIcons.xmark_circle),
-        maxWidth: StatusAlertWidth,
-      );
+      if (context.mounted) {
+        StatusAlert.show(
+          context,
+          duration: const Duration(seconds: 2),
+          title: '',
+          subtitle: 'Insufficient balance. Consider sending less.',
+          configuration:
+              const IconConfiguration(icon: CupertinoIcons.xmark_circle),
+          maxWidth: statusAlertWidth,
+        );
+      }
       return false;
     }
 
     return true;
   }
 
-  Future<void> _sendAppreciation(BuildContext context) async {
+  Future<void> _sendAppreciation() async {
     // todo: validate data and show alerts if invalid
 
     String number =
@@ -190,7 +211,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
         appState.kCentsAmount.value,
         appState.kCentsFeeAmount.value,
         appState.selectedPersonalityTrait.value,
-        communityId,
+        widget.communityId,
         number,
         '',
         '');
@@ -202,28 +223,30 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   }
 
   Color _getNavBarBackgroundColor() {
-    if (communityId == 0) {
+    if (widget.communityId == 0) {
       return CupertinoTheme.of(context).barBackgroundColor;
     } else {
-      return GenesisConfig.CommunityColors[communityId]!.backgroundColor;
+      return GenesisConfig.communityColors[widget.communityId]!.backgroundColor;
     }
   }
 
   TextStyle _getNavBarTitleStyle() {
-    if (communityId == 0) {
+    if (widget.communityId == 0) {
       return CupertinoTheme.of(context).textTheme.navLargeTitleTextStyle;
     } else {
       return CupertinoTheme.of(context).textTheme.navLargeTitleTextStyle.merge(
           TextStyle(
-              color: GenesisConfig.CommunityColors[communityId]!.textColor));
+              color: GenesisConfig
+                  .communityColors[widget.communityId]!.textColor));
     }
   }
 
   String _getSendToTitle() {
-    if (communityId == 1) {
+    if (widget.communityId == 1) {
       return 'Receiver\'s  phone number';
-    } else
+    } else {
       return 'Send to';
+    }
   }
 
   @override
@@ -250,7 +273,8 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
           SliverFillRemaining(
             hasScrollBody: false,
             child: Padding(
-              padding: EdgeInsets.only(left: 0, right: 0, top: 6, bottom: 6),
+              padding:
+                  const EdgeInsets.only(left: 0, right: 0, top: 6, bottom: 6),
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -261,10 +285,10 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                             .pickerTextStyle),
                     // todo: pick theme from app settings
                     Padding(
-                      padding: EdgeInsets.only(left: 16, right: 16),
+                      padding: const EdgeInsets.only(left: 16, right: 16),
                       child: Material(
                         child: PhoneFormField(
-                          key: phoneKey,
+                          key: UniqueKey(),
                           controller: phoneController,
                           shouldFormat: shouldFormat && !useRtl,
                           autofocus: true,
@@ -283,9 +307,9 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 6),
+                    const SizedBox(height: 6),
                     traitsPicker,
-                    SizedBox(height: 6),
+                    const SizedBox(height: 6),
                     Column(
                       children: [
                         Text('Amount to send',
@@ -305,11 +329,11 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                                         .textTheme
                                         .actionTextStyle
                                         .merge(
-                                          TextStyle(fontSize: 15),
+                                          const TextStyle(fontSize: 15),
                                         ),
                                   )),
                         ),
-                        SizedBox(height: 6),
+                        const SizedBox(height: 6),
                         Text('Network fee',
                             style: CupertinoTheme.of(context)
                                 .textTheme
@@ -328,7 +352,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                                         .textTheme
                                         .actionTextStyle
                                         .merge(
-                                          TextStyle(fontSize: 15),
+                                          const TextStyle(fontSize: 15),
                                         ),
                                   )),
                         ),
@@ -340,7 +364,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                                 .textTheme
                                 .actionTextStyle
                                 .merge(
-                                  TextStyle(fontSize: 15),
+                                  const TextStyle(fontSize: 15),
                                 ),
                           ),
                           onPressed: () {
@@ -351,7 +375,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                     ),
                     //SizedBox(height: 6),
                     _getAppreciateButton(context),
-                    SizedBox(height: 1),
+                    const SizedBox(height: 1),
                   ]),
             ),
           ),
@@ -361,24 +385,27 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   }
 
   Widget _getAppreciateButton(BuildContext context) {
-    if (communityId == 0) {
+    if (widget.communityId == 0) {
       return CupertinoButton.filled(
         onPressed: () async {
-          if (await _validateData(context)) {
-            await _sendAppreciation(context);
+          if (context.mounted) {
+            if (await _validateData()) {
+              await _sendAppreciation();
+            }
           }
         },
         child: const Text('Appreciate'),
       );
     }
 
-    CommunityDesignTheme theme = GenesisConfig.CommunityColors[communityId]!;
+    CommunityDesignTheme theme =
+        GenesisConfig.communityColors[widget.communityId]!;
 
     return CupertinoButton(
-      color: GenesisConfig.CommunityColors[communityId]!.backgroundColor,
+      color: GenesisConfig.communityColors[widget.communityId]!.backgroundColor,
       onPressed: () async {
-        if (await _validateData(context)) {
-          await _sendAppreciation(context);
+        if (await _validateData()) {
+          await _sendAppreciation();
         }
       },
       child: Text(

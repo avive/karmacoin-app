@@ -86,9 +86,9 @@ class SignedTransactionWithStatus {
 
   /// Create a new SignedTransactionWithStatus from json representation
   static SignedTransactionWithStatus fromJson(Map<String, dynamic> value) {
-    String tx_data = value['txWithStatus'];
+    String txData = value['txWithStatus'];
     types.SignedTransactionWithStatus tx =
-        types.SignedTransactionWithStatus.fromJson(tx_data);
+        types.SignedTransactionWithStatus.fromJson(txData);
 
     SignedTransactionWithStatus txWithStatus = SignedTransactionWithStatus(
         tx, value['incoming'] == 'true' || value['incoming'] == true);
@@ -99,7 +99,7 @@ class SignedTransactionWithStatus {
   // Returns a json representation of the tx
   Map<String, dynamic> toJson() {
     return {
-      'txWithStatus': this.txWithStatus.writeToJson(),
+      'txWithStatus': txWithStatus.writeToJson(),
       'openned': openned.value,
       'incoming': incoming
     };

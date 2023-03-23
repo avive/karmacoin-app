@@ -23,7 +23,7 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
     introTiles.add(
       CupertinoListTile.notched(
         title: Padding(
-          padding: EdgeInsets.only(top: 16, bottom: 0),
+          padding: const EdgeInsets.only(top: 16, bottom: 0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,8 +45,8 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
               ),
               CupertinoButton(
                   onPressed: () {},
-                  padding: EdgeInsets.only(left: 0),
-                  child: Text('Learn more...'))
+                  padding: const EdgeInsets.only(left: 0),
+                  child: const Text('Learn more...'))
             ],
           ),
         ),
@@ -66,7 +66,7 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
     for (int i = 0; i < 24; i++) {
       tiles.add(
         CupertinoListTile.notched(
-          key: UniqueKey(),
+          key: ValueKey(i),
           title: Center(
             child: CupertinoTextFormFieldRow(
               initialValue: backupWords[i],
@@ -86,7 +86,7 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
               style: CupertinoTheme.of(context)
                   .textTheme
                   .navTitleTextStyle
-                  .merge(TextStyle(fontSize: 18))),
+                  .merge(const TextStyle(fontSize: 18))),
           // todo: number format
         ),
       );
@@ -100,11 +100,11 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
           onPressed: () async {
             await submitUserInput();
           },
-          padding: EdgeInsets.only(left: 0),
+          padding: const EdgeInsets.only(left: 0),
           child: Text(
             'Restore Account',
             style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                  TextStyle(color: CupertinoColors.destructiveRed),
+                  const TextStyle(color: CupertinoColors.destructiveRed),
                 ),
           ),
         ),
@@ -151,8 +151,8 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             if (!mounted) return [];
             return <Widget>[
-              CupertinoSliverNavigationBar(
-                largeTitle: const Text('Restore Account'),
+              const CupertinoSliverNavigationBar(
+                largeTitle: Text('Restore Account'),
               ),
             ];
           },
@@ -188,20 +188,20 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
       // display error dialog
       StatusAlert.show(
         context,
-        duration: Duration(seconds: 2),
-        configuration:
-            IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
+        duration: const Duration(seconds: 2),
+        configuration: const IconConfiguration(
+            icon: CupertinoIcons.exclamationmark_triangle),
         title: 'Missing Input',
         subtitle: 'Please enter word ${firstMissingWordIdx + 1} and try again.',
         dismissOnBackgroundTap: true,
-        maxWidth: StatusAlertWidth,
+        maxWidth: statusAlertWidth,
       );
       return;
     }
     String allWords = "";
-    backupWords.forEach((element) {
-      allWords += element + " ";
-    });
+    for (var element in backupWords) {
+      allWords += '$element ';
+    }
     allWords = allWords.substring(0, allWords.length - 1);
     debugPrint('User provided words: "$allWords"');
 
@@ -212,13 +212,13 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
       debugPrint('set keypair error: $e');
       StatusAlert.show(
         context,
-        duration: Duration(seconds: 2),
-        configuration:
-            IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
+        duration: const Duration(seconds: 2),
+        configuration: const IconConfiguration(
+            icon: CupertinoIcons.exclamationmark_triangle),
         title: 'Invalid Words',
         subtitle: 'Some of the words you have entered are wrong.',
         dismissOnBackgroundTap: true,
-        maxWidth: StatusAlertWidth,
+        maxWidth: statusAlertWidth,
       );
       return;
     }
@@ -236,7 +236,9 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
 
     //Future.delayed(Duration.zero, () async {
     // todo: only if not came from welcome?
-    context.push(ScreenPaths.signup, extra: 'Verify Number');
+    if (context.mounted) {
+      context.push(ScreenPaths.signup, extra: 'Verify Number');
+    }
     //});
   }
 }

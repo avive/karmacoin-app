@@ -28,14 +28,14 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
           if (value > 0) {
             final label = (value).toString();
             return badges.Badge(
-              badgeStyle:
-                  badges.BadgeStyle(badgeColor: CupertinoColors.systemBlue),
+              badgeStyle: const badges.BadgeStyle(
+                  badgeColor: CupertinoColors.systemBlue),
               position: badges.BadgePosition.topEnd(top: -2, end: -30),
               badgeContent: Text(label,
                   style: CupertinoTheme.of(context)
                       .textTheme
                       .tabLabelTextStyle
-                      .merge(TextStyle(
+                      .merge(const TextStyle(
                           fontSize: 12, color: CupertinoColors.white))),
               child: const Text('Recieved'),
             );
@@ -52,14 +52,14 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
           if (value > 0) {
             final label = value.toString();
             return badges.Badge(
-              badgeStyle:
-                  badges.BadgeStyle(badgeColor: CupertinoColors.systemBlue),
+              badgeStyle: const badges.BadgeStyle(
+                  badgeColor: CupertinoColors.systemBlue),
               position: badges.BadgePosition.topEnd(top: -2, end: -30),
               badgeContent: Text(label,
                   style: CupertinoTheme.of(context)
                       .textTheme
                       .tabLabelTextStyle
-                      .merge(TextStyle(
+                      .merge(const TextStyle(
                           fontSize: 12, color: CupertinoColors.white))),
               child: const Text('Sent'),
             );
@@ -79,7 +79,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
               CupertinoSliverNavigationBar(
-                largeTitle: Text('Appreciations'),
+                largeTitle: const Text('Appreciations'),
                 middle: CupertinoSlidingSegmentedControl<Group>(
                   // Provide horizontal padding around the children.
                   // padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -96,11 +96,11 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
                   },
                   children: <Group, Widget>{
                     Group.received: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 24),
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: _getRecivedLabel(context),
                     ),
                     Group.sent: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 24),
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: _getSentLabel(context),
                     ),
                   },
@@ -156,7 +156,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
         builder: (context, value, child) {
           return ListView.separated(
             separatorBuilder: (context, index) {
-              return Divider(
+              return const Divider(
                 thickness: 1,
                 indent: 58,
               );
@@ -201,13 +201,13 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
         }
       }
 
-      PersonalityTrait? trait = null;
+      PersonalityTrait? trait;
       String title = 'Karma Coins payment';
       String emoji = '🤑';
 
       if (appreciation.charTraitId != 0 &&
-          appreciation.charTraitId < GenesisConfig.PersonalityTraits.length) {
-        trait = GenesisConfig.PersonalityTraits[appreciation.charTraitId];
+          appreciation.charTraitId < GenesisConfig.personalityTraits.length) {
+        trait = GenesisConfig.personalityTraits[appreciation.charTraitId];
         title = 'You are ${trait.name.toLowerCase()}';
         emoji = trait.emoji;
       }
@@ -244,7 +244,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
         }
       }
 
-      detailsLabel += '${tx.getTimesAgo()}';
+      detailsLabel += tx.getTimesAgo();
 
       return CupertinoListTile(
         onTap: () {
@@ -252,7 +252,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
               params: {'txId': txHash});
         },
         key: Key(index.toString()),
-        padding: EdgeInsets.only(top: 6, bottom: 6, left: 14, right: 14),
+        padding: const EdgeInsets.only(top: 6, bottom: 6, left: 14, right: 14),
         leading: Text(
           emoji,
           style: CupertinoTheme.of(context).textTheme.textStyle.merge(
@@ -271,6 +271,8 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
         ),
         trailing: const CupertinoListTileChevron(),
         subtitle: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _getCommunityDetails(context, appreciation),
             const SizedBox(height: 2),
@@ -279,14 +281,14 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
               style: CupertinoTheme.of(context)
                   .textTheme
                   .tabLabelTextStyle
-                  .merge(TextStyle(fontSize: 14)),
+                  .merge(const TextStyle(fontSize: 14)),
             ),
             const SizedBox(height: 2),
             Text(detailsLabel,
                 style: CupertinoTheme.of(context)
                     .textTheme
                     .tabLabelTextStyle
-                    .merge(TextStyle(fontSize: 14))),
+                    .merge(const TextStyle(fontSize: 14))),
             const SizedBox(height: 6),
             // todo: change to pill widget
             Container(
@@ -300,7 +302,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
                 child: Text(
                   getStatusDisplayString(status),
                   style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                        TextStyle(
+                        const TextStyle(
                           fontSize: 11,
                           color: CupertinoColors.white,
                           fontWeight: FontWeight.w600,
@@ -310,8 +312,6 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
               ),
             ),
           ],
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
         ),
       );
     } catch (e) {
@@ -327,13 +327,13 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
     }
 
     types.Community community =
-        GenesisConfig.Communities[appreciation.communityId]!;
+        GenesisConfig.communities[appreciation.communityId]!;
     String label = '${community.emoji} a ${community.name} appreciation';
 
     return Text(label,
         style: CupertinoTheme.of(context)
             .textTheme
             .tabLabelTextStyle
-            .merge(TextStyle(fontSize: 14)));
+            .merge(const TextStyle(fontSize: 14)));
   }
 }

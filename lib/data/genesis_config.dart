@@ -10,57 +10,57 @@ class CommunityDesignTheme {
 }
 
 class GenesisConfig {
-  static final kCentsPerCoin = 1000000;
+  static const kCentsPerCoin = 1000000;
 
   /// Karmachain netId. 1 is testnet 1
-  static final netId = 1;
+  static const netId = 1;
 
-  static final netName = "Karmachain Testnet 1";
+  static const netName = "Karmachain Testnet 1";
 
   /// Signup reward in kCents (phase I reward)
   static final kCentsSignupReward = Int64(10 * kCentsPerCoin);
 
   /// Default user tx fee
-  static final kCentsDefaultFee = Int64.ONE;
+  static const kCentsDefaultFee = Int64.ONE;
 
   /// Default personality trait index for trait picket
-  static final defaultAppreciationTraitIndex = 27;
+  static const defaultAppreciationTraitIndex = 27;
 
   /// Trait index for sign up. e.g. a Karma Grower
-  static final signUpCharTraitIndex = 2;
+  static const signUpCharTraitIndex = 2;
 
   /// Trait index for no appreciation - used in payemnt transactions
-  static final noAppreciationTraitIndex = 0;
+  static const noAppreciationTraitIndex = 0;
 
   // todo: unify all of these props into community ClientData object and store
   // in map by community id
 
   /// todo: move to community manager - not part og genesis config
-  static final Map<int, CommunityDesignTheme> CommunityColors = {
-    1: CommunityDesignTheme(
-        Color.fromARGB(255, 183, 66, 179), Color.fromARGB(255, 255, 255, 255)),
+  static final Map<int, CommunityDesignTheme> communityColors = {
+    1: CommunityDesignTheme(const Color.fromARGB(255, 183, 66, 179),
+        const Color.fromARGB(255, 255, 255, 255)),
   };
 
-  static final Map<int, String> CommunityTileAssets = {
+  static final Map<int, String> communityTileAssets = {
     1: 'assets/images/giraffes_tile.png',
   };
 
-  static final Map<int, String> CommunityBannerAssets = {
+  static final Map<int, String> communityBannerAssets = {
     1: 'assets/images/giraffes_banner.png',
   };
 
-  static final Map<int, String> CommunityAppreciateLabels = {
+  static final Map<int, String> communityAppreciateLabels = {
     1: '🦒 Appreciate a Giraffe',
   };
 
-  static final Map<int, String> CommunityHomeScreenPaths = {
+  static final Map<int, String> communityHomeScreenPaths = {
     1: '/community/giraffes',
   };
 
   // todo: add asset for banner
 
   /// Meta-data for partner communitites supported by the app index by id
-  static final Map<int, Community> Communities = {
+  static final Map<int, Community> communities = {
     1: Community(
         id: 1,
         name: 'Grateful Giraffes',
@@ -74,7 +74,7 @@ class GenesisConfig {
         charTraitIds: [10, 4, 3, 11, 15, 18, 39, 42, 60])
   };
 
-  static final Map<int, List<PersonalityTrait>> CommunityPersonalityTraits = {
+  static final Map<int, List<PersonalityTrait>> communityPersonalityTraits = {
     1: [
       PersonalityTrait(10, 'Grateful', '🦒'),
       PersonalityTrait(4, 'Helpful', '🤗'),
@@ -88,7 +88,7 @@ class GenesisConfig {
     ]
   };
 
-  static final List<PersonalityTrait> PersonalityTraits = [
+  static final List<PersonalityTrait> personalityTraits = [
     PersonalityTrait(0, '', ''),
     // user gets it for on signup
     PersonalityTrait(1, 'a Karma Grower', '💚'),

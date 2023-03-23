@@ -5,23 +5,17 @@ import 'package:karma_coin/services/api/types.pb.dart';
 
 class TraitsScoresWheel extends StatefulWidget {
   @required
-  late final int communityId;
+  final int communityId;
 
-  TraitsScoresWheel(Key? key, this.communityId) : super(key: key);
+  const TraitsScoresWheel(Key? key, this.communityId) : super(key: key);
 
   @override
-  State<TraitsScoresWheel> createState() =>
-      _TraitsScoresWheelState(communityId);
+  State<TraitsScoresWheel> createState() => _TraitsScoresWheelState();
 }
 
 const double _kItemExtent = 32.0;
 
 class _TraitsScoresWheelState extends State<TraitsScoresWheel> {
-  @required
-  late final int communityId;
-
-  _TraitsScoresWheelState(this.communityId);
-
   // ignore: unused_field
   @required
   int selectedItemIndex = 0;
@@ -31,7 +25,7 @@ class _TraitsScoresWheelState extends State<TraitsScoresWheel> {
     return ValueListenableBuilder<Map<int, List<TraitScore>>>(
         valueListenable: accountLogic.karmaCoinUser.value!.traitScores,
         builder: (context, value, child) {
-          List<TraitScore> scores = value[communityId] ?? [];
+          List<TraitScore> scores = value[widget.communityId] ?? [];
           return Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -55,10 +49,10 @@ class _TraitsScoresWheelState extends State<TraitsScoresWheel> {
                   children: List<Widget>.generate(scores.length, (int index) {
                     TraitScore score = scores[index];
                     PersonalityTrait trait =
-                        GenesisConfig.PersonalityTraits[score.traitId];
+                        GenesisConfig.personalityTraits[score.traitId];
                     String label = '${trait.emoji} ${trait.name}';
                     if (score.score > 1) {
-                      label = label + ' x${score.score}';
+                      label = '$label x${score.score}';
                     }
                     return Center(
                       child: Column(children: [

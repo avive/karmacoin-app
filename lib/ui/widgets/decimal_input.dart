@@ -9,11 +9,11 @@ class DecimalAmountInputWidget extends StatefulWidget {
   @required
   final FeeType feeType;
 
-  DecimalAmountInputWidget({Key? key, this.feeType = FeeType.Payment})
+  const DecimalAmountInputWidget({Key? key, this.feeType = FeeType.payment})
       : super(key: key);
   @override
   State<DecimalAmountInputWidget> createState() =>
-      _DecimalAmountInputWidgetState(feeType);
+      _DecimalAmountInputWidgetState();
 }
 
 const double _kItemExtent = 32.0;
@@ -21,20 +21,17 @@ const double _kItemExtent = 32.0;
 class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
   // picker's currently selected amount in karma coins
   double _kAmountCoins = 1;
-
-  @required
-  FeeType feeType;
-
-  _DecimalAmountInputWidgetState(this.feeType);
+  late FeeType feeType;
 
   // this is the exchange rate - needs to come from the api for real time estimate
-  double _kToUsdExchangeRate = 0.02;
+  final double _kToUsdExchangeRate = 0.02;
 
   /// 0...10,0000
-  List<int> _kcMajorDecimalDigits = Iterable<int>.generate(100000).toList();
+  final List<int> _kcMajorDecimalDigits =
+      Iterable<int>.generate(100000).toList();
 
   /// 0...9
-  List<int> _kcDecimalDigits = Iterable<int>.generate(10).toList();
+  final List<int> _kcDecimalDigits = Iterable<int>.generate(10).toList();
 
   FixedExtentScrollController? _kcMajorUnitsScrollController;
   FixedExtentScrollController? _kcCentiUnitsScrollController;
@@ -52,7 +49,9 @@ class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
   void initState() {
     super.initState();
 
-    Int64 val = feeType == FeeType.Payment
+    feeType = widget.feeType;
+
+    Int64 val = feeType == FeeType.payment
         ? appState.kCentsAmount.value
         : appState.kCentsFeeAmount.value;
 
@@ -93,7 +92,7 @@ class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
         centiIndex.toDouble() * 0.01;
 
     setState(() => _kAmountCoins = kAmountCoins);
-    if (feeType == FeeType.Payment) {
+    if (feeType == FeeType.payment) {
       appState.kCentsAmount.value =
           Int64((kAmountCoins * GenesisConfig.kCentsPerCoin).round());
     } else {
@@ -108,9 +107,10 @@ class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(
-            '${KarmaCoinAmountFormatter.format(Int64((_kAmountCoins * GenesisConfig.kCentsPerCoin).round()))}',
+            KarmaCoinAmountFormatter.format(
+                Int64((_kAmountCoins * GenesisConfig.kCentsPerCoin).round())),
             style: CupertinoTheme.of(context).textTheme.pickerTextStyle),
-        Container(
+        SizedBox(
           height: 300,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -137,7 +137,7 @@ class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  SizedBox(width: 14),
+                                  const SizedBox(width: 14),
                                   Text(
                                     '${_kcMajorDecimalDigits[index]}',
                                   ),
@@ -154,7 +154,7 @@ class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
               Text(
                 '.',
                 style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                      TextStyle(fontSize: 32),
+                      const TextStyle(fontSize: 32),
                     ),
               ),
               Expanded(
@@ -177,7 +177,7 @@ class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                SizedBox(width: 14),
+                                const SizedBox(width: 14),
                                 Text(
                                   '${_kcDecimalDigits[index]}',
                                 ),
@@ -211,7 +211,7 @@ class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  SizedBox(width: 14),
+                                  const SizedBox(width: 14),
                                   Text(
                                     '${_kcDecimalDigits[index]}',
                                   ),

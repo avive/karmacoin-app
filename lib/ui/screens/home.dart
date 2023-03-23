@@ -1,6 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
@@ -22,12 +23,12 @@ class UserHomeScreen extends StatefulWidget {
 }
 
 class _UserHomeScreenState extends State<UserHomeScreen> {
-  static Color purple = Color.fromARGB(255, 88, 40, 138);
+  static Color purple = const Color.fromARGB(255, 88, 40, 138);
 
   static Route<void> _activityModelBuilder(
       BuildContext context, Object? arguments) {
     return CupertinoModalPopupRoute<void>(builder: (BuildContext context) {
-      return AppreciateWidget(null, arguments as int);
+      return AppreciateWidget(communityId: arguments as int);
     });
   }
 
@@ -42,21 +43,49 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     debugPrint('post frame handler');
 
     Future.delayed(Duration.zero, () async {
-      if (!await checkInternetConnection(context)) {
-        return;
-      }
-
-      if (appState.signedUpInCurentSession.value) {
+      if (appState.signedUpInCurentSession.value && mounted) {
         appState.signedUpInCurentSession.value = false;
         StatusAlert.show(
           context,
-          duration: Duration(seconds: 4),
+          duration: const Duration(seconds: 4),
           title: 'Signed up',
           subtitle: 'Welcome to Karma Coin!',
           configuration:
-              IconConfiguration(icon: CupertinoIcons.check_mark_circled),
-          maxWidth: StatusAlertWidth,
+              const IconConfiguration(icon: CupertinoIcons.check_mark_circled),
+          maxWidth: statusAlertWidth,
         );
+      }
+
+      bool isConnected = await PlatformInfo.isConnected();
+      if (!isConnected) {
+        if (context.mounted) {
+          StatusAlert.show(context,
+              duration: const Duration(seconds: 4),
+              title: 'No Internet',
+              subtitle: 'Check your connection',
+              configuration: const IconConfiguration(
+                  icon: CupertinoIcons.exclamationmark_triangle),
+              dismissOnBackgroundTap: true,
+              maxWidth: statusAlertWidth);
+        }
+        return;
+      }
+
+      try {
+        await api.apiServiceClient.getGenesisData(GetGenesisDataRequest());
+        // todo: update genesis data
+      } catch (e) {
+        debugPrint('Can\'t get genesis data from api: $e');
+        if (context.mounted) {
+          StatusAlert.show(context,
+              duration: const Duration(seconds: 4),
+              title: 'Karma Coin is down',
+              subtitle: 'Please try again later.',
+              configuration: const IconConfiguration(
+                  icon: CupertinoIcons.exclamationmark_triangle),
+              dismissOnBackgroundTap: true,
+              maxWidth: statusAlertWidth);
+        }
       }
     });
   }
@@ -84,39 +113,43 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           // show sending alert
           Future.delayed(Duration.zero, () async {
             StatusAlert.show(context,
-                duration: Duration(seconds: 2),
+                duration: const Duration(seconds: 2),
                 title: sendingTitle,
                 configuration:
-                    IconConfiguration(icon: CupertinoIcons.wand_stars),
+                    const IconConfiguration(icon: CupertinoIcons.wand_stars),
                 dismissOnBackgroundTap: true,
-                maxWidth: StatusAlertWidth);
+                maxWidth: statusAlertWidth);
 
             SubmitTransactionResponse resp =
                 await accountLogic.submitPaymentTransaction(value);
 
             switch (resp.submitTransactionResult) {
               case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
-                StatusAlert.show(
-                  context,
-                  duration: Duration(seconds: 2),
-                  configuration: IconConfiguration(
-                      icon: CupertinoIcons.check_mark_circled),
-                  title: sentTitle,
-                  dismissOnBackgroundTap: true,
-                  maxWidth: StatusAlertWidth,
-                );
+                if (mounted) {
+                  StatusAlert.show(
+                    context,
+                    duration: const Duration(seconds: 2),
+                    configuration: const IconConfiguration(
+                        icon: CupertinoIcons.check_mark_circled),
+                    title: sentTitle,
+                    dismissOnBackgroundTap: true,
+                    maxWidth: statusAlertWidth,
+                  );
+                }
                 break;
               case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
-                StatusAlert.show(
-                  context,
-                  duration: Duration(seconds: 2),
-                  configuration:
-                      IconConfiguration(icon: CupertinoIcons.stop_circle),
-                  title: 'Internal Error',
-                  subtitle: 'Sorry, please try again later.',
-                  dismissOnBackgroundTap: true,
-                  maxWidth: StatusAlertWidth,
-                );
+                if (mounted) {
+                  StatusAlert.show(
+                    context,
+                    duration: const Duration(seconds: 2),
+                    configuration: const IconConfiguration(
+                        icon: CupertinoIcons.stop_circle),
+                    title: 'Internal Error',
+                    subtitle: 'Sorry, please try again later.',
+                    dismissOnBackgroundTap: true,
+                    maxWidth: statusAlertWidth,
+                  );
+                }
                 break;
             }
             // clear the user tx data
@@ -162,7 +195,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       ),*/
                       const SizedBox(height: 20),
                       _getKarmaScoreWidget(context),
-                      TraitsScoresWheel(null, 0),
+                      const TraitsScoresWheel(null, 0),
                       _getKarmaCoinWidget(context),
                       //_getBalanceWidget(context),
                     ],
@@ -188,13 +221,11 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   const SizedBox(height: 24),
                   CupertinoButton.filled(
                     onPressed: () async {
-                      if (!await checkInternetConnection(context)) {
-                        return;
-                      }
+                      if (!context.mounted) return;
                       Navigator.of(context)
                           .restorablePush(_activityModelBuilder, arguments: 0);
                     },
-                    child: Text('Appreciate'),
+                    child: const Text('Appreciate'),
                   ),
                   _getAppreciationListener(context),
                 ]),
@@ -243,8 +274,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: purple,
-              border:
-                  Border.all(width: 6, color: Color.fromARGB(255, 255, 184, 0)),
+              border: Border.all(
+                  width: 6, color: const Color.fromARGB(255, 255, 184, 0)),
             ),
             child: Padding(
               padding: const EdgeInsets.only(left: 8, right: 8),
@@ -260,7 +291,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                             .textTheme
                             .textStyle
                             .merge(
-                              TextStyle(
+                              const TextStyle(
                                   fontSize: 64,
                                   color: Color.fromARGB(255, 255, 184, 0),
                                   fontWeight: FontWeight.w400),
@@ -271,7 +302,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       'KARMA SCORE',
                       style:
                           CupertinoTheme.of(context).textTheme.textStyle.merge(
-                                TextStyle(
+                                const TextStyle(
                                     fontSize: 12,
                                     color: Color.fromARGB(255, 255, 184, 0),
                                     fontWeight: FontWeight.w600),
@@ -298,8 +329,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: purple,
-              border:
-                  Border.all(width: 6, color: Color.fromARGB(255, 255, 184, 0)),
+              border: Border.all(
+                  width: 6, color: const Color.fromARGB(255, 255, 184, 0)),
             ),
             child: Padding(
               padding: const EdgeInsets.only(left: 8, right: 8),
@@ -315,7 +346,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                             .textTheme
                             .textStyle
                             .merge(
-                              TextStyle(
+                              const TextStyle(
                                   fontSize: 64,
                                   color: Color.fromARGB(255, 255, 184, 0),
                                   fontWeight: FontWeight.w400),
@@ -323,10 +354,10 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       ),
                     ),
                     Text(
-                      '$unitsLabel'.toUpperCase(),
+                      unitsLabel.toUpperCase(),
                       style:
                           CupertinoTheme.of(context).textTheme.textStyle.merge(
-                                TextStyle(
+                                const TextStyle(
                                     fontSize: 12,
                                     color: Color.fromARGB(255, 255, 184, 0),
                                     fontWeight: FontWeight.w600),
@@ -349,23 +380,23 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           }
 
           List<PullDownMenuEntry> items = [
-            PullDownMenuTitle(
-              title: const Text('Your Communities'),
+            const PullDownMenuTitle(
+              title: Text('Your Communities'),
             ),
           ];
 
           for (CommunityMembership membership in value) {
             Community? community =
-                GenesisConfig.Communities[membership.communityId];
+                GenesisConfig.communities[membership.communityId];
             if (community == null) {
               continue;
             }
 
             items.add(
               PullDownMenuItem(
-                title: community.emoji + ' ' + community.name,
+                title: '${community.emoji} ${community.name}',
                 onTap: () => context.push(
-                    GenesisConfig.CommunityHomeScreenPaths[community.id]!),
+                    GenesisConfig.communityHomeScreenPaths[community.id]!),
               ),
             );
             items.add(const PullDownMenuDivider());
@@ -376,7 +407,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             position: PullDownMenuPosition.under,
             buttonBuilder: (context, showMenu) => CupertinoButton(
               onPressed: showMenu,
-              padding: EdgeInsets.only(left: 10, top: 10),
+              padding: const EdgeInsets.only(left: 10, top: 10),
               child: const Icon(CupertinoIcons.person_3, size: 38),
             ),
           );
@@ -394,12 +425,12 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             physics: const NeverScrollableScrollPhysics(),
             slivers: [
               CupertinoSliverNavigationBar(
-                border: Border(
+                border: const Border(
                   bottom: BorderSide(
                       color: Color.fromARGB(255, 255, 184, 0), width: 2),
                 ),
 
-                backgroundColor: Color.fromARGB(255, 88, 40, 138),
+                backgroundColor: const Color.fromARGB(255, 88, 40, 138),
                 // backgroundColor: CupertinoColors.activeOrange,
                 leading: _getCommunitiesPullDownMenuItems(context),
                 trailing: adjustNavigationBarButtonPosition(
@@ -416,7 +447,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     style: CupertinoTheme.of(context)
                         .textTheme
                         .navLargeTitleTextStyle
-                        .merge(TextStyle(
+                        .merge(const TextStyle(
                           color: Colors.white,
                           fontSize: 30,
                           fontWeight: FontWeight.w400,

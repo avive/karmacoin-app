@@ -16,16 +16,13 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
   bool isWorking = false;
   String code = '';
 
+  @override
   initState() {
     super.initState();
     isWorking = false;
   }
 
   Future<void> _submitCode(BuildContext context) async {
-    if (!await checkInternetConnection(context)) {
-      return;
-    }
-
     // Create a PhoneAuthCredential with the code
     PhoneAuthCredential credential = PhoneAuthProvider.credential(
         verificationId: appState.phoneAuthVerificationCodeId, smsCode: code);
@@ -41,11 +38,11 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
       if (mounted) {
         StatusAlert.show(
           context,
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
           title: 'Verificaiton Error',
           subtitle: 'Invalid code provided. Please try again.',
-          configuration: IconConfiguration(icon: CupertinoIcons.bookmark),
-          maxWidth: StatusAlertWidth,
+          configuration: const IconConfiguration(icon: CupertinoIcons.bookmark),
+          maxWidth: statusAlertWidth,
         );
 
         setState(() {
@@ -77,7 +74,7 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
 
   Widget _getIndicator(BuildContext context) {
     if (isWorking) {
-      return CupertinoActivityIndicator(
+      return const CupertinoActivityIndicator(
         radius: 20,
         animating: true,
       );
@@ -96,17 +93,17 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
               CupertinoSliverNavigationBar(
-                largeTitle: Text('Verifiction Code'),
+                largeTitle: const Text('Verifiction Code'),
                 leading: Container(),
               ),
             ];
           },
           body: SafeArea(
             child: Padding(
-              padding: EdgeInsets.all(24),
+              padding: const EdgeInsets.all(24),
               child: Center(
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: 480),
+                  constraints: const BoxConstraints(maxWidth: 480),
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
@@ -115,12 +112,12 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
                             style: CupertinoTheme.of(context)
                                 .textTheme
                                 .navTitleTextStyle),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         Material(
                           child: OtpTextField(
                             numberOfFields: 6,
                             autoFocus: true,
-                            borderColor: Color(0xFF512DA8),
+                            borderColor: const Color(0xFF512DA8),
                             //set to true to show as box or false to show as dash
                             showFieldAsBox: true,
                             clearText: false,
@@ -139,7 +136,7 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
                             }, // end onSubmit
                           ),
                         ),
-                        SizedBox(height: 36),
+                        const SizedBox(height: 36),
                         _getIndicator(context),
                       ]),
                 ),

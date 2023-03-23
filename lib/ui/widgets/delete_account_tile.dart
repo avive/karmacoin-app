@@ -1,7 +1,7 @@
 import '../../common_libs.dart';
 
 class DeleteAccountTile extends StatelessWidget {
-  DeleteAccountTile({super.key});
+  const DeleteAccountTile({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +42,9 @@ void _displayWarning(BuildContext context) {
               Navigator.pop(context);
               context.pop();
             }
-            Future.delayed(Duration(milliseconds: 300), () async {
+            Future.delayed(const Duration(milliseconds: 300), () async {
               context.go(ScreenPaths.welcome);
-              Future.delayed(Duration(milliseconds: 300), () async {
+              Future.delayed(const Duration(milliseconds: 300), () async {
                 await accountLogic.clear();
                 await authLogic.signOut();
               });

@@ -192,24 +192,24 @@ final GoRouter appRouter = GoRouter(
         name: ScreenNames.newUserName,
         path: ScreenPaths.newUserName,
         builder: (BuildContext context, GoRouterState state) {
-          debugPrint('userName route builder called');
-          return SetUserNameScreen(
-              title: 'Your User Name', operation: Operation.SignUp);
+          debugPrint('**** userName route builder called');
+          return const SetUserNameScreen(
+              title: 'Your User Name', operation: Operation.signUp);
         }),
     GoRoute(
         // New User name input screen
         name: ScreenNames.updateUserName,
         path: ScreenPaths.updateUserName,
         builder: (BuildContext context, GoRouterState state) {
-          return SetUserNameScreen(
-              title: 'Change User Name', operation: Operation.UpdateUserName);
+          return const SetUserNameScreen(
+              title: 'Change User Name', operation: Operation.updateUserName);
         }),
     GoRoute(
         // Initial app screen (playground for now)
         name: ScreenNames.welcome,
         path: ScreenPaths.welcome,
         builder: (BuildContext context, GoRouterState state) {
-          return WelcomeScreen(title: 'Karma Coin');
+          return const WelcomeScreen(title: 'KARMA COIN');
         }),
     GoRoute(
         name: ScreenNames.actions,
@@ -240,13 +240,12 @@ final GoRouter appRouter = GoRouter(
         builder: (BuildContext context, GoRouterState state) {
           if (state.extra != null) {
             User user = state.extra as User;
-            return UserDetailsScreen(key: Key(user.userName), user: user);
+            return UserDetailsScreen(Key(user.userName), user);
           }
 
           // local user
           return UserDetailsScreen(
-            key: Key(accountLogic.karmaCoinUser.value!.userData.userName),
-          );
+              Key(accountLogic.karmaCoinUser.value!.userData.userName), null);
         }),
     GoRoute(
         name: ScreenNames.securityWords,
@@ -288,7 +287,7 @@ final GoRouter appRouter = GoRouter(
         name: ScreenNames.girrafesHomeScreen,
         path: ScreenPaths.girrafesHomeScreen,
         builder: (BuildContext context, GoRouterState state) {
-          return CommunityHomeScreen(Key("1"), 1);
+          return const CommunityHomeScreen(Key("1"), 1);
         }),
   ],
 );

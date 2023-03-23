@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/ui/helpers/behaviors.dart';
 import 'package:keyboard_dismisser/keyboard_dismisser.dart';
+
+// ignore: depend_on_referenced_packages
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 /// The KarmaCoinApp widget is the root of the app
@@ -34,7 +36,7 @@ class KarmaCoinApp extends StatelessWidget with GetItMixin {
                 debugShowCheckedModeBanner: false,
                 useInheritedMediaQuery: true,
                 title: 'Karma Coin',
-                theme: CupertinoThemeData(
+                theme: const CupertinoThemeData(
                   primaryColor: CupertinoColors.activeOrange,
                 ),
                 localizationsDelegates: const [

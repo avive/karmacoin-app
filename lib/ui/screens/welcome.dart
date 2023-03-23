@@ -1,11 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/services/api/api.pb.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
+import 'package:status_alert/status_alert.dart';
 
 /// temp screen with some
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key, required this.title});
+
   final String title;
 
   @override
@@ -22,7 +26,37 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   void _postFrameCallback(BuildContext context) {
     Future.delayed(Duration.zero, () async {
-      await checkInternetConnection(context);
+      bool isConnected = await PlatformInfo.isConnected();
+      if (!isConnected) {
+        if (context.mounted) {
+          StatusAlert.show(context,
+              duration: const Duration(seconds: 4),
+              title: 'No Internet',
+              subtitle: 'Check your connection',
+              configuration: const IconConfiguration(
+                  icon: CupertinoIcons.exclamationmark_triangle),
+              dismissOnBackgroundTap: true,
+              maxWidth: statusAlertWidth);
+        }
+        return;
+      }
+
+      try {
+        await api.apiServiceClient.getGenesisData(GetGenesisDataRequest());
+        // todo: update genesis data
+      } catch (e) {
+        debugPrint('Can\'t get genesis data from api: $e');
+        if (context.mounted) {
+          StatusAlert.show(context,
+              duration: const Duration(seconds: 4),
+              title: 'Karma Coin is down.',
+              subtitle: 'Please try again later.',
+              configuration: const IconConfiguration(
+                  icon: CupertinoIcons.exclamationmark_triangle),
+              dismissOnBackgroundTap: true,
+              maxWidth: statusAlertWidth);
+        }
+      }
     });
   }
 
@@ -38,7 +72,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     res.add(const SizedBox(height: 12));
     res.add(
       Padding(
-        padding: EdgeInsets.symmetric(horizontal: 64.0),
+        padding: const EdgeInsets.symmetric(horizontal: 64.0),
         child: Text(
           'An easy-to-use cryptocurrency designed for appreciation, tipping and communities.',
           style: textTheme.textStyle,
@@ -55,14 +89,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       child: const Text('Sign Up'),
     ));
     res.add(const SizedBox(height: 12));
-    /*
-    } else {
-      res.add(CupertinoButton.filled(
-        onPressed: () => context.go(ScreenPaths.home),
-        child: const Text('User Home'),
-      ));
-      res.add(const SizedBox(height: 16));
-    }*/
 
     res.add(CupertinoButton(
       onPressed: () => context.push(ScreenPaths.restoreAccount),
@@ -88,18 +114,18 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     (BuildContext context, bool innerBoxIsScrolled) {
                   return <Widget>[
                     CupertinoSliverNavigationBar(
-                      border: Border(),
+                      border: const Border(),
                       //border: Border(
                       //  bottom: BorderSide(color: Colors.orange, width: 2),
                       //),
-                      backgroundColor: Color.fromARGB(255, 88, 40, 138),
+                      backgroundColor: const Color.fromARGB(255, 88, 40, 138),
                       largeTitle: Center(
                           child: Text(
-                        'KARMA COIN',
+                        widget.title,
                         style: CupertinoTheme.of(context)
                             .textTheme
                             .navLargeTitleTextStyle
-                            .merge(TextStyle(
+                            .merge(const TextStyle(
                               color: Colors.white,
                               fontSize: 30,
                               fontWeight: FontWeight.w400,
@@ -130,7 +156,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             return Container();
           }
 
-          Future.delayed(Duration(milliseconds: 200), () async {
+          Future.delayed(const Duration(milliseconds: 200), () async {
             if (!mounted) return;
             context.push(ScreenPaths.signup);
           });

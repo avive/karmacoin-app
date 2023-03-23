@@ -7,11 +7,11 @@ class NumericalAmountInputWidget extends StatefulWidget {
   @required
   final FeeType feeType;
 
-  const NumericalAmountInputWidget({super.key, this.feeType = FeeType.Payment});
+  const NumericalAmountInputWidget({super.key, this.feeType = FeeType.payment});
 
   @override
   State<NumericalAmountInputWidget> createState() =>
-      _NumericalAmountInputWidgetState(feeType);
+      _NumericalAmountInputWidgetState();
 }
 
 const double _kItemExtent = 32.0;
@@ -20,13 +20,9 @@ class _NumericalAmountInputWidgetState
     extends State<NumericalAmountInputWidget> {
   // picker's currently selected amount in karma cents
   Int64 _kAmountCents = Int64.ONE;
-  List<int> _kcMajorDecimalDigits = Iterable<int>.generate(100000).toList();
+  final List<int> _kcMajorDecimalDigits =
+      Iterable<int>.generate(100000).toList();
   FixedExtentScrollController? _kcMajorUnitsScrollController;
-
-  @required
-  final FeeType feeType;
-
-  _NumericalAmountInputWidgetState(this.feeType);
 
   @override
   void dispose() {
@@ -40,7 +36,7 @@ class _NumericalAmountInputWidgetState
     _kcMajorUnitsScrollController = FixedExtentScrollController(initialItem: 0);
 
     Future.delayed(Duration.zero, () {
-      if (feeType == FeeType.Payment) {
+      if (widget.feeType == FeeType.payment) {
         appState.kCentsAmount.value = Int64.ONE;
       } else {
         appState.kCentsFeeAmount.value = Int64.ONE;
@@ -58,7 +54,7 @@ class _NumericalAmountInputWidgetState
     Int64 amountCents = Int64(majorIndex + 1);
 
     setState(() => _kAmountCents = amountCents);
-    if (feeType == FeeType.Payment) {
+    if (widget.feeType == FeeType.payment) {
       appState.kCentsAmount.value = amountCents;
     } else {
       appState.kCentsFeeAmount.value = amountCents;
@@ -70,11 +66,11 @@ class _NumericalAmountInputWidgetState
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Text('${KarmaCoinAmountFormatter.format(_kAmountCents)}',
+        Text(KarmaCoinAmountFormatter.format(_kAmountCents),
             style: CupertinoTheme.of(context).textTheme.pickerTextStyle),
         Column(
           children: [
-            Container(
+            SizedBox(
               height: 400,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -99,7 +95,7 @@ class _NumericalAmountInputWidgetState
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  SizedBox(width: 14),
+                                  const SizedBox(width: 14),
                                   Text(
                                     '${_kcMajorDecimalDigits[index] + 1}',
                                   ),

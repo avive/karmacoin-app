@@ -11,7 +11,7 @@ class SendDestination extends StatefulWidget {
 }
 
 class _SendDestinationState extends State<SendDestination> {
-  Destination _selectedSegment = Destination.AccountAddress;
+  Destination _selectedSegment = Destination.accountAddress;
   late PhoneController _phoneController;
   late TextEditingController _accountAddressTextController;
 
@@ -22,7 +22,7 @@ class _SendDestinationState extends State<SendDestination> {
   @override
   initState() {
     super.initState();
-    _selectedSegment = Destination.AccountAddress;
+    _selectedSegment = Destination.accountAddress;
 
     // some defaults for dev mode to reduce typing in interactive testing...
 
@@ -35,7 +35,7 @@ class _SendDestinationState extends State<SendDestination> {
         text:
             "0xdf35d76f13a7d2b3ca949909737f211e1927132e210f676e8738fe1ba9dcfbb3");
 
-    appState.sendDestination.value = Destination.AccountAddress;
+    appState.sendDestination.value = Destination.accountAddress;
     appState.sendDestinationAddress.value = _accountAddressTextController.text;
     appState.sendDestinationPhoneNumber.value =
         '+${_phoneController.value!.countryCode}${_phoneController.value!.nsn}';
@@ -54,7 +54,7 @@ class _SendDestinationState extends State<SendDestination> {
       children: [
         Text('Send to',
             style: CupertinoTheme.of(context).textTheme.pickerTextStyle),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         CupertinoSlidingSegmentedControl<Destination>(
           // Provide horizontal padding around the children.
           padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -72,27 +72,27 @@ class _SendDestinationState extends State<SendDestination> {
             });
           },
           children: <Destination, Widget>{
-            Destination.AccountAddress: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24),
+            Destination.accountAddress: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Text('Account',
                   style: CupertinoTheme.of(context)
                       .textTheme
                       .textStyle
-                      .merge(TextStyle(fontSize: 14))),
+                      .merge(const TextStyle(fontSize: 14))),
             ),
-            Destination.PhoneNumber: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24),
+            Destination.phoneNumber: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Text(
                 'Phone Number',
                 style: CupertinoTheme.of(context)
                     .textTheme
                     .textStyle
-                    .merge(TextStyle(fontSize: 15)),
+                    .merge(const TextStyle(fontSize: 15)),
               ),
             ),
           },
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         _getInputWidget(context),
       ],
     );
@@ -100,16 +100,16 @@ class _SendDestinationState extends State<SendDestination> {
 
   Widget _getInputWidget(BuildContext context) {
     switch (_selectedSegment) {
-      case Destination.AccountAddress:
+      case Destination.accountAddress:
         return _getAccountAddressInputWidget(context);
-      case Destination.PhoneNumber:
+      case Destination.phoneNumber:
         return _getPhoneNumberInputWidget(context);
     }
   }
 
   Widget _getPhoneNumberInputWidget(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(left: 16, right: 16),
+      padding: const EdgeInsets.only(left: 16, right: 16),
       child: Material(
         child: PhoneFormField(
           controller: _phoneController,
@@ -126,7 +126,7 @@ class _SendDestinationState extends State<SendDestination> {
           countrySelectorNavigator: selectorNavigator,
           defaultCountry: IsoCode.US,
           validator: _getValidator(),
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             // fillColor: CupertinoColors.white,
             label: null,
           ),
@@ -148,11 +148,11 @@ class _SendDestinationState extends State<SendDestination> {
       placeholder: 'Receiver\'s karma coin account address',
       maxLines: 2,
       style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-            TextStyle(fontSize: 14),
+            const TextStyle(fontSize: 14),
           ),
       textAlign: TextAlign.start,
       padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         border: Border(
           bottom: BorderSide(
             width: 2,

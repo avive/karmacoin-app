@@ -3,7 +3,7 @@ import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 
 class CommunitiesListSection extends StatelessWidget {
-  CommunitiesListSection({Key? key}) : super(key: key);
+  const CommunitiesListSection({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class CommunitiesListSection extends StatelessWidget {
                 style: CupertinoTheme.of(context)
                     .textTheme
                     .textStyle
-                    .merge(TextStyle(fontSize: 14)),
+                    .merge(const TextStyle(fontSize: 14)),
               ),
               onTap: () => {
                 // todo: show community web page on site
@@ -35,7 +35,7 @@ class CommunitiesListSection extends StatelessWidget {
   }
 
   Widget _getCommunityTile(BuildContext context, CommunityMembership value) {
-    Community? community = GenesisConfig.Communities[value.communityId];
+    Community? community = GenesisConfig.communities[value.communityId];
     if (community == null) {
       return Container();
     }
@@ -44,19 +44,19 @@ class CommunitiesListSection extends StatelessWidget {
       return CupertinoListTile.notched(
         title: Text(community.name),
         subtitle: const Text('ADMIN'),
-        leading: Text(community.emoji, style: TextStyle(fontSize: 24)),
+        leading: Text(community.emoji, style: const TextStyle(fontSize: 24)),
         trailing: const CupertinoListTileChevron(),
         onTap: () =>
-            context.push(GenesisConfig.CommunityHomeScreenPaths[community.id]!),
+            context.push(GenesisConfig.communityHomeScreenPaths[community.id]!),
       );
     }
 
     return CupertinoListTile.notched(
       title: Text(community.name),
-      leading: Text(community.emoji, style: TextStyle(fontSize: 24)),
+      leading: Text(community.emoji, style: const TextStyle(fontSize: 24)),
       trailing: const CupertinoListTileChevron(),
       onTap: () =>
-          context.push(GenesisConfig.CommunityHomeScreenPaths[community.id]!),
+          context.push(GenesisConfig.communityHomeScreenPaths[community.id]!),
     );
   }
 }

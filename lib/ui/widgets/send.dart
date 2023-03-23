@@ -1,4 +1,5 @@
 import 'package:fixnum/fixnum.dart';
+import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/kc_user.dart';
@@ -26,9 +27,9 @@ class _SendWidgetState extends State<SendWidget> {
   static Route<void> _paymentAmountInputModelBuilder(
       BuildContext context, Object? arguments) {
     return CupertinoModalPopupRoute<void>(builder: (BuildContext context) {
-      return AmountInputWidget(
+      return const AmountInputWidget(
           coinKind: CoinKind.kCoins,
-          feeType: FeeType.Payment,
+          feeType: FeeType.payment,
           title: 'Amount to send');
     });
   }
@@ -37,76 +38,97 @@ class _SendWidgetState extends State<SendWidget> {
   static Route<void> _feeAmountInputModelBuilder(
       BuildContext context, Object? arguments) {
     return CupertinoModalPopupRoute<void>(builder: (BuildContext context) {
-      return AmountInputWidget(
+      return const AmountInputWidget(
           coinKind: CoinKind.kCents,
-          feeType: FeeType.Fee,
+          feeType: FeeType.fee,
           title: 'Network fee');
     });
   }
 
   // validate input data and show alert if invalid
-  Future<bool> _validateData(BuildContext context) async {
-    if (!await checkInternetConnection(context)) {
-      return false;
-    }
-
+  Future<bool> _validateData() async {
     KarmaCoinUser? user = accountLogic.karmaCoinUser.value;
 
     if (user == null) {
-      StatusAlert.show(
-        context,
-        duration: Duration(seconds: 2),
-        title: 'Oops...',
-        subtitle: 'Please login to your account.',
-        configuration:
-            IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
-        maxWidth: StatusAlertWidth,
-      );
+      if (context.mounted) {
+        StatusAlert.show(
+          context,
+          duration: const Duration(seconds: 2),
+          title: 'Oops...',
+          subtitle: 'Please login to your account.',
+          configuration: const IconConfiguration(
+              icon: CupertinoIcons.exclamationmark_triangle),
+          maxWidth: statusAlertWidth,
+        );
+      }
+      return false;
+    }
+
+    bool isConnected = await PlatformInfo.isConnected();
+
+    if (!isConnected) {
+      if (context.mounted) {
+        StatusAlert.show(context,
+            duration: const Duration(seconds: 4),
+            title: 'No Internet',
+            subtitle: 'Check your connection',
+            configuration: const IconConfiguration(
+                icon: CupertinoIcons.exclamationmark_triangle),
+            dismissOnBackgroundTap: true,
+            maxWidth: statusAlertWidth);
+      }
       return false;
     }
 
     switch (appState.sendDestination.value) {
-      case Destination.AccountAddress:
+      case Destination.accountAddress:
         // todo: validate address format here 0x01fe for now...
         if (appState.sendDestinationAddress.value.isEmpty) {
-          StatusAlert.show(
-            context,
-            duration: Duration(seconds: 2),
-            title: 'Oops...',
-            subtitle: 'Invalid receiver\'s Karma Coin address.',
-            configuration: IconConfiguration(
-                icon: CupertinoIcons.exclamationmark_triangle),
-            maxWidth: StatusAlertWidth,
-          );
+          if (context.mounted) {
+            StatusAlert.show(
+              context,
+              duration: const Duration(seconds: 2),
+              title: 'Oops...',
+              subtitle: 'Invalid receiver\'s Karma Coin address.',
+              configuration: const IconConfiguration(
+                  icon: CupertinoIcons.exclamationmark_triangle),
+              maxWidth: statusAlertWidth,
+            );
+          }
           return false;
         }
 
         if (user.mobileNumber.value.number ==
             appState.sendDestinationAddress.value) {
-          StatusAlert.show(
-            context,
-            duration: Duration(seconds: 2),
-            title: 'Ooops',
-            subtitle: 'You can\'t send coin to your account.',
-            configuration: IconConfiguration(icon: CupertinoIcons.xmark_circle),
-            maxWidth: StatusAlertWidth,
-          );
+          if (context.mounted) {
+            StatusAlert.show(
+              context,
+              duration: const Duration(seconds: 2),
+              title: 'Ooops',
+              subtitle: 'You can\'t send coin to your account.',
+              configuration:
+                  const IconConfiguration(icon: CupertinoIcons.xmark_circle),
+              maxWidth: statusAlertWidth,
+            );
+          }
           return false;
         }
 
         break;
-      case Destination.PhoneNumber:
+      case Destination.phoneNumber:
         // todo: validate the phone number string here
         if (appState.sendDestinationAddress.value.isEmpty) {
-          StatusAlert.show(
-            context,
-            duration: Duration(seconds: 2),
-            title: 'Oops...',
-            subtitle: 'Invalid receiver\'s phone number.',
-            configuration: IconConfiguration(
-                icon: CupertinoIcons.exclamationmark_triangle),
-            maxWidth: StatusAlertWidth,
-          );
+          if (context.mounted) {
+            StatusAlert.show(
+              context,
+              duration: const Duration(seconds: 2),
+              title: 'Oops...',
+              subtitle: 'Invalid receiver\'s phone number.',
+              configuration: const IconConfiguration(
+                  icon: CupertinoIcons.exclamationmark_triangle),
+              maxWidth: statusAlertWidth,
+            );
+          }
           return false;
         }
 
@@ -114,38 +136,43 @@ class _SendWidgetState extends State<SendWidget> {
     }
 
     if (appState.kCentsAmount.value == Int64.ZERO) {
-      StatusAlert.show(
-        context,
-        duration: Duration(seconds: 2),
-        title: 'Oops...',
-        subtitle: 'Please enter a non-zero Karma Coin amount',
-        configuration:
-            IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
-        maxWidth: StatusAlertWidth,
-      );
+      if (context.mounted) {
+        StatusAlert.show(
+          context,
+          duration: const Duration(seconds: 2),
+          title: 'Oops...',
+          subtitle: 'Please enter a non-zero Karma Coin amount',
+          configuration: const IconConfiguration(
+              icon: CupertinoIcons.exclamationmark_triangle),
+          maxWidth: statusAlertWidth,
+        );
+      }
       return false;
     }
 
     debugPrint('user balance: ${user.balance.value}');
 
     if (user.balance.value < appState.kCentsAmount.value) {
-      StatusAlert.show(
-        context,
-        duration: Duration(seconds: 2),
-        title: '',
-        subtitle: 'Insufficient balance. Consider sending less.',
-        configuration: IconConfiguration(icon: CupertinoIcons.xmark_circle),
-        maxWidth: StatusAlertWidth,
-      );
+      if (context.mounted) {
+        StatusAlert.show(
+          context,
+          duration: const Duration(seconds: 2),
+          title: '',
+          subtitle: 'Insufficient balance. Consider sending less.',
+          configuration:
+              const IconConfiguration(icon: CupertinoIcons.xmark_circle),
+          maxWidth: statusAlertWidth,
+        );
+      }
       return false;
     }
 
     return true;
   }
 
-  Future<void> _send(BuildContext context) async {
+  Future<void> _send() async {
     switch (appState.sendDestination.value) {
-      case Destination.AccountAddress:
+      case Destination.accountAddress:
         appState.paymentTransactionData.value = PaymentTransactionData(
             appState.kCentsAmount.value,
             appState.kCentsFeeAmount.value,
@@ -155,7 +182,7 @@ class _SendWidgetState extends State<SendWidget> {
             appState.sendDestinationAddress.value,
             '');
         break;
-      case Destination.PhoneNumber:
+      case Destination.phoneNumber:
         appState.paymentTransactionData.value = PaymentTransactionData(
             appState.kCentsAmount.value,
             appState.kCentsFeeAmount.value,
@@ -167,7 +194,9 @@ class _SendWidgetState extends State<SendWidget> {
         break;
     }
 
-    context.pop();
+    if (context.mounted) {
+      context.pop();
+    }
 
     debugPrint('payment tx data: ${appState.paymentTransactionData.value}');
   }
@@ -177,21 +206,21 @@ class _SendWidgetState extends State<SendWidget> {
     return CupertinoPageScaffold(
       child: CustomScrollView(
         slivers: [
-          CupertinoSliverNavigationBar(
+          const CupertinoSliverNavigationBar(
             padding: EdgeInsetsDirectional.zero,
             largeTitle: Center(child: Text('Send Karma Coins')),
           ),
           SliverFillRemaining(
             hasScrollBody: false,
             child: Padding(
-              padding:
-                  EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
+              padding: const EdgeInsets.only(
+                  left: 16, right: 16, top: 16, bottom: 16),
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    SendDestination(),
-                    SizedBox(height: 12),
+                    const SendDestination(),
+                    const SizedBox(height: 12),
                     Column(
                       children: [
                         Text('Amount to send',
@@ -208,7 +237,7 @@ class _SendWidgetState extends State<SendWidget> {
                               builder: (context, value, child) =>
                                   Text(KarmaCoinAmountFormatter.format(value))),
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         Text('Network fee',
                             style: CupertinoTheme.of(context)
                                 .textTheme
@@ -226,16 +255,16 @@ class _SendWidgetState extends State<SendWidget> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     CupertinoButton.filled(
                       onPressed: () async {
-                        if (await _validateData(context)) {
-                          await _send(context);
+                        if (await _validateData()) {
+                          await _send();
                         }
                       },
-                      child: Text('Send'),
+                      child: const Text('Send'),
                     ),
-                    SizedBox(height: 14),
+                    const SizedBox(height: 14),
                   ]),
             ),
           ),

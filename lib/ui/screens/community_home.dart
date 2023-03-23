@@ -18,28 +18,24 @@ class CommunityHomeScreen extends StatefulWidget {
   const CommunityHomeScreen(Key? key, this.communityId) : super(key: key);
 
   @override
-  State<CommunityHomeScreen> createState() =>
-      _CommunityHomeScreenState(communityId);
+  State<CommunityHomeScreen> createState() => _CommunityHomeScreenState();
 }
 
 class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
-  final int communityId;
   late final Community community;
 
   static Route<void> _activityModelBuilder(
       BuildContext context, Object? arguments) {
     return CupertinoModalPopupRoute<void>(builder: (BuildContext context) {
-      return AppreciateWidget(null, arguments as int);
+      return AppreciateWidget(communityId: arguments as int);
     });
-  }
-
-  _CommunityHomeScreenState(this.communityId) {
-    community = GenesisConfig.Communities[communityId]!;
   }
 
   @override
   void initState() {
     super.initState();
+    community = GenesisConfig.communities[widget.communityId]!;
+
     WidgetsBinding.instance
         .addPostFrameCallback((_) => _postFrameCallback(context));
   }
@@ -48,9 +44,9 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
     debugPrint('post frame handler');
 
     Future.delayed(Duration.zero, () async {
-      if (!await checkInternetConnection(context)) {
-        return;
-      }
+      //if (!await checkInternetConnection(context)) {
+      //  return;
+      // }
 
       // todo: show first time user sees this screen - a welcome message
 
@@ -74,7 +70,7 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
     return ValueListenableBuilder<PaymentTransactionData?>(
         valueListenable: appState.paymentTransactionData,
         builder: (context, value, child) {
-          if (value == null || value.communityId != communityId) {
+          if (value == null || value.communityId != widget.communityId) {
             // not an appreciation with this community
             return Container();
           }
@@ -92,39 +88,43 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
           // show sending alert
           Future.delayed(Duration.zero, () async {
             StatusAlert.show(context,
-                duration: Duration(seconds: 2),
+                duration: const Duration(seconds: 2),
                 title: sendingTitle,
                 configuration:
-                    IconConfiguration(icon: CupertinoIcons.wand_stars),
+                    const IconConfiguration(icon: CupertinoIcons.wand_stars),
                 dismissOnBackgroundTap: true,
-                maxWidth: StatusAlertWidth);
+                maxWidth: statusAlertWidth);
 
             SubmitTransactionResponse resp =
                 await accountLogic.submitPaymentTransaction(value);
 
             switch (resp.submitTransactionResult) {
               case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
-                StatusAlert.show(
-                  context,
-                  duration: Duration(seconds: 2),
-                  configuration: IconConfiguration(
-                      icon: CupertinoIcons.check_mark_circled),
-                  title: sentTitle,
-                  dismissOnBackgroundTap: true,
-                  maxWidth: StatusAlertWidth,
-                );
+                if (mounted) {
+                  StatusAlert.show(
+                    context,
+                    duration: const Duration(seconds: 2),
+                    configuration: const IconConfiguration(
+                        icon: CupertinoIcons.check_mark_circled),
+                    title: sentTitle,
+                    dismissOnBackgroundTap: true,
+                    maxWidth: statusAlertWidth,
+                  );
+                }
                 break;
               case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
-                StatusAlert.show(
-                  context,
-                  duration: Duration(seconds: 2),
-                  configuration:
-                      IconConfiguration(icon: CupertinoIcons.stop_circle),
-                  title: 'Internal Error',
-                  subtitle: 'Sorry, please try again later.',
-                  dismissOnBackgroundTap: true,
-                  maxWidth: StatusAlertWidth,
-                );
+                if (mounted) {
+                  StatusAlert.show(
+                    context,
+                    duration: const Duration(seconds: 2),
+                    configuration: const IconConfiguration(
+                        icon: CupertinoIcons.stop_circle),
+                    title: 'Internal Error',
+                    subtitle: 'Sorry, please try again later.',
+                    dismissOnBackgroundTap: true,
+                    maxWidth: statusAlertWidth,
+                  );
+                }
                 break;
             }
             // clear the user tx data
@@ -145,7 +145,7 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
           }
 
           CommunityDesignTheme theme =
-              GenesisConfig.CommunityColors[communityId]!;
+              GenesisConfig.communityColors[widget.communityId]!;
 
           return Padding(
             padding: const EdgeInsets.all(0),
@@ -158,7 +158,7 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
                           width: double.infinity,
                           fit: BoxFit.fill,
                           image: AssetImage(GenesisConfig
-                              .CommunityBannerAssets[communityId]!)),
+                              .communityBannerAssets[widget.communityId]!)),
                       const SizedBox(height: 24),
                       _getKarmaScoreWidget(context),
                       Text(
@@ -172,24 +172,23 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
                             ),
                       ),
                       const SizedBox(height: 24),
-                      TraitsScoresWheel(null, communityId),
+                      TraitsScoresWheel(null, widget.communityId),
                     ],
                   ),
 
                   // const SizedBox(height: 24),
                   CupertinoButton(
                     color: GenesisConfig
-                        .CommunityColors[communityId]!.backgroundColor,
+                        .communityColors[widget.communityId]!.backgroundColor,
                     onPressed: () async {
-                      if (!await checkInternetConnection(context)) {
-                        return;
-                      }
+                      if (!context.mounted) return;
                       Navigator.of(context).restorablePush(
                           _activityModelBuilder,
-                          arguments: communityId);
+                          arguments: widget.communityId);
                     },
                     child: Text(
-                      GenesisConfig.CommunityAppreciateLabels[communityId]!,
+                      GenesisConfig
+                          .communityAppreciateLabels[widget.communityId]!,
                       style: CupertinoTheme.of(context)
                           .textTheme
                           .textStyle
@@ -206,11 +205,11 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
     return ValueListenableBuilder<List<CommunityMembership>>(
         valueListenable: accountLogic.karmaCoinUser.value!.communities,
         builder: (context, value, child) {
-          CommunityMembership membership =
-              value.firstWhere((element) => element.communityId == communityId);
+          CommunityMembership membership = value.firstWhere(
+              (element) => element.communityId == widget.communityId);
 
           CommunityDesignTheme theme =
-              GenesisConfig.CommunityColors[communityId]!;
+              GenesisConfig.communityColors[widget.communityId]!;
 
           return FittedBox(
             child: Text(
@@ -228,11 +227,12 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
 
   @override
   build(BuildContext context) {
-    CommunityDesignTheme theme = GenesisConfig.CommunityColors[communityId]!;
+    CommunityDesignTheme theme =
+        GenesisConfig.communityColors[widget.communityId]!;
 
     return Title(
       color: CupertinoColors.black, // This is required
-      title: community.name + ' - Karma Coin',
+      title: '${community.name} - Karma Coin',
       child: CupertinoPageScaffold(
         resizeToAvoidBottomInset: true,
         navigationBar: CupertinoNavigationBar(

@@ -2,32 +2,26 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/personality_traits.dart';
 
 class TraitsPickerWidget extends StatefulWidget {
-  @required
   final List<PersonalityTrait> traits;
-
-  @required
   final int selectedItemIndex;
 
-  const TraitsPickerWidget(this.traits, this.selectedItemIndex, {super.key});
+  const TraitsPickerWidget(Key? key, this.traits, this.selectedItemIndex)
+      : super(key: key);
 
   @override
-  State<TraitsPickerWidget> createState() =>
-      _TraitsPickerWidgetState(traits, selectedItemIndex);
+  State<TraitsPickerWidget> createState() => _TraitsPickerWidgetState();
 }
 
 const double _kItemExtent = 32.0;
 
 class _TraitsPickerWidgetState extends State<TraitsPickerWidget> {
-  @required
-  final List<PersonalityTrait> items;
-
-  _TraitsPickerWidgetState(this.items, this.selectedItemIndex) {
-    appState.selectedPersonalityTrait.value = items[selectedItemIndex];
-  }
-
-  // ignore: unused_field
-  @required
   int selectedItemIndex = 0;
+
+  @override
+  initState() {
+    super.initState();
+    appState.selectedPersonalityTrait.value = widget.traits[selectedItemIndex];
+  }
 
   @override
   build(BuildContext context) {
@@ -51,19 +45,18 @@ class _TraitsPickerWidgetState extends State<TraitsPickerWidget> {
               setState(() {
                 selectedItemIndex = index;
                 appState.selectedPersonalityTrait.value =
-                    items[selectedItemIndex];
+                    widget.traits[selectedItemIndex];
               });
             },
-            children: List<Widget>.generate(items.length, (int index) {
+            children: List<Widget>.generate(widget.traits.length, (int index) {
               return Center(
                 child: Column(children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SizedBox(width: 14),
+                      const SizedBox(width: 14),
                       Text(
-                        items[index].emoji + ' ' + items[index].name,
-                      ),
+                          '${widget.traits[index].emoji} ${widget.traits[index].name}'),
                     ],
                   )
                 ]),

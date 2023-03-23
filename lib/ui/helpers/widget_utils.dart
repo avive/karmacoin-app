@@ -5,23 +5,33 @@ import 'package:url_launcher/url_launcher.dart';
 
 // common widget helper functions
 
-const StatusAlertWidth = 270.0;
+const statusAlertWidth = 270.0;
 
-openUrl(BuildContext context, String url) async {
-  if (!await checkInternetConnection(context)) {
-    return;
-  }
+showNoConnectionAlert(BuildContext context) {
+  StatusAlert.show(context,
+      duration: const Duration(seconds: 4),
+      title: 'No Internet',
+      subtitle: 'Check your connection',
+      configuration: const IconConfiguration(
+          icon: CupertinoIcons.exclamationmark_triangle),
+      dismissOnBackgroundTap: true,
+      maxWidth: statusAlertWidth);
+}
 
-  final Uri _url = Uri.parse(url);
-  if (!await launchUrl(_url)) {
+Future<bool> openUrl(String url) async {
+  final Uri uri = Uri.parse(url);
+  return await launchUrl(uri);
+
+  /*
+  if (!await launchUrl(url0) && context.mounted) {
     StatusAlert.show(context,
-        duration: Duration(seconds: 4),
+        duration: const Duration(seconds: 4),
         title: 'Failed to open url',
-        configuration:
-            IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
+        configuration: const IconConfiguration(
+            icon: CupertinoIcons.exclamationmark_triangle),
         dismissOnBackgroundTap: true,
-        maxWidth: StatusAlertWidth);
-  }
+        maxWidth: statusAlertWidth);
+  }*/
 }
 
 Widget adjustNavigationBarButtonPosition(Widget button, double x, double y) {
@@ -35,15 +45,15 @@ Widget adjustNavigationBarButtonPosition(Widget button, double x, double y) {
 Future<bool> checkInternetConnection(BuildContext context) async {
   bool isConnected = await PlatformInfo.isConnected();
 
-  if (!isConnected) {
+  if (!isConnected && context.mounted) {
     StatusAlert.show(context,
-        duration: Duration(seconds: 4),
+        duration: const Duration(seconds: 4),
         title: 'No Internet',
         subtitle: 'Check your connection',
-        configuration:
-            IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
+        configuration: const IconConfiguration(
+            icon: CupertinoIcons.exclamationmark_triangle),
         dismissOnBackgroundTap: true,
-        maxWidth: StatusAlertWidth);
+        maxWidth: statusAlertWidth);
   }
 
   return isConnected;

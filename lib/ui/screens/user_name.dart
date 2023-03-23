@@ -1,28 +1,27 @@
+import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/user_name_availability.dart';
 import 'package:karma_coin/services/api/api.pb.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:status_alert/status_alert.dart';
 
-enum Operation { SignUp, UpdateUserName }
+enum Operation { signUp, updateUserName }
 
 /// User name input screen part of signup flow, also used to update existing user name
 class SetUserNameScreen extends StatefulWidget {
+  @required
   final Operation operation;
+  @required
   final String title;
 
   const SetUserNameScreen(
       {super.key, required this.title, required this.operation});
 
   @override
-  State<SetUserNameScreen> createState() =>
-      _SetUserNameScreenState(this.title, this.operation);
+  State<SetUserNameScreen> createState() => _SetUserNameScreenState();
 }
 
 class _SetUserNameScreenState extends State<SetUserNameScreen> {
-  final Operation operation;
-  final String title;
-
   String deafaultName = settingsLogic.devMode ? "avive" : "";
   late final _textController = TextEditingController(text: deafaultName);
 
@@ -35,19 +34,32 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
 
   void _postFrameCallback(BuildContext context) {
     Future.delayed(Duration.zero, () async {
-      if (!await checkInternetConnection(context)) {
+      bool isConnected = await PlatformInfo.isConnected();
+
+      if (!isConnected) {
+        if (context.mounted) {
+          StatusAlert.show(context,
+              duration: const Duration(seconds: 4),
+              title: 'No Internet',
+              subtitle: 'Check your connection',
+              configuration: const IconConfiguration(
+                  icon: CupertinoIcons.exclamationmark_triangle),
+              dismissOnBackgroundTap: true,
+              maxWidth: statusAlertWidth);
+        }
         return;
       }
-      // check availbility for deafult nam
-      await userNameAvailabilityLogic.check(_textController.text);
+
+      // check availbility for deafult name
+      if (_textController.text.isNotEmpty) {
+        await userNameAvailabilityLogic.check(_textController.text);
+      }
     });
   }
 
-  _SetUserNameScreenState(this.title, this.operation);
-
   @override
   Widget build(BuildContext context) {
-    Text submitButtonText = operation == Operation.SignUp
+    Text submitButtonText = widget.operation == Operation.signUp
         ? const Text('Next')
         : const Text('Update');
 
@@ -56,16 +68,16 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             CupertinoSliverNavigationBar(
-              largeTitle: Text(title),
+              largeTitle: Text(widget.title),
             ),
           ];
         },
         body: SafeArea(
           child: Padding(
-            padding: EdgeInsets.all(24),
+            padding: const EdgeInsets.all(24),
             child: Center(
               child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: 500),
+                constraints: const BoxConstraints(maxWidth: 500),
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -103,13 +115,13 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
               return const Text(
                 'Name available',
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: CupertinoColors.activeGreen),
+                style: TextStyle(color: CupertinoColors.activeGreen),
               );
             case UserNameAvailabilityStatus.unavailable:
               return const Text(
                 'Name unavailable. Try another one',
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: CupertinoColors.systemRed),
+                style: TextStyle(color: CupertinoColors.systemRed),
               );
             case UserNameAvailabilityStatus.error:
               return const Text(
@@ -126,20 +138,31 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
   }
 
   Future<void> _submitName(BuildContext context) async {
+    if (!mounted) return;
     if (_textController.text.isEmpty) {
       StatusAlert.show(
         context,
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
         title: 'Ooops',
         subtitle: 'Please enter user name',
-        configuration:
-            IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
-        maxWidth: StatusAlertWidth,
+        configuration: const IconConfiguration(
+            icon: CupertinoIcons.exclamationmark_triangle),
+        maxWidth: statusAlertWidth,
       );
       return;
     }
 
-    if (!await checkInternetConnection(context)) {
+    bool isConnected = await PlatformInfo.isConnected();
+
+    if (!isConnected && context.mounted) {
+      StatusAlert.show(context,
+          duration: const Duration(seconds: 4),
+          title: 'No Internet',
+          subtitle: 'Check your connection',
+          configuration: const IconConfiguration(
+              icon: CupertinoIcons.exclamationmark_triangle),
+          dismissOnBackgroundTap: true,
+          maxWidth: statusAlertWidth);
       return;
     }
 
@@ -151,12 +174,12 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
       // store the user's reuqested name in account logic
       await accountLogic.setRequestedUserName(_textController.text);
 
-      switch (operation) {
-        case Operation.SignUp:
-          debugPrint('>>> astarting signup flow...');
+      switch (widget.operation) {
+        case Operation.signUp:
+          debugPrint('*** astarting signup flow...');
           await accountSetupController.signUpUser();
           break;
-        case Operation.UpdateUserName:
+        case Operation.updateUserName:
           debugPrint('starting update user name flow...');
           try {
             SubmitTransactionResponse resp = await accountLogic
@@ -164,55 +187,61 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
 
             switch (resp.submitTransactionResult) {
               case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
-                StatusAlert.show(
-                  context,
-                  duration: Duration(seconds: 2),
-                  title: 'Name updated',
-                  configuration:
-                      IconConfiguration(icon: CupertinoIcons.wand_rays),
-                  maxWidth: StatusAlertWidth,
-                );
+                if (context.mounted) {
+                  StatusAlert.show(
+                    context,
+                    duration: const Duration(seconds: 2),
+                    title: 'Name updated',
+                    configuration:
+                        const IconConfiguration(icon: CupertinoIcons.wand_rays),
+                    maxWidth: statusAlertWidth,
+                  );
+                }
                 debugPrint(
                     'Update user name transaction submitted and accepted');
                 break;
               case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
-                StatusAlert.show(
-                  context,
-                  duration: Duration(seconds: 2),
-                  title: 'Server Error',
-                  subtitle: 'Operation failed. Try again later.',
-                  configuration: IconConfiguration(
-                      icon: CupertinoIcons.exclamationmark_triangle),
-                  maxWidth: StatusAlertWidth,
-                );
+                if (context.mounted) {
+                  StatusAlert.show(
+                    context,
+                    duration: const Duration(seconds: 2),
+                    title: 'Server Error',
+                    subtitle: 'Operation failed. Try again later.',
+                    configuration: const IconConfiguration(
+                        icon: CupertinoIcons.exclamationmark_triangle),
+                    maxWidth: statusAlertWidth,
+                  );
+                }
                 break;
             }
-            // go back to actions screen
-            context.pop();
           } catch (e) {
-            StatusAlert.show(
-              context,
-              duration: Duration(seconds: 2),
-              title: 'Oops',
-              subtitle: 'Operation failed. Try again later.',
-              configuration: IconConfiguration(
-                  icon: CupertinoIcons.exclamationmark_triangle),
-              maxWidth: StatusAlertWidth,
-            );
+            if (context.mounted) {
+              StatusAlert.show(
+                context,
+                duration: const Duration(seconds: 2),
+                title: 'Oops',
+                subtitle: 'Operation failed. Try again later.',
+                configuration: const IconConfiguration(
+                    icon: CupertinoIcons.exclamationmark_triangle),
+                maxWidth: statusAlertWidth,
+              );
+            }
           }
           break;
       }
     } else {
       debugPrint('Name not available - show warning');
-      StatusAlert.show(
-        context,
-        duration: Duration(seconds: 2),
-        title: 'Name Unavailable',
-        subtitle: 'Please try another name.',
-        configuration:
-            IconConfiguration(icon: CupertinoIcons.exclamationmark_triangle),
-        maxWidth: StatusAlertWidth,
-      );
+      if (context.mounted) {
+        StatusAlert.show(
+          context,
+          duration: const Duration(seconds: 2),
+          title: 'Name Unavailable',
+          subtitle: 'Please try another name.',
+          configuration: const IconConfiguration(
+              icon: CupertinoIcons.exclamationmark_triangle),
+          maxWidth: statusAlertWidth,
+        );
+      }
     }
   }
 
@@ -233,7 +262,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
         style: CupertinoTheme.of(context).textTheme.textStyle,
         textAlign: TextAlign.center,
         padding: const EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           border: Border(
             bottom: BorderSide(
               width: 0,

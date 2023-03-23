@@ -15,29 +15,29 @@ class TransactionDetailsScreen extends StatefulWidget {
   // 0x212...
   final String txId;
 
-  TransactionDetailsScreen(Key? key, this.txId) : super(key: key);
+  const TransactionDetailsScreen(Key? key, this.txId) : super(key: key);
 
   @override
   State<TransactionDetailsScreen> createState() =>
-      _TransactionDetailsScreenState(txId);
+      _TransactionDetailsScreenState();
 }
 
 class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
-  final String txHash;
+  late final String txHash;
 
   late final SignedTransactionWithStatus? transaction;
   late final types.TransactionEvent? transactionEvent;
 
-  _TransactionDetailsScreenState(this.txHash) {
-    transaction = txsBoss.getTranscation(this.txHash);
+  @override
+  initState() {
+    super.initState();
+    transaction = txsBoss.getTranscation(widget.txId);
     if (transaction == null) {
       return;
     }
 
-    transactionEvent = txsBoss.txEventsNotifer.value[this.txHash];
+    transactionEvent = txsBoss.txEventsNotifer.value[txHash];
     transaction!.openned.value = true;
-
-    // todo: do more pre-processing
   }
 
   /// Return the list secionts
@@ -92,9 +92,9 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
     }
 
     if (paymentData.charTraitId != 0 &&
-        paymentData.charTraitId < GenesisConfig.PersonalityTraits.length) {
+        paymentData.charTraitId < GenesisConfig.personalityTraits.length) {
       PersonalityTrait trait =
-          GenesisConfig.PersonalityTraits[paymentData.charTraitId];
+          GenesisConfig.personalityTraits[paymentData.charTraitId];
       String title = 'You are ${trait.name.toLowerCase()}';
       String emoji = trait.emoji;
 
@@ -102,7 +102,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
         CupertinoListTile.notched(
           title: Text(
             title,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
           ),
           leading: Text(
             emoji,
@@ -149,7 +149,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
             children: [
               Text(sender.userName),
               Text(sender.accountId.data.toShortHexString()),
-              SizedBox(height: 6),
+              const SizedBox(height: 6),
             ],
           ),
           trailing: Text(senderPhoneNumber,
@@ -280,7 +280,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
               CupertinoSliverNavigationBar(
                 largeTitle: Text(title),
                 trailing: adjustNavigationBarButtonPosition(
-                    Icon(CupertinoIcons.share, size: 24), 0, 0),
+                    const Icon(CupertinoIcons.share, size: 24), 0, 0),
               ),
             ];
           },
@@ -301,9 +301,9 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
   Widget _buildCommunityWidget(
       BuildContext context, types.PaymentTransactionV1 paymentData) {
     CommunityDesignTheme theme =
-        GenesisConfig.CommunityColors[paymentData.communityId]!;
+        GenesisConfig.communityColors[paymentData.communityId]!;
 
-    String emoji = GenesisConfig.Communities[paymentData.communityId]!.emoji;
+    String emoji = GenesisConfig.communities[paymentData.communityId]!.emoji;
 
     return Title(
       color: CupertinoColors.black, // This is required
@@ -341,7 +341,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
                     width: double.infinity,
                     fit: BoxFit.fill,
                     image: AssetImage(GenesisConfig
-                        .CommunityBannerAssets[paymentData.communityId]!)),
+                        .communityBannerAssets[paymentData.communityId]!)),
                 ListView(
                   padding: EdgeInsets.zero,
                   shrinkWrap: true,
@@ -363,9 +363,9 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
           tx.txData as types.PaymentTransactionV1;
 
       if (appreciation.charTraitId != 0 &&
-          appreciation.charTraitId < GenesisConfig.PersonalityTraits.length) {
+          appreciation.charTraitId < GenesisConfig.personalityTraits.length) {
         PersonalityTrait trait =
-            GenesisConfig.PersonalityTraits[appreciation.charTraitId];
+            GenesisConfig.personalityTraits[appreciation.charTraitId];
         return '${trait.emoji} You are ${trait.name.toLowerCase()}';
       } else {
         return '🤑 Payment';

@@ -27,7 +27,7 @@ class _BackupAccountScreenState extends State<BackupAccountScreen> {
     introTiles.add(
       CupertinoListTile.notched(
         title: Padding(
-          padding: EdgeInsets.only(top: 16, bottom: 0),
+          padding: const EdgeInsets.only(top: 16, bottom: 0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,8 +49,8 @@ class _BackupAccountScreenState extends State<BackupAccountScreen> {
               ),
               CupertinoButton(
                   onPressed: () {},
-                  padding: EdgeInsets.only(left: 0),
-                  child: Text('Learn more...'))
+                  padding: const EdgeInsets.only(left: 0),
+                  child: const Text('Learn more...'))
             ],
           ),
         ),
@@ -71,22 +71,22 @@ class _BackupAccountScreenState extends State<BackupAccountScreen> {
               style: CupertinoTheme.of(context)
                   .textTheme
                   .navTitleTextStyle
-                  .merge(TextStyle(fontSize: 18))),
+                  .merge(const TextStyle(fontSize: 18))),
           leading: Text((index + 1).toString(),
               style: CupertinoTheme.of(context)
                   .textTheme
                   .navTitleTextStyle
-                  .merge(TextStyle(fontSize: 18))),
+                  .merge(const TextStyle(fontSize: 18))),
           // todo: number format
         ),
       );
     });
 
     tiles.add(
-      CupertinoListTile.notched(
-        title: Container(
+      const CupertinoListTile.notched(
+        title: SizedBox(
           height: 64,
-          child: const Text(''),
+          child: Text(''),
         ),
       ),
     );
@@ -130,8 +130,8 @@ class _BackupAccountScreenState extends State<BackupAccountScreen> {
         child: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
-              CupertinoSliverNavigationBar(
-                largeTitle: const Text('Backup Account'),
+              const CupertinoSliverNavigationBar(
+                largeTitle: Text('Backup Account'),
               ),
             ];
           },

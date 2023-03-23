@@ -5,7 +5,7 @@ import 'package:karma_coin/data/genesis_config.dart';
 abstract class KarmaCoinAmountFormatter {
   static final NumberFormat _deicmalFormat = NumberFormat("#,###.#####");
 
-  static final double _kToUsdExchangeRate = 0.02;
+  static const double _kToUsdExchangeRate = 0.02;
   static final _kCentsDisplayUpperLimit = Int64(10000);
 
   // Returns formatted KC amount with USD estimate. If amount is small then returns in cents units,otherwise returns in coins.
@@ -46,13 +46,14 @@ abstract class KarmaCoinAmountFormatter {
   static String formatUSDEstimate(Int64 amount) {
     double amountCoins = amount.toDouble() / GenesisConfig.kCentsPerCoin;
     if (amount <= _kCentsDisplayUpperLimit) {
-      return '${NumberFormat.currency(
+      return NumberFormat.currency(
         decimalDigits: 8,
         customPattern: '#.## USD',
-      ).format(amountCoins * _kToUsdExchangeRate)}';
+      ).format(amountCoins * _kToUsdExchangeRate);
     }
 
-    return '${NumberFormat.currency(customPattern: '#,###.## USD').format(amountCoins * _kToUsdExchangeRate)}';
+    return NumberFormat.currency(customPattern: '#,###.## USD')
+        .format(amountCoins * _kToUsdExchangeRate);
   }
 
   static String getUnitsLabel(Int64 amount) {

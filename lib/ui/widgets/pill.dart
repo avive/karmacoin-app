@@ -18,14 +18,14 @@ class Pill extends StatelessWidget {
         color: backgroundColor,
       ),
       child: Padding(
-        padding: EdgeInsets.only(left: 10, right: 10),
+        padding: const EdgeInsets.only(left: 10, right: 10),
         child: Center(
           child: Row(children: [
             _getCountWidget(context),
             Text(
               title,
               style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                    TextStyle(
+                    const TextStyle(
                       fontSize: 11,
                       color: CupertinoColors.white,
                       fontWeight: FontWeight.w600,
@@ -46,7 +46,7 @@ class Pill extends StatelessWidget {
     debugPrint(count.format());
 
     return Padding(
-      padding: EdgeInsets.only(right: 6),
+      padding: const EdgeInsets.only(right: 6),
       child: Container(
         height: 16,
         decoration: BoxDecoration(
@@ -54,12 +54,12 @@ class Pill extends StatelessWidget {
           color: CupertinoColors.black,
         ),
         child: Padding(
-          padding: EdgeInsets.only(left: 6, right: 6),
+          padding: const EdgeInsets.only(left: 6, right: 6),
           child: Center(
             child: Text(
               count.format(),
               style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                    TextStyle(
+                    const TextStyle(
                       fontSize: 12,
                       color: CupertinoColors.white,
                       fontWeight: FontWeight.w600,

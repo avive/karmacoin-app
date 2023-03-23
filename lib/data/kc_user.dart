@@ -101,7 +101,7 @@ class KarmaCoinUser {
 
     for (List<TraitScore> scores in newScores.values) {
       for (TraitScore score in scores) {
-        debugPrint('*** Trait score: ${score} in comm ${score.communityId}');
+        debugPrint('*** Trait score: $score in comm ${score.communityId}');
       }
     }
 
@@ -113,7 +113,7 @@ class KarmaCoinUser {
     communities.value = user.communityMemberships;
 
     for (CommunityMembership membership in user.communityMemberships) {
-      debugPrint('*** Community membership: ${membership}');
+      debugPrint('*** Community membership: $membership');
     }
 
     if (persist) {

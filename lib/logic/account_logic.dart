@@ -37,7 +37,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
   final _secureStorage = const FlutterSecureStorage();
 
   // update user data from chain polling timer
-  Timer? _timer = null;
+  Timer? _timer;
 
   // User verification data from verifier
   UserVerificationData? _userVerificationData;
@@ -185,16 +185,19 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
   Future<bool> attemptAutoSignIn() async {
     try {
       List<int>? id = _getAccountId();
-      assert(id != null, 'expected account id');
-      debugPrint('Account id param: ${id!.toHexString()}');
+      if (id == null) {
+        return false;
+      }
+
+      debugPrint('Account id param: ${id.toHexString()}');
       GetUserInfoByAccountResponse resp = await api.apiServiceClient
           .getUserInfoByAccount(
               GetUserInfoByAccountRequest(accountId: AccountId(data: id)));
 
       if (resp.hasUser()) {
         User user = resp.user;
-        debugPrint('${user.mobileNumber.number}, ${this.phoneNumber.value!}');
-        if (user.mobileNumber.number == this.phoneNumber.value!) {
+        debugPrint('${user.mobileNumber.number}, ${phoneNumber.value!}');
+        if (user.mobileNumber.number == phoneNumber.value!) {
           debugPrint('auto signing user');
           // set requested name to current user name
           await accountLogic.setRequestedUserName(user.userName);
@@ -204,7 +207,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
 
           // update local user with data from the chain
           // including chain nonce
-          await this.karmaCoinUser.value!.updatWithUserData(user, true);
+          await karmaCoinUser.value!.updatWithUserData(user, true);
 
           // User is signed up on chain
           await _setSignedUp(true);
@@ -269,7 +272,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
         .mnemonicToSeed(securityWords, passphrase: 'karmacoin')
         .sublist(0, 32);
 
-    debugPrint('Seed from words [${securityWords}]: ${seed.toHexString()}');
+    debugPrint('Seed from words [$securityWords]: ${seed.toHexString()}');
     return seed;
   }
 
@@ -289,7 +292,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
 
     //Uint8List seed = await compute(_mnemonicToSeed, securityWords);
 
-    Uint8List seed = await _mnemonicToSeed(securityWords);
+    Uint8List seed = _mnemonicToSeed(securityWords);
 
     debugPrint('seed length:${seed.length} seed: ${seed.toHexString()}');
 
@@ -325,10 +328,9 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
 
   @override
   Future<void> persistKarmaCoinUser() async {
-    assert(this.karmaCoinUser.value != null, 'no local karma coin user found');
+    assert(karmaCoinUser.value != null, 'no local karma coin user found');
 
-    String userData =
-        this.karmaCoinUser.value!.userData.writeToBuffer().toBase64();
+    String userData = karmaCoinUser.value!.userData.writeToBuffer().toBase64();
 
     await _secureStorage.write(
         key: _AccountStoreKeys.karmaCoinUser,
@@ -507,7 +509,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     );
 
     // store it locally
-    this.karmaCoinUser.value = newKarmaCoinUser;
+    karmaCoinUser.value = newKarmaCoinUser;
     await persistKarmaCoinUser();
   }
 

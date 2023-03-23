@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:phone_form_field/phone_form_field.dart';
@@ -8,10 +9,10 @@ import 'package:status_alert/status_alert.dart';
 class PhoneInputScreen extends StatefulWidget {
   final String title;
 
-  PhoneInputScreen({super.key, this.title = 'Sign Up'});
+  const PhoneInputScreen({super.key, this.title = 'Sign Up'});
 
   @override
-  State<PhoneInputScreen> createState() => _PhoneInputScreenState(title);
+  State<PhoneInputScreen> createState() => _PhoneInputScreenState();
 }
 
 class _PhoneInputScreenState extends State<PhoneInputScreen> {
@@ -23,9 +24,8 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
   bool isCountryChipPersistent = false;
   bool withLabel = false;
   bool useRtl = false;
-  final String title;
 
-  _PhoneInputScreenState(this.title);
+  _PhoneInputScreenState();
 
   // country selector ux
   CountrySelectorNavigator selectorNavigator =
@@ -56,16 +56,27 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
     if (!isValid) {
       StatusAlert.show(
         context,
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
         title: 'Oopps',
         subtitle: 'Please enter your mobile phone number.',
-        configuration: IconConfiguration(icon: CupertinoIcons.stop_circle),
-        maxWidth: StatusAlertWidth,
+        configuration:
+            const IconConfiguration(icon: CupertinoIcons.stop_circle),
+        maxWidth: statusAlertWidth,
       );
       return;
     }
 
-    if (!await checkInternetConnection(context)) {
+    if (!await PlatformInfo.isConnected()) {
+      if (context.mounted) {
+        StatusAlert.show(context,
+            duration: const Duration(seconds: 4),
+            title: 'No Internet',
+            subtitle: 'Check your connection',
+            configuration: const IconConfiguration(
+                icon: CupertinoIcons.exclamationmark_triangle),
+            dismissOnBackgroundTap: true,
+            maxWidth: statusAlertWidth);
+      }
       return;
     }
 
@@ -85,11 +96,12 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
           debugPrint('error: $e');
           StatusAlert.show(
             context,
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
             title: 'Oopps',
             subtitle: 'The phone number you entered is invalid.',
-            configuration: IconConfiguration(icon: CupertinoIcons.stop_circle),
-            maxWidth: StatusAlertWidth,
+            configuration:
+                const IconConfiguration(icon: CupertinoIcons.stop_circle),
+            maxWidth: statusAlertWidth,
           );
           return;
         }
@@ -106,11 +118,12 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
         if (e.code == 'invalid-phone-number') {
           StatusAlert.show(
             context,
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
             title: 'Oopps',
             subtitle: 'The phone number you entered is invalid.',
-            configuration: IconConfiguration(icon: CupertinoIcons.stop_circle),
-            maxWidth: StatusAlertWidth,
+            configuration:
+                const IconConfiguration(icon: CupertinoIcons.stop_circle),
+            maxWidth: statusAlertWidth,
           );
           return;
         }
@@ -119,11 +132,12 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
 
         StatusAlert.show(
           context,
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
           title: 'Oopps',
           subtitle: 'No Internet connection. Please try again later.',
-          configuration: IconConfiguration(icon: CupertinoIcons.stop_circle),
-          maxWidth: StatusAlertWidth,
+          configuration:
+              const IconConfiguration(icon: CupertinoIcons.stop_circle),
+          maxWidth: statusAlertWidth,
         );
       },
       codeSent: (String verificationId, int? resendToken) async {
@@ -158,16 +172,16 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
               CupertinoSliverNavigationBar(
-                largeTitle: Text(title),
+                largeTitle: Text(widget.title),
               ),
             ];
           },
           body: SafeArea(
             child: Padding(
-              padding: EdgeInsets.all(24),
+              padding: const EdgeInsets.all(24),
               child: Center(
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: 360),
+                  constraints: const BoxConstraints(maxWidth: 360),
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
@@ -175,46 +189,43 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                             style: CupertinoTheme.of(context)
                                 .textTheme
                                 .navTitleTextStyle),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         Material(
-                          child: Container(
-                            child: Form(
-                              child: PhoneFormField(
-                                controller: controller,
-                                shouldFormat: shouldFormat && !useRtl,
-                                autofocus: true,
-                                autofillHints: const [
-                                  AutofillHints.telephoneNumber
-                                ],
-                                flagSize: 18,
-                                countrySelectorNavigator: selectorNavigator,
-                                defaultCountry: IsoCode.US,
-                                validator: PhoneValidator.compose([
-                                  PhoneValidator.validMobile(),
-                                ]),
-                                decoration: InputDecoration(
-                                  label: withLabel
-                                      ? const Text('Your phone number')
-                                      : null,
-                                  border: outlineBorder
-                                      ? const OutlineInputBorder()
-                                      : const UnderlineInputBorder(),
-                                  hintText: withLabel
-                                      ? ''
-                                      : 'Your mobile phone number',
-                                ),
+                          child: Form(
+                            child: PhoneFormField(
+                              controller: controller,
+                              shouldFormat: shouldFormat && !useRtl,
+                              autofocus: true,
+                              autofillHints: const [
+                                AutofillHints.telephoneNumber
+                              ],
+                              flagSize: 18,
+                              countrySelectorNavigator: selectorNavigator,
+                              defaultCountry: IsoCode.US,
+                              validator: PhoneValidator.compose([
+                                PhoneValidator.validMobile(),
+                              ]),
+                              decoration: InputDecoration(
+                                label: withLabel
+                                    ? const Text('Your phone number')
+                                    : null,
+                                border: outlineBorder
+                                    ? const OutlineInputBorder()
+                                    : const UnderlineInputBorder(),
+                                hintText:
+                                    withLabel ? '' : 'Your mobile phone number',
                               ),
                             ),
                           ),
                         ),
-                        SizedBox(height: 36),
+                        const SizedBox(height: 36),
                         CupertinoButton.filled(
                           onPressed: () async {
                             await _beginSignup(context);
                           },
-                          child: Text(title),
+                          child: Text(widget.title),
                         ),
-                        SizedBox(height: 14),
+                        const SizedBox(height: 14),
                         _processRestoreAccountFlow(context),
                       ]),
                 ),
@@ -236,17 +247,17 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
 
           Future.delayed(Duration.zero, () {
             appState.triggerSignupAfterRestore.value = false;
-            Future.delayed(Duration(milliseconds: 300), () async {
+            Future.delayed(const Duration(milliseconds: 300), () async {
               if (!mounted) return;
               StatusAlert.show(
                 context,
-                duration: Duration(seconds: 1),
-                configuration: IconConfiguration(
+                duration: const Duration(seconds: 1),
+                configuration: const IconConfiguration(
                     icon: CupertinoIcons.exclamationmark_triangle),
                 title: 'Restore Account',
                 subtitle: 'Sign up to complete restoration',
                 dismissOnBackgroundTap: true,
-                maxWidth: StatusAlertWidth,
+                maxWidth: statusAlertWidth,
               );
             });
           });

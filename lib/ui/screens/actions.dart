@@ -31,14 +31,14 @@ class _ActionsScreenState extends State<ActionsScreen> {
                 if (value + value1 > 0) {
                   final label = (value + value1).toString();
                   return badges.Badge(
-                      badgeStyle: badges.BadgeStyle(
+                      badgeStyle: const badges.BadgeStyle(
                           badgeColor: CupertinoColors.systemBlue),
                       position: badges.BadgePosition.topEnd(top: -10, end: -6),
                       badgeContent: Text(label,
                           style: CupertinoTheme.of(context)
                               .textTheme
                               .tabLabelTextStyle
-                              .merge(TextStyle(
+                              .merge(const TextStyle(
                                   fontSize: 12, color: CupertinoColors.white))),
                       child: const Icon(CupertinoIcons.square_list, size: 28));
                 } else {
@@ -55,7 +55,8 @@ class _ActionsScreenState extends State<ActionsScreen> {
           header: Text(
             'KARMA COINS',
             style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                  TextStyle(fontSize: 14, color: CupertinoColors.inactiveGray),
+                  const TextStyle(
+                      fontSize: 14, color: CupertinoColors.inactiveGray),
                 ),
           ),
           children: <CupertinoListTile>[
@@ -75,16 +76,18 @@ class _ActionsScreenState extends State<ActionsScreen> {
         header: Text(
           'COMMUNITIES',
           style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                TextStyle(fontSize: 14, color: CupertinoColors.inactiveGray),
+                const TextStyle(
+                    fontSize: 14, color: CupertinoColors.inactiveGray),
               ),
         ),
-        children: <Widget>[CommunitiesListSection()],
+        children: const <Widget>[CommunitiesListSection()],
       ),
       CupertinoListSection.insetGrouped(
         header: Text(
           'ACCOUNT',
           style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                TextStyle(fontSize: 14, color: CupertinoColors.inactiveGray),
+                const TextStyle(
+                    fontSize: 14, color: CupertinoColors.inactiveGray),
               ),
         ),
         children: <CupertinoListTile>[
@@ -119,14 +122,15 @@ class _ActionsScreenState extends State<ActionsScreen> {
             trailing: const CupertinoListTileChevron(),
             onTap: () => {},
           ),
-          DeleteAccountTile().build(context) as CupertinoListTile,
+          const DeleteAccountTile().build(context) as CupertinoListTile,
         ],
       ),
       CupertinoListSection.insetGrouped(
         header: Text(
           'SECURITY',
           style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                TextStyle(fontSize: 14, color: CupertinoColors.inactiveGray),
+                const TextStyle(
+                    fontSize: 14, color: CupertinoColors.inactiveGray),
               ),
         ),
         children: <CupertinoListTile>[
@@ -148,7 +152,8 @@ class _ActionsScreenState extends State<ActionsScreen> {
         header: Text(
           'SUPPORT',
           style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                TextStyle(fontSize: 14, color: CupertinoColors.inactiveGray),
+                const TextStyle(
+                    fontSize: 14, color: CupertinoColors.inactiveGray),
               ),
         ),
         children: <CupertinoListTile>[
@@ -160,12 +165,12 @@ class _ActionsScreenState extends State<ActionsScreen> {
           CupertinoListTile.notched(
             title: const Text('Get Support'),
             leading: const Icon(CupertinoIcons.question, size: 28),
-            onTap: () async => {await openUrl(context, _supportUrl)},
+            onTap: () async => {await openUrl(_supportUrl)},
           ),
           CupertinoListTile.notched(
             title: const Text('Privacy Statement'),
             leading: const Icon(CupertinoIcons.lock_circle, size: 28),
-            onTap: () async => {await openUrl(context, _privacyUrl)},
+            onTap: () async => {await openUrl(_privacyUrl)},
           ),
         ],
       ),
@@ -173,19 +178,20 @@ class _ActionsScreenState extends State<ActionsScreen> {
         header: Text(
           'COMMUNITY',
           style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                TextStyle(fontSize: 14, color: CupertinoColors.inactiveGray),
+                const TextStyle(
+                    fontSize: 14, color: CupertinoColors.inactiveGray),
               ),
         ),
         children: <CupertinoListTile>[
           CupertinoListTile.notched(
             title: const Text('Twitter'),
             leading: const FaIcon(FontAwesomeIcons.twitter, size: 24),
-            onTap: () async => {await openUrl(context, _twitterUrl)},
+            onTap: () async => {await openUrl(_twitterUrl)},
           ),
           CupertinoListTile.notched(
             title: const Text('Telegram'),
             leading: const FaIcon(FontAwesomeIcons.telegram, size: 24),
-            onTap: () async => {await openUrl(context, _tgramUrl)},
+            onTap: () async => {await openUrl(_tgramUrl)},
           ),
           /*
           CupertinoListTile.notched(
@@ -197,12 +203,12 @@ class _ActionsScreenState extends State<ActionsScreen> {
           CupertinoListTile.notched(
             title: const Text('Blog'),
             leading: const FaIcon(FontAwesomeIcons.blog, size: 24),
-            onTap: () async => {await openUrl(context, _blogUrl)},
+            onTap: () async => {await openUrl(_blogUrl)},
           ),
           CupertinoListTile.notched(
             title: const Text('LinkedIn'),
             leading: const FaIcon(FontAwesomeIcons.linkedin, size: 24),
-            onTap: () async => {await openUrl(context, _linkedInUrl)},
+            onTap: () async => {await openUrl(_linkedInUrl)},
           ),
         ],
       ),
@@ -210,7 +216,8 @@ class _ActionsScreenState extends State<ActionsScreen> {
         header: Text(
           'Misc',
           style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                TextStyle(fontSize: 14, color: CupertinoColors.inactiveGray),
+                const TextStyle(
+                    fontSize: 14, color: CupertinoColors.inactiveGray),
               ),
         ),
         children: <CupertinoListTile>[
@@ -226,8 +233,8 @@ class _ActionsScreenState extends State<ActionsScreen> {
             trailing: const CupertinoListTileChevron(),
             onTap: () => context.push(ScreenPaths.about),
           ),
-          CupertinoListTile.notched(
-            title: const Text(''),
+          const CupertinoListTile.notched(
+            title: Text(''),
           ),
         ],
       ),
@@ -241,7 +248,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           if (!mounted) return [];
           return <Widget>[
-            CupertinoSliverNavigationBar(
+            const CupertinoSliverNavigationBar(
               largeTitle: Text('Actions'),
             ),
           ];

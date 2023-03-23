@@ -17,7 +17,7 @@ class SettingsLogic with ThrottledSaveLoadMixin {
   final bool localMode = false;
 
   // dev mode has some text field input shortcuts to save time in dev
-  final bool devMode = false;
+  final bool devMode = true;
 
   Future<void> init() async {
     await load();

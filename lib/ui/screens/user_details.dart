@@ -9,29 +9,28 @@ import 'package:karma_coin/services/api/types.pb.dart';
 /// Display user details for provided user or for local user
 class UserDetailsScreen extends StatefulWidget {
   // 0x212...
-  final User? user;
+  late final User? user;
+  late final bool isLocal;
 
   /// Set user to display details for or null for local user
-  UserDetailsScreen({super.key, this.user});
-  @override
-  State<UserDetailsScreen> createState() => _UserDetailsScreenState(user);
-}
-
-class _UserDetailsScreenState extends State<UserDetailsScreen> {
-  User? user;
-  bool isLocal = false;
-
-  _UserDetailsScreenState(this.user) {
-    // todo: do more pre-processing
-    if (user == null) {
+  UserDetailsScreen(Key? key, User? aUser) : super(key: key) {
+    if (aUser == null) {
       user = accountLogic.karmaCoinUser.value!.userData;
       isLocal = true;
+    } else {
+      user = aUser;
+      isLocal = false;
     }
   }
 
+  @override
+  State<UserDetailsScreen> createState() => _UserDetailsScreenState();
+}
+
+class _UserDetailsScreenState extends State<UserDetailsScreen> {
   /// Return the list secionts
   List<CupertinoListSection> _getSections(BuildContext context) {
-    if (user == null) {
+    if (widget.user == null) {
       return [];
     }
 
@@ -44,24 +43,24 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
             style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
         leading: const Icon(CupertinoIcons.circle, size: 28),
         // todo: number format
-        trailing: Text(user!.karmaScore.format(),
+        trailing: Text(widget.user!.karmaScore.format(),
             style: CupertinoTheme.of(context).textTheme.textStyle),
       ),
     );
 
     tiles.add(
       CupertinoListTile.notched(
-        padding: EdgeInsets.only(top: 12, bottom: 12, left: 12),
+        padding: const EdgeInsets.only(top: 12, bottom: 12, left: 12),
         title: Text('Balance',
             style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
 
         leading: const Icon(CupertinoIcons.money_dollar, size: 28),
         // todo: number format
         subtitle: Padding(
-          padding: EdgeInsets.only(top: 2),
+          padding: const EdgeInsets.only(top: 2),
           child: Text(
               KarmaCoinAmountFormatter.format(
-                user!.balance,
+                widget.user!.balance,
               ),
               maxLines: 3,
               style: CupertinoTheme.of(context).textTheme.textStyle),
@@ -75,7 +74,8 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
             style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
         leading: const Icon(CupertinoIcons.phone, size: 28),
         // todo: number format
-        subtitle: Text('+' + user!.mobileNumber.number.formatPhoneNumber(),
+        subtitle: Text(
+            '+${widget.user!.mobileNumber.number.formatPhoneNumber()}',
             style: CupertinoTheme.of(context).textTheme.textStyle),
         trailing: const Icon(CupertinoIcons.share),
         onTap: () async {
@@ -86,14 +86,15 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
 
     techSectionTiles.add(
       CupertinoListTile.notched(
-        padding: EdgeInsets.only(top: 12, bottom: 12, left: 12, right: 14),
+        padding:
+            const EdgeInsets.only(top: 12, bottom: 12, left: 12, right: 14),
         title: Text('Account Id',
             style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
         subtitle: Padding(
-          padding: EdgeInsets.only(top: 6, right: 12),
+          padding: const EdgeInsets.only(top: 6, right: 12),
           child: Text(
             maxLines: 3,
-            user!.accountId.data.toHexString(),
+            widget.user!.accountId.data.toHexString(),
             style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                   TextStyle(
                       fontSize: 16,
@@ -112,13 +113,14 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
 
     techSectionTiles.add(
       CupertinoListTile.notched(
-        padding: EdgeInsets.only(top: 12, bottom: 12, left: 12, right: 14),
+        padding:
+            const EdgeInsets.only(top: 12, bottom: 12, left: 12, right: 14),
         title: Text('Exact Balance',
             style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
         subtitle: Padding(
-          padding: EdgeInsets.only(top: 3),
+          padding: const EdgeInsets.only(top: 3),
           child: Text(
-            KarmaCoinAmountFormatter.formatKCents(user!.balance),
+            KarmaCoinAmountFormatter.formatKCents(widget.user!.balance),
             maxLines: 2,
             style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                   TextStyle(
@@ -137,18 +139,19 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
 
     techSectionTiles.add(
       CupertinoListTile.notched(
-          padding: EdgeInsets.only(top: 12, bottom: 12, left: 12, right: 14),
+          padding:
+              const EdgeInsets.only(top: 12, bottom: 12, left: 12, right: 14),
           title: Text('Transactions Counter',
               style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
-          trailing: Text(user!.nonce.toString(),
+          trailing: Text(widget.user!.nonce.toString(),
               style: CupertinoTheme.of(context).textTheme.textStyle),
           leading: const Icon(CupertinoIcons.number, size: 28)),
     );
 
     List<CupertinoListTile> karmaTiles = [];
 
-    for (TraitScore score in user!.traitScores) {
-      PersonalityTrait trait = GenesisConfig.PersonalityTraits[score.traitId];
+    for (TraitScore score in widget.user!.traitScores) {
+      PersonalityTrait trait = GenesisConfig.personalityTraits[score.traitId];
 
       if (score.communityId != 0) {
         // we only display global traits here and not community ones
@@ -254,13 +257,13 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
   build(BuildContext context) {
     Widget trailingWidget = Container();
 
-    if (isLocal) {
+    if (widget.isLocal) {
       trailingWidget = CupertinoButton(
         onPressed: () {
           // todo: push update username screen
         },
         child: adjustNavigationBarButtonPosition(
-            Icon(CupertinoIcons.pencil, size: 24), 0, 0),
+            const Icon(CupertinoIcons.pencil, size: 24), 0, 0),
       );
     }
 
@@ -272,7 +275,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
               CupertinoSliverNavigationBar(
-                largeTitle: Text(user!.userName),
+                largeTitle: Text(widget.user!.userName),
                 trailing: trailingWidget,
               ),
             ];

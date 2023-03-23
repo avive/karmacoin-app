@@ -15,46 +15,32 @@ class AmountInputWidget extends StatefulWidget {
   @required
   final String title;
 
-  AmountInputWidget(
+  const AmountInputWidget(
       {Key? key,
-      this.feeType = FeeType.Payment,
+      this.feeType = FeeType.payment,
       this.coinKind = CoinKind.kCoins,
       this.title = 'Karma Coin Amount'})
       : super(key: key);
 
   @override
-  State<AmountInputWidget> createState() =>
-      _AmountInputWidgetState(feeType, coinKind, title);
+  State<AmountInputWidget> createState() => _AmountInputWidgetState();
 }
 
 class _AmountInputWidgetState extends State<AmountInputWidget> {
-  @required
-  CoinKind coinKind;
-
-  @required
-  final FeeType feeType;
-
-  @required
-  final String title;
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
+  late CoinKind coinKind;
 
   @override
   void initState() {
     super.initState();
+    coinKind = widget.coinKind;
   }
-
-  _AmountInputWidgetState(this.feeType, this.coinKind, this.title);
 
   Widget _getPickerWidget(CoinKind units) {
     switch (units) {
       case CoinKind.kCoins:
-        return DecimalAmountInputWidget(feeType: feeType);
+        return DecimalAmountInputWidget(feeType: widget.feeType);
       case CoinKind.kCents:
-        return NumericalAmountInputWidget(feeType: feeType);
+        return NumericalAmountInputWidget(feeType: widget.feeType);
     }
   }
 
@@ -74,14 +60,14 @@ class _AmountInputWidgetState extends State<AmountInputWidget> {
                 ),
                 0,
                 0),
-            largeTitle: Text(title),
+            largeTitle: Text(widget.title),
           ),
           SliverFillRemaining(
             hasScrollBody: false,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
                 CupertinoSegmentedControl<CoinKind>(
                   // Provide horizontal padding around the children.
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -106,11 +92,11 @@ class _AmountInputWidgetState extends State<AmountInputWidget> {
                     ),
                   },
                 ),
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
                 _getPickerWidget(coinKind),
                 CupertinoButton(
                   onPressed: () {},
-                  child: Text('Another amount...'),
+                  child: const Text('Another amount...'),
                 ),
               ],
             ),

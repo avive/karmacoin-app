@@ -7,7 +7,7 @@ class PaymentTransactionData {
   Int64 kCentsAmount = Int64.ZERO;
   Int64 kCentsFeeAmount = Int64.ZERO;
 
-  PersonalityTrait personalityTrait = GenesisConfig.PersonalityTraits[0];
+  PersonalityTrait personalityTrait = GenesisConfig.personalityTraits[0];
   int communityId = 0;
   String mobilePhoneNumber = '';
   String thankYouMessage = '';
