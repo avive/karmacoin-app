@@ -23,8 +23,6 @@ class TransactionDetailsScreen extends StatefulWidget {
 }
 
 class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
-  late final String txHash;
-
   late final SignedTransactionWithStatus? transaction;
   late final types.TransactionEvent? transactionEvent;
 
@@ -36,7 +34,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
       return;
     }
 
-    transactionEvent = txsBoss.txEventsNotifer.value[txHash];
+    transactionEvent = txsBoss.txEventsNotifer.value[widget.txId];
     transaction!.openned.value = true;
   }
 
@@ -213,7 +211,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
       CupertinoListTile.notched(
         title:
             Text('Id', style: CupertinoTheme.of(context).textTheme.textStyle),
-        trailing: Text(txHash.toHex().toShortHexString(),
+        trailing: Text(widget.txId.toHex().toShortHexString(),
             style: CupertinoTheme.of(context).textTheme.textStyle),
         leading: const Icon(CupertinoIcons.checkmark_seal, size: 28),
       ),
