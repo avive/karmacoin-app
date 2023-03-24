@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:18491747418:android:046d4f8663fbe8a4a73c63",
         "android_client_info": {
-          "package_name": "in.karmaco.app"
+          "package_name": "com.example.firebase_auth_demo"
         }
       },
       "oauth_client": [
@@ -45,7 +45,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:18491747418:android:8d7b3f9ba06fd9bea73c63",
         "android_client_info": {
-          "package_name": "in.karmaco.app"
+          "package_name": "com.example.flutter_application_1"
         }
       },
       "oauth_client": [
