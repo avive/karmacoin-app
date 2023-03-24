@@ -16,6 +16,7 @@ flutter pub run flutter_native_splash:create
 ### Build an Android Relase
 ```bash
 flutter build appbundle
+flutter build apk
 ```
 
 ### Build Web App

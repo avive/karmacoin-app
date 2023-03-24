@@ -135,6 +135,59 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
       // todo: how to make this not assert when karmaCoinUser is null?
       valueListenable: txsBoss.incomingAppreciationsNotifer,
       builder: (context, value, child) {
+        if (value.isEmpty) {
+          return Padding(
+            padding: const EdgeInsets.all(24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 500),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'No received appreciations',
+                    textAlign: TextAlign.center,
+                    style: CupertinoTheme.of(context)
+                        .textTheme
+                        .navTitleTextStyle
+                        .merge(
+                          TextStyle(
+                              color: CupertinoTheme.of(context)
+                                  .textTheme
+                                  .textStyle
+                                  .color),
+                        ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Appreciations other send you on Karma Coin will appear here.',
+                    textAlign: TextAlign.center,
+                    style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                          TextStyle(
+                              color: CupertinoTheme.of(context)
+                                  .textTheme
+                                  .textStyle
+                                  .color),
+                        ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'To get appreciated, go do something good to someone!',
+                    textAlign: TextAlign.center,
+                    style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                          TextStyle(
+                              color: CupertinoTheme.of(context)
+                                  .textTheme
+                                  .textStyle
+                                  .color),
+                        ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
         return ListView.builder(
           shrinkWrap: true,
           itemCount: value.length,
@@ -154,6 +207,61 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
         // todo: how to make this not assert when karmaCoinUser is null?
         valueListenable: txsBoss.outgoingAppreciationsNotifer,
         builder: (context, value, child) {
+          if (value.isEmpty) {
+            return Padding(
+              padding: const EdgeInsets.all(24),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 500),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'No sent appreciations',
+                      textAlign: TextAlign.center,
+                      style: CupertinoTheme.of(context)
+                          .textTheme
+                          .navTitleTextStyle
+                          .merge(
+                            TextStyle(
+                                color: CupertinoTheme.of(context)
+                                    .textTheme
+                                    .textStyle
+                                    .color),
+                          ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Appreciations you send on Karma Coin will appear here.',
+                      textAlign: TextAlign.center,
+                      style:
+                          CupertinoTheme.of(context).textTheme.textStyle.merge(
+                                TextStyle(
+                                    color: CupertinoTheme.of(context)
+                                        .textTheme
+                                        .textStyle
+                                        .color),
+                              ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'To appreciate someone tap the \'Appreciate\' button in the main screen.',
+                      textAlign: TextAlign.center,
+                      style:
+                          CupertinoTheme.of(context).textTheme.textStyle.merge(
+                                TextStyle(
+                                    color: CupertinoTheme.of(context)
+                                        .textTheme
+                                        .textStyle
+                                        .color),
+                              ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
           return ListView.separated(
             separatorBuilder: (context, index) {
               return const Divider(
