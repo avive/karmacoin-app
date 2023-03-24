@@ -12,7 +12,7 @@ void main() async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   AppLogic.registerSingletons();
 
-  debugPrint('initializing firebase auth...');
+  //debugPrint('initializing firebase auth...');
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
