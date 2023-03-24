@@ -307,9 +307,9 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    //const SizedBox(height: 6),
                     traitsPicker,
-                    const SizedBox(height: 6),
+                    //const SizedBox(height: 6),
                     Column(
                       children: [
                         Text('Amount to send',

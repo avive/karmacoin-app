@@ -20,6 +20,7 @@ class _TraitsPickerWidgetState extends State<TraitsPickerWidget> {
   @override
   initState() {
     super.initState();
+    selectedItemIndex = widget.selectedItemIndex;
     appState.selectedPersonalityTrait.value = widget.traits[selectedItemIndex];
   }
 

@@ -24,6 +24,9 @@ class UserHomeScreen extends StatefulWidget {
 
 class _UserHomeScreenState extends State<UserHomeScreen> {
   static Color purple = const Color.fromARGB(255, 88, 40, 138);
+  final coinWidth = 140.0;
+  final coinLabelFontSize = 10.0;
+  final coinNumberFontSize = 60.0;
 
   static Route<void> _activityModelBuilder(
       BuildContext context, Object? arguments) {
@@ -269,8 +272,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         valueListenable: accountLogic.karmaCoinUser.value!.karmaScore,
         builder: (context, value, child) {
           return Container(
-            height: 180,
-            width: 180,
+            height: coinWidth,
+            width: coinWidth,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: purple,
@@ -291,22 +294,24 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                             .textTheme
                             .textStyle
                             .merge(
-                              const TextStyle(
-                                  fontSize: 64,
-                                  color: Color.fromARGB(255, 255, 184, 0),
+                              TextStyle(
+                                  fontSize: coinNumberFontSize,
+                                  color: const Color.fromARGB(255, 255, 184, 0),
                                   fontWeight: FontWeight.w400),
                             ),
                       ),
                     ),
                     Text(
                       'KARMA SCORE',
-                      style:
-                          CupertinoTheme.of(context).textTheme.textStyle.merge(
-                                const TextStyle(
-                                    fontSize: 12,
-                                    color: Color.fromARGB(255, 255, 184, 0),
-                                    fontWeight: FontWeight.w600),
-                              ),
+                      style: CupertinoTheme.of(context)
+                          .textTheme
+                          .textStyle
+                          .merge(
+                            TextStyle(
+                                fontSize: coinLabelFontSize,
+                                color: const Color.fromARGB(255, 255, 184, 0),
+                                fontWeight: FontWeight.w600),
+                          ),
                     ),
                   ],
                 ),
@@ -324,8 +329,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           String unitsLabel = KarmaCoinAmountFormatter.getUnitsLabel(value);
 
           return Container(
-            height: 180,
-            width: 180,
+            height: coinWidth,
+            width: coinWidth,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: purple,
@@ -346,22 +351,24 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                             .textTheme
                             .textStyle
                             .merge(
-                              const TextStyle(
-                                  fontSize: 64,
-                                  color: Color.fromARGB(255, 255, 184, 0),
+                              TextStyle(
+                                  fontSize: coinNumberFontSize,
+                                  color: const Color.fromARGB(255, 255, 184, 0),
                                   fontWeight: FontWeight.w400),
                             ),
                       ),
                     ),
                     Text(
                       unitsLabel.toUpperCase(),
-                      style:
-                          CupertinoTheme.of(context).textTheme.textStyle.merge(
-                                const TextStyle(
-                                    fontSize: 12,
-                                    color: Color.fromARGB(255, 255, 184, 0),
-                                    fontWeight: FontWeight.w600),
-                              ),
+                      style: CupertinoTheme.of(context)
+                          .textTheme
+                          .textStyle
+                          .merge(
+                            TextStyle(
+                                fontSize: coinLabelFontSize,
+                                color: const Color.fromARGB(255, 255, 184, 0),
+                                fontWeight: FontWeight.w600),
+                          ),
                     ),
                   ],
                 ),

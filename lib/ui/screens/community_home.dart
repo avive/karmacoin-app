@@ -43,6 +43,7 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
   void _postFrameCallback(BuildContext context) {
     debugPrint('post frame handler');
 
+    /*
     Future.delayed(Duration.zero, () async {
       //if (!await checkInternetConnection(context)) {
       //  return;
@@ -50,7 +51,6 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
 
       // todo: show first time user sees this screen - a welcome message
 
-      /*
       if (appState.signedUpInCurentSession.value) {
         appState.signedUpInCurentSession.value = false;
         StatusAlert.show(
@@ -62,8 +62,8 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
               IconConfiguration(icon: CupertinoIcons.check_mark_circled),
           maxWidth: StatusAlertWidth,
         );
-      }*/
-    });
+      }
+    });*/
   }
 
   Widget _getAppreciationListener(BuildContext context) {

@@ -17,7 +17,10 @@ class SettingsLogic with ThrottledSaveLoadMixin {
   final bool localMode = false;
 
   // dev mode has some text field input shortcuts to save time in dev
-  final bool devMode = true;
+  final bool devMode = false;
+
+  // check internet connections and show error messages
+  final bool enableInternetConnectionChecking = false;
 
   Future<void> init() async {
     await load();
