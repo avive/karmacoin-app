@@ -13,6 +13,14 @@ Web, iOS, Android
 flutter pub run flutter_native_splash:create
 ```
 
+### Build an Android Relase
+```bash
+flutter build appbundle
+```
+
+### Build Web App
+- Push to remote github branch 'web-deploy'
+
 Copyright (c) 2022 by the KarmaCoin Authors. This work is licensed under the [KarmaCoin License](https://github.com/karma-coin/.github/blob/main/LICENSE).
 
 
