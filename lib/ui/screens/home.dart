@@ -106,7 +106,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           debugPrint('Data: $value');
 
           String sendingTitle = 'Sending Appreciation...';
-          String sentTitle = 'Appreciaiton Sent';
+          String sentTitle = 'Appreciation Sent';
 
           if (value.personalityTrait.index == 0) {
             sendingTitle = 'Sending Karma Coins...';
