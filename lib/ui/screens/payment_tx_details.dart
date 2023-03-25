@@ -307,7 +307,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
       color: CupertinoColors.black, // This is required
       title: 'Karma Coin - Appreciation Details',
       child: CupertinoPageScaffold(
-        resizeToAvoidBottomInset: true,
+        resizeToAvoidBottomInset: false,
         navigationBar: CupertinoNavigationBar(
           padding: EdgeInsetsDirectional.zero,
           border: Border.all(color: Colors.transparent),

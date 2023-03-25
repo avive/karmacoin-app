@@ -252,6 +252,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   @override
   build(BuildContext context) {
     return CupertinoPageScaffold(
+      resizeToAvoidBottomInset: false,
       child: CustomScrollView(
         slivers: [
           CupertinoSliverNavigationBar(

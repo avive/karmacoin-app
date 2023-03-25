@@ -234,7 +234,7 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
       color: CupertinoColors.black, // This is required
       title: '${community.name} - Karma Coin',
       child: CupertinoPageScaffold(
-        resizeToAvoidBottomInset: true,
+        resizeToAvoidBottomInset: false,
         navigationBar: CupertinoNavigationBar(
           padding: EdgeInsetsDirectional.zero,
           border: Border.all(color: Colors.transparent),
