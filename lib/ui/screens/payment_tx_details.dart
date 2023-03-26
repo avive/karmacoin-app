@@ -335,11 +335,24 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
             removeTop: false,
             child: Column(
               children: [
-                Image(
-                    width: double.infinity,
-                    fit: BoxFit.fill,
-                    image: AssetImage(GenesisConfig
-                        .communityBannerAssets[paymentData.communityId]!)),
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                      color: GenesisConfig
+                          .communityColors[paymentData.communityId]!
+                          .backgroundColor),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 400),
+                      child: Image(
+                        width: double.infinity,
+                        fit: BoxFit.fill,
+                        image: AssetImage(GenesisConfig
+                            .communityBannerAssets[paymentData.communityId]!),
+                      ),
+                    ),
+                  ),
+                ),
                 ListView(
                   padding: EdgeInsets.zero,
                   shrinkWrap: true,

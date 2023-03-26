@@ -292,7 +292,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                           key: UniqueKey(),
                           controller: phoneController,
                           shouldFormat: shouldFormat && !useRtl,
-                          autofocus: true,
+                          autofocus: false,
                           autofillHints: const [AutofillHints.telephoneNumber],
                           countrySelectorNavigator: selectorNavigator,
                           defaultCountry: IsoCode.US,

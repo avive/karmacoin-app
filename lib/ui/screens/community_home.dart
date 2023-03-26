@@ -147,56 +147,68 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
           CommunityDesignTheme theme =
               GenesisConfig.communityColors[widget.communityId]!;
 
+          Color bcgColr = GenesisConfig
+              .communityColors[widget.communityId]!.backgroundColor;
+
           return Padding(
             padding: const EdgeInsets.all(0),
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    children: [
-                      Image(
-                          width: double.infinity,
-                          fit: BoxFit.fill,
-                          image: AssetImage(GenesisConfig
-                              .communityBannerAssets[widget.communityId]!)),
-                      const SizedBox(height: 24),
-                      _getKarmaScoreWidget(context),
-                      Text(
-                        'Karma Score',
+            child: Center(
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          decoration: BoxDecoration(color: bcgColr),
+                          child: Center(
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 500),
+                              child: Image(
+                                  width: double.infinity,
+                                  fit: BoxFit.fill,
+                                  image: AssetImage(
+                                      GenesisConfig.communityBannerAssets[
+                                          widget.communityId]!)),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        _getKarmaScoreWidget(context),
+                        Text(
+                          'Karma Score',
+                          style: CupertinoTheme.of(context)
+                              .textTheme
+                              .textStyle
+                              .merge(
+                                TextStyle(
+                                    fontSize: 24, color: theme.backgroundColor),
+                              ),
+                        ),
+                        const SizedBox(height: 12),
+                        TraitsScoresWheel(null, widget.communityId),
+                      ],
+                    ),
+                    CupertinoButton(
+                      color: bcgColr,
+                      onPressed: () async {
+                        if (!context.mounted) return;
+                        Navigator.of(context).restorablePush(
+                            _activityModelBuilder,
+                            arguments: widget.communityId);
+                      },
+                      child: Text(
+                        GenesisConfig
+                            .communityAppreciateLabels[widget.communityId]!,
                         style: CupertinoTheme.of(context)
                             .textTheme
                             .textStyle
-                            .merge(
-                              TextStyle(
-                                  fontSize: 24, color: theme.backgroundColor),
-                            ),
+                            .merge(TextStyle(color: theme.textColor)),
                       ),
-                      const SizedBox(height: 24),
-                      TraitsScoresWheel(null, widget.communityId),
-                    ],
-                  ),
-
-                  // const SizedBox(height: 24),
-                  CupertinoButton(
-                    color: GenesisConfig
-                        .communityColors[widget.communityId]!.backgroundColor,
-                    onPressed: () async {
-                      if (!context.mounted) return;
-                      Navigator.of(context).restorablePush(
-                          _activityModelBuilder,
-                          arguments: widget.communityId);
-                    },
-                    child: Text(
-                      GenesisConfig
-                          .communityAppreciateLabels[widget.communityId]!,
-                      style: CupertinoTheme.of(context)
-                          .textTheme
-                          .textStyle
-                          .merge(TextStyle(color: theme.textColor)),
                     ),
-                  ),
-                  _getAppreciationListener(context),
-                ]),
+                    _getAppreciationListener(context),
+                  ]),
+            ),
           );
         });
   }
@@ -234,7 +246,7 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
       color: CupertinoColors.black, // This is required
       title: '${community.name} - Karma Coin',
       child: CupertinoPageScaffold(
-        resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: true,
         navigationBar: CupertinoNavigationBar(
           padding: EdgeInsetsDirectional.zero,
           border: Border.all(color: Colors.transparent),

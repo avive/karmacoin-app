@@ -33,7 +33,11 @@ class PlatformInfo {
     if (kIsWeb) {
       return true;
     }
-    return await InternetConnectionChecker().hasConnection;
+
+    // disable for now
+    return true;
+
+    // return await InternetConnectionChecker().hasConnection;
   }
 
   static Future<bool> get isDisconnected async =>
