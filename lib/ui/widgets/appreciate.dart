@@ -33,8 +33,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   bool useRtl = false;
 
   // country selector ux
-  CountrySelectorNavigator selectorNavigator =
-      const CountrySelectorNavigator.draggableBottomSheet();
+  late CountrySelectorNavigator selectorNavigator;
 
   //final formKey = GlobalKey<FormState>();
   //final phoneKey = GlobalKey<FormFieldState<PhoneNumber>>();
@@ -53,6 +52,8 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
       traitsPicker = TraitsPickerWidget(null,
           GenesisConfig.communityPersonalityTraits[widget.communityId]!, 6);
     }
+
+    selectorNavigator = const CountrySelectorNavigator.draggableBottomSheet();
 
     phoneController =
         PhoneController(PhoneNumber(isoCode: code, nsn: defaultNumber));
@@ -289,7 +290,6 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                       padding: const EdgeInsets.only(left: 16, right: 16),
                       child: Material(
                         child: PhoneFormField(
-                          key: UniqueKey(),
                           controller: phoneController,
                           shouldFormat: shouldFormat && !useRtl,
                           autofocus: false,
