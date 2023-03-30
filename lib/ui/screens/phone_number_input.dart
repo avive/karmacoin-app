@@ -25,6 +25,8 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
   bool withLabel = false;
   bool useRtl = false;
 
+  bool isSigninIn = false;
+
   _PhoneInputScreenState();
 
   // country selector ux
@@ -34,6 +36,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
   @override
   initState() {
     super.initState();
+    isSigninIn = false;
 
     String defaultNuber = settingsLogic.devMode ? "549805381" : "";
     IsoCode code = settingsLogic.devMode ? IsoCode.IL : IsoCode.US;
@@ -50,6 +53,10 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
   }
 
   Future<void> _beginSignup(BuildContext context) async {
+    setState(() {
+      isSigninIn = true;
+    });
+
     bool isValid =
         controller.value?.isValid(type: PhoneNumberType.mobile) ?? false;
 
@@ -63,6 +70,9 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
             const IconConfiguration(icon: CupertinoIcons.stop_circle),
         maxWidth: statusAlertWidth,
       );
+      setState(() {
+        isSigninIn = false;
+      });
       return;
     }
 
@@ -77,6 +87,9 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
             dismissOnBackgroundTap: true,
             maxWidth: statusAlertWidth);
       }
+      setState(() {
+        isSigninIn = false;
+      });
       return;
     }
 
@@ -85,6 +98,10 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
     String number = '+${controller.value!.countryCode}${controller.value!.nsn}';
     debugPrint(
         'Phone number canonical string: $number. Calling firebase api...');
+
+    setState(() {
+      isSigninIn = true;
+    });
 
     await FirebaseAuth.instance.verifyPhoneNumber(
       phoneNumber: number,
@@ -103,11 +120,18 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                 const IconConfiguration(icon: CupertinoIcons.stop_circle),
             maxWidth: statusAlertWidth,
           );
+
+          setState(() {
+            isSigninIn = false;
+          });
           return;
         }
 
         accountLogic.phoneNumber.value = number;
 
+        setState(() {
+          isSigninIn = false;
+        });
         Future.delayed(Duration.zero, () {
           debugPrint('navigate to user name...');
           context.push(ScreenPaths.newUserName);
@@ -125,6 +149,9 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                 const IconConfiguration(icon: CupertinoIcons.stop_circle),
             maxWidth: statusAlertWidth,
           );
+          setState(() {
+            isSigninIn = false;
+          });
           return;
         }
 
@@ -134,11 +161,16 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
           context,
           duration: const Duration(seconds: 2),
           title: 'Oopps',
-          subtitle: 'No Internet connection. Please try again later.',
+          subtitle: 'Something\'s wrong. Please try again later.',
           configuration:
               const IconConfiguration(icon: CupertinoIcons.stop_circle),
           maxWidth: statusAlertWidth,
         );
+
+        setState(() {
+          isSigninIn = false;
+        });
+        return;
       },
       codeSent: (String verificationId, int? resendToken) async {
         // store verficationId in app state
@@ -154,6 +186,10 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
         // andorid auto resolution timed out - show auth code screen
         appState.phoneAuthVerificationCodeId = verificationId;
         accountLogic.phoneNumber.value = number;
+
+        setState(() {
+          isSigninIn = false;
+        });
 
         Future.delayed(Duration.zero, () {
           context.push(ScreenPaths.verify);
@@ -220,12 +256,15 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                         ),
                         const SizedBox(height: 36),
                         CupertinoButton.filled(
-                          onPressed: () async {
-                            await _beginSignup(context);
-                          },
+                          onPressed: isSigninIn
+                              ? null
+                              : () async {
+                                  await _beginSignup(context);
+                                },
                           child: Text(widget.title),
                         ),
                         const SizedBox(height: 14),
+                        _getIndicator(context),
                         _processRestoreAccountFlow(context),
                       ]),
                 ),
@@ -235,6 +274,17 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
         ),
       ),
     );
+  }
+
+  Widget _getIndicator(BuildContext context) {
+    if (isSigninIn) {
+      return const CupertinoActivityIndicator(
+        radius: 20,
+        animating: true,
+      );
+    } else {
+      return Container();
+    }
   }
 
   Widget _processRestoreAccountFlow(BuildContext context) {
