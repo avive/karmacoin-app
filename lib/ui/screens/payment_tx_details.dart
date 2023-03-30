@@ -23,7 +23,7 @@ class TransactionDetailsScreen extends StatefulWidget {
 }
 
 class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
-  late final SignedTransactionWithStatus? transaction;
+  late final SignedTransactionWithStatusEx? transaction;
   late final types.TransactionEvent? transactionEvent;
 
   @override
@@ -45,18 +45,18 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
       return [];
     }
 
-    SignedTransactionWithStatus tx = transaction!;
+    SignedTransactionWithStatusEx tx = transaction!;
 
     List<CupertinoListTile> tiles = [];
     final types.User sender = tx.getFromUser();
     final senderPhoneNumber = sender.mobileNumber.number.formatPhoneNumber();
 
-    TransacitonStatus status = TransacitonStatus.pending;
+    TransactionStatus status = TransactionStatus.pending;
     String operationLabel = 'Sent by you';
 
     // an incoming appreciation is always confirmed on chain
     if (tx.incoming) {
-      status = TransacitonStatus.confirmed;
+      status = TransactionStatus.confirmed;
       operationLabel = 'Sent to you';
     }
 
@@ -83,9 +83,9 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
       // get the status from the tx event
       if (transactionEvent!.result ==
           types.ExecutionResult.EXECUTION_RESULT_EXECUTED) {
-        status = TransacitonStatus.confirmed;
+        status = TransactionStatus.confirmed;
       } else {
-        status = TransacitonStatus.failed;
+        status = TransactionStatus.failed;
       }
     }
 
@@ -253,7 +253,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
       return Container();
     }
 
-    SignedTransactionWithStatus tx = transaction!;
+    SignedTransactionWithStatusEx tx = transaction!;
     types.PaymentTransactionV1 paymentData =
         tx.txData as types.PaymentTransactionV1;
 
@@ -367,7 +367,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
     );
   }
 
-  String getMainTitle(SignedTransactionWithStatus tx) {
+  String getMainTitle(SignedTransactionWithStatusEx tx) {
     final types.TransactionType txType = tx.getTxType();
     if (txType == types.TransactionType.TRANSACTION_TYPE_PAYMENT_V1) {
       types.PaymentTransactionV1 appreciation =

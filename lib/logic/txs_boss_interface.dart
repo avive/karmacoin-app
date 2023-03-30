@@ -5,7 +5,7 @@ import 'package:karma_coin/services/api/types.pb.dart' as types;
 
 abstract class TransactionsBossInterface extends ChangeNotifier {
   /// Returns tx known by boss if such exists
-  SignedTransactionWithStatus? getTranscation(String txHash);
+  SignedTransactionWithStatusEx? getTranscation(String txHash);
 
   /// Set the local user account id - transactions to and from this accountId will be tracked by the TransactionBoss
   /// Boss will attempt to load known txs for this account from local store
@@ -15,24 +15,24 @@ abstract class TransactionsBossInterface extends ChangeNotifier {
 
   /// Add one or more transactions
   /// This is public as it is called to store locally submitted user transactions
-  Future<void> updateWithTxs(List<SignedTransactionWithStatus> transactions,
+  Future<void> updateWithTxs(List<SignedTransactionWithStatusEx> transactions,
       {List<types.TransactionEvent>? transactionsEvents});
 
-  Future<void> updateWithTx(SignedTransactionWithStatus transaction);
+  Future<void> updateWithTx(SignedTransactionWithStatusEx transaction);
 
   /// transactions from _accountId indexed by tx hash
-  final ValueNotifier<List<SignedTransactionWithStatus>>
+  final ValueNotifier<List<SignedTransactionWithStatusEx>>
       outgoingAppreciationsNotifer =
-      ValueNotifier<List<SignedTransactionWithStatus>>([]);
+      ValueNotifier<List<SignedTransactionWithStatusEx>>([]);
 
   /// transactions to _accountId indexed by tx hash
-  final ValueNotifier<List<SignedTransactionWithStatus>>
+  final ValueNotifier<List<SignedTransactionWithStatusEx>>
       incomingAppreciationsNotifer =
-      ValueNotifier<List<SignedTransactionWithStatus>>([]);
+      ValueNotifier<List<SignedTransactionWithStatusEx>>([]);
 
   /// transactions to _accountId indexed by tx hash
-  final ValueNotifier<List<SignedTransactionWithStatus>> accountTxsNotifer =
-      ValueNotifier<List<SignedTransactionWithStatus>>([]);
+  final ValueNotifier<List<SignedTransactionWithStatusEx>> accountTxsNotifer =
+      ValueNotifier<List<SignedTransactionWithStatusEx>>([]);
 
   final ValueNotifier<int> incomingAppreciationsNotOpenedCount =
       ValueNotifier<int>(0);
@@ -47,8 +47,8 @@ abstract class TransactionsBossInterface extends ChangeNotifier {
       ValueNotifier<Map<String, types.TransactionEvent>>({});
 
   /// signup transaction for accountId...
-  final ValueNotifier<SignedTransactionWithStatus?> newUserTransaction =
-      ValueNotifier<SignedTransactionWithStatus?>(null);
+  final ValueNotifier<SignedTransactionWithStatusEx?> newUserTransaction =
+      ValueNotifier<SignedTransactionWithStatusEx?>(null);
 
   /// signup transaction event for accountId...
   final ValueNotifier<types.TransactionEvent?> newUserTransactionEvent =

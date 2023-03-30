@@ -1,20 +1,19 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/data/data_time_extension.dart';
-import 'package:karma_coin/services/api/types.pb.dart' as types;
+import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:crypto/crypto.dart';
-import 'package:karma_coin/services/api/types.pb.dart';
+import 'package:time_ago_provider/time_ago_provider.dart' as time_ago;
 
 /// An extension class over SignedTransaction that supports signing, verification
 /// and user read app state
-class SignedTransactionWithStatus {
+class SignedTransactionWithStatusEx {
   @required
-  final types.SignedTransactionWithStatus txWithStatus;
+  final SignedTransactionWithStatus txWithStatus;
 
   /// the transaction's body
   @required
-  late final types.TransactionBody txBody;
+  late final TransactionBody txBody;
 
   /// the transaction's data. One of the NewUserTransactionV1, PaymentTransactionV1 or UpdateUserTransactionV1
   @required
@@ -27,22 +26,22 @@ class SignedTransactionWithStatus {
   // true if user has opened the tx details in the app
   final ValueNotifier<bool> openned = ValueNotifier<bool>(false);
 
-  SignedTransactionWithStatus(this.txWithStatus, bool isIncoming) {
+  SignedTransactionWithStatusEx(this.txWithStatus, bool isIncoming) {
     incoming = isIncoming;
-    txBody = types.TransactionBody.fromBuffer(
-        txWithStatus.transaction.transactionBody);
+    txBody =
+        TransactionBody.fromBuffer(txWithStatus.transaction.transactionBody);
 
     switch (txBody.transactionData.transactionType) {
       case TransactionType.TRANSACTION_TYPE_NEW_USER_V1:
-        txData = types.NewUserTransactionV1.fromBuffer(
+        txData = NewUserTransactionV1.fromBuffer(
             txBody.transactionData.transactionData);
         break;
       case TransactionType.TRANSACTION_TYPE_PAYMENT_V1:
-        txData = types.PaymentTransactionV1.fromBuffer(
+        txData = PaymentTransactionV1.fromBuffer(
             txBody.transactionData.transactionData);
         break;
       case TransactionType.TRANSACTION_TYPE_UPDATE_USER_V1:
-        txData = types.UpdateUserTransactionV1.fromBuffer(
+        txData = UpdateUserTransactionV1.fromBuffer(
             txBody.transactionData.transactionData);
         break;
       default:
@@ -60,20 +59,46 @@ class SignedTransactionWithStatus {
     return txBody.transactionData.transactionType;
   }
 
+  String getStatusDisplayString() {
+    switch (status) {
+      case TransactionStatus.TRANSACTION_STATUS_SUBMITTED:
+        return 'PENDING';
+      case TransactionStatus.TRANSACTION_STATUS_ON_CHAIN:
+        return 'CONFIRMED';
+      case TransactionStatus.TRANSACTION_STATUS_REJECTED:
+        return 'FAILED';
+      default:
+        return 'UNKNOWN';
+    }
+  }
+
+  Color getStatusDisplayColor() {
+    switch (status) {
+      case TransactionStatus.TRANSACTION_STATUS_SUBMITTED:
+        return CupertinoColors.systemOrange;
+      case TransactionStatus.TRANSACTION_STATUS_ON_CHAIN:
+        return CupertinoColors.activeGreen;
+      case TransactionStatus.TRANSACTION_STATUS_REJECTED:
+        return CupertinoColors.destructiveRed;
+      default:
+        return CupertinoColors.systemOrange;
+    }
+  }
+
   /// Sign the transaction using the provided private key and
   /// set the tx signature to the result
   void sign(ed.PrivateKey privateKey,
-      {keyScheme = types.KeyScheme.KEY_SCHEME_ED25519}) {
+      {keyScheme = KeyScheme.KEY_SCHEME_ED25519}) {
     Uint8List signature = ed.sign(privateKey,
         Uint8List.fromList(txWithStatus.transaction.transactionBody));
     txWithStatus.transaction.signature =
-        types.Signature(scheme: keyScheme, signature: signature.toList());
+        Signature(scheme: keyScheme, signature: signature.toList());
   }
 
   /// Verify the transaction using its signature
   bool verify(ed.PublicKey publicKey,
-      {keyScheme = types.KeyScheme.KEY_SCHEME_ED25519}) {
-    if (keyScheme != types.KeyScheme.KEY_SCHEME_ED25519) {
+      {keyScheme = KeyScheme.KEY_SCHEME_ED25519}) {
+    if (keyScheme != KeyScheme.KEY_SCHEME_ED25519) {
       debugPrint('Only ed scheme is currently supported');
       return false;
     }
@@ -85,12 +110,12 @@ class SignedTransactionWithStatus {
   }
 
   /// Create a new SignedTransactionWithStatus from json representation
-  static SignedTransactionWithStatus fromJson(Map<String, dynamic> value) {
+  static SignedTransactionWithStatusEx fromJson(Map<String, dynamic> value) {
     String txData = value['txWithStatus'];
-    types.SignedTransactionWithStatus tx =
-        types.SignedTransactionWithStatus.fromJson(txData);
+    SignedTransactionWithStatus tx =
+        SignedTransactionWithStatus.fromJson(txData);
 
-    SignedTransactionWithStatus txWithStatus = SignedTransactionWithStatus(
+    SignedTransactionWithStatusEx txWithStatus = SignedTransactionWithStatusEx(
         tx, value['incoming'] == 'true' || value['incoming'] == true);
     txWithStatus.openned.value = value['openned'];
     return txWithStatus;
@@ -111,8 +136,8 @@ class SignedTransactionWithStatus {
   }
 
   String getTimesAgo() {
-    return DateTime.fromMillisecondsSinceEpoch(txBody.timestamp.toInt())
-        .toTimeAgo();
+    return time_ago
+        .format(DateTime.fromMillisecondsSinceEpoch(txBody.timestamp.toInt()));
   }
 
   Int64 getNonce() {

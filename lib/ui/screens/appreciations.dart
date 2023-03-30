@@ -131,7 +131,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
   }
 
   Widget _displayIncomingTxs(BuildContext context) {
-    return ValueListenableBuilder<List<SignedTransactionWithStatus>>(
+    return ValueListenableBuilder<List<SignedTransactionWithStatusEx>>(
       // todo: how to make this not assert when karmaCoinUser is null?
       valueListenable: txsBoss.incomingAppreciationsNotifer,
       builder: (context, value, child) {
@@ -192,7 +192,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
           shrinkWrap: true,
           itemCount: value.length,
           itemBuilder: (context, index) {
-            SignedTransactionWithStatus tx =
+            SignedTransactionWithStatusEx tx =
                 txsBoss.incomingAppreciationsNotifer.value[index];
             return _getAppreciationWidget(context, tx, true, index);
             // return Container(key: Key(index.toString()));
@@ -203,7 +203,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
   }
 
   Widget _displayOutgoingTxs(BuildContext context) {
-    return ValueListenableBuilder<List<SignedTransactionWithStatus>>(
+    return ValueListenableBuilder<List<SignedTransactionWithStatusEx>>(
         // todo: how to make this not assert when karmaCoinUser is null?
         valueListenable: txsBoss.outgoingAppreciationsNotifer,
         builder: (context, value, child) {
@@ -271,7 +271,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
             },
             itemCount: value.length,
             itemBuilder: (context, index) {
-              SignedTransactionWithStatus tx =
+              SignedTransactionWithStatusEx tx =
                   txsBoss.outgoingAppreciationsNotifer.value[index];
               return _getAppreciationWidget(context, tx, false, index);
             },
@@ -280,7 +280,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
   }
 
   Widget _getAppreciationWidget(BuildContext context,
-      SignedTransactionWithStatus tx, bool incoming, int index) {
+      SignedTransactionWithStatusEx tx, bool incoming, int index) {
     try {
       final String txHash = tx.getHash().toHexString();
 
@@ -293,19 +293,19 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
 
       String amount = KarmaCoinAmountFormatter.format(appreciation.amount);
 
-      TransacitonStatus status = TransacitonStatus.pending;
+      TransactionStatus status = TransactionStatus.pending;
 
       // an incoming appreciation is always confirmed on chain
       if (incoming) {
-        status = TransacitonStatus.confirmed;
+        status = TransactionStatus.confirmed;
       }
 
       if (txEvent != null) {
         // get the status from the tx event
         if (txEvent.result == types.ExecutionResult.EXECUTION_RESULT_EXECUTED) {
-          status = TransacitonStatus.confirmed;
+          status = TransactionStatus.confirmed;
         } else {
-          status = TransacitonStatus.failed;
+          status = TransactionStatus.failed;
         }
       }
 

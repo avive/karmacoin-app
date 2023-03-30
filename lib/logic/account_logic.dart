@@ -150,7 +150,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
         return;
       }
 
-      dst.SignedTransactionWithStatus tx = txsBoss.newUserTransaction.value!;
+      dst.SignedTransactionWithStatusEx tx = txsBoss.newUserTransaction.value!;
       // set user as signed if there's a local karma user (user started the signup flow from this device)
       // and that karma user id is same as the one in the transaction
       if (karmaCoinUser.value == null) {

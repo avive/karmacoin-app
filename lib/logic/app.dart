@@ -97,7 +97,7 @@ class AppLogic with AppLogicInterface {
     setDeviceOrientation(supportedOrientations);
 
     // Set preferred refresh rate to the max possible (the OS may ignore this)
-    if (PlatformInfo.isAndroid) {
+    if (!kIsWeb && PlatformInfo.isAndroid) {
       await FlutterDisplayMode.setHighRefreshRate();
     }
 

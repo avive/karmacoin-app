@@ -946,6 +946,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.4.16"
+  time_ago_provider:
+    dependency: "direct main"
+    description:
+      name: time_ago_provider
+      sha256: f4e1cec72099e3eb27020d40d9596ef2b182dbdd155865aa380650e75a927c23
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2.0"
   typed_data:
     dependency: transitive
     description:

@@ -70,7 +70,8 @@ dependencies:
   url_launcher: ^6.1.10
   pull_down_button: ^0.7.0
   package_info_plus: ^3.0.3
-  
+  time_ago_provider: ^4.2.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

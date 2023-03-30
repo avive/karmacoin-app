@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 
 class PlatformInfo {
@@ -44,7 +43,7 @@ class PlatformInfo {
       (await isConnected()) == false;
 
   static Future<bool> isRunningOnAndroidEmulator() async {
-    if (!isAndroid) {
+    if (kIsWeb || !isAndroid) {
       return false;
     }
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();

@@ -26,13 +26,13 @@ class TransactionsBoss extends TransactionsBossInterface {
   Timer? _timer;
 
   // key is hex string of tx hash
-  Map<String, dst.SignedTransactionWithStatus> _outgoingAppreciations = {};
+  Map<String, dst.SignedTransactionWithStatusEx> _outgoingAppreciations = {};
 
   // key is hex string of tx hash
-  Map<String, dst.SignedTransactionWithStatus> _incomingAppreciations = {};
+  Map<String, dst.SignedTransactionWithStatusEx> _incomingAppreciations = {};
 
   // key is hex string of tx hash - signup and update user txs
-  Map<String, dst.SignedTransactionWithStatus> _accountTransactions = {};
+  Map<String, dst.SignedTransactionWithStatusEx> _accountTransactions = {};
 
   // transactions db for current local user
   BoxCollection? _txsBoxCollection;
@@ -41,13 +41,13 @@ class TransactionsBoss extends TransactionsBossInterface {
 
   /// Update observable data with current internal state
   void _updateObservables() {
-    List<dst.SignedTransactionWithStatus> newIncomingAppreciations =
+    List<dst.SignedTransactionWithStatusEx> newIncomingAppreciations =
         _incomingAppreciations.values.toList();
 
-    List<dst.SignedTransactionWithStatus> newOutgoingAppreciations =
+    List<dst.SignedTransactionWithStatusEx> newOutgoingAppreciations =
         _outgoingAppreciations.values.toList();
 
-    List<dst.SignedTransactionWithStatus> newAccountTxs =
+    List<dst.SignedTransactionWithStatusEx> newAccountTxs =
         _accountTransactions.values.toList();
 
     int inAppreciationsNotOpenedCount = 0;
@@ -55,7 +55,7 @@ class TransactionsBoss extends TransactionsBossInterface {
     int newAccountTxsNotOpenedCount = 0;
     int notOpenedTotal = 0;
 
-    for (dst.SignedTransactionWithStatus tx in newIncomingAppreciations) {
+    for (dst.SignedTransactionWithStatusEx tx in newIncomingAppreciations) {
       debugPrint('incoming tx: ${tx.getHash().toShortHexString()}');
 
       if (!tx.openned.value) {
@@ -64,7 +64,7 @@ class TransactionsBoss extends TransactionsBossInterface {
       }
     }
 
-    for (dst.SignedTransactionWithStatus tx in newOutgoingAppreciations) {
+    for (dst.SignedTransactionWithStatusEx tx in newOutgoingAppreciations) {
       debugPrint('outgoing tx: ${tx.getHash().toShortHexString()}');
 
       if (!tx.openned.value) {
@@ -73,7 +73,7 @@ class TransactionsBoss extends TransactionsBossInterface {
       }
     }
 
-    for (dst.SignedTransactionWithStatus tx in newAccountTxs) {
+    for (dst.SignedTransactionWithStatusEx tx in newAccountTxs) {
       debugPrint('account tx: ${tx.getHash().toShortHexString()}');
 
       if (!tx.openned.value) {
@@ -128,8 +128,8 @@ class TransactionsBoss extends TransactionsBossInterface {
   }
 
   @override
-  dst.SignedTransactionWithStatus? getTranscation(String txHash) {
-    dst.SignedTransactionWithStatus? res = _incomingAppreciations[txHash];
+  dst.SignedTransactionWithStatusEx? getTranscation(String txHash) {
+    dst.SignedTransactionWithStatusEx? res = _incomingAppreciations[txHash];
     if (res != null) {
       res.incoming = true;
       return res;
@@ -212,7 +212,8 @@ class TransactionsBoss extends TransactionsBossInterface {
   }
 
   @override
-  Future<void> updateWithTx(dst.SignedTransactionWithStatus transaction) async {
+  Future<void> updateWithTx(
+      dst.SignedTransactionWithStatusEx transaction) async {
     await updateWithTxs([transaction]);
   }
 
@@ -221,7 +222,7 @@ class TransactionsBoss extends TransactionsBossInterface {
   /// If a locally created trnsaction, it will be submitted as soon as client
   /// knows that the user is on-chain
   @override
-  Future<void> updateWithTxs(List<dst.SignedTransactionWithStatus> txs,
+  Future<void> updateWithTxs(List<dst.SignedTransactionWithStatusEx> txs,
       {List<types.TransactionEvent>? transactionsEvents}) async {
     if (txs.isEmpty) {
       return;
@@ -238,7 +239,7 @@ class TransactionsBoss extends TransactionsBossInterface {
         await _txsBoxCollection?.openBox<String>(_accountTxsBoxName);
     var eventsBox = await _txsBoxCollection?.openBox<String>(_txEventsBoxName);
 
-    for (dst.SignedTransactionWithStatus tx in txs) {
+    for (dst.SignedTransactionWithStatusEx tx in txs) {
       if (!tx.verify(ed.PublicKey(tx.txWithStatus.transaction.signer.data))) {
         debugPrint('rejecting transaction with invalid user signature');
         continue;
@@ -358,20 +359,20 @@ class TransactionsBoss extends TransactionsBossInterface {
     var events = await _txsBoxCollection?.openBox<String>(_txEventsBoxName);
 
     (await incomingBox?.getAllValues())?.forEach((key, value) {
-      dst.SignedTransactionWithStatus tx =
-          dst.SignedTransactionWithStatus.fromJson(jsonDecode(value));
+      dst.SignedTransactionWithStatusEx tx =
+          dst.SignedTransactionWithStatusEx.fromJson(jsonDecode(value));
       _incomingAppreciations[key] = tx;
     });
 
     (await outgoingBox?.getAllValues())?.forEach((key, value) {
-      dst.SignedTransactionWithStatus tx =
-          dst.SignedTransactionWithStatus.fromJson(jsonDecode(value));
+      dst.SignedTransactionWithStatusEx tx =
+          dst.SignedTransactionWithStatusEx.fromJson(jsonDecode(value));
       _outgoingAppreciations[key] = tx;
     });
 
     (await accountTxsBox?.getAllValues())?.forEach((key, value) {
-      dst.SignedTransactionWithStatus tx =
-          dst.SignedTransactionWithStatus.fromJson(jsonDecode(value));
+      dst.SignedTransactionWithStatusEx tx =
+          dst.SignedTransactionWithStatusEx.fromJson(jsonDecode(value));
       _accountTransactions[key] = tx;
     });
 
@@ -402,10 +403,10 @@ class TransactionsBoss extends TransactionsBossInterface {
 
       if (resp.transactions.isNotEmpty) {
         // create new enriched txs from the api response
-        List<dst.SignedTransactionWithStatus> enrichedTxs = [];
+        List<dst.SignedTransactionWithStatusEx> enrichedTxs = [];
         for (types.SignedTransactionWithStatus tx in resp.transactions) {
           enrichedTxs.add(
-            dst.SignedTransactionWithStatus(tx, false),
+            dst.SignedTransactionWithStatusEx(tx, false),
           );
         }
 

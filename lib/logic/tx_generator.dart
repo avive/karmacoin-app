@@ -46,8 +46,8 @@ abstract class TrnasactionGenerator {
       debugPrint('failed to submit transaction to api: $e');
     }
 
-    est.SignedTransactionWithStatus enriched =
-        est.SignedTransactionWithStatus(signedTx, false);
+    est.SignedTransactionWithStatusEx enriched =
+        est.SignedTransactionWithStatusEx(signedTx, false);
 
     switch (resp.submitTransactionResult) {
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
@@ -105,8 +105,8 @@ abstract class TrnasactionGenerator {
       debugPrint('failed to submit transaction to api: $e');
     }
 
-    est.SignedTransactionWithStatus enriched =
-        est.SignedTransactionWithStatus(signedTx, false);
+    est.SignedTransactionWithStatusEx enriched =
+        est.SignedTransactionWithStatusEx(signedTx, false);
 
     switch (resp.submitTransactionResult) {
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
@@ -173,8 +173,8 @@ abstract class TrnasactionGenerator {
       // todo: show throw here so ui can handle this error
     }
 
-    est.SignedTransactionWithStatus enriched =
-        est.SignedTransactionWithStatus(signedTx, false);
+    est.SignedTransactionWithStatusEx enriched =
+        est.SignedTransactionWithStatusEx(signedTx, false);
 
     switch (resp.submitTransactionResult) {
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
@@ -225,8 +225,8 @@ abstract class TrnasactionGenerator {
         // it might be to a non user...
         to: null);
 
-    est.SignedTransactionWithStatus enrichedTx =
-        est.SignedTransactionWithStatus(txWithStatus, false);
+    est.SignedTransactionWithStatusEx enrichedTx =
+        est.SignedTransactionWithStatusEx(txWithStatus, false);
 
     List<int> txhash = enrichedTx.getHash();
     enrichedTx.sign(keyPair.privateKey);

@@ -1,11 +1,11 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/data/data_time_extension.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:status_alert/status_alert.dart';
 import 'package:karma_coin/services/api/api.pbgrpc.dart';
+import 'package:time_ago_provider/time_ago_provider.dart' as time_ago;
 
 /// Display user details for provided user or for local user
 class Karmachain extends StatefulWidget {
@@ -97,6 +97,8 @@ class _KarmachainState extends State<Karmachain> {
     DateTime genesisTime = DateTime.fromMillisecondsSinceEpoch(
         genesisData!.genesisTime.toInt() * 1000);
 
+    String ago = time_ago.format(genesisTime);
+
     //String dateDisp = DateFormat().format(genesis_time);
 
     tiles.add(
@@ -104,8 +106,8 @@ class _KarmachainState extends State<Karmachain> {
         title: const Text('Genesis'),
         leading: const Icon(CupertinoIcons.clock),
         //subtitle: Text(dateDisp),
-        trailing: Text(genesisTime.toTimeAgo(),
-            style: CupertinoTheme.of(context).textTheme.textStyle),
+        trailing:
+            Text(ago, style: CupertinoTheme.of(context).textTheme.textStyle),
         // todo: number format
       ),
     );
@@ -128,7 +130,7 @@ class _KarmachainState extends State<Karmachain> {
       CupertinoListTile.notched(
         title: const Text('Current block'),
         leading: const FaIcon(FontAwesomeIcons.square, size: 20),
-        trailing: Text(lastBlockTime.toTimeAgo(),
+        trailing: Text(time_ago.format(lastBlockTime),
             style: CupertinoTheme.of(context).textTheme.textStyle),
       ),
     );
