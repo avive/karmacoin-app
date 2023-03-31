@@ -415,8 +415,33 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
 
         if (contact != null) {
           String? phoneNumber = contact.phoneNumbers?.first;
+
+          if (phoneNumber == null) {
+            return;
+          }
+
           debugPrint('Contact number: $phoneNumber');
-          if (phoneNumber != null) {
+
+          // get defuault iso code from controller in case contact doesn't
+          // provide internation code
+          IsoCode isoCode = phoneController.value?.isoCode ?? IsoCode.US;
+          PhoneNumber? newNumber;
+
+          String numberNoDashes = phoneNumber
+              .replaceAll('-', '')
+              .replaceAll('(', '')
+              .replaceAll(')', '')
+              .replaceAll(' ', '')
+              .trim();
+
+          if (numberNoDashes.length <= 10) {
+            // not an international number - pick it from controller
+            String nsn = numberNoDashes;
+            if (nsn.startsWith('0')) {
+              nsn = nsn.substring(1);
+            }
+            newNumber = PhoneNumber(isoCode: isoCode, nsn: nsn);
+          } else {
             PhoneNumber pn = PhoneNumber.parse(phoneNumber);
             String iso = pn.countryCode;
             String nsn = pn.nsn;
@@ -427,11 +452,11 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
               nsn = nsn.substring(1);
             }
 
-            PhoneNumber fixed = PhoneNumber(isoCode: pn.isoCode, nsn: nsn);
-
-            debugPrint(fixed.toString());
-            phoneController.value = fixed;
+            newNumber = PhoneNumber(isoCode: pn.isoCode, nsn: nsn);
           }
+
+          debugPrint(newNumber.toString());
+          phoneController.value = newNumber;
         }
       },
     );
