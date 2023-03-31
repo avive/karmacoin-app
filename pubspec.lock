@@ -355,6 +355,15 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_native_contact_picker:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: master
+      resolved-ref: "11dbfeebd81ad75c956d7a7c7b872dae74043350"
+      url: "https://github.com/avive/flutter_native_contact_picker"
+    source: git
+    version: "0.0.3"
   flutter_native_splash:
     dependency: "direct main"
     description:

@@ -86,12 +86,10 @@ class AppLogic with AppLogicInterface {
     GetIt.I.registerLazySingleton<AppState>(() => AppState());
   }
 
-  /// Initialize the app and all main actors.
-  /// Loads settings, sets up services etc.
+  /// Initialize the app and singleton services
   @override
   Future<void> bootstrap() async {
-    debugPrint(
-        'bootstrap app, deviceSize: $deviceSize, isTablet: $isLandscapeEnabled');
+    // debugPrint('bootstrap app, deviceSize: $deviceSize, isTablet: $isLandscapeEnabled');
 
     // Set the initial supported orientations
     setDeviceOrientation(supportedOrientations);
@@ -100,12 +98,6 @@ class AppLogic with AppLogicInterface {
     if (!kIsWeb && PlatformInfo.isAndroid) {
       await FlutterDisplayMode.setHighRefreshRate();
     }
-
-    //WidgetsFlutterBinding.ensureInitialized();
-    //if (!kIsWeb) {
-    //  var appDir = await getApplicationSupportDirectory();
-    //  Hive.init(appDir.path);
-    //}
 
     // Load app settings
     await settingsLogic.init();

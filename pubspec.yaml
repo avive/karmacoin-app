@@ -71,6 +71,14 @@ dependencies:
   pull_down_button: ^0.7.0
   package_info_plus: ^3.0.3
   time_ago_provider: ^4.2.0
+  # enable3 when 0.0.4 is in pubdev
+  # flutter_native_contact_picker: ^0.0.3
+  # we use this for with updated kotlin version
+  flutter_native_contact_picker:
+     git:
+      url: https://github.com/avive/flutter_native_contact_picker
+      ref: master # branch name
+
 
 dev_dependencies:
   flutter_test:

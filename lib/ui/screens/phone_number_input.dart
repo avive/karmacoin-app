@@ -5,6 +5,8 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:status_alert/status_alert.dart';
+import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart'
+    as contact_picker;
 
 class PhoneInputScreen extends StatefulWidget {
   final String title;
@@ -16,7 +18,7 @@ class PhoneInputScreen extends StatefulWidget {
 }
 
 class _PhoneInputScreenState extends State<PhoneInputScreen> {
-  late PhoneController controller;
+  late PhoneController phoneController;
   late PhoneNumberInputValidator validator;
   bool outlineBorder = false;
   bool mobileOnly = true;
@@ -28,6 +30,8 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
   bool isSigninIn = false;
 
   _PhoneInputScreenState();
+
+  contact_picker.FlutterContactPicker? _contactPicker;
 
   // country selector ux
   CountrySelectorNavigator selectorNavigator =
@@ -41,14 +45,20 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
     String defaultNuber = settingsLogic.devMode ? "549805381" : "";
     IsoCode code = settingsLogic.devMode ? IsoCode.IL : IsoCode.US;
 
-    controller = PhoneController(PhoneNumber(isoCode: code, nsn: defaultNuber));
+    phoneController =
+        PhoneController(PhoneNumber(isoCode: code, nsn: defaultNuber));
     validator = PhoneValidator.validMobile();
+
+    if (PlatformInfo.isMobile) {
+      // contact picker only available in native mobile iOs or Android
+      _contactPicker = contact_picker.FlutterContactPicker();
+    }
   }
 
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
-    controller.dispose();
+    phoneController.dispose();
     super.dispose();
   }
 
@@ -58,7 +68,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
     });
 
     bool isValid =
-        controller.value?.isValid(type: PhoneNumberType.mobile) ?? false;
+        phoneController.value?.isValid(type: PhoneNumberType.mobile) ?? false;
 
     if (!isValid) {
       StatusAlert.show(
@@ -94,8 +104,9 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
     }
 
     debugPrint(
-        'Starting signup flow... Phone number: ${controller.value.toString()}');
-    String number = '+${controller.value!.countryCode}${controller.value!.nsn}';
+        'Starting signup flow... Phone number: ${phoneController.value.toString()}');
+    String number =
+        '+${phoneController.value!.countryCode}${phoneController.value!.nsn}';
     debugPrint(
         'Phone number canonical string: $number. Calling firebase api...');
 
@@ -229,13 +240,13 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                         Material(
                           child: Form(
                             child: PhoneFormField(
-                              controller: controller,
+                              controller: phoneController,
                               shouldFormat: shouldFormat && !useRtl,
                               autofocus: true,
                               autofillHints: const [
                                 AutofillHints.telephoneNumber
                               ],
-                              flagSize: 18,
+                              flagSize: 32,
                               countrySelectorNavigator: selectorNavigator,
                               defaultCountry: IsoCode.US,
                               validator: PhoneValidator.compose([
@@ -254,7 +265,9 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 36),
+                        const SizedBox(height: 12),
+                        _getContactsButton(context),
+                        const SizedBox(height: 24),
                         CupertinoButton.filled(
                           onPressed: isSigninIn
                               ? null
@@ -273,6 +286,46 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _getContactsButton(BuildContext context) {
+    if (!PlatformInfo.isMobile) {
+      return const SizedBox(height: 0);
+    }
+
+    return CupertinoButton(
+      padding: const EdgeInsets.only(left: 0),
+      child: Text(
+        'Choose from contacts',
+        style: CupertinoTheme.of(context).textTheme.actionTextStyle.merge(
+              const TextStyle(fontSize: 15),
+            ),
+      ),
+      onPressed: () async {
+        contact_picker.Contact? contact = await _contactPicker!.selectContact();
+
+        if (contact != null) {
+          String? phoneNumber = contact.phoneNumbers?.first;
+          debugPrint('Contact number: $phoneNumber');
+          if (phoneNumber != null) {
+            PhoneNumber pn = PhoneNumber.parse(phoneNumber);
+            String iso = pn.countryCode;
+            String nsn = pn.nsn;
+            if (nsn.startsWith(iso)) {
+              nsn = nsn.substring(iso.length);
+            }
+            if (nsn.startsWith('0')) {
+              nsn = nsn.substring(1);
+            }
+
+            PhoneNumber fixed = PhoneNumber(isoCode: pn.isoCode, nsn: nsn);
+
+            debugPrint(fixed.toString());
+            phoneController.value = fixed;
+          }
+        }
+      },
     );
   }
 

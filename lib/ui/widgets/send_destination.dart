@@ -114,6 +114,7 @@ class _SendDestinationState extends State<SendDestination> {
         child: PhoneFormField(
           controller: _phoneController,
           shouldFormat: true,
+          flagSize: 32,
           autofocus: true,
           onChanged: (value) {
             if (value != null) {

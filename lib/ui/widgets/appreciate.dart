@@ -12,6 +12,8 @@ import 'package:karma_coin/ui/widgets/amount_input.dart';
 import 'package:karma_coin/ui/widgets/traits_picker.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:status_alert/status_alert.dart';
+import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart'
+    as contact_picker;
 
 class AppreciateWidget extends StatefulWidget {
   final int communityId;
@@ -35,6 +37,8 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   // country selector ux
   late CountrySelectorNavigator selectorNavigator;
 
+  contact_picker.FlutterContactPicker? _contactPicker;
+
   //final formKey = GlobalKey<FormState>();
   //final phoneKey = GlobalKey<FormFieldState<PhoneNumber>>();
 
@@ -57,6 +61,12 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
 
     phoneController =
         PhoneController(PhoneNumber(isoCode: code, nsn: defaultNumber));
+
+    if (PlatformInfo
+        .isMobile /*!kIsWeb && (PlatformInfo.isIOS || PlatformInfo.isAndroid)*/) {
+      // contact picker only available in native mobile iOs or Android
+      _contactPicker = contact_picker.FlutterContactPicker();
+    }
   }
 
   @override
@@ -291,6 +301,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                       child: Material(
                         child: PhoneFormField(
                           controller: phoneController,
+                          flagSize: 32,
                           shouldFormat: shouldFormat && !useRtl,
                           autofocus: false,
                           autofillHints: const [AutofillHints.telephoneNumber],
@@ -308,6 +319,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                         ),
                       ),
                     ),
+                    _getContactsButton(context),
                     //const SizedBox(height: 6),
                     traitsPicker,
                     //const SizedBox(height: 6),
@@ -382,6 +394,46 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _getContactsButton(BuildContext context) {
+    if (!PlatformInfo.isMobile) {
+      return const SizedBox(height: 0);
+    }
+
+    return CupertinoButton(
+      padding: const EdgeInsets.only(left: 0),
+      child: Text(
+        'Choose from contacts',
+        style: CupertinoTheme.of(context).textTheme.actionTextStyle.merge(
+              const TextStyle(fontSize: 15),
+            ),
+      ),
+      onPressed: () async {
+        contact_picker.Contact? contact = await _contactPicker!.selectContact();
+
+        if (contact != null) {
+          String? phoneNumber = contact.phoneNumbers?.first;
+          debugPrint('Contact number: $phoneNumber');
+          if (phoneNumber != null) {
+            PhoneNumber pn = PhoneNumber.parse(phoneNumber);
+            String iso = pn.countryCode;
+            String nsn = pn.nsn;
+            if (nsn.startsWith(iso)) {
+              nsn = nsn.substring(iso.length);
+            }
+            if (nsn.startsWith('0')) {
+              nsn = nsn.substring(1);
+            }
+
+            PhoneNumber fixed = PhoneNumber(isoCode: pn.isoCode, nsn: nsn);
+
+            debugPrint(fixed.toString());
+            phoneController.value = fixed;
+          }
+        }
+      },
     );
   }
 
