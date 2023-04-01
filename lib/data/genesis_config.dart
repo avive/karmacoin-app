@@ -65,7 +65,7 @@ class GenesisConfig {
         id: 1,
         name: 'Grateful Giraffes',
         desc:
-            'A global community of oleaders that come together for powerful wellness experiences',
+            'A global community of leaders that come together for powerful wellness experiences',
         emoji: '🦒',
         websiteUrl: 'https://www.gratefulgiraffes.com',
         twitterUrl: 'https://twitter.com/TheGratefulDAO',
@@ -156,5 +156,6 @@ class GenesisConfig {
     PersonalityTrait(59, 'a Dynamo', '🚀'),
     PersonalityTrait(60, 'an Imaginative Motivator', '🌻'),
     PersonalityTrait(61, 'a Campaigner', '📣'),
+    PersonalityTrait(62, 'A Karma Rewwards Winner', '🏆'),
   ];
 }
