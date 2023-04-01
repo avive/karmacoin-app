@@ -427,21 +427,22 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
           IsoCode isoCode = phoneController.value?.isoCode ?? IsoCode.US;
           PhoneNumber? newNumber;
 
-          String numberNoDashes = phoneNumber
+          // todo: do this in a more standarized and less error-prone manner....
+          String rawNumber = phoneNumber
               .replaceAll('-', '')
               .replaceAll('(', '')
               .replaceAll(')', '')
               .replaceAll(' ', '')
               .trim();
 
-          if (numberNoDashes.length <= 10) {
-            // not an international number - pick it from controller
-            String nsn = numberNoDashes;
-            if (nsn.startsWith('0')) {
-              nsn = nsn.substring(1);
+          if (rawNumber.length <= 10) {
+            // contacat is not international number - pick it from controller
+            if (rawNumber.startsWith('0')) {
+              rawNumber = rawNumber.substring(1);
             }
-            newNumber = PhoneNumber(isoCode: isoCode, nsn: nsn);
+            newNumber = PhoneNumber(isoCode: isoCode, nsn: rawNumber);
           } else {
+            // contact has an international number
             PhoneNumber pn = PhoneNumber.parse(phoneNumber);
             String iso = pn.countryCode;
             String nsn = pn.nsn;

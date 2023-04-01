@@ -313,7 +313,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
             return;
           }
 
-          // defuault iso code
+          // Set iso code from ui or default value
           IsoCode isoCode = phoneController.value?.isoCode ?? IsoCode.US;
           PhoneNumber? newNumber;
 
@@ -325,12 +325,11 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
               .trim();
 
           if (numberNoDashes.length <= 10) {
-            // not an international number - pick it from controller
-            String nsn = numberNoDashes;
-            if (nsn.startsWith('0')) {
-              nsn = nsn.substring(1);
+            // not an international number - use default iso
+            if (numberNoDashes.startsWith('0')) {
+              numberNoDashes = numberNoDashes.substring(1);
             }
-            newNumber = PhoneNumber(isoCode: isoCode, nsn: nsn);
+            newNumber = PhoneNumber(isoCode: isoCode, nsn: numberNoDashes);
           } else {
             PhoneNumber pn = PhoneNumber.parse(phoneNumber);
             String iso = pn.countryCode;
