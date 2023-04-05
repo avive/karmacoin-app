@@ -36,6 +36,19 @@ class KarmaCoinUser {
 
   KarmaCoinUser(this.userData);
 
+  bool isCommunityMember(int communityId) {
+    return communities.value
+        .where((membership) => membership.communityId == communityId)
+        .isNotEmpty;
+  }
+
+  bool isCommunityAdmin(int communityId) {
+    return communities.value
+        .where((membership) =>
+            membership.communityId == communityId && membership.isAdmin)
+        .isNotEmpty;
+  }
+
   /// Update user with provided user data in an observable way
   Future<void> updatWithUserData(User user, bool persist) async {
     userData.accountId = user.accountId;

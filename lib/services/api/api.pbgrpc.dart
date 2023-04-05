@@ -14,6 +14,37 @@ import 'api.pb.dart' as $0;
 export 'api.pb.dart';
 
 class ApiServiceClient extends $grpc.Client {
+  static final _$setCommunityAdmin = $grpc.ClientMethod<
+          $0.SetCommunityAdminRequest, $0.SetCommunityAdminResponse>(
+      '/karma_coin.api.ApiService/SetCommunityAdmin',
+      ($0.SetCommunityAdminRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) =>
+          $0.SetCommunityAdminResponse.fromBuffer(value));
+  static final _$getLeaderBoard =
+      $grpc.ClientMethod<$0.GetLeaderBoardRequest, $0.GetLeaderBoardResponse>(
+          '/karma_coin.api.ApiService/GetLeaderBoard',
+          ($0.GetLeaderBoardRequest value) => value.writeToBuffer(),
+          ($core.List<$core.int> value) =>
+              $0.GetLeaderBoardResponse.fromBuffer(value));
+  static final _$getAllUsers =
+      $grpc.ClientMethod<$0.GetAllUsersRequest, $0.GetAllUsersResponse>(
+          '/karma_coin.api.ApiService/GetAllUsers',
+          ($0.GetAllUsersRequest value) => value.writeToBuffer(),
+          ($core.List<$core.int> value) =>
+              $0.GetAllUsersResponse.fromBuffer(value));
+  static final _$getContacts =
+      $grpc.ClientMethod<$0.GetContactsRequest, $0.GetContactsResponse>(
+          '/karma_coin.api.ApiService/GetContacts',
+          ($0.GetContactsRequest value) => value.writeToBuffer(),
+          ($core.List<$core.int> value) =>
+              $0.GetContactsResponse.fromBuffer(value));
+  static final _$getTransactionsFromHashes = $grpc.ClientMethod<
+          $0.GetTransactionsFromHashesRequest,
+          $0.GetTransactionsFromHashesResponse>(
+      '/karma_coin.api.ApiService/GetTransactionsFromHashes',
+      ($0.GetTransactionsFromHashesRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) =>
+          $0.GetTransactionsFromHashesResponse.fromBuffer(value));
   static final _$getUserInfoByUserName = $grpc.ClientMethod<
           $0.GetUserInfoByUserNameRequest, $0.GetUserInfoByUserNameResponse>(
       '/karma_coin.api.ApiService/GetUserInfoByUserName',
@@ -80,6 +111,37 @@ class ApiServiceClient extends $grpc.Client {
       $core.Iterable<$grpc.ClientInterceptor>? interceptors})
       : super(channel, options: options, interceptors: interceptors);
 
+  $grpc.ResponseFuture<$0.SetCommunityAdminResponse> setCommunityAdmin(
+      $0.SetCommunityAdminRequest request,
+      {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$setCommunityAdmin, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.GetLeaderBoardResponse> getLeaderBoard(
+      $0.GetLeaderBoardRequest request,
+      {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$getLeaderBoard, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.GetAllUsersResponse> getAllUsers(
+      $0.GetAllUsersRequest request,
+      {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$getAllUsers, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.GetContactsResponse> getContacts(
+      $0.GetContactsRequest request,
+      {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$getContacts, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.GetTransactionsFromHashesResponse>
+      getTransactionsFromHashes($0.GetTransactionsFromHashesRequest request,
+          {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$getTransactionsFromHashes, request,
+        options: options);
+  }
+
   $grpc.ResponseFuture<$0.GetUserInfoByUserNameResponse> getUserInfoByUserName(
       $0.GetUserInfoByUserNameRequest request,
       {$grpc.CallOptions? options}) {
@@ -145,6 +207,51 @@ abstract class ApiServiceBase extends $grpc.Service {
   $core.String get $name => 'karma_coin.api.ApiService';
 
   ApiServiceBase() {
+    $addMethod($grpc.ServiceMethod<$0.SetCommunityAdminRequest,
+            $0.SetCommunityAdminResponse>(
+        'SetCommunityAdmin',
+        setCommunityAdmin_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) =>
+            $0.SetCommunityAdminRequest.fromBuffer(value),
+        ($0.SetCommunityAdminResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.GetLeaderBoardRequest,
+            $0.GetLeaderBoardResponse>(
+        'GetLeaderBoard',
+        getLeaderBoard_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) =>
+            $0.GetLeaderBoardRequest.fromBuffer(value),
+        ($0.GetLeaderBoardResponse value) => value.writeToBuffer()));
+    $addMethod(
+        $grpc.ServiceMethod<$0.GetAllUsersRequest, $0.GetAllUsersResponse>(
+            'GetAllUsers',
+            getAllUsers_Pre,
+            false,
+            false,
+            ($core.List<$core.int> value) =>
+                $0.GetAllUsersRequest.fromBuffer(value),
+            ($0.GetAllUsersResponse value) => value.writeToBuffer()));
+    $addMethod(
+        $grpc.ServiceMethod<$0.GetContactsRequest, $0.GetContactsResponse>(
+            'GetContacts',
+            getContacts_Pre,
+            false,
+            false,
+            ($core.List<$core.int> value) =>
+                $0.GetContactsRequest.fromBuffer(value),
+            ($0.GetContactsResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.GetTransactionsFromHashesRequest,
+            $0.GetTransactionsFromHashesResponse>(
+        'GetTransactionsFromHashes',
+        getTransactionsFromHashes_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) =>
+            $0.GetTransactionsFromHashesRequest.fromBuffer(value),
+        ($0.GetTransactionsFromHashesResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.GetUserInfoByUserNameRequest,
             $0.GetUserInfoByUserNameResponse>(
         'GetUserInfoByUserName',
@@ -235,6 +342,34 @@ abstract class ApiServiceBase extends $grpc.Service {
         ($0.GetBlocksResponse value) => value.writeToBuffer()));
   }
 
+  $async.Future<$0.SetCommunityAdminResponse> setCommunityAdmin_Pre(
+      $grpc.ServiceCall call,
+      $async.Future<$0.SetCommunityAdminRequest> request) async {
+    return setCommunityAdmin(call, await request);
+  }
+
+  $async.Future<$0.GetLeaderBoardResponse> getLeaderBoard_Pre(
+      $grpc.ServiceCall call,
+      $async.Future<$0.GetLeaderBoardRequest> request) async {
+    return getLeaderBoard(call, await request);
+  }
+
+  $async.Future<$0.GetAllUsersResponse> getAllUsers_Pre($grpc.ServiceCall call,
+      $async.Future<$0.GetAllUsersRequest> request) async {
+    return getAllUsers(call, await request);
+  }
+
+  $async.Future<$0.GetContactsResponse> getContacts_Pre($grpc.ServiceCall call,
+      $async.Future<$0.GetContactsRequest> request) async {
+    return getContacts(call, await request);
+  }
+
+  $async.Future<$0.GetTransactionsFromHashesResponse>
+      getTransactionsFromHashes_Pre($grpc.ServiceCall call,
+          $async.Future<$0.GetTransactionsFromHashesRequest> request) async {
+    return getTransactionsFromHashes(call, await request);
+  }
+
   $async.Future<$0.GetUserInfoByUserNameResponse> getUserInfoByUserName_Pre(
       $grpc.ServiceCall call,
       $async.Future<$0.GetUserInfoByUserNameRequest> request) async {
@@ -294,6 +429,16 @@ abstract class ApiServiceBase extends $grpc.Service {
     return getBlocks(call, await request);
   }
 
+  $async.Future<$0.SetCommunityAdminResponse> setCommunityAdmin(
+      $grpc.ServiceCall call, $0.SetCommunityAdminRequest request);
+  $async.Future<$0.GetLeaderBoardResponse> getLeaderBoard(
+      $grpc.ServiceCall call, $0.GetLeaderBoardRequest request);
+  $async.Future<$0.GetAllUsersResponse> getAllUsers(
+      $grpc.ServiceCall call, $0.GetAllUsersRequest request);
+  $async.Future<$0.GetContactsResponse> getContacts(
+      $grpc.ServiceCall call, $0.GetContactsRequest request);
+  $async.Future<$0.GetTransactionsFromHashesResponse> getTransactionsFromHashes(
+      $grpc.ServiceCall call, $0.GetTransactionsFromHashesRequest request);
   $async.Future<$0.GetUserInfoByUserNameResponse> getUserInfoByUserName(
       $grpc.ServiceCall call, $0.GetUserInfoByUserNameRequest request);
   $async.Future<$0.GetUserInfoByNumberResponse> getUserInfoByNumber(

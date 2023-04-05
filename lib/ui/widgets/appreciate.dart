@@ -9,6 +9,7 @@ import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/ui/widgets/amount_input.dart';
+import 'package:karma_coin/ui/widgets/users_selector.dart';
 import 'package:karma_coin/ui/widgets/traits_picker.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:status_alert/status_alert.dart';
@@ -235,7 +236,8 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
 
   Color _getNavBarBackgroundColor() {
     if (widget.communityId == 0) {
-      return CupertinoTheme.of(context).barBackgroundColor;
+      return const Color.fromARGB(
+          255, 88, 40, 138); //CupertinoTheme.of(context).barBackgroundColor;
     } else {
       return GenesisConfig.communityColors[widget.communityId]!.backgroundColor;
     }
@@ -243,7 +245,16 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
 
   TextStyle _getNavBarTitleStyle() {
     if (widget.communityId == 0) {
-      return CupertinoTheme.of(context).textTheme.navLargeTitleTextStyle;
+      return // CupertinoTheme.of(context).textTheme.navLargeTitleTextStyle;
+
+          CupertinoTheme.of(context)
+              .textTheme
+              .navLargeTitleTextStyle
+              .merge(const TextStyle(
+                color: Colors.white,
+                fontSize: 30,
+                fontWeight: FontWeight.w400,
+              ));
     } else {
       return CupertinoTheme.of(context).textTheme.navLargeTitleTextStyle.merge(
           TextStyle(
@@ -280,10 +291,10 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                 0,
                 0),
             largeTitle: Center(
-                child: Text('Appreciate', style: _getNavBarTitleStyle())),
+                child: Text('☥ APPRECIATE ', style: _getNavBarTitleStyle())),
           ),
           SliverFillRemaining(
-            hasScrollBody: false,
+            hasScrollBody: true,
             child: Padding(
               padding:
                   const EdgeInsets.only(left: 0, right: 0, top: 6, bottom: 6),
@@ -319,7 +330,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                         ),
                       ),
                     ),
-                    _getContactsButton(context),
+                    _getContactsRow(context),
                     //const SizedBox(height: 6),
                     traitsPicker,
                     //const SizedBox(height: 6),
@@ -397,70 +408,108 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     );
   }
 
-  Widget _getContactsButton(BuildContext context) {
-    if (!PlatformInfo.isMobile) {
-      return const SizedBox(height: 0);
+  Widget _getContactsRow(BuildContext context) {
+    List<Widget> widgets = [];
+
+    if (PlatformInfo.isMobile) {
+      // mobile phone contacts integration
+      widgets.add(CupertinoButton(
+        padding: const EdgeInsets.only(left: 0, right: 12),
+        child: Text(
+          'Contact',
+          style: CupertinoTheme.of(context).textTheme.actionTextStyle.merge(
+                const TextStyle(fontSize: 15),
+              ),
+        ),
+        onPressed: () async {
+          contact_picker.Contact? contact =
+              await _contactPicker!.selectContact();
+
+          if (contact != null) {
+            String? phoneNumber = contact.phoneNumbers?.first;
+
+            if (phoneNumber == null) {
+              return;
+            }
+
+            debugPrint('Contact number: $phoneNumber');
+
+            // get defuault iso code from controller in case contact doesn't
+            // provide internation code
+            IsoCode isoCode = phoneController.value?.isoCode ?? IsoCode.US;
+            PhoneNumber? newNumber;
+
+            // todo: do this in a more standarized and less error-prone manner....
+            String rawNumber = phoneNumber
+                .replaceAll('-', '')
+                .replaceAll('(', '')
+                .replaceAll(')', '')
+                .replaceAll(' ', '')
+                .trim();
+
+            if (rawNumber.length <= 10) {
+              // contacat is not international number - pick it from controller
+              if (rawNumber.startsWith('0')) {
+                rawNumber = rawNumber.substring(1);
+              }
+              newNumber = PhoneNumber(isoCode: isoCode, nsn: rawNumber);
+            } else {
+              // contact has an international number
+              PhoneNumber pn = PhoneNumber.parse(phoneNumber);
+              String iso = pn.countryCode;
+              String nsn = pn.nsn;
+              if (nsn.startsWith(iso)) {
+                nsn = nsn.substring(iso.length);
+              }
+              if (nsn.startsWith('0')) {
+                nsn = nsn.substring(1);
+              }
+
+              newNumber = PhoneNumber(isoCode: pn.isoCode, nsn: nsn);
+            }
+
+            debugPrint(newNumber.toString());
+            phoneController.value = newNumber;
+          }
+        },
+      ));
+      widgets.add(const SizedBox(width: 34));
     }
 
-    return CupertinoButton(
+    // karma coin contacts
+    widgets.add(CupertinoButton(
       padding: const EdgeInsets.only(left: 0),
+      onPressed: () {
+        // only show contacts in a community
+        int communityId = widget.communityId;
+
+        if (accountLogic.karmaCoinUser.value!.isCommunityAdmin(communityId)) {
+          // let admin see non-community members users
+          communityId = 0;
+        }
+
+        Navigator.of(context).push(CupertinoPageRoute(
+            fullscreenDialog: true,
+            builder: ((context) => KarmaCoinUserSelector(
+                communityId: communityId,
+                setPhoneNumberCallback: setPhoneNumberCallback))));
+      },
       child: Text(
-        'Choose from contacts',
+        'User',
         style: CupertinoTheme.of(context).textTheme.actionTextStyle.merge(
               const TextStyle(fontSize: 15),
             ),
       ),
-      onPressed: () async {
-        contact_picker.Contact? contact = await _contactPicker!.selectContact();
+    ));
 
-        if (contact != null) {
-          String? phoneNumber = contact.phoneNumbers?.first;
+    return Row(mainAxisAlignment: MainAxisAlignment.center, children: widgets);
+  }
 
-          if (phoneNumber == null) {
-            return;
-          }
-
-          debugPrint('Contact number: $phoneNumber');
-
-          // get defuault iso code from controller in case contact doesn't
-          // provide internation code
-          IsoCode isoCode = phoneController.value?.isoCode ?? IsoCode.US;
-          PhoneNumber? newNumber;
-
-          // todo: do this in a more standarized and less error-prone manner....
-          String rawNumber = phoneNumber
-              .replaceAll('-', '')
-              .replaceAll('(', '')
-              .replaceAll(')', '')
-              .replaceAll(' ', '')
-              .trim();
-
-          if (rawNumber.length <= 10) {
-            // contacat is not international number - pick it from controller
-            if (rawNumber.startsWith('0')) {
-              rawNumber = rawNumber.substring(1);
-            }
-            newNumber = PhoneNumber(isoCode: isoCode, nsn: rawNumber);
-          } else {
-            // contact has an international number
-            PhoneNumber pn = PhoneNumber.parse(phoneNumber);
-            String iso = pn.countryCode;
-            String nsn = pn.nsn;
-            if (nsn.startsWith(iso)) {
-              nsn = nsn.substring(iso.length);
-            }
-            if (nsn.startsWith('0')) {
-              nsn = nsn.substring(1);
-            }
-
-            newNumber = PhoneNumber(isoCode: pn.isoCode, nsn: nsn);
-          }
-
-          debugPrint(newNumber.toString());
-          phoneController.value = newNumber;
-        }
-      },
-    );
+  void setPhoneNumberCallback(String number) {
+    debugPrint('setPhoneNumberCallback: $number');
+    setState(() {
+      phoneController.value = PhoneNumber.parse(number);
+    });
   }
 
   Widget _getAppreciateButton(BuildContext context) {

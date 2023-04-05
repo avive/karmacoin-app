@@ -156,6 +156,6 @@ class GenesisConfig {
     PersonalityTrait(59, 'a Dynamo', '🚀'),
     PersonalityTrait(60, 'an Imaginative Motivator', '🌻'),
     PersonalityTrait(61, 'a Campaigner', '📣'),
-    PersonalityTrait(62, 'A Karma Rewwards Winner', '🏆'),
+    PersonalityTrait(62, 'A Karma Rewards Winner', '🏆'),
   ];
 }

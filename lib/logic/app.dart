@@ -7,7 +7,7 @@ import 'package:get_it/get_it.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/logic/auth.dart';
-import 'package:karma_coin/logic/settings.dart';
+import 'package:karma_coin/logic/config.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/logic/account_setup_controller.dart';
 import 'package:karma_coin/logic/txs_boss.dart';
@@ -26,7 +26,7 @@ Api get api => GetIt.I.get<Api>();
 
 Verifier get verifier => GetIt.I.get<Verifier>();
 
-SettingsLogic get settingsLogic => GetIt.I.get<SettingsLogic>();
+ConfigLogic get settingsLogic => GetIt.I.get<ConfigLogic>();
 
 AuthLogicInterface get authLogic => GetIt.I.get<AuthLogicInterface>();
 
@@ -74,7 +74,7 @@ class AppLogic with AppLogicInterface {
     GetIt.I.registerLazySingleton<Verifier>(() => Verifier());
     GetIt.I.registerLazySingleton<Api>(() => Api());
     GetIt.I.registerLazySingleton<AppLogic>(() => AppLogic());
-    GetIt.I.registerLazySingleton<SettingsLogic>(() => SettingsLogic());
+    GetIt.I.registerLazySingleton<ConfigLogic>(() => ConfigLogic());
     GetIt.I.registerLazySingleton<AuthLogicInterface>(() => AuthLogic());
     GetIt.I.registerLazySingleton<AccountLogicInterface>(() => AccountLogic());
     GetIt.I.registerLazySingleton<UserNameAvailabilityLogic>(

@@ -653,6 +653,93 @@ class User extends $pb.GeneratedMessage {
   $core.List<CommunityMembership> get communityMemberships => $_getList(8);
 }
 
+class Contact extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Contact', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'karma_coin.core_types'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'userName')
+    ..aOM<AccountId>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'accountId', subBuilder: AccountId.create)
+    ..aOM<MobileNumber>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'mobileNumber', subBuilder: MobileNumber.create)
+    ..pc<CommunityMembership>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'communityMemberships', $pb.PbFieldType.PM, subBuilder: CommunityMembership.create)
+    ..hasRequiredFields = false
+  ;
+
+  Contact._() : super();
+  factory Contact({
+    $core.String? userName,
+    AccountId? accountId,
+    MobileNumber? mobileNumber,
+    $core.Iterable<CommunityMembership>? communityMemberships,
+  }) {
+    final _result = create();
+    if (userName != null) {
+      _result.userName = userName;
+    }
+    if (accountId != null) {
+      _result.accountId = accountId;
+    }
+    if (mobileNumber != null) {
+      _result.mobileNumber = mobileNumber;
+    }
+    if (communityMemberships != null) {
+      _result.communityMemberships.addAll(communityMemberships);
+    }
+    return _result;
+  }
+  factory Contact.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Contact.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Contact clone() => Contact()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Contact copyWith(void Function(Contact) updates) => super.copyWith((message) => updates(message as Contact)) as Contact; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static Contact create() => Contact._();
+  Contact createEmptyInstance() => create();
+  static $pb.PbList<Contact> createRepeated() => $pb.PbList<Contact>();
+  @$core.pragma('dart2js:noInline')
+  static Contact getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Contact>(create);
+  static Contact? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get userName => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set userName($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasUserName() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearUserName() => clearField(1);
+
+  @$pb.TagNumber(2)
+  AccountId get accountId => $_getN(1);
+  @$pb.TagNumber(2)
+  set accountId(AccountId v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasAccountId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearAccountId() => clearField(2);
+  @$pb.TagNumber(2)
+  AccountId ensureAccountId() => $_ensure(1);
+
+  @$pb.TagNumber(3)
+  MobileNumber get mobileNumber => $_getN(2);
+  @$pb.TagNumber(3)
+  set mobileNumber(MobileNumber v) { setField(3, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasMobileNumber() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearMobileNumber() => clearField(3);
+  @$pb.TagNumber(3)
+  MobileNumber ensureMobileNumber() => $_ensure(2);
+
+  @$pb.TagNumber(4)
+  $core.List<CommunityMembership> get communityMemberships => $_getList(3);
+}
+
 class CommunityMembership extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'CommunityMembership', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'karma_coin.core_types'), createEmptyInstance: create)
     ..a<$core.int>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'communityId', $pb.PbFieldType.OU3)
@@ -726,6 +813,91 @@ class CommunityMembership extends $pb.GeneratedMessage {
   $core.bool hasIsAdmin() => $_has(2);
   @$pb.TagNumber(3)
   void clearIsAdmin() => clearField(3);
+}
+
+class LeaderboardEntry extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'LeaderboardEntry', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'karma_coin.core_types'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'userName')
+    ..aOM<AccountId>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'accountId', subBuilder: AccountId.create)
+    ..a<$core.int>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'score', $pb.PbFieldType.OU3)
+    ..p<$core.int>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'charTraitsIds', $pb.PbFieldType.KU3)
+    ..hasRequiredFields = false
+  ;
+
+  LeaderboardEntry._() : super();
+  factory LeaderboardEntry({
+    $core.String? userName,
+    AccountId? accountId,
+    $core.int? score,
+    $core.Iterable<$core.int>? charTraitsIds,
+  }) {
+    final _result = create();
+    if (userName != null) {
+      _result.userName = userName;
+    }
+    if (accountId != null) {
+      _result.accountId = accountId;
+    }
+    if (score != null) {
+      _result.score = score;
+    }
+    if (charTraitsIds != null) {
+      _result.charTraitsIds.addAll(charTraitsIds);
+    }
+    return _result;
+  }
+  factory LeaderboardEntry.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory LeaderboardEntry.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  LeaderboardEntry clone() => LeaderboardEntry()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  LeaderboardEntry copyWith(void Function(LeaderboardEntry) updates) => super.copyWith((message) => updates(message as LeaderboardEntry)) as LeaderboardEntry; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static LeaderboardEntry create() => LeaderboardEntry._();
+  LeaderboardEntry createEmptyInstance() => create();
+  static $pb.PbList<LeaderboardEntry> createRepeated() => $pb.PbList<LeaderboardEntry>();
+  @$core.pragma('dart2js:noInline')
+  static LeaderboardEntry getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<LeaderboardEntry>(create);
+  static LeaderboardEntry? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get userName => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set userName($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasUserName() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearUserName() => clearField(1);
+
+  @$pb.TagNumber(2)
+  AccountId get accountId => $_getN(1);
+  @$pb.TagNumber(2)
+  set accountId(AccountId v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasAccountId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearAccountId() => clearField(2);
+  @$pb.TagNumber(2)
+  AccountId ensureAccountId() => $_ensure(1);
+
+  @$pb.TagNumber(4)
+  $core.int get score => $_getIZ(2);
+  @$pb.TagNumber(4)
+  set score($core.int v) { $_setUnsignedInt32(2, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasScore() => $_has(2);
+  @$pb.TagNumber(4)
+  void clearScore() => clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.List<$core.int> get charTraitsIds => $_getList(3);
 }
 
 class PhoneVerifier extends $pb.GeneratedMessage {
@@ -2385,6 +2557,8 @@ class BlockchainStats extends $pb.GeneratedMessage {
     ..a<$fixnum.Int64>(18, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'updateUserTransactionsCount', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
     ..a<$core.double>(19, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'exchangeRate', $pb.PbFieldType.OD)
     ..a<$fixnum.Int64>(20, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'causesRewardsAmount', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(21, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'karmaRewardsCount', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(22, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'karmaRewardsAmount', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
     ..hasRequiredFields = false
   ;
 
@@ -2410,6 +2584,8 @@ class BlockchainStats extends $pb.GeneratedMessage {
     $fixnum.Int64? updateUserTransactionsCount,
     $core.double? exchangeRate,
     $fixnum.Int64? causesRewardsAmount,
+    $fixnum.Int64? karmaRewardsCount,
+    $fixnum.Int64? karmaRewardsAmount,
   }) {
     final _result = create();
     if (lastBlockTime != null) {
@@ -2471,6 +2647,12 @@ class BlockchainStats extends $pb.GeneratedMessage {
     }
     if (causesRewardsAmount != null) {
       _result.causesRewardsAmount = causesRewardsAmount;
+    }
+    if (karmaRewardsCount != null) {
+      _result.karmaRewardsCount = karmaRewardsCount;
+    }
+    if (karmaRewardsAmount != null) {
+      _result.karmaRewardsAmount = karmaRewardsAmount;
     }
     return _result;
   }
@@ -2674,6 +2856,24 @@ class BlockchainStats extends $pb.GeneratedMessage {
   $core.bool hasCausesRewardsAmount() => $_has(19);
   @$pb.TagNumber(20)
   void clearCausesRewardsAmount() => clearField(20);
+
+  @$pb.TagNumber(21)
+  $fixnum.Int64 get karmaRewardsCount => $_getI64(20);
+  @$pb.TagNumber(21)
+  set karmaRewardsCount($fixnum.Int64 v) { $_setInt64(20, v); }
+  @$pb.TagNumber(21)
+  $core.bool hasKarmaRewardsCount() => $_has(20);
+  @$pb.TagNumber(21)
+  void clearKarmaRewardsCount() => clearField(21);
+
+  @$pb.TagNumber(22)
+  $fixnum.Int64 get karmaRewardsAmount => $_getI64(21);
+  @$pb.TagNumber(22)
+  set karmaRewardsAmount($fixnum.Int64 v) { $_setInt64(21, v); }
+  @$pb.TagNumber(22)
+  $core.bool hasKarmaRewardsAmount() => $_has(21);
+  @$pb.TagNumber(22)
+  void clearKarmaRewardsAmount() => clearField(22);
 }
 
 class BlockEvent extends $pb.GeneratedMessage {
@@ -2883,5 +3083,404 @@ class BlockEvent extends $pb.GeneratedMessage {
   $core.bool hasReward() => $_has(12);
   @$pb.TagNumber(13)
   void clearReward() => clearField(13);
+}
+
+class GenesisData extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GenesisData', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'karma_coin.core_types'), createEmptyInstance: create)
+    ..a<$core.int>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'netId', $pb.PbFieldType.OU3)
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'netName')
+    ..a<$fixnum.Int64>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'genesisTime', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'signupRewardPhase1Alloc', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'signupRewardPhase2Alloc', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'signupRewardPhase1Amount', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'signupRewardPhase2Amount', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'signupRewardPhase3Start', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'referralRewardPhase1Alloc', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'referralRewardPhase2Alloc', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'referralRewardPhase1Amount', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(12, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'referralRewardPhase2Amount', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'txFeeSubsidyMaxPerUser', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(14, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'txFeeSubsidiesAlloc', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(15, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'txFeeSubsidyMaxAmount', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(16, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'blockRewardAmount', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(17, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'blockRewardLastBlock', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(18, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'karmaRewardAmount', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(19, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'karmaRewardAlloc', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(20, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'karmaRewardTopNUsers', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(21, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'karmaRewardsEligibility', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(22, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'karmaRewardsPeriodHours', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(23, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'treasuryPremintAmount', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..aOS(24, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'treasuryAccountId')
+    ..aOS(25, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'treasuryAccountName')
+    ..pc<CharTrait>(26, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'charTraits', $pb.PbFieldType.PM, subBuilder: CharTrait.create)
+    ..pc<PhoneVerifier>(27, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'verifiers', $pb.PbFieldType.PM, subBuilder: PhoneVerifier.create)
+    ..hasRequiredFields = false
+  ;
+
+  GenesisData._() : super();
+  factory GenesisData({
+    $core.int? netId,
+    $core.String? netName,
+    $fixnum.Int64? genesisTime,
+    $fixnum.Int64? signupRewardPhase1Alloc,
+    $fixnum.Int64? signupRewardPhase2Alloc,
+    $fixnum.Int64? signupRewardPhase1Amount,
+    $fixnum.Int64? signupRewardPhase2Amount,
+    $fixnum.Int64? signupRewardPhase3Start,
+    $fixnum.Int64? referralRewardPhase1Alloc,
+    $fixnum.Int64? referralRewardPhase2Alloc,
+    $fixnum.Int64? referralRewardPhase1Amount,
+    $fixnum.Int64? referralRewardPhase2Amount,
+    $fixnum.Int64? txFeeSubsidyMaxPerUser,
+    $fixnum.Int64? txFeeSubsidiesAlloc,
+    $fixnum.Int64? txFeeSubsidyMaxAmount,
+    $fixnum.Int64? blockRewardAmount,
+    $fixnum.Int64? blockRewardLastBlock,
+    $fixnum.Int64? karmaRewardAmount,
+    $fixnum.Int64? karmaRewardAlloc,
+    $fixnum.Int64? karmaRewardTopNUsers,
+    $fixnum.Int64? karmaRewardsEligibility,
+    $fixnum.Int64? karmaRewardsPeriodHours,
+    $fixnum.Int64? treasuryPremintAmount,
+    $core.String? treasuryAccountId,
+    $core.String? treasuryAccountName,
+    $core.Iterable<CharTrait>? charTraits,
+    $core.Iterable<PhoneVerifier>? verifiers,
+  }) {
+    final _result = create();
+    if (netId != null) {
+      _result.netId = netId;
+    }
+    if (netName != null) {
+      _result.netName = netName;
+    }
+    if (genesisTime != null) {
+      _result.genesisTime = genesisTime;
+    }
+    if (signupRewardPhase1Alloc != null) {
+      _result.signupRewardPhase1Alloc = signupRewardPhase1Alloc;
+    }
+    if (signupRewardPhase2Alloc != null) {
+      _result.signupRewardPhase2Alloc = signupRewardPhase2Alloc;
+    }
+    if (signupRewardPhase1Amount != null) {
+      _result.signupRewardPhase1Amount = signupRewardPhase1Amount;
+    }
+    if (signupRewardPhase2Amount != null) {
+      _result.signupRewardPhase2Amount = signupRewardPhase2Amount;
+    }
+    if (signupRewardPhase3Start != null) {
+      _result.signupRewardPhase3Start = signupRewardPhase3Start;
+    }
+    if (referralRewardPhase1Alloc != null) {
+      _result.referralRewardPhase1Alloc = referralRewardPhase1Alloc;
+    }
+    if (referralRewardPhase2Alloc != null) {
+      _result.referralRewardPhase2Alloc = referralRewardPhase2Alloc;
+    }
+    if (referralRewardPhase1Amount != null) {
+      _result.referralRewardPhase1Amount = referralRewardPhase1Amount;
+    }
+    if (referralRewardPhase2Amount != null) {
+      _result.referralRewardPhase2Amount = referralRewardPhase2Amount;
+    }
+    if (txFeeSubsidyMaxPerUser != null) {
+      _result.txFeeSubsidyMaxPerUser = txFeeSubsidyMaxPerUser;
+    }
+    if (txFeeSubsidiesAlloc != null) {
+      _result.txFeeSubsidiesAlloc = txFeeSubsidiesAlloc;
+    }
+    if (txFeeSubsidyMaxAmount != null) {
+      _result.txFeeSubsidyMaxAmount = txFeeSubsidyMaxAmount;
+    }
+    if (blockRewardAmount != null) {
+      _result.blockRewardAmount = blockRewardAmount;
+    }
+    if (blockRewardLastBlock != null) {
+      _result.blockRewardLastBlock = blockRewardLastBlock;
+    }
+    if (karmaRewardAmount != null) {
+      _result.karmaRewardAmount = karmaRewardAmount;
+    }
+    if (karmaRewardAlloc != null) {
+      _result.karmaRewardAlloc = karmaRewardAlloc;
+    }
+    if (karmaRewardTopNUsers != null) {
+      _result.karmaRewardTopNUsers = karmaRewardTopNUsers;
+    }
+    if (karmaRewardsEligibility != null) {
+      _result.karmaRewardsEligibility = karmaRewardsEligibility;
+    }
+    if (karmaRewardsPeriodHours != null) {
+      _result.karmaRewardsPeriodHours = karmaRewardsPeriodHours;
+    }
+    if (treasuryPremintAmount != null) {
+      _result.treasuryPremintAmount = treasuryPremintAmount;
+    }
+    if (treasuryAccountId != null) {
+      _result.treasuryAccountId = treasuryAccountId;
+    }
+    if (treasuryAccountName != null) {
+      _result.treasuryAccountName = treasuryAccountName;
+    }
+    if (charTraits != null) {
+      _result.charTraits.addAll(charTraits);
+    }
+    if (verifiers != null) {
+      _result.verifiers.addAll(verifiers);
+    }
+    return _result;
+  }
+  factory GenesisData.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory GenesisData.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  GenesisData clone() => GenesisData()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  GenesisData copyWith(void Function(GenesisData) updates) => super.copyWith((message) => updates(message as GenesisData)) as GenesisData; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static GenesisData create() => GenesisData._();
+  GenesisData createEmptyInstance() => create();
+  static $pb.PbList<GenesisData> createRepeated() => $pb.PbList<GenesisData>();
+  @$core.pragma('dart2js:noInline')
+  static GenesisData getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GenesisData>(create);
+  static GenesisData? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.int get netId => $_getIZ(0);
+  @$pb.TagNumber(1)
+  set netId($core.int v) { $_setUnsignedInt32(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasNetId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearNetId() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get netName => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set netName($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasNetName() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearNetName() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $fixnum.Int64 get genesisTime => $_getI64(2);
+  @$pb.TagNumber(3)
+  set genesisTime($fixnum.Int64 v) { $_setInt64(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasGenesisTime() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearGenesisTime() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $fixnum.Int64 get signupRewardPhase1Alloc => $_getI64(3);
+  @$pb.TagNumber(4)
+  set signupRewardPhase1Alloc($fixnum.Int64 v) { $_setInt64(3, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasSignupRewardPhase1Alloc() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearSignupRewardPhase1Alloc() => clearField(4);
+
+  @$pb.TagNumber(5)
+  $fixnum.Int64 get signupRewardPhase2Alloc => $_getI64(4);
+  @$pb.TagNumber(5)
+  set signupRewardPhase2Alloc($fixnum.Int64 v) { $_setInt64(4, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasSignupRewardPhase2Alloc() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearSignupRewardPhase2Alloc() => clearField(5);
+
+  @$pb.TagNumber(6)
+  $fixnum.Int64 get signupRewardPhase1Amount => $_getI64(5);
+  @$pb.TagNumber(6)
+  set signupRewardPhase1Amount($fixnum.Int64 v) { $_setInt64(5, v); }
+  @$pb.TagNumber(6)
+  $core.bool hasSignupRewardPhase1Amount() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearSignupRewardPhase1Amount() => clearField(6);
+
+  @$pb.TagNumber(7)
+  $fixnum.Int64 get signupRewardPhase2Amount => $_getI64(6);
+  @$pb.TagNumber(7)
+  set signupRewardPhase2Amount($fixnum.Int64 v) { $_setInt64(6, v); }
+  @$pb.TagNumber(7)
+  $core.bool hasSignupRewardPhase2Amount() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearSignupRewardPhase2Amount() => clearField(7);
+
+  @$pb.TagNumber(8)
+  $fixnum.Int64 get signupRewardPhase3Start => $_getI64(7);
+  @$pb.TagNumber(8)
+  set signupRewardPhase3Start($fixnum.Int64 v) { $_setInt64(7, v); }
+  @$pb.TagNumber(8)
+  $core.bool hasSignupRewardPhase3Start() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearSignupRewardPhase3Start() => clearField(8);
+
+  @$pb.TagNumber(9)
+  $fixnum.Int64 get referralRewardPhase1Alloc => $_getI64(8);
+  @$pb.TagNumber(9)
+  set referralRewardPhase1Alloc($fixnum.Int64 v) { $_setInt64(8, v); }
+  @$pb.TagNumber(9)
+  $core.bool hasReferralRewardPhase1Alloc() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearReferralRewardPhase1Alloc() => clearField(9);
+
+  @$pb.TagNumber(10)
+  $fixnum.Int64 get referralRewardPhase2Alloc => $_getI64(9);
+  @$pb.TagNumber(10)
+  set referralRewardPhase2Alloc($fixnum.Int64 v) { $_setInt64(9, v); }
+  @$pb.TagNumber(10)
+  $core.bool hasReferralRewardPhase2Alloc() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearReferralRewardPhase2Alloc() => clearField(10);
+
+  @$pb.TagNumber(11)
+  $fixnum.Int64 get referralRewardPhase1Amount => $_getI64(10);
+  @$pb.TagNumber(11)
+  set referralRewardPhase1Amount($fixnum.Int64 v) { $_setInt64(10, v); }
+  @$pb.TagNumber(11)
+  $core.bool hasReferralRewardPhase1Amount() => $_has(10);
+  @$pb.TagNumber(11)
+  void clearReferralRewardPhase1Amount() => clearField(11);
+
+  @$pb.TagNumber(12)
+  $fixnum.Int64 get referralRewardPhase2Amount => $_getI64(11);
+  @$pb.TagNumber(12)
+  set referralRewardPhase2Amount($fixnum.Int64 v) { $_setInt64(11, v); }
+  @$pb.TagNumber(12)
+  $core.bool hasReferralRewardPhase2Amount() => $_has(11);
+  @$pb.TagNumber(12)
+  void clearReferralRewardPhase2Amount() => clearField(12);
+
+  @$pb.TagNumber(13)
+  $fixnum.Int64 get txFeeSubsidyMaxPerUser => $_getI64(12);
+  @$pb.TagNumber(13)
+  set txFeeSubsidyMaxPerUser($fixnum.Int64 v) { $_setInt64(12, v); }
+  @$pb.TagNumber(13)
+  $core.bool hasTxFeeSubsidyMaxPerUser() => $_has(12);
+  @$pb.TagNumber(13)
+  void clearTxFeeSubsidyMaxPerUser() => clearField(13);
+
+  @$pb.TagNumber(14)
+  $fixnum.Int64 get txFeeSubsidiesAlloc => $_getI64(13);
+  @$pb.TagNumber(14)
+  set txFeeSubsidiesAlloc($fixnum.Int64 v) { $_setInt64(13, v); }
+  @$pb.TagNumber(14)
+  $core.bool hasTxFeeSubsidiesAlloc() => $_has(13);
+  @$pb.TagNumber(14)
+  void clearTxFeeSubsidiesAlloc() => clearField(14);
+
+  @$pb.TagNumber(15)
+  $fixnum.Int64 get txFeeSubsidyMaxAmount => $_getI64(14);
+  @$pb.TagNumber(15)
+  set txFeeSubsidyMaxAmount($fixnum.Int64 v) { $_setInt64(14, v); }
+  @$pb.TagNumber(15)
+  $core.bool hasTxFeeSubsidyMaxAmount() => $_has(14);
+  @$pb.TagNumber(15)
+  void clearTxFeeSubsidyMaxAmount() => clearField(15);
+
+  @$pb.TagNumber(16)
+  $fixnum.Int64 get blockRewardAmount => $_getI64(15);
+  @$pb.TagNumber(16)
+  set blockRewardAmount($fixnum.Int64 v) { $_setInt64(15, v); }
+  @$pb.TagNumber(16)
+  $core.bool hasBlockRewardAmount() => $_has(15);
+  @$pb.TagNumber(16)
+  void clearBlockRewardAmount() => clearField(16);
+
+  @$pb.TagNumber(17)
+  $fixnum.Int64 get blockRewardLastBlock => $_getI64(16);
+  @$pb.TagNumber(17)
+  set blockRewardLastBlock($fixnum.Int64 v) { $_setInt64(16, v); }
+  @$pb.TagNumber(17)
+  $core.bool hasBlockRewardLastBlock() => $_has(16);
+  @$pb.TagNumber(17)
+  void clearBlockRewardLastBlock() => clearField(17);
+
+  @$pb.TagNumber(18)
+  $fixnum.Int64 get karmaRewardAmount => $_getI64(17);
+  @$pb.TagNumber(18)
+  set karmaRewardAmount($fixnum.Int64 v) { $_setInt64(17, v); }
+  @$pb.TagNumber(18)
+  $core.bool hasKarmaRewardAmount() => $_has(17);
+  @$pb.TagNumber(18)
+  void clearKarmaRewardAmount() => clearField(18);
+
+  @$pb.TagNumber(19)
+  $fixnum.Int64 get karmaRewardAlloc => $_getI64(18);
+  @$pb.TagNumber(19)
+  set karmaRewardAlloc($fixnum.Int64 v) { $_setInt64(18, v); }
+  @$pb.TagNumber(19)
+  $core.bool hasKarmaRewardAlloc() => $_has(18);
+  @$pb.TagNumber(19)
+  void clearKarmaRewardAlloc() => clearField(19);
+
+  @$pb.TagNumber(20)
+  $fixnum.Int64 get karmaRewardTopNUsers => $_getI64(19);
+  @$pb.TagNumber(20)
+  set karmaRewardTopNUsers($fixnum.Int64 v) { $_setInt64(19, v); }
+  @$pb.TagNumber(20)
+  $core.bool hasKarmaRewardTopNUsers() => $_has(19);
+  @$pb.TagNumber(20)
+  void clearKarmaRewardTopNUsers() => clearField(20);
+
+  @$pb.TagNumber(21)
+  $fixnum.Int64 get karmaRewardsEligibility => $_getI64(20);
+  @$pb.TagNumber(21)
+  set karmaRewardsEligibility($fixnum.Int64 v) { $_setInt64(20, v); }
+  @$pb.TagNumber(21)
+  $core.bool hasKarmaRewardsEligibility() => $_has(20);
+  @$pb.TagNumber(21)
+  void clearKarmaRewardsEligibility() => clearField(21);
+
+  @$pb.TagNumber(22)
+  $fixnum.Int64 get karmaRewardsPeriodHours => $_getI64(21);
+  @$pb.TagNumber(22)
+  set karmaRewardsPeriodHours($fixnum.Int64 v) { $_setInt64(21, v); }
+  @$pb.TagNumber(22)
+  $core.bool hasKarmaRewardsPeriodHours() => $_has(21);
+  @$pb.TagNumber(22)
+  void clearKarmaRewardsPeriodHours() => clearField(22);
+
+  @$pb.TagNumber(23)
+  $fixnum.Int64 get treasuryPremintAmount => $_getI64(22);
+  @$pb.TagNumber(23)
+  set treasuryPremintAmount($fixnum.Int64 v) { $_setInt64(22, v); }
+  @$pb.TagNumber(23)
+  $core.bool hasTreasuryPremintAmount() => $_has(22);
+  @$pb.TagNumber(23)
+  void clearTreasuryPremintAmount() => clearField(23);
+
+  @$pb.TagNumber(24)
+  $core.String get treasuryAccountId => $_getSZ(23);
+  @$pb.TagNumber(24)
+  set treasuryAccountId($core.String v) { $_setString(23, v); }
+  @$pb.TagNumber(24)
+  $core.bool hasTreasuryAccountId() => $_has(23);
+  @$pb.TagNumber(24)
+  void clearTreasuryAccountId() => clearField(24);
+
+  @$pb.TagNumber(25)
+  $core.String get treasuryAccountName => $_getSZ(24);
+  @$pb.TagNumber(25)
+  set treasuryAccountName($core.String v) { $_setString(24, v); }
+  @$pb.TagNumber(25)
+  $core.bool hasTreasuryAccountName() => $_has(24);
+  @$pb.TagNumber(25)
+  void clearTreasuryAccountName() => clearField(25);
+
+  @$pb.TagNumber(26)
+  $core.List<CharTrait> get charTraits => $_getList(25);
+
+  @$pb.TagNumber(27)
+  $core.List<PhoneVerifier> get verifiers => $_getList(26);
 }
 

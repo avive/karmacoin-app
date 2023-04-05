@@ -37,6 +37,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
   final _secureStorage = const FlutterSecureStorage();
 
   // update user data from chain polling timer
+  // ignore: unused_field
   Timer? _timer;
 
   // User verification data from verifier
@@ -174,8 +175,8 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
       }
     });
 
-    debugPrint('Polling for user account data every 60 secs...');
-    _timer = Timer.periodic(const Duration(seconds: 60), (Timer t) async {
+    debugPrint('Polling for user account data every 30 secs...');
+    _timer = Timer.periodic(const Duration(seconds: 30), (Timer t) async {
       await _updateLocalKarmaUserFromChain();
     });
   }
@@ -227,10 +228,10 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
   /// Update the local KarmaCoin user from chain
   Future<void> _updateLocalKarmaUserFromChain() async {
     try {
-      debugPrint('Calling api to get updated karma coin use data...');
+      debugPrint('Getting updated karma coin use data...');
 
       if (karmaCoinUser.value == null) {
-        // debugPrint('No local karma coin user found. ignoring...');
+        debugPrint('No local karma coin user found. ignoring...');
         return;
       }
 
@@ -240,7 +241,6 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
 
       if (resp.hasUser()) {
         debugPrint('Got back user from api. Updating local user data...');
-
         await karmaCoinUser.value!.updatWithUserData(resp.user, true);
 
         // User is signed up on chain
@@ -384,12 +384,6 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     // log out from firebase
 
     debugPrint('clearing all local user account from store and from memory...');
-
-    // clear timer that pulls user data from chain
-    if (_timer != null) {
-      _timer!.cancel();
-      _timer = null;
-    }
 
     // stop tracking txs for local user
     await txsBoss.setAccountId(null);

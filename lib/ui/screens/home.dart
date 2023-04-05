@@ -11,6 +11,7 @@ import 'package:karma_coin/services/api/api.pb.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/ui/widgets/appreciate.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
+import 'package:karma_coin/ui/widgets/leaderboard.dart';
 import 'package:karma_coin/ui/widgets/traits_scores_wheel.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:status_alert/status_alert.dart';
@@ -27,13 +28,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   final coinWidth = 140.0;
   final coinLabelFontSize = 10.0;
   final coinNumberFontSize = 60.0;
-
-  static Route<void> _activityModelBuilder(
-      BuildContext context, Object? arguments) {
-    return CupertinoModalPopupRoute<void>(builder: (BuildContext context) {
-      return AppreciateWidget(communityId: arguments as int);
-    });
-  }
 
   @override
   void initState() {
@@ -82,8 +76,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         if (context.mounted) {
           StatusAlert.show(context,
               duration: const Duration(seconds: 4),
-              title: 'Karma Coin is down',
-              subtitle: 'Please try again later.',
+              title: 'Ooops',
+              subtitle: 'Karma coin down.',
               configuration: const IconConfiguration(
                   icon: CupertinoIcons.exclamationmark_triangle),
               dismissOnBackgroundTap: true,
@@ -189,7 +183,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                               .textTheme
                               .textStyle
                               .merge(
-                                TextStyle(
+                                const TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.w400,
                                     color: CupertinoColors.activeOrange),
@@ -203,21 +197,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       //_getBalanceWidget(context),
                     ],
                   ),
-                  /*
-                  Column(children: [
-                    /*
-                    Text(
-                      'Balance',
-                      style:
-                          CupertinoTheme.of(context).textTheme.textStyle.merge(
-                                TextStyle(
-                                    fontSize: 24,
-                                    color: CupertinoColors.activeBlue),
-                              ),
-                    ),*/
-                    _getBalanceWidget(context),
-                  ]),
-                  */
 
                   // _getCommunityWidget(context),
 
@@ -225,8 +204,14 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   CupertinoButton.filled(
                     onPressed: () async {
                       if (!context.mounted) return;
-                      Navigator.of(context)
-                          .restorablePush(_activityModelBuilder, arguments: 0);
+
+                      Navigator.of(context).push(CupertinoPageRoute(
+                          fullscreenDialog: true,
+                          builder: ((context) =>
+                              const AppreciateWidget(communityId: 0))));
+
+                      //Navigator.of(context)
+                      //    .restorablePush(_activityModalBuilder, arguments: 0);
                     },
                     child: const Text('Appreciate'),
                   ),
@@ -271,49 +256,61 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     return ValueListenableBuilder<int>(
         valueListenable: accountLogic.karmaCoinUser.value!.karmaScore,
         builder: (context, value, child) {
-          return Container(
-            height: coinWidth,
-            width: coinWidth,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: purple,
-              border: Border.all(
-                  width: 6, color: const Color.fromARGB(255, 255, 184, 0)),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.only(left: 8, right: 8),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    FittedBox(
-                      child: Text(
-                        NumberFormat.compact().format(value),
+          return GestureDetector(
+            onTap: () async {
+              debugPrint('Tapped karma score');
+              if (!context.mounted) return;
+
+              Navigator.of(context).push(CupertinoPageRoute(
+                  fullscreenDialog: true,
+                  builder: ((context) =>
+                      const LeaderboardWidget(communityId: 0))));
+            },
+            child: Container(
+              height: coinWidth,
+              width: coinWidth,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: purple,
+                border: Border.all(
+                    width: 6, color: const Color.fromARGB(255, 255, 184, 0)),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8, right: 8),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      FittedBox(
+                        child: Text(
+                          NumberFormat.compact().format(value),
+                          style: CupertinoTheme.of(context)
+                              .textTheme
+                              .textStyle
+                              .merge(
+                                TextStyle(
+                                    fontSize: coinNumberFontSize,
+                                    color:
+                                        const Color.fromARGB(255, 255, 184, 0),
+                                    fontWeight: FontWeight.w400),
+                              ),
+                        ),
+                      ),
+                      Text(
+                        'KARMA SCORE',
                         style: CupertinoTheme.of(context)
                             .textTheme
                             .textStyle
                             .merge(
                               TextStyle(
-                                  fontSize: coinNumberFontSize,
+                                  fontSize: coinLabelFontSize,
                                   color: const Color.fromARGB(255, 255, 184, 0),
-                                  fontWeight: FontWeight.w400),
+                                  fontWeight: FontWeight.w600),
                             ),
                       ),
-                    ),
-                    Text(
-                      'KARMA SCORE',
-                      style: CupertinoTheme.of(context)
-                          .textTheme
-                          .textStyle
-                          .merge(
-                            TextStyle(
-                                fontSize: coinLabelFontSize,
-                                color: const Color.fromARGB(255, 255, 184, 0),
-                                fontWeight: FontWeight.w600),
-                          ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

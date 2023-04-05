@@ -34,29 +34,29 @@ class VerifierInfo extends $pb.GeneratedMessage {
     $core.String? apiEndpointIp6,
     $3.Signature? signature,
   }) {
-    final result = create();
+    final _result = create();
     if (name != null) {
-      result.name = name;
+      _result.name = name;
     }
     if (accountId != null) {
-      result.accountId = accountId;
+      _result.accountId = accountId;
     }
     if (verifierEndpointIp4 != null) {
-      result.verifierEndpointIp4 = verifierEndpointIp4;
+      _result.verifierEndpointIp4 = verifierEndpointIp4;
     }
     if (verifierEndpointIp6 != null) {
-      result.verifierEndpointIp6 = verifierEndpointIp6;
+      _result.verifierEndpointIp6 = verifierEndpointIp6;
     }
     if (apiEndpointIp4 != null) {
-      result.apiEndpointIp4 = apiEndpointIp4;
+      _result.apiEndpointIp4 = apiEndpointIp4;
     }
     if (apiEndpointIp6 != null) {
-      result.apiEndpointIp6 = apiEndpointIp6;
+      _result.apiEndpointIp6 = apiEndpointIp6;
     }
     if (signature != null) {
-      result.signature = signature;
+      _result.signature = signature;
     }
-    return result;
+    return _result;
   }
   factory VerifierInfo.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory VerifierInfo.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
@@ -157,11 +157,11 @@ class VerifyNumberResponse extends $pb.GeneratedMessage {
   factory VerifyNumberResponse({
     $3.UserVerificationData? userVerificationData,
   }) {
-    final result = create();
+    final _result = create();
     if (userVerificationData != null) {
-      result.userVerificationData = userVerificationData;
+      _result.userVerificationData = userVerificationData;
     }
-    return result;
+    return _result;
   }
   factory VerifyNumberResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory VerifyNumberResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
@@ -214,23 +214,23 @@ class VerifyNumberRequest extends $pb.GeneratedMessage {
     $core.String? requestedUserName,
     $3.Signature? signature,
   }) {
-    final result = create();
+    final _result = create();
     if (timestamp != null) {
-      result.timestamp = timestamp;
+      _result.timestamp = timestamp;
     }
     if (accountId != null) {
-      result.accountId = accountId;
+      _result.accountId = accountId;
     }
     if (mobileNumber != null) {
-      result.mobileNumber = mobileNumber;
+      _result.mobileNumber = mobileNumber;
     }
     if (requestedUserName != null) {
-      result.requestedUserName = requestedUserName;
+      _result.requestedUserName = requestedUserName;
     }
     if (signature != null) {
-      result.signature = signature;
+      _result.signature = signature;
     }
-    return result;
+    return _result;
   }
   factory VerifyNumberRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory VerifyNumberRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
@@ -323,23 +323,23 @@ class SmsInviteMetadata extends $pb.GeneratedMessage {
     $3.AccountId? inviterAccountId,
     $core.List<$core.int>? inviteTxHash,
   }) {
-    final result = create();
+    final _result = create();
     if (mobileNumber != null) {
-      result.mobileNumber = mobileNumber;
+      _result.mobileNumber = mobileNumber;
     }
     if (lastMessageSentTimeStamp != null) {
-      result.lastMessageSentTimeStamp = lastMessageSentTimeStamp;
+      _result.lastMessageSentTimeStamp = lastMessageSentTimeStamp;
     }
     if (messagesSent != null) {
-      result.messagesSent = messagesSent;
+      _result.messagesSent = messagesSent;
     }
     if (inviterAccountId != null) {
-      result.inviterAccountId = inviterAccountId;
+      _result.inviterAccountId = inviterAccountId;
     }
     if (inviteTxHash != null) {
-      result.inviteTxHash = inviteTxHash;
+      _result.inviteTxHash = inviteTxHash;
     }
-    return result;
+    return _result;
   }
   factory SmsInviteMetadata.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory SmsInviteMetadata.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);

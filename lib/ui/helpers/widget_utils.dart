@@ -5,7 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 // common widget helper functions
 
-const statusAlertWidth = 270.0;
+const statusAlertWidth = 300.0;
 
 showNoConnectionAlert(BuildContext context) {
   StatusAlert.show(context,

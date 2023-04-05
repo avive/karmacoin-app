@@ -1,3 +1,4 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
@@ -22,8 +23,9 @@ const _githubNextrUrl = 'https://github.com/karma-coin/karmachain';
 class _KarmachainState extends State<Karmachain> {
   _KarmachainState();
 
-  GetGenesisDataResponse? genesisData;
+  GenesisData? genesisData;
   BlockchainStats? chainData;
+  Block? genesisBlock;
 
   @override
   void initState() {
@@ -34,14 +36,22 @@ class _KarmachainState extends State<Karmachain> {
         GetBlockchainDataResponse cData = await api.apiServiceClient
             .getBlockchainData(GetBlockchainDataRequest());
 
-        GetGenesisDataResponse gData =
+        GetGenesisDataResponse resp =
             await api.apiServiceClient.getGenesisData(GetGenesisDataRequest());
+
+        // get genesis block
+        GetBlocksResponse blockResp = await api.apiServiceClient.getBlocks(
+          GetBlocksRequest(
+              fromBlockHeight: Int64.ONE, toBlockHeight: Int64.ONE),
+        );
 
         setState(() {
           chainData = cData.stats;
-          genesisData = gData;
-          // debugPrint(chain_data.toString());
-          // debugPrint(genesis_data.toString());
+          genesisData = resp.genesisData;
+          genesisBlock =
+              blockResp.blocks.isNotEmpty ? blockResp.blocks.first : null;
+          debugPrint(chainData.toString());
+          //debugPrint(genesisData.toString());
         });
       } catch (e) {
         if (!mounted) return;
@@ -97,6 +107,11 @@ class _KarmachainState extends State<Karmachain> {
     DateTime genesisTime = DateTime.fromMillisecondsSinceEpoch(
         genesisData!.genesisTime.toInt() * 1000);
 
+    if (genesisBlock != null) {
+      genesisTime =
+          DateTime.fromMillisecondsSinceEpoch(genesisBlock!.time.toInt());
+    }
+
     String ago = time_ago.format(genesisTime);
 
     //String dateDisp = DateFormat().format(genesis_time);
@@ -108,7 +123,6 @@ class _KarmachainState extends State<Karmachain> {
         //subtitle: Text(dateDisp),
         trailing:
             Text(ago, style: CupertinoTheme.of(context).textTheme.textStyle),
-        // todo: number format
       ),
     );
 

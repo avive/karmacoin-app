@@ -208,6 +208,19 @@ const User$json = const {
 
 /// Descriptor for `User`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List userDescriptor = $convert.base64Decode('CgRVc2VyEj8KCmFjY291bnRfaWQYASABKAsyIC5rYXJtYV9jb2luLmNvcmVfdHlwZXMuQWNjb3VudElkUglhY2NvdW50SWQSFAoFbm9uY2UYAiABKARSBW5vbmNlEhsKCXVzZXJfbmFtZRgDIAEoCVIIdXNlck5hbWUSSAoNbW9iaWxlX251bWJlchgEIAEoCzIjLmthcm1hX2NvaW4uY29yZV90eXBlcy5Nb2JpbGVOdW1iZXJSDG1vYmlsZU51bWJlchIYCgdiYWxhbmNlGAUgASgEUgdiYWxhbmNlEkQKDHRyYWl0X3Njb3JlcxgGIAMoCzIhLmthcm1hX2NvaW4uY29yZV90eXBlcy5UcmFpdFNjb3JlUgt0cmFpdFNjb3JlcxI4CghwcmVfa2V5cxgHIAMoCzIdLmthcm1hX2NvaW4uY29yZV90eXBlcy5QcmVLZXlSB3ByZUtleXMSHwoLa2FybWFfc2NvcmUYCCABKA1SCmthcm1hU2NvcmUSXwoVY29tbXVuaXR5X21lbWJlcnNoaXBzGAkgAygLMioua2FybWFfY29pbi5jb3JlX3R5cGVzLkNvbW11bml0eU1lbWJlcnNoaXBSFGNvbW11bml0eU1lbWJlcnNoaXBz');
+@$core.Deprecated('Use contactDescriptor instead')
+const Contact$json = const {
+  '1': 'Contact',
+  '2': const [
+    const {'1': 'user_name', '3': 1, '4': 1, '5': 9, '10': 'userName'},
+    const {'1': 'account_id', '3': 2, '4': 1, '5': 11, '6': '.karma_coin.core_types.AccountId', '10': 'accountId'},
+    const {'1': 'mobile_number', '3': 3, '4': 1, '5': 11, '6': '.karma_coin.core_types.MobileNumber', '10': 'mobileNumber'},
+    const {'1': 'community_memberships', '3': 4, '4': 3, '5': 11, '6': '.karma_coin.core_types.CommunityMembership', '10': 'communityMemberships'},
+  ],
+};
+
+/// Descriptor for `Contact`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List contactDescriptor = $convert.base64Decode('CgdDb250YWN0EhsKCXVzZXJfbmFtZRgBIAEoCVIIdXNlck5hbWUSPwoKYWNjb3VudF9pZBgCIAEoCzIgLmthcm1hX2NvaW4uY29yZV90eXBlcy5BY2NvdW50SWRSCWFjY291bnRJZBJICg1tb2JpbGVfbnVtYmVyGAMgASgLMiMua2FybWFfY29pbi5jb3JlX3R5cGVzLk1vYmlsZU51bWJlclIMbW9iaWxlTnVtYmVyEl8KFWNvbW11bml0eV9tZW1iZXJzaGlwcxgEIAMoCzIqLmthcm1hX2NvaW4uY29yZV90eXBlcy5Db21tdW5pdHlNZW1iZXJzaGlwUhRjb21tdW5pdHlNZW1iZXJzaGlwcw==');
 @$core.Deprecated('Use communityMembershipDescriptor instead')
 const CommunityMembership$json = const {
   '1': 'CommunityMembership',
@@ -220,6 +233,19 @@ const CommunityMembership$json = const {
 
 /// Descriptor for `CommunityMembership`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List communityMembershipDescriptor = $convert.base64Decode('ChNDb21tdW5pdHlNZW1iZXJzaGlwEiEKDGNvbW11bml0eV9pZBgBIAEoDVILY29tbXVuaXR5SWQSHwoLa2FybWFfc2NvcmUYAiABKA1SCmthcm1hU2NvcmUSGQoIaXNfYWRtaW4YAyABKAhSB2lzQWRtaW4=');
+@$core.Deprecated('Use leaderboardEntryDescriptor instead')
+const LeaderboardEntry$json = const {
+  '1': 'LeaderboardEntry',
+  '2': const [
+    const {'1': 'user_name', '3': 1, '4': 1, '5': 9, '10': 'userName'},
+    const {'1': 'account_id', '3': 2, '4': 1, '5': 11, '6': '.karma_coin.core_types.AccountId', '10': 'accountId'},
+    const {'1': 'score', '3': 4, '4': 1, '5': 13, '10': 'score'},
+    const {'1': 'char_traits_ids', '3': 5, '4': 3, '5': 13, '10': 'charTraitsIds'},
+  ],
+};
+
+/// Descriptor for `LeaderboardEntry`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List leaderboardEntryDescriptor = $convert.base64Decode('ChBMZWFkZXJib2FyZEVudHJ5EhsKCXVzZXJfbmFtZRgBIAEoCVIIdXNlck5hbWUSPwoKYWNjb3VudF9pZBgCIAEoCzIgLmthcm1hX2NvaW4uY29yZV90eXBlcy5BY2NvdW50SWRSCWFjY291bnRJZBIUCgVzY29yZRgEIAEoDVIFc2NvcmUSJgoPY2hhcl90cmFpdHNfaWRzGAUgAygNUg1jaGFyVHJhaXRzSWRz');
 @$core.Deprecated('Use phoneVerifierDescriptor instead')
 const PhoneVerifier$json = const {
   '1': 'PhoneVerifier',
@@ -473,11 +499,13 @@ const BlockchainStats$json = const {
     const {'1': 'update_user_transactions_count', '3': 18, '4': 1, '5': 4, '10': 'updateUserTransactionsCount'},
     const {'1': 'exchange_rate', '3': 19, '4': 1, '5': 1, '10': 'exchangeRate'},
     const {'1': 'causes_rewards_amount', '3': 20, '4': 1, '5': 4, '10': 'causesRewardsAmount'},
+    const {'1': 'karma_rewards_count', '3': 21, '4': 1, '5': 4, '10': 'karmaRewardsCount'},
+    const {'1': 'karma_rewards_amount', '3': 22, '4': 1, '5': 4, '10': 'karmaRewardsAmount'},
   ],
 };
 
 /// Descriptor for `BlockchainStats`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List blockchainStatsDescriptor = $convert.base64Decode('Cg9CbG9ja2NoYWluU3RhdHMSJgoPbGFzdF9ibG9ja190aW1lGAEgASgEUg1sYXN0QmxvY2tUaW1lEh0KCnRpcF9oZWlnaHQYAiABKARSCXRpcEhlaWdodBItChJ0cmFuc2FjdGlvbnNfY291bnQYAyABKARSEXRyYW5zYWN0aW9uc0NvdW50Ej4KG3BheW1lbnRzX3RyYW5zYWN0aW9uc19jb3VudBgEIAEoBFIZcGF5bWVudHNUcmFuc2FjdGlvbnNDb3VudBJICiBhcHByZWNpYXRpb25zX3RyYW5zYWN0aW9uc19jb3VudBgFIAEoBFIeYXBwcmVjaWF0aW9uc1RyYW5zYWN0aW9uc0NvdW50Eh8KC3VzZXJzX2NvdW50GAYgASgEUgp1c2Vyc0NvdW50Eh8KC2ZlZXNfYW1vdW50GAcgASgEUgpmZWVzQW1vdW50EiMKDW1pbnRlZF9hbW91bnQYCCABKARSDG1pbnRlZEFtb3VudBIgCgtjaXJjdWxhdGlvbhgJIAEoBFILY2lyY3VsYXRpb24SJAoOZmVlX3N1YnNfY291bnQYCiABKARSDGZlZVN1YnNDb3VudBImCg9mZWVfc3Vic19hbW91bnQYCyABKARSDWZlZVN1YnNBbW91bnQSMAoUc2lnbnVwX3Jld2FyZHNfY291bnQYDCABKARSEnNpZ251cFJld2FyZHNDb3VudBIyChVzaWdudXBfcmV3YXJkc19hbW91bnQYDSABKARSE3NpZ251cFJld2FyZHNBbW91bnQSNAoWcmVmZXJyYWxfcmV3YXJkc19jb3VudBgOIAEoBFIUcmVmZXJyYWxSZXdhcmRzQ291bnQSNgoXcmVmZXJyYWxfcmV3YXJkc19hbW91bnQYDyABKARSFXJlZmVycmFsUmV3YXJkc0Ftb3VudBI2Chd2YWxpZGF0b3JfcmV3YXJkc19jb3VudBgQIAEoBFIVdmFsaWRhdG9yUmV3YXJkc0NvdW50EjgKGHZhbGlkYXRvcl9yZXdhcmRzX2Ftb3VudBgRIAEoBFIWdmFsaWRhdG9yUmV3YXJkc0Ftb3VudBJDCh51cGRhdGVfdXNlcl90cmFuc2FjdGlvbnNfY291bnQYEiABKARSG3VwZGF0ZVVzZXJUcmFuc2FjdGlvbnNDb3VudBIjCg1leGNoYW5nZV9yYXRlGBMgASgBUgxleGNoYW5nZVJhdGUSMgoVY2F1c2VzX3Jld2FyZHNfYW1vdW50GBQgASgEUhNjYXVzZXNSZXdhcmRzQW1vdW50');
+final $typed_data.Uint8List blockchainStatsDescriptor = $convert.base64Decode('Cg9CbG9ja2NoYWluU3RhdHMSJgoPbGFzdF9ibG9ja190aW1lGAEgASgEUg1sYXN0QmxvY2tUaW1lEh0KCnRpcF9oZWlnaHQYAiABKARSCXRpcEhlaWdodBItChJ0cmFuc2FjdGlvbnNfY291bnQYAyABKARSEXRyYW5zYWN0aW9uc0NvdW50Ej4KG3BheW1lbnRzX3RyYW5zYWN0aW9uc19jb3VudBgEIAEoBFIZcGF5bWVudHNUcmFuc2FjdGlvbnNDb3VudBJICiBhcHByZWNpYXRpb25zX3RyYW5zYWN0aW9uc19jb3VudBgFIAEoBFIeYXBwcmVjaWF0aW9uc1RyYW5zYWN0aW9uc0NvdW50Eh8KC3VzZXJzX2NvdW50GAYgASgEUgp1c2Vyc0NvdW50Eh8KC2ZlZXNfYW1vdW50GAcgASgEUgpmZWVzQW1vdW50EiMKDW1pbnRlZF9hbW91bnQYCCABKARSDG1pbnRlZEFtb3VudBIgCgtjaXJjdWxhdGlvbhgJIAEoBFILY2lyY3VsYXRpb24SJAoOZmVlX3N1YnNfY291bnQYCiABKARSDGZlZVN1YnNDb3VudBImCg9mZWVfc3Vic19hbW91bnQYCyABKARSDWZlZVN1YnNBbW91bnQSMAoUc2lnbnVwX3Jld2FyZHNfY291bnQYDCABKARSEnNpZ251cFJld2FyZHNDb3VudBIyChVzaWdudXBfcmV3YXJkc19hbW91bnQYDSABKARSE3NpZ251cFJld2FyZHNBbW91bnQSNAoWcmVmZXJyYWxfcmV3YXJkc19jb3VudBgOIAEoBFIUcmVmZXJyYWxSZXdhcmRzQ291bnQSNgoXcmVmZXJyYWxfcmV3YXJkc19hbW91bnQYDyABKARSFXJlZmVycmFsUmV3YXJkc0Ftb3VudBI2Chd2YWxpZGF0b3JfcmV3YXJkc19jb3VudBgQIAEoBFIVdmFsaWRhdG9yUmV3YXJkc0NvdW50EjgKGHZhbGlkYXRvcl9yZXdhcmRzX2Ftb3VudBgRIAEoBFIWdmFsaWRhdG9yUmV3YXJkc0Ftb3VudBJDCh51cGRhdGVfdXNlcl90cmFuc2FjdGlvbnNfY291bnQYEiABKARSG3VwZGF0ZVVzZXJUcmFuc2FjdGlvbnNDb3VudBIjCg1leGNoYW5nZV9yYXRlGBMgASgBUgxleGNoYW5nZVJhdGUSMgoVY2F1c2VzX3Jld2FyZHNfYW1vdW50GBQgASgEUhNjYXVzZXNSZXdhcmRzQW1vdW50Ei4KE2thcm1hX3Jld2FyZHNfY291bnQYFSABKARSEWthcm1hUmV3YXJkc0NvdW50EjAKFGthcm1hX3Jld2FyZHNfYW1vdW50GBYgASgEUhJrYXJtYVJld2FyZHNBbW91bnQ=');
 @$core.Deprecated('Use blockEventDescriptor instead')
 const BlockEvent$json = const {
   '1': 'BlockEvent',
@@ -500,3 +528,39 @@ const BlockEvent$json = const {
 
 /// Descriptor for `BlockEvent`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List blockEventDescriptor = $convert.base64Decode('CgpCbG9ja0V2ZW50EhwKCXRpbWVzdGFtcBgBIAEoBFIJdGltZXN0YW1wEhYKBmhlaWdodBgCIAEoBFIGaGVpZ2h0Eh0KCmJsb2NrX2hhc2gYAyABKAxSCWJsb2NrSGFzaBJYChN0cmFuc2FjdGlvbnNfZXZlbnRzGAQgAygLMicua2FybWFfY29pbi5jb3JlX3R5cGVzLlRyYW5zYWN0aW9uRXZlbnRSEnRyYW5zYWN0aW9uc0V2ZW50cxIjCg1zaWdudXBzX2NvdW50GAUgASgEUgxzaWdudXBzQ291bnQSJQoOcGF5bWVudHNfY291bnQYBiABKARSDXBheW1lbnRzQ291bnQSLwoTYXBwcmVjaWF0aW9uc19jb3VudBgHIAEoBFISYXBwcmVjaWF0aW9uc0NvdW50EiwKEnVzZXJfdXBkYXRlc19jb3VudBgIIAEoBFIQdXNlclVwZGF0ZXNDb3VudBIfCgtmZWVzX2Ftb3VudBgJIAEoBFIKZmVlc0Ftb3VudBIyChVzaWdudXBfcmV3YXJkc19hbW91bnQYCiABKARSE3NpZ251cFJld2FyZHNBbW91bnQSNgoXcmVmZXJyYWxfcmV3YXJkc19hbW91bnQYCyABKARSFXJlZmVycmFsUmV3YXJkc0Ftb3VudBI0ChZyZWZlcnJhbF9yZXdhcmRzX2NvdW50GAwgASgEUhRyZWZlcnJhbFJld2FyZHNDb3VudBIWCgZyZXdhcmQYDSABKARSBnJld2FyZA==');
+@$core.Deprecated('Use genesisDataDescriptor instead')
+const GenesisData$json = const {
+  '1': 'GenesisData',
+  '2': const [
+    const {'1': 'net_id', '3': 1, '4': 1, '5': 13, '10': 'netId'},
+    const {'1': 'net_name', '3': 2, '4': 1, '5': 9, '10': 'netName'},
+    const {'1': 'genesis_time', '3': 3, '4': 1, '5': 4, '10': 'genesisTime'},
+    const {'1': 'signup_reward_phase1_alloc', '3': 4, '4': 1, '5': 4, '10': 'signupRewardPhase1Alloc'},
+    const {'1': 'signup_reward_phase2_alloc', '3': 5, '4': 1, '5': 4, '10': 'signupRewardPhase2Alloc'},
+    const {'1': 'signup_reward_phase1_amount', '3': 6, '4': 1, '5': 4, '10': 'signupRewardPhase1Amount'},
+    const {'1': 'signup_reward_phase2_amount', '3': 7, '4': 1, '5': 4, '10': 'signupRewardPhase2Amount'},
+    const {'1': 'signup_reward_phase3_start', '3': 8, '4': 1, '5': 4, '10': 'signupRewardPhase3Start'},
+    const {'1': 'referral_reward_phase1_alloc', '3': 9, '4': 1, '5': 4, '10': 'referralRewardPhase1Alloc'},
+    const {'1': 'referral_reward_phase2_alloc', '3': 10, '4': 1, '5': 4, '10': 'referralRewardPhase2Alloc'},
+    const {'1': 'referral_reward_phase1_amount', '3': 11, '4': 1, '5': 4, '10': 'referralRewardPhase1Amount'},
+    const {'1': 'referral_reward_phase2_amount', '3': 12, '4': 1, '5': 4, '10': 'referralRewardPhase2Amount'},
+    const {'1': 'tx_fee_subsidy_max_per_user', '3': 13, '4': 1, '5': 4, '10': 'txFeeSubsidyMaxPerUser'},
+    const {'1': 'tx_fee_subsidies_alloc', '3': 14, '4': 1, '5': 4, '10': 'txFeeSubsidiesAlloc'},
+    const {'1': 'tx_fee_subsidy_max_amount', '3': 15, '4': 1, '5': 4, '10': 'txFeeSubsidyMaxAmount'},
+    const {'1': 'block_reward_amount', '3': 16, '4': 1, '5': 4, '10': 'blockRewardAmount'},
+    const {'1': 'block_reward_last_block', '3': 17, '4': 1, '5': 4, '10': 'blockRewardLastBlock'},
+    const {'1': 'karma_reward_amount', '3': 18, '4': 1, '5': 4, '10': 'karmaRewardAmount'},
+    const {'1': 'karma_reward_alloc', '3': 19, '4': 1, '5': 4, '10': 'karmaRewardAlloc'},
+    const {'1': 'karma_reward_top_n_users', '3': 20, '4': 1, '5': 4, '10': 'karmaRewardTopNUsers'},
+    const {'1': 'karma_rewards_eligibility', '3': 21, '4': 1, '5': 4, '10': 'karmaRewardsEligibility'},
+    const {'1': 'karma_rewards_period_hours', '3': 22, '4': 1, '5': 4, '10': 'karmaRewardsPeriodHours'},
+    const {'1': 'treasury_premint_amount', '3': 23, '4': 1, '5': 4, '10': 'treasuryPremintAmount'},
+    const {'1': 'treasury_account_id', '3': 24, '4': 1, '5': 9, '10': 'treasuryAccountId'},
+    const {'1': 'treasury_account_name', '3': 25, '4': 1, '5': 9, '10': 'treasuryAccountName'},
+    const {'1': 'char_traits', '3': 26, '4': 3, '5': 11, '6': '.karma_coin.core_types.CharTrait', '10': 'charTraits'},
+    const {'1': 'verifiers', '3': 27, '4': 3, '5': 11, '6': '.karma_coin.core_types.PhoneVerifier', '10': 'verifiers'},
+  ],
+};
+
+/// Descriptor for `GenesisData`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List genesisDataDescriptor = $convert.base64Decode('CgtHZW5lc2lzRGF0YRIVCgZuZXRfaWQYASABKA1SBW5ldElkEhkKCG5ldF9uYW1lGAIgASgJUgduZXROYW1lEiEKDGdlbmVzaXNfdGltZRgDIAEoBFILZ2VuZXNpc1RpbWUSOwoac2lnbnVwX3Jld2FyZF9waGFzZTFfYWxsb2MYBCABKARSF3NpZ251cFJld2FyZFBoYXNlMUFsbG9jEjsKGnNpZ251cF9yZXdhcmRfcGhhc2UyX2FsbG9jGAUgASgEUhdzaWdudXBSZXdhcmRQaGFzZTJBbGxvYxI9ChtzaWdudXBfcmV3YXJkX3BoYXNlMV9hbW91bnQYBiABKARSGHNpZ251cFJld2FyZFBoYXNlMUFtb3VudBI9ChtzaWdudXBfcmV3YXJkX3BoYXNlMl9hbW91bnQYByABKARSGHNpZ251cFJld2FyZFBoYXNlMkFtb3VudBI7ChpzaWdudXBfcmV3YXJkX3BoYXNlM19zdGFydBgIIAEoBFIXc2lnbnVwUmV3YXJkUGhhc2UzU3RhcnQSPwoccmVmZXJyYWxfcmV3YXJkX3BoYXNlMV9hbGxvYxgJIAEoBFIZcmVmZXJyYWxSZXdhcmRQaGFzZTFBbGxvYxI/ChxyZWZlcnJhbF9yZXdhcmRfcGhhc2UyX2FsbG9jGAogASgEUhlyZWZlcnJhbFJld2FyZFBoYXNlMkFsbG9jEkEKHXJlZmVycmFsX3Jld2FyZF9waGFzZTFfYW1vdW50GAsgASgEUhpyZWZlcnJhbFJld2FyZFBoYXNlMUFtb3VudBJBCh1yZWZlcnJhbF9yZXdhcmRfcGhhc2UyX2Ftb3VudBgMIAEoBFIacmVmZXJyYWxSZXdhcmRQaGFzZTJBbW91bnQSOwobdHhfZmVlX3N1YnNpZHlfbWF4X3Blcl91c2VyGA0gASgEUhZ0eEZlZVN1YnNpZHlNYXhQZXJVc2VyEjMKFnR4X2ZlZV9zdWJzaWRpZXNfYWxsb2MYDiABKARSE3R4RmVlU3Vic2lkaWVzQWxsb2MSOAoZdHhfZmVlX3N1YnNpZHlfbWF4X2Ftb3VudBgPIAEoBFIVdHhGZWVTdWJzaWR5TWF4QW1vdW50Ei4KE2Jsb2NrX3Jld2FyZF9hbW91bnQYECABKARSEWJsb2NrUmV3YXJkQW1vdW50EjUKF2Jsb2NrX3Jld2FyZF9sYXN0X2Jsb2NrGBEgASgEUhRibG9ja1Jld2FyZExhc3RCbG9jaxIuChNrYXJtYV9yZXdhcmRfYW1vdW50GBIgASgEUhFrYXJtYVJld2FyZEFtb3VudBIsChJrYXJtYV9yZXdhcmRfYWxsb2MYEyABKARSEGthcm1hUmV3YXJkQWxsb2MSNgoYa2FybWFfcmV3YXJkX3RvcF9uX3VzZXJzGBQgASgEUhRrYXJtYVJld2FyZFRvcE5Vc2VycxI6ChlrYXJtYV9yZXdhcmRzX2VsaWdpYmlsaXR5GBUgASgEUhdrYXJtYVJld2FyZHNFbGlnaWJpbGl0eRI7ChprYXJtYV9yZXdhcmRzX3BlcmlvZF9ob3VycxgWIAEoBFIXa2FybWFSZXdhcmRzUGVyaW9kSG91cnMSNgoXdHJlYXN1cnlfcHJlbWludF9hbW91bnQYFyABKARSFXRyZWFzdXJ5UHJlbWludEFtb3VudBIuChN0cmVhc3VyeV9hY2NvdW50X2lkGBggASgJUhF0cmVhc3VyeUFjY291bnRJZBIyChV0cmVhc3VyeV9hY2NvdW50X25hbWUYGSABKAlSE3RyZWFzdXJ5QWNjb3VudE5hbWUSQQoLY2hhcl90cmFpdHMYGiADKAsyIC5rYXJtYV9jb2luLmNvcmVfdHlwZXMuQ2hhclRyYWl0UgpjaGFyVHJhaXRzEkIKCXZlcmlmaWVycxgbIAMoCzIkLmthcm1hX2NvaW4uY29yZV90eXBlcy5QaG9uZVZlcmlmaWVyUgl2ZXJpZmllcnM=');

@@ -12,6 +12,7 @@ const _twitterUrl = 'https://twitter.com/TeamKarmaCoin';
 const _tgramUrl = 'https://t.me/karmacoinapp/13';
 const _linkedInUrl = 'https://www.linkedin.com/company/karmacoin';
 const _blogUrl = 'https://connect.karmaco.in';
+const _discordUrl = 'http://bit.ly/3z9fvNe';
 
 class ActionsScreen extends StatefulWidget {
   const ActionsScreen({super.key});
@@ -187,6 +188,11 @@ class _ActionsScreenState extends State<ActionsScreen> {
             title: const Text('Twitter'),
             leading: const FaIcon(FontAwesomeIcons.twitter, size: 24),
             onTap: () async => {await openUrl(_twitterUrl)},
+          ),
+          CupertinoListTile.notched(
+            title: const Text('Discord'),
+            leading: const FaIcon(FontAwesomeIcons.discord, size: 24),
+            onTap: () async => {await openUrl(_discordUrl)},
           ),
           CupertinoListTile.notched(
             title: const Text('Telegram'),
