@@ -102,10 +102,13 @@ final $typed_data.Uint8List getTransactionsFromHashesResponseDescriptor = $conve
 @$core.Deprecated('Use getAllUsersRequestDescriptor instead')
 const GetAllUsersRequest$json = const {
   '1': 'GetAllUsersRequest',
+  '2': const [
+    const {'1': 'community_id', '3': 1, '4': 1, '5': 13, '10': 'communityId'},
+  ],
 };
 
 /// Descriptor for `GetAllUsersRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List getAllUsersRequestDescriptor = $convert.base64Decode('ChJHZXRBbGxVc2Vyc1JlcXVlc3Q=');
+final $typed_data.Uint8List getAllUsersRequestDescriptor = $convert.base64Decode('ChJHZXRBbGxVc2Vyc1JlcXVlc3QSIQoMY29tbXVuaXR5X2lkGAEgASgNUgtjb21tdW5pdHlJZA==');
 @$core.Deprecated('Use getAllUsersResponseDescriptor instead')
 const GetAllUsersResponse$json = const {
   '1': 'GetAllUsersResponse',

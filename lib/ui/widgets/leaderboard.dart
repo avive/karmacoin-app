@@ -195,6 +195,10 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
           CupertinoSliverNavigationBar(
               padding: EdgeInsetsDirectional.zero,
               backgroundColor: const Color.fromARGB(255, 88, 40, 138),
+              border: const Border(
+                bottom: BorderSide(
+                    color: Color.fromARGB(255, 255, 184, 0), width: 2),
+              ),
               leading: Container(),
               trailing: adjustNavigationBarButtonPosition(
                   CupertinoButton(

@@ -424,11 +424,20 @@ class GetTransactionsFromHashesResponse extends $pb.GeneratedMessage {
 
 class GetAllUsersRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GetAllUsersRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'karma_coin.api'), createEmptyInstance: create)
+    ..a<$core.int>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'communityId', $pb.PbFieldType.OU3)
     ..hasRequiredFields = false
   ;
 
   GetAllUsersRequest._() : super();
-  factory GetAllUsersRequest() => create();
+  factory GetAllUsersRequest({
+    $core.int? communityId,
+  }) {
+    final _result = create();
+    if (communityId != null) {
+      _result.communityId = communityId;
+    }
+    return _result;
+  }
   factory GetAllUsersRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory GetAllUsersRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
   @$core.Deprecated(
@@ -449,6 +458,15 @@ class GetAllUsersRequest extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static GetAllUsersRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GetAllUsersRequest>(create);
   static GetAllUsersRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.int get communityId => $_getIZ(0);
+  @$pb.TagNumber(1)
+  set communityId($core.int v) { $_setUnsignedInt32(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasCommunityId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearCommunityId() => clearField(1);
 }
 
 class GetAllUsersResponse extends $pb.GeneratedMessage {

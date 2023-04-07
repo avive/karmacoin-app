@@ -216,11 +216,12 @@ const Contact$json = const {
     const {'1': 'account_id', '3': 2, '4': 1, '5': 11, '6': '.karma_coin.core_types.AccountId', '10': 'accountId'},
     const {'1': 'mobile_number', '3': 3, '4': 1, '5': 11, '6': '.karma_coin.core_types.MobileNumber', '10': 'mobileNumber'},
     const {'1': 'community_memberships', '3': 4, '4': 3, '5': 11, '6': '.karma_coin.core_types.CommunityMembership', '10': 'communityMemberships'},
+    const {'1': 'trait_scores', '3': 5, '4': 3, '5': 11, '6': '.karma_coin.core_types.TraitScore', '10': 'traitScores'},
   ],
 };
 
 /// Descriptor for `Contact`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List contactDescriptor = $convert.base64Decode('CgdDb250YWN0EhsKCXVzZXJfbmFtZRgBIAEoCVIIdXNlck5hbWUSPwoKYWNjb3VudF9pZBgCIAEoCzIgLmthcm1hX2NvaW4uY29yZV90eXBlcy5BY2NvdW50SWRSCWFjY291bnRJZBJICg1tb2JpbGVfbnVtYmVyGAMgASgLMiMua2FybWFfY29pbi5jb3JlX3R5cGVzLk1vYmlsZU51bWJlclIMbW9iaWxlTnVtYmVyEl8KFWNvbW11bml0eV9tZW1iZXJzaGlwcxgEIAMoCzIqLmthcm1hX2NvaW4uY29yZV90eXBlcy5Db21tdW5pdHlNZW1iZXJzaGlwUhRjb21tdW5pdHlNZW1iZXJzaGlwcw==');
+final $typed_data.Uint8List contactDescriptor = $convert.base64Decode('CgdDb250YWN0EhsKCXVzZXJfbmFtZRgBIAEoCVIIdXNlck5hbWUSPwoKYWNjb3VudF9pZBgCIAEoCzIgLmthcm1hX2NvaW4uY29yZV90eXBlcy5BY2NvdW50SWRSCWFjY291bnRJZBJICg1tb2JpbGVfbnVtYmVyGAMgASgLMiMua2FybWFfY29pbi5jb3JlX3R5cGVzLk1vYmlsZU51bWJlclIMbW9iaWxlTnVtYmVyEl8KFWNvbW11bml0eV9tZW1iZXJzaGlwcxgEIAMoCzIqLmthcm1hX2NvaW4uY29yZV90eXBlcy5Db21tdW5pdHlNZW1iZXJzaGlwUhRjb21tdW5pdHlNZW1iZXJzaGlwcxJECgx0cmFpdF9zY29yZXMYBSADKAsyIS5rYXJtYV9jb2luLmNvcmVfdHlwZXMuVHJhaXRTY29yZVILdHJhaXRTY29yZXM=');
 @$core.Deprecated('Use communityMembershipDescriptor instead')
 const CommunityMembership$json = const {
   '1': 'CommunityMembership',

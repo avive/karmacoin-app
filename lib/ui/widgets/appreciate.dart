@@ -1,6 +1,8 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/data/genesis_config.dart';
+import 'package:karma_coin/data/phone_number_formatter.dart';
+import 'package:karma_coin/services/api/types.pb.dart' as api_types;
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +36,8 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   bool isCountryChipPersistent = false;
   bool withLabel = true;
   bool useRtl = false;
+  bool isUsercommunityAdmin = false;
+  api_types.Contact? contact;
 
   // country selector ux
   late CountrySelectorNavigator selectorNavigator;
@@ -56,6 +60,9 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     } else {
       traitsPicker = TraitsPickerWidget(null,
           GenesisConfig.communityPersonalityTraits[widget.communityId]!, 6);
+
+      isUsercommunityAdmin = accountLogic.karmaCoinUser.value!
+          .isCommunityAdmin(widget.communityId);
     }
 
     selectorNavigator = const CountrySelectorNavigator.draggableBottomSheet();
@@ -63,8 +70,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     phoneController =
         PhoneController(PhoneNumber(isoCode: code, nsn: defaultNumber));
 
-    if (PlatformInfo
-        .isMobile /*!kIsWeb && (PlatformInfo.isIOS || PlatformInfo.isAndroid)*/) {
+    if (PlatformInfo.isMobile) {
       // contact picker only available in native mobile iOs or Android
       _contactPicker = contact_picker.FlutterContactPicker();
     }
@@ -234,6 +240,16 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     context.pop();
   }
 
+  Border? _getNavBarBorder() {
+    if (widget.communityId == 0) {
+      return const Border(
+        bottom: BorderSide(color: Color.fromARGB(255, 255, 184, 0), width: 2),
+      );
+    } else {
+      return null;
+    }
+  }
+
   Color _getNavBarBackgroundColor() {
     if (widget.communityId == 0) {
       return const Color.fromARGB(
@@ -263,12 +279,156 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     }
   }
 
-  String _getSendToTitle() {
-    if (widget.communityId == 1) {
-      return 'Receiver\'s  phone number';
-    } else {
-      return 'Send to';
+  Widget _getCommunityMemberInfo() {
+    String phoneNumber = '+${contact!.mobileNumber.number.formatPhoneNumber()}';
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Icon(CupertinoIcons.person, size: 28),
+        const SizedBox(
+          width: 6,
+        ),
+        Text(
+          '${contact!.userName} $phoneNumber',
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w300,
+          ),
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _getBodyWidget(BuildContext context) {
+    List<Widget> widgets = [];
+
+    if (widget.communityId == 0) {
+      widgets.add(Text('Send to',
+          style: CupertinoTheme.of(context).textTheme.pickerTextStyle));
     }
+
+    if (widget.communityId == 0 || isUsercommunityAdmin) {
+      // don't show phone picker in context of community when user is not admin
+      // as he can ony appreciate other community members
+      widgets.add(Padding(
+        padding: const EdgeInsets.only(left: 16, right: 16),
+        child: Material(
+          child: PhoneFormField(
+            controller: phoneController,
+            flagSize: 32,
+            shouldFormat: shouldFormat && !useRtl,
+            autofocus: false,
+            autofillHints: const [AutofillHints.telephoneNumber],
+            countrySelectorNavigator: selectorNavigator,
+            defaultCountry: IsoCode.US,
+            validator: _getValidator(),
+            decoration: InputDecoration(
+              // fillColor: CupertinoColors.white,
+              label: null,
+              border: outlineBorder
+                  ? const OutlineInputBorder()
+                  : const UnderlineInputBorder(),
+              hintText: withLabel ? '' : 'Phone',
+            ),
+          ),
+        ),
+      ));
+      widgets.add(_getContactsRow(context));
+    } else {
+      // community member picker for community member
+      if (contact != null) {
+        widgets.add(_getCommunityMemberInfo());
+      }
+
+      widgets.add(
+        Column(children: [
+          // karma coin contacts
+          CupertinoButton(
+            padding: const EdgeInsets.only(),
+            onPressed: () {
+              // only show contacts in a community
+              int communityId = widget.communityId;
+
+              Navigator.of(context).push(CupertinoPageRoute(
+                  fullscreenDialog: true,
+                  builder: ((context) => KarmaCoinUserSelector(
+                      title: 'Members',
+                      communityId: communityId,
+                      setPhoneNumberCallback: setPhoneNumberCallback))));
+            },
+            child: Text(
+              'A community Member',
+              style: CupertinoTheme.of(context).textTheme.actionTextStyle.merge(
+                    const TextStyle(fontSize: 20),
+                  ),
+            ),
+          )
+        ]),
+      );
+    }
+
+    widgets.add(traitsPicker);
+
+    widgets.add(Column(
+      children: [
+        Text('Amount to send',
+            style: CupertinoTheme.of(context).textTheme.pickerTextStyle),
+        CupertinoButton(
+          onPressed: () {
+            Navigator.of(context)
+                .restorablePush(_paymentAmountInputModelBuilder);
+          },
+          child: ValueListenableBuilder<Int64>(
+              valueListenable: appState.kCentsAmount,
+              builder: (context, value, child) => Text(
+                    KarmaCoinAmountFormatter.format(value),
+                    style: CupertinoTheme.of(context)
+                        .textTheme
+                        .actionTextStyle
+                        .merge(
+                          const TextStyle(fontSize: 15),
+                        ),
+                  )),
+        ),
+        const SizedBox(height: 6),
+        Text('Network fee',
+            style: CupertinoTheme.of(context).textTheme.pickerTextStyle),
+        CupertinoButton(
+          onPressed: () {
+            // todo: show dedicated fee picker - kcents only
+            Navigator.of(context).restorablePush(_feeAmountInputModelBuilder);
+          },
+          child: ValueListenableBuilder<Int64>(
+              valueListenable: appState.kCentsFeeAmount,
+              builder: (context, value, child) => Text(
+                    KarmaCoinAmountFormatter.format(value),
+                    style: CupertinoTheme.of(context)
+                        .textTheme
+                        .actionTextStyle
+                        .merge(
+                          const TextStyle(fontSize: 15),
+                        ),
+                  )),
+        ),
+        //SizedBox(height: 2),
+        CupertinoButton(
+          child: Text(
+            'Add a thank you note',
+            style: CupertinoTheme.of(context).textTheme.actionTextStyle.merge(
+                  const TextStyle(fontSize: 15),
+                ),
+          ),
+          onPressed: () {
+            // todo: show personal note taker...
+          },
+        ),
+      ],
+    ));
+
+    widgets.add(_getAppreciateButton(context));
+    widgets.add(const SizedBox(height: 1));
+
+    return widgets;
   }
 
   @override
@@ -280,6 +440,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
           CupertinoSliverNavigationBar(
             padding: EdgeInsetsDirectional.zero,
             backgroundColor: _getNavBarBackgroundColor(),
+            border: _getNavBarBorder(),
             leading: Container(),
             trailing: adjustNavigationBarButtonPosition(
                 CupertinoButton(
@@ -299,108 +460,10 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
               padding:
                   const EdgeInsets.only(left: 0, right: 0, top: 6, bottom: 6),
               child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(_getSendToTitle(),
-                        style: CupertinoTheme.of(context)
-                            .textTheme
-                            .pickerTextStyle),
-                    // todo: pick theme from app settings
-                    Padding(
-                      padding: const EdgeInsets.only(left: 16, right: 16),
-                      child: Material(
-                        child: PhoneFormField(
-                          controller: phoneController,
-                          flagSize: 32,
-                          shouldFormat: shouldFormat && !useRtl,
-                          autofocus: false,
-                          autofillHints: const [AutofillHints.telephoneNumber],
-                          countrySelectorNavigator: selectorNavigator,
-                          defaultCountry: IsoCode.US,
-                          validator: _getValidator(),
-                          decoration: InputDecoration(
-                            // fillColor: CupertinoColors.white,
-                            label: null,
-                            border: outlineBorder
-                                ? const OutlineInputBorder()
-                                : const UnderlineInputBorder(),
-                            hintText: withLabel ? '' : 'Phone',
-                          ),
-                        ),
-                      ),
-                    ),
-                    _getContactsRow(context),
-                    //const SizedBox(height: 6),
-                    traitsPicker,
-                    //const SizedBox(height: 6),
-                    Column(
-                      children: [
-                        Text('Amount to send',
-                            style: CupertinoTheme.of(context)
-                                .textTheme
-                                .pickerTextStyle),
-                        CupertinoButton(
-                          onPressed: () {
-                            Navigator.of(context).restorablePush(
-                                _paymentAmountInputModelBuilder);
-                          },
-                          child: ValueListenableBuilder<Int64>(
-                              valueListenable: appState.kCentsAmount,
-                              builder: (context, value, child) => Text(
-                                    KarmaCoinAmountFormatter.format(value),
-                                    style: CupertinoTheme.of(context)
-                                        .textTheme
-                                        .actionTextStyle
-                                        .merge(
-                                          const TextStyle(fontSize: 15),
-                                        ),
-                                  )),
-                        ),
-                        const SizedBox(height: 6),
-                        Text('Network fee',
-                            style: CupertinoTheme.of(context)
-                                .textTheme
-                                .pickerTextStyle),
-                        CupertinoButton(
-                          onPressed: () {
-                            // todo: show dedicated fee picker - kcents only
-                            Navigator.of(context)
-                                .restorablePush(_feeAmountInputModelBuilder);
-                          },
-                          child: ValueListenableBuilder<Int64>(
-                              valueListenable: appState.kCentsFeeAmount,
-                              builder: (context, value, child) => Text(
-                                    KarmaCoinAmountFormatter.format(value),
-                                    style: CupertinoTheme.of(context)
-                                        .textTheme
-                                        .actionTextStyle
-                                        .merge(
-                                          const TextStyle(fontSize: 15),
-                                        ),
-                                  )),
-                        ),
-                        //SizedBox(height: 2),
-                        CupertinoButton(
-                          child: Text(
-                            'Add a thank you note',
-                            style: CupertinoTheme.of(context)
-                                .textTheme
-                                .actionTextStyle
-                                .merge(
-                                  const TextStyle(fontSize: 15),
-                                ),
-                          ),
-                          onPressed: () {
-                            // todo: show personal note taker...
-                          },
-                        ),
-                      ],
-                    ),
-                    //SizedBox(height: 6),
-                    _getAppreciateButton(context),
-                    const SizedBox(height: 1),
-                  ]),
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: _getBodyWidget(context),
+              ),
             ),
           ),
         ],
@@ -505,10 +568,11 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     return Row(mainAxisAlignment: MainAxisAlignment.center, children: widgets);
   }
 
-  void setPhoneNumberCallback(String number) {
-    debugPrint('setPhoneNumberCallback: $number');
+  void setPhoneNumberCallback(api_types.Contact selectedContact) {
+    debugPrint('setPhoneNumberCallback: $selectedContact');
     setState(() {
-      phoneController.value = PhoneNumber.parse(number);
+      contact = selectedContact;
+      phoneController.value = PhoneNumber.parse(contact!.mobileNumber.number);
     });
   }
 

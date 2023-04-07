@@ -433,8 +433,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   bottom: BorderSide(
                       color: Color.fromARGB(255, 255, 184, 0), width: 2),
                 ),
-
-                backgroundColor: const Color.fromARGB(255, 88, 40, 138),
+                backgroundColor: purple,
                 // backgroundColor: CupertinoColors.activeOrange,
                 leading: _getCommunitiesPullDownMenuItems(context),
                 trailing: adjustNavigationBarButtonPosition(

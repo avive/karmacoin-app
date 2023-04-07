@@ -659,6 +659,7 @@ class Contact extends $pb.GeneratedMessage {
     ..aOM<AccountId>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'accountId', subBuilder: AccountId.create)
     ..aOM<MobileNumber>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'mobileNumber', subBuilder: MobileNumber.create)
     ..pc<CommunityMembership>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'communityMemberships', $pb.PbFieldType.PM, subBuilder: CommunityMembership.create)
+    ..pc<TraitScore>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'traitScores', $pb.PbFieldType.PM, subBuilder: TraitScore.create)
     ..hasRequiredFields = false
   ;
 
@@ -668,6 +669,7 @@ class Contact extends $pb.GeneratedMessage {
     AccountId? accountId,
     MobileNumber? mobileNumber,
     $core.Iterable<CommunityMembership>? communityMemberships,
+    $core.Iterable<TraitScore>? traitScores,
   }) {
     final _result = create();
     if (userName != null) {
@@ -681,6 +683,9 @@ class Contact extends $pb.GeneratedMessage {
     }
     if (communityMemberships != null) {
       _result.communityMemberships.addAll(communityMemberships);
+    }
+    if (traitScores != null) {
+      _result.traitScores.addAll(traitScores);
     }
     return _result;
   }
@@ -738,6 +743,9 @@ class Contact extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(4)
   $core.List<CommunityMembership> get communityMemberships => $_getList(3);
+
+  @$pb.TagNumber(5)
+  $core.List<TraitScore> get traitScores => $_getList(4);
 }
 
 class CommunityMembership extends $pb.GeneratedMessage {

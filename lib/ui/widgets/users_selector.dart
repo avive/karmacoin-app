@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/phone_number_formatter.dart';
 import 'package:karma_coin/data/user.dart';
@@ -11,11 +12,15 @@ import 'package:status_alert/status_alert.dart';
 // Karma coin users selector
 class KarmaCoinUserSelector extends StatefulWidget {
   final int communityId;
+  final String title;
 
-  final Function(String)? setPhoneNumberCallback;
+  final Function(Contact)? setPhoneNumberCallback;
 
   const KarmaCoinUserSelector(
-      {super.key, this.communityId = 0, this.setPhoneNumberCallback});
+      {super.key,
+      this.communityId = 0,
+      this.setPhoneNumberCallback,
+      this.title = 'Karma Coin Users'});
 
   @override
   State<KarmaCoinUserSelector> createState() => _KarmaCoinUserSelectorState();
@@ -171,10 +176,49 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
           style: CupertinoTheme.of(context).textTheme.textStyle),
       leading: const Icon(CupertinoIcons.person, size: 28),
       onTap: () {
-        widget.setPhoneNumberCallback?.call(contact.mobileNumber.number);
+        widget.setPhoneNumberCallback?.call(contact);
         context.pop();
       },
     );
+  }
+
+  Color _getNavBarBackgroundColor() {
+    if (widget.communityId == 0) {
+      return const Color.fromARGB(
+          255, 88, 40, 138); //CupertinoTheme.of(context).barBackgroundColor;
+    } else {
+      return GenesisConfig.communityColors[widget.communityId]!.backgroundColor;
+    }
+  }
+
+  TextStyle _getNavBarTitleStyle() {
+    if (widget.communityId == 0) {
+      return // CupertinoTheme.of(context).textTheme.navLargeTitleTextStyle;
+
+          CupertinoTheme.of(context)
+              .textTheme
+              .navLargeTitleTextStyle
+              .merge(const TextStyle(
+                color: Colors.white,
+                fontSize: 30,
+                fontWeight: FontWeight.w400,
+              ));
+    } else {
+      return CupertinoTheme.of(context).textTheme.navLargeTitleTextStyle.merge(
+          TextStyle(
+              color: GenesisConfig
+                  .communityColors[widget.communityId]!.textColor));
+    }
+  }
+
+  Border? _getNavBarBorder() {
+    if (widget.communityId == 0) {
+      return const Border(
+        bottom: BorderSide(color: Color.fromARGB(255, 255, 184, 0), width: 2),
+      );
+    } else {
+      return null;
+    }
   }
 
   @override
@@ -184,28 +228,26 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
       child: CustomScrollView(
         slivers: [
           CupertinoSliverNavigationBar(
-              padding: EdgeInsetsDirectional.zero,
-              backgroundColor: const Color.fromARGB(255, 88, 40, 138),
-              leading: Container(),
-              trailing: adjustNavigationBarButtonPosition(
-                  CupertinoButton(
-                    onPressed: () {
-                      context.pop();
-                    },
-                    child: const Icon(CupertinoIcons.xmark_circle, size: 24),
-                  ),
-                  0,
-                  0),
-              largeTitle: Center(
-                  child: Text('Karma Coin Users',
-                      style: CupertinoTheme.of(context)
-                          .textTheme
-                          .navLargeTitleTextStyle
-                          .merge(const TextStyle(
-                            color: Colors.white,
-                            fontSize: 30,
-                            fontWeight: FontWeight.w400,
-                          ))))),
+            padding: EdgeInsetsDirectional.zero,
+            backgroundColor: _getNavBarBackgroundColor(),
+            border: _getNavBarBorder(),
+            leading: Container(),
+            trailing: adjustNavigationBarButtonPosition(
+                CupertinoButton(
+                  onPressed: () {
+                    context.pop();
+                  },
+                  child: const Icon(CupertinoIcons.xmark_circle, size: 24),
+                ),
+                0,
+                0),
+            largeTitle: Center(
+              child: Text(
+                widget.title,
+                style: _getNavBarTitleStyle(),
+              ),
+            ),
+          ),
           SliverFillRemaining(
             hasScrollBody: true,
             child: _getBodyContent(context),

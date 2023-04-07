@@ -257,10 +257,10 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
           trailing: adjustNavigationBarButtonPosition(
               CupertinoButton(
                 onPressed: () => {},
-                child: const Icon(CupertinoIcons.ellipsis_circle, size: 24),
+                child: const Icon(CupertinoIcons.person_3, size: 38),
               ),
-              0,
-              0),
+              -6,
+              -14),
         ),
         child: SafeArea(child: _getWidgetForUser(context)),
       ),
