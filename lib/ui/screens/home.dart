@@ -389,9 +389,15 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               continue;
             }
 
+            String title = '${community.emoji} ${community.name}';
+
+            if (membership.isAdmin) {
+              title += ' 👑';
+            }
+
             items.add(
               PullDownMenuItem(
-                title: '${community.emoji} ${community.name}',
+                title: title,
                 onTap: () => context.push(
                     GenesisConfig.communityHomeScreenPaths[community.id]!),
               ),

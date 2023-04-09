@@ -1,3 +1,4 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/kc_user.dart';
@@ -10,6 +11,7 @@ import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/ui/widgets/pill.dart';
 import 'package:status_alert/status_alert.dart';
+import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 
 // Karma coin users selector
 class KarmaCoinUserSelector extends StatefulWidget {
@@ -161,6 +163,94 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
     );
   }
 
+  void _setAdmin(Contact contact) {
+    // todo: move this to kc_user
+    Future.delayed(Duration.zero, () async {
+      try {
+        KarmaCoinUser localUser = accountLogic.karmaCoinUser.value!;
+        ed.KeyPair keyPair = accountLogic.keyPair.value!;
+
+        SetCommunityAdminData data = SetCommunityAdminData(
+          communityId: widget.communityId,
+          targetAccountId: contact.accountId,
+          timestamp: Int64(DateTime.now().millisecondsSinceEpoch),
+          admin: true,
+        );
+
+        List<int> message = data.writeToBuffer();
+
+        Uint8List edSignature =
+            ed.sign(keyPair.privateKey, Uint8List.fromList(message));
+
+        SetCommunityAdminRequest request = SetCommunityAdminRequest(
+            fromAccountId: localUser.userData.accountId,
+            data: message,
+            signature: edSignature);
+
+        await api.apiServiceClient.setCommunityAdmin(request);
+        if (!mounted) return;
+        StatusAlert.show(context,
+            duration: const Duration(seconds: 4),
+            title: 'Allright',
+            subtitle: 'User is now an admin',
+            configuration: const IconConfiguration(icon: CupertinoIcons.smiley),
+            dismissOnBackgroundTap: true,
+            maxWidth: statusAlertWidth);
+      } catch (e) {
+        debugPrint('error setting admin: $e');
+        if (!mounted) return;
+        StatusAlert.show(context,
+            duration: const Duration(seconds: 4),
+            title: 'Ooops',
+            subtitle: 'Server error',
+            configuration: const IconConfiguration(
+                icon: CupertinoIcons.exclamationmark_triangle),
+            dismissOnBackgroundTap: true,
+            maxWidth: statusAlertWidth);
+        return;
+      }
+    });
+  }
+
+  void _showContextMenu(BuildContext conext, int index) {
+    debugPrint('showing context menu for index $index');
+
+    Contact contact = contacts![index];
+
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => CupertinoActionSheet(
+        title: Text(
+          'Make user ${contact.userName} a community admin?',
+          style: CupertinoTheme.of(context)
+              .textTheme
+              .dateTimePickerTextStyle
+              .merge(
+                const TextStyle(
+                  fontSize: 20,
+                ),
+              ),
+        ),
+        actions: <CupertinoActionSheetAction>[
+          CupertinoActionSheetAction(
+            onPressed: () {
+              _setAdmin(contact);
+              Navigator.pop(context);
+            },
+            child: const Text('Yes'),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            isDefaultAction: true,
+            child: const Text('No'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _getContactWidget(BuildContext context, Contact contact, int index) {
     // todo: add personality trait emojis from appre
     // show appreciations strip for user :-)
@@ -168,7 +258,20 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
     String displayName =
         '${contact.userName} ${getCommunitiesBadge(contact)}'.trim();
 
-    return CupertinoListTile.notched(
+    bool isAdmin = false;
+
+    for (CommunityMembership m in contact.communityMemberships) {
+      Community? c = GenesisConfig.communities[widget.communityId];
+      if (c == null) {
+        continue;
+      }
+
+      if (m.isAdmin) {
+        isAdmin = true;
+      }
+    }
+
+    Widget tile = CupertinoListTile.notched(
       key: Key(index.toString()),
       padding: const EdgeInsets.only(top: 0, bottom: 6, left: 14, right: 14),
       title: Column(
@@ -205,6 +308,13 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
             }
           : null,
     );
+
+    if (!isAdmin) {
+      return GestureDetector(
+          onLongPress: () => _showContextMenu(context, index), child: tile);
+    }
+
+    return tile;
   }
 
   Widget? _getAppreciationsStrip(BuildContext context, Contact contact) {
