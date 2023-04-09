@@ -218,9 +218,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
         child: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
-              CupertinoSliverNavigationBar(
-                largeTitle: Text(widget.title),
-              ),
+              kcNavBar(context, widget.title),
             ];
           },
           body: SafeArea(

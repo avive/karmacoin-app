@@ -8,6 +8,8 @@ import 'package:karma_coin/data/signed_transaction.dart';
 import 'package:karma_coin/services/api/types.pb.dart' as types;
 import 'package:karma_coin/ui/helpers/transactions.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:karma_coin/ui/helpers/widget_utils.dart';
+import 'package:karma_coin/ui/widgets/pill.dart';
 
 enum Group { received, sent }
 
@@ -79,11 +81,19 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
               CupertinoSliverNavigationBar(
-                largeTitle: const Text('Appreciations'),
+                largeTitle: Text(
+                  'Appreciations',
+                  textAlign: TextAlign.center,
+                  style: getNavBarTitleTextStyle(context),
+                ),
+                backgroundColor: kcPurple,
+                border: kcOrangeBorder,
                 middle: CupertinoSlidingSegmentedControl<Group>(
                   // Provide horizontal padding around the children.
                   // padding: const EdgeInsets.symmetric(horizontal: 12),
                   // This represents a currently selected segmented control.
+                  backgroundColor:
+                      CupertinoTheme.of(context).barBackgroundColor,
 
                   groupValue: _selectedSegment,
                   // Callback that sets the selected segmented control.
@@ -399,25 +409,11 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
                     .merge(const TextStyle(fontSize: 14))),
             const SizedBox(height: 6),
             // todo: change to pill widget
-            Container(
-              height: 18.0,
-              width: 80,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: getStatusDisplayColor(status),
-              ),
-              child: Center(
-                child: Text(
-                  getStatusDisplayString(status),
-                  style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                        const TextStyle(
-                          fontSize: 11,
-                          color: CupertinoColors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                ),
-              ),
+
+            Pill(
+              title: getStatusDisplayString(status),
+              count: 0,
+              backgroundColor: getStatusDisplayColor(status),
             ),
           ],
         ),

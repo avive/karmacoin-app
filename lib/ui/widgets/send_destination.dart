@@ -4,15 +4,17 @@ import 'package:karma_coin/logic/app_state.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 
 class SendDestination extends StatefulWidget {
-  const SendDestination({super.key});
+  @required
+  final PhoneController phoneController;
+
+  const SendDestination(Key? key, this.phoneController) : super(key: key);
 
   @override
   State<SendDestination> createState() => _SendDestinationState();
 }
 
 class _SendDestinationState extends State<SendDestination> {
-  Destination _selectedSegment = Destination.accountAddress;
-  late PhoneController _phoneController;
+  Destination _selectedSegment = Destination.phoneNumber;
   late TextEditingController _accountAddressTextController;
 
 // country selector ux
@@ -22,28 +24,26 @@ class _SendDestinationState extends State<SendDestination> {
   @override
   initState() {
     super.initState();
-    _selectedSegment = Destination.accountAddress;
+    _selectedSegment = Destination.phoneNumber;
 
     // some defaults for dev mode to reduce typing in interactive testing...
 
-    String defaultNumber = settingsLogic.devMode ? "549805380" : "";
-    IsoCode code = settingsLogic.devMode ? IsoCode.IL : IsoCode.US;
+    if (!settingsLogic.devMode) {
+      _accountAddressTextController = TextEditingController(
+          text:
+              "0xdf35d76f13a7d2b3ca949909737f211e1927132e210f676e8738fe1ba9dcfbb3");
+    } else {
+      _accountAddressTextController = TextEditingController();
+    }
 
-    _phoneController =
-        PhoneController(PhoneNumber(isoCode: code, nsn: defaultNumber));
-    _accountAddressTextController = TextEditingController(
-        text:
-            "0xdf35d76f13a7d2b3ca949909737f211e1927132e210f676e8738fe1ba9dcfbb3");
-
-    appState.sendDestination.value = Destination.accountAddress;
+    appState.sendDestination.value = Destination.phoneNumber;
     appState.sendDestinationAddress.value = _accountAddressTextController.text;
     appState.sendDestinationPhoneNumber.value =
-        '+${_phoneController.value!.countryCode}${_phoneController.value!.nsn}';
+        '+${widget.phoneController.value!.countryCode}${widget.phoneController.value!.nsn}';
   }
 
   @override
   void dispose() {
-    _phoneController.dispose();
     _accountAddressTextController.dispose();
     super.dispose();
   }
@@ -72,23 +72,17 @@ class _SendDestinationState extends State<SendDestination> {
             });
           },
           children: <Destination, Widget>{
-            Destination.accountAddress: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Text('Account',
-                  style: CupertinoTheme.of(context)
-                      .textTheme
-                      .textStyle
-                      .merge(const TextStyle(fontSize: 14))),
-            ),
             Destination.phoneNumber: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Text(
-                'Phone Number',
-                style: CupertinoTheme.of(context)
-                    .textTheme
-                    .textStyle
-                    .merge(const TextStyle(fontSize: 15)),
-              ),
+              child: Icon(CupertinoIcons.phone,
+                  size: 20,
+                  color: CupertinoTheme.of(context).textTheme.textStyle.color),
+            ),
+            Destination.accountAddress: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Icon(CupertinoIcons.person,
+                  size: 20,
+                  color: CupertinoTheme.of(context).textTheme.textStyle.color),
             ),
           },
         ),
@@ -112,7 +106,7 @@ class _SendDestinationState extends State<SendDestination> {
       padding: const EdgeInsets.only(left: 16, right: 16),
       child: Material(
         child: PhoneFormField(
-          controller: _phoneController,
+          controller: widget.phoneController,
           shouldFormat: true,
           flagSize: 32,
           autofocus: true,
@@ -121,6 +115,7 @@ class _SendDestinationState extends State<SendDestination> {
               // set canonical representation of phone number
               String number = '+${value.countryCode}${value.nsn}';
               appState.sendDestinationPhoneNumber.value = number;
+              appState.sendDestination.value = Destination.phoneNumber;
             }
           },
           autofillHints: const [AutofillHints.telephoneNumber],
@@ -146,8 +141,8 @@ class _SendDestinationState extends State<SendDestination> {
       autofocus: true,
       autocorrect: false,
       clearButtonMode: OverlayVisibilityMode.editing,
-      placeholder: 'Receiver\'s karma coin account address',
-      maxLines: 2,
+      placeholder: 'Enter receiver\'s karma coin account address',
+      maxLines: 3,
       style: CupertinoTheme.of(context).textTheme.textStyle.merge(
             const TextStyle(fontSize: 14),
           ),
@@ -156,7 +151,7 @@ class _SendDestinationState extends State<SendDestination> {
       decoration: const BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            width: 2,
+            width: 1.5,
             color: CupertinoColors.systemBlue,
           ),
         ),

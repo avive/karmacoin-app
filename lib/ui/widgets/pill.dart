@@ -4,46 +4,56 @@ class Pill extends StatelessWidget {
   final String title;
   final int count;
   final Color backgroundColor;
+  final bool showOneCount;
+  final bool trailingCount;
 
-  const Pill(Key? key, this.title,
-      {this.count = 1, this.backgroundColor = CupertinoColors.activeBlue})
-      : super(key: key);
+  const Pill(
+      {super.key,
+      this.title = "",
+      this.count = 1,
+      this.backgroundColor = CupertinoColors.activeBlue,
+      this.showOneCount = true,
+      this.trailingCount = true});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 18,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: backgroundColor,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.only(left: 10, right: 10),
-        child: Center(
-          child: Row(children: [
-            _getCountWidget(context),
-            Text(
-              title,
-              style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                    const TextStyle(
-                      fontSize: 11,
-                      color: CupertinoColors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
+    return FittedBox(
+      fit: BoxFit.fitWidth,
+      child: Container(
+        height: 20,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: backgroundColor,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.only(left: 10, right: 10),
+          child: Center(
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  _getCountWidget(context),
+                  Text(
+                    title,
+                    style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                          const TextStyle(
+                            fontSize: 11,
+                            color: CupertinoColors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                   ),
-            ),
-          ]),
+                ]),
+          ),
         ),
       ),
     );
   }
 
   Widget _getCountWidget(BuildContext context) {
-    if (count == 0) {
+    if (count == 0 || (!showOneCount && count == 1)) {
       return Container();
     }
-
-    debugPrint(count.format());
 
     return Padding(
       padding: const EdgeInsets.only(right: 6),

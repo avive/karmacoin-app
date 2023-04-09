@@ -234,8 +234,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
             style: CupertinoTheme.of(context).textTheme.textStyle),
         leading: const Icon(CupertinoIcons.check_mark, size: 28),
         trailing: Pill(
-          null,
-          getStatusDisplayString(status),
+          title: getStatusDisplayString(status),
           count: 0,
           backgroundColor: getStatusDisplayColor(status),
         ),

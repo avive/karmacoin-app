@@ -40,32 +40,7 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
 
         debugPrint('got entries: ${resp.leaderboardEntries}');
 
-        List<LeaderboardEntry> newEntries = settingsLogic.devMode
-            ? resp.leaderboardEntries.isEmpty
-                ? [
-                    LeaderboardEntry(
-                      userName: "avive",
-                      accountId: null,
-                      score: 3,
-                    ),
-                    LeaderboardEntry(
-                      userName: "rachel",
-                      accountId: null,
-                      score: 7,
-                    ),
-                    LeaderboardEntry(
-                      userName: "oriya",
-                      accountId: null,
-                      score: 2,
-                    ),
-                    LeaderboardEntry(
-                      userName: "danielo",
-                      accountId: null,
-                      score: 5,
-                    ),
-                  ]
-                : resp.leaderboardEntries
-            : resp.leaderboardEntries;
+        List<LeaderboardEntry> newEntries = resp.leaderboardEntries;
 
         setState(() {
           debugPrint('setting entries: $newEntries');
@@ -193,32 +168,24 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
       child: CustomScrollView(
         slivers: [
           CupertinoSliverNavigationBar(
-              padding: EdgeInsetsDirectional.zero,
-              backgroundColor: const Color.fromARGB(255, 88, 40, 138),
-              border: const Border(
-                bottom: BorderSide(
-                    color: Color.fromARGB(255, 255, 184, 0), width: 2),
-              ),
-              leading: Container(),
-              trailing: adjustNavigationBarButtonPosition(
-                  CupertinoButton(
-                    onPressed: () {
-                      context.pop();
-                    },
-                    child: const Icon(CupertinoIcons.xmark_circle, size: 24),
-                  ),
-                  0,
-                  0),
-              largeTitle: Center(
-                  child: Text('☥ KARMA REWARDS',
-                      style: CupertinoTheme.of(context)
-                          .textTheme
-                          .navLargeTitleTextStyle
-                          .merge(const TextStyle(
-                            color: Colors.white,
-                            fontSize: 30,
-                            fontWeight: FontWeight.w400,
-                          ))))),
+            padding: EdgeInsetsDirectional.zero,
+            backgroundColor: kcPurple,
+            border: kcOrangeBorder,
+            leading: Container(),
+            trailing: adjustNavigationBarButtonPosition(
+                CupertinoButton(
+                  onPressed: () {
+                    context.pop();
+                  },
+                  child: const Icon(CupertinoIcons.xmark_circle, size: 24),
+                ),
+                0,
+                0),
+            largeTitle: Center(
+              child: Text('☥ KARMA REWARDS',
+                  style: getNavBarTitleTextStyle(context)),
+            ),
+          ),
           SliverFillRemaining(
             hasScrollBody: true,
             child: _getBodyContent(context),

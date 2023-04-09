@@ -11,6 +11,7 @@ import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/ui/widgets/amount_input.dart';
+import 'package:karma_coin/ui/widgets/contacts_importer.dart';
 import 'package:karma_coin/ui/widgets/users_selector.dart';
 import 'package:karma_coin/ui/widgets/traits_picker.dart';
 import 'package:phone_form_field/phone_form_field.dart';
@@ -20,8 +21,13 @@ import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart
 
 class AppreciateWidget extends StatefulWidget {
   final int communityId;
+  final api_types.Contact? contact;
 
-  const AppreciateWidget({super.key, this.communityId = 0});
+  const AppreciateWidget({
+    super.key,
+    this.communityId = 0,
+    this.contact,
+  });
 
   @override
   State<AppreciateWidget> createState() => _AppreciateWidgetState();
@@ -42,6 +48,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   // country selector ux
   late CountrySelectorNavigator selectorNavigator;
 
+  // ignore: unused_field
   contact_picker.FlutterContactPicker? _contactPicker;
 
   //final formKey = GlobalKey<FormState>();
@@ -73,6 +80,13 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     if (PlatformInfo.isMobile) {
       // contact picker only available in native mobile iOs or Android
       _contactPicker = contact_picker.FlutterContactPicker();
+    } else {
+      _contactPicker = null;
+    }
+
+    if (widget.contact != null) {
+      contact = widget.contact;
+      phoneController.value = PhoneNumber.parse(contact!.mobileNumber.number);
     }
   }
 
@@ -90,28 +104,6 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
       validators.add(PhoneValidator.valid());
     }
     return validators.isNotEmpty ? PhoneValidator.compose(validators) : null;
-  }
-
-  // for payemnt
-  static Route<void> _paymentAmountInputModelBuilder(
-      BuildContext context, Object? arguments) {
-    return CupertinoModalPopupRoute<void>(builder: (BuildContext context) {
-      return const AmountInputWidget(
-          coinKind: CoinKind.kCoins,
-          feeType: FeeType.payment,
-          title: 'Amount to send');
-    });
-  }
-
-  // for fee
-  static Route<void> _feeAmountInputModelBuilder(
-      BuildContext context, Object? arguments) {
-    return CupertinoModalPopupRoute<void>(builder: (BuildContext context) {
-      return const AmountInputWidget(
-          coinKind: CoinKind.kCents,
-          feeType: FeeType.fee,
-          title: 'Network fee');
-    });
   }
 
   // validate input data and show alert if invalid
@@ -242,9 +234,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
 
   Border? _getNavBarBorder() {
     if (widget.communityId == 0) {
-      return const Border(
-        bottom: BorderSide(color: Color.fromARGB(255, 255, 184, 0), width: 2),
-      );
+      return kcOrangeBorder;
     } else {
       return null;
     }
@@ -290,10 +280,12 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
         ),
         Text(
           '${contact!.userName} $phoneNumber',
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w300,
-          ),
+          style: CupertinoTheme.of(context).textTheme.pickerTextStyle.merge(
+                const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w300,
+                ),
+              ),
         ),
       ],
     );
@@ -308,8 +300,8 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     }
 
     if (widget.communityId == 0 || isUsercommunityAdmin) {
-      // don't show phone picker in context of community when user is not admin
-      // as he can ony appreciate other community members
+      // Dispaly phone picker in context of community only if user is an admin
+      // so he can ony invite non-members
       widgets.add(Padding(
         padding: const EdgeInsets.only(left: 16, right: 16),
         child: Material(
@@ -335,7 +327,8 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
       ));
       widgets.add(_getContactsRow(context));
     } else {
-      // community member picker for community member
+      // community member picker for a community member
+      // community members can only appreicate other members
       if (contact != null) {
         widgets.add(_getCommunityMemberInfo());
       }
@@ -375,8 +368,13 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
             style: CupertinoTheme.of(context).textTheme.pickerTextStyle),
         CupertinoButton(
           onPressed: () {
-            Navigator.of(context)
-                .restorablePush(_paymentAmountInputModelBuilder);
+            if (!context.mounted) return;
+            Navigator.of(context).push(CupertinoPageRoute(
+                fullscreenDialog: true,
+                builder: ((context) => const AmountInputWidget(
+                    coinKind: CoinKind.kCoins,
+                    feeType: FeeType.payment,
+                    title: 'Amount to send'))));
           },
           child: ValueListenableBuilder<Int64>(
               valueListenable: appState.kCentsAmount,
@@ -395,8 +393,12 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
             style: CupertinoTheme.of(context).textTheme.pickerTextStyle),
         CupertinoButton(
           onPressed: () {
-            // todo: show dedicated fee picker - kcents only
-            Navigator.of(context).restorablePush(_feeAmountInputModelBuilder);
+            Navigator.of(context).push(CupertinoPageRoute(
+                fullscreenDialog: true,
+                builder: ((context) => const AmountInputWidget(
+                    coinKind: CoinKind.kCents,
+                    feeType: FeeType.fee,
+                    title: 'Network fee'))));
           },
           child: ValueListenableBuilder<Int64>(
               valueListenable: appState.kCentsFeeAmount,
@@ -476,66 +478,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
 
     if (PlatformInfo.isMobile) {
       // mobile phone contacts integration
-      widgets.add(CupertinoButton(
-        padding: const EdgeInsets.only(left: 0, right: 12),
-        child: Text(
-          'Contact',
-          style: CupertinoTheme.of(context).textTheme.actionTextStyle.merge(
-                const TextStyle(fontSize: 15),
-              ),
-        ),
-        onPressed: () async {
-          contact_picker.Contact? contact =
-              await _contactPicker!.selectContact();
-
-          if (contact != null) {
-            String? phoneNumber = contact.phoneNumbers?.first;
-
-            if (phoneNumber == null) {
-              return;
-            }
-
-            debugPrint('Contact number: $phoneNumber');
-
-            // get defuault iso code from controller in case contact doesn't
-            // provide internation code
-            IsoCode isoCode = phoneController.value?.isoCode ?? IsoCode.US;
-            PhoneNumber? newNumber;
-
-            // todo: do this in a more standarized and less error-prone manner....
-            String rawNumber = phoneNumber
-                .replaceAll('-', '')
-                .replaceAll('(', '')
-                .replaceAll(')', '')
-                .replaceAll(' ', '')
-                .trim();
-
-            if (rawNumber.length <= 10) {
-              // contacat is not international number - pick it from controller
-              if (rawNumber.startsWith('0')) {
-                rawNumber = rawNumber.substring(1);
-              }
-              newNumber = PhoneNumber(isoCode: isoCode, nsn: rawNumber);
-            } else {
-              // contact has an international number
-              PhoneNumber pn = PhoneNumber.parse(phoneNumber);
-              String iso = pn.countryCode;
-              String nsn = pn.nsn;
-              if (nsn.startsWith(iso)) {
-                nsn = nsn.substring(iso.length);
-              }
-              if (nsn.startsWith('0')) {
-                nsn = nsn.substring(1);
-              }
-
-              newNumber = PhoneNumber(isoCode: pn.isoCode, nsn: nsn);
-            }
-
-            debugPrint(newNumber.toString());
-            phoneController.value = newNumber;
-          }
-        },
-      ));
+      widgets.add(ContactsImporter(null, phoneController));
       widgets.add(const SizedBox(width: 34));
     }
 

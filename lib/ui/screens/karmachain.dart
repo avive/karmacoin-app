@@ -312,9 +312,7 @@ class _KarmachainState extends State<Karmachain> {
         child: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
-              const CupertinoSliverNavigationBar(
-                largeTitle: Text('Karmachain'),
-              ),
+              kcNavBar(context, 'Karmachain'),
             ];
           },
           body: MediaQuery.removePadding(

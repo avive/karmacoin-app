@@ -66,11 +66,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
     return CupertinoPageScaffold(
       child: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return <Widget>[
-            CupertinoSliverNavigationBar(
-              largeTitle: Text(widget.title),
-            ),
-          ];
+          return <Widget>[kcNavBar(context, widget.title)];
         },
         body: SafeArea(
           child: Padding(

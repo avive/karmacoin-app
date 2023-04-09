@@ -150,11 +150,7 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
         child: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             if (!mounted) return [];
-            return <Widget>[
-              const CupertinoSliverNavigationBar(
-                largeTitle: Text('Restore Account'),
-              ),
-            ];
+            return <Widget>[kcNavBar(context, 'Restore Account')];
           },
           body: MediaQuery.removePadding(
             context: context,

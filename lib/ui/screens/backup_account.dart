@@ -1,4 +1,5 @@
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/ui/helpers/widget_utils.dart';
 
 /// Display user details for provided user or for local user
 class BackupAccountScreen extends StatefulWidget {
@@ -129,11 +130,7 @@ class _BackupAccountScreenState extends State<BackupAccountScreen> {
       child: CupertinoPageScaffold(
         child: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-            return <Widget>[
-              const CupertinoSliverNavigationBar(
-                largeTitle: Text('Backup Account'),
-              ),
-            ];
+            return <Widget>[kcNavBar(context, 'Backup Account')];
           },
           body: MediaQuery.removePadding(
             context: context,

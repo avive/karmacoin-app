@@ -60,7 +60,13 @@ class _AmountInputWidgetState extends State<AmountInputWidget> {
                 ),
                 0,
                 0),
-            largeTitle: Text(widget.title),
+            backgroundColor: kcPurple,
+            border: kcOrangeBorder,
+            largeTitle: Text(
+              widget.title,
+              style: getNavBarTitleTextStyle(context),
+              textAlign: TextAlign.center,
+            ),
           ),
           SliverFillRemaining(
             hasScrollBody: false,

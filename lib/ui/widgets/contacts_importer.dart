@@ -1,0 +1,88 @@
+import 'package:karma_coin/common_libs.dart';
+import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart'
+    as contact_picker;
+import 'package:karma_coin/logic/app_state.dart';
+import 'package:phone_form_field/phone_form_field.dart';
+
+// Imports a phone contact to a phone controller
+class ContactsImporter extends StatefulWidget {
+  @required
+  final PhoneController phoneController;
+
+  const ContactsImporter(Key? key, this.phoneController) : super(key: key);
+
+  @override
+  State<ContactsImporter> createState() => _AmountInputWidgetState();
+}
+
+class _AmountInputWidgetState extends State<ContactsImporter> {
+  final contact_picker.FlutterContactPicker _contactPicker =
+      contact_picker.FlutterContactPicker();
+
+  @override
+  build(BuildContext context) {
+    return CupertinoButton(
+        padding: const EdgeInsets.only(left: 0, right: 12),
+        child: Text(
+          'Contact',
+          style: CupertinoTheme.of(context).textTheme.actionTextStyle.merge(
+                const TextStyle(fontSize: 15),
+              ),
+        ),
+        onPressed: () async {
+          contact_picker.Contact? contact =
+              await _contactPicker.selectContact();
+
+          if (contact != null) {
+            String? phoneNumber = contact.phoneNumbers?.first;
+
+            if (phoneNumber == null) {
+              return;
+            }
+
+            debugPrint('Contact number: $phoneNumber');
+
+            // get defuault iso code from controller in case contact doesn't
+            // provide internation code
+            IsoCode isoCode =
+                widget.phoneController.value?.isoCode ?? IsoCode.US;
+            PhoneNumber? newNumber;
+
+            // todo: do this in a more standarized and less error-prone manner....
+            String rawNumber = phoneNumber
+                .replaceAll('-', '')
+                .replaceAll('(', '')
+                .replaceAll(')', '')
+                .replaceAll(' ', '')
+                .trim();
+
+            if (rawNumber.length <= 10) {
+              // contacat is not international number - pick it from controller
+              if (rawNumber.startsWith('0')) {
+                rawNumber = rawNumber.substring(1);
+              }
+              newNumber = PhoneNumber(isoCode: isoCode, nsn: rawNumber);
+            } else {
+              // contact has an international number
+              PhoneNumber pn = PhoneNumber.parse(phoneNumber);
+              String iso = pn.countryCode;
+              String nsn = pn.nsn;
+              if (nsn.startsWith(iso)) {
+                nsn = nsn.substring(iso.length);
+              }
+              if (nsn.startsWith('0')) {
+                nsn = nsn.substring(1);
+              }
+
+              newNumber = PhoneNumber(isoCode: pn.isoCode, nsn: nsn);
+            }
+
+            debugPrint(newNumber.toString());
+            widget.phoneController.value = newNumber;
+            appState.sendDestination.value = Destination.phoneNumber;
+            appState.sendDestinationPhoneNumber.value =
+                '+${widget.phoneController.value!.countryCode}${widget.phoneController.value!.nsn}';
+          }
+        });
+  }
+}

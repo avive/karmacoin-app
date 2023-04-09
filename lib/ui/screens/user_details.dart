@@ -255,17 +255,17 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
 
   @override
   build(BuildContext context) {
+    /*
     Widget trailingWidget = Container();
-
     if (widget.isLocal) {
       trailingWidget = CupertinoButton(
         onPressed: () {
           // todo: push update username screen
         },
         child: adjustNavigationBarButtonPosition(
-            const Icon(CupertinoIcons.pencil, size: 24), 0, 0),
+            const Icon(CupertinoIcons.pencil, size: 24), 0, -6),
       );
-    }
+    }*/
 
     return Title(
       color: CupertinoColors.black, // This is required
@@ -273,12 +273,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
       child: CupertinoPageScaffold(
         child: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-            return <Widget>[
-              CupertinoSliverNavigationBar(
-                largeTitle: Text(widget.user!.userName),
-                trailing: trailingWidget,
-              ),
-            ];
+            return <Widget>[kcNavBar(context, widget.user!.userName)];
           },
           body: MediaQuery.removePadding(
             context: context,

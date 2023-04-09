@@ -1,5 +1,4 @@
 import 'package:fixnum/fixnum.dart';
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
@@ -24,7 +23,6 @@ class UserHomeScreen extends StatefulWidget {
 }
 
 class _UserHomeScreenState extends State<UserHomeScreen> {
-  static Color purple = const Color.fromARGB(255, 88, 40, 138);
   final coinWidth = 140.0;
   final coinLabelFontSize = 10.0;
   final coinNumberFontSize = 60.0;
@@ -204,14 +202,10 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   CupertinoButton.filled(
                     onPressed: () async {
                       if (!context.mounted) return;
-
                       Navigator.of(context).push(CupertinoPageRoute(
                           fullscreenDialog: true,
                           builder: ((context) =>
                               const AppreciateWidget(communityId: 0))));
-
-                      //Navigator.of(context)
-                      //    .restorablePush(_activityModalBuilder, arguments: 0);
                     },
                     child: const Text('Appreciate'),
                   ),
@@ -271,7 +265,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               width: coinWidth,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: purple,
+                color: kcPurple,
                 border: Border.all(
                     width: 6, color: const Color.fromARGB(255, 255, 184, 0)),
               ),
@@ -330,9 +324,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             width: coinWidth,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: purple,
-              border: Border.all(
-                  width: 6, color: const Color.fromARGB(255, 255, 184, 0)),
+              color: kcPurple,
+              border: Border.all(width: 6, color: kcOrange),
             ),
             child: Padding(
               padding: const EdgeInsets.only(left: 8, right: 8),
@@ -429,11 +422,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             physics: const NeverScrollableScrollPhysics(),
             slivers: [
               CupertinoSliverNavigationBar(
-                border: const Border(
-                  bottom: BorderSide(
-                      color: Color.fromARGB(255, 255, 184, 0), width: 2),
-                ),
-                backgroundColor: purple,
+                border: kcOrangeBorder,
+                backgroundColor: kcPurple,
                 // backgroundColor: CupertinoColors.activeOrange,
                 leading: _getCommunitiesPullDownMenuItems(context),
                 trailing: adjustNavigationBarButtonPosition(
@@ -447,14 +437,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 largeTitle: Center(
                   child: Text(
                     '☥ KARMA COIN',
-                    style: CupertinoTheme.of(context)
-                        .textTheme
-                        .navLargeTitleTextStyle
-                        .merge(const TextStyle(
-                          color: Colors.white,
-                          fontSize: 30,
-                          fontWeight: FontWeight.w400,
-                        )),
+                    style: getNavBarTitleTextStyle(context),
                   ),
                 ),
                 padding: EdgeInsetsDirectional.zero,

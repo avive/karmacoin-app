@@ -7,9 +7,12 @@ import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/ui/widgets/amount_input.dart';
-import 'package:karma_coin/ui/widgets/send_destination.dart';
+import 'package:karma_coin/ui/widgets/contacts_importer.dart';
+import 'package:karma_coin/ui/widgets/users_selector.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:status_alert/status_alert.dart';
+import 'package:karma_coin/ui/widgets/send_destination.dart';
+import 'package:karma_coin/services/api/types.pb.dart' as api_types;
 
 class SendWidget extends StatefulWidget {
   const SendWidget({super.key});
@@ -19,31 +22,11 @@ class SendWidget extends StatefulWidget {
 }
 
 class _SendWidgetState extends State<SendWidget> {
+  late PhoneController phoneController;
+
   // country selector ux
   CountrySelectorNavigator selectorNavigator =
       const CountrySelectorNavigator.draggableBottomSheet();
-
-  // for payemnt
-  static Route<void> _paymentAmountInputModelBuilder(
-      BuildContext context, Object? arguments) {
-    return CupertinoModalPopupRoute<void>(builder: (BuildContext context) {
-      return const AmountInputWidget(
-          coinKind: CoinKind.kCoins,
-          feeType: FeeType.payment,
-          title: 'Amount to send');
-    });
-  }
-
-  // for fee
-  static Route<void> _feeAmountInputModelBuilder(
-      BuildContext context, Object? arguments) {
-    return CupertinoModalPopupRoute<void>(builder: (BuildContext context) {
-      return const AmountInputWidget(
-          coinKind: CoinKind.kCents,
-          feeType: FeeType.fee,
-          title: 'Network fee');
-    });
-  }
 
   // validate input data and show alert if invalid
   Future<bool> _validateData() async {
@@ -117,7 +100,7 @@ class _SendWidgetState extends State<SendWidget> {
         break;
       case Destination.phoneNumber:
         // todo: validate the phone number string here
-        if (appState.sendDestinationAddress.value.isEmpty) {
+        if (appState.sendDestinationPhoneNumber.value.isEmpty) {
           if (context.mounted) {
             StatusAlert.show(
               context,
@@ -126,6 +109,41 @@ class _SendWidgetState extends State<SendWidget> {
               subtitle: 'Invalid receiver\'s phone number.',
               configuration: const IconConfiguration(
                   icon: CupertinoIcons.exclamationmark_triangle),
+              maxWidth: statusAlertWidth,
+            );
+          }
+          return false;
+        }
+
+        KarmaCoinUser? user = accountLogic.karmaCoinUser.value;
+
+        if (user == null) {
+          if (context.mounted) {
+            StatusAlert.show(
+              context,
+              duration: const Duration(seconds: 2),
+              title: 'Oops...',
+              subtitle: 'Please login to your account.',
+              configuration: const IconConfiguration(
+                  icon: CupertinoIcons.exclamationmark_triangle),
+              maxWidth: statusAlertWidth,
+            );
+          }
+          return false;
+        }
+
+        String number =
+            '+${phoneController.value!.countryCode}${phoneController.value!.nsn}';
+
+        if (user.mobileNumber.value.number == number) {
+          if (context.mounted) {
+            StatusAlert.show(
+              context,
+              duration: const Duration(seconds: 2),
+              title: 'Ooops',
+              subtitle: 'You can\'t send to yourself.',
+              configuration:
+                  const IconConfiguration(icon: CupertinoIcons.xmark_circle),
               maxWidth: statusAlertWidth,
             );
           }
@@ -202,14 +220,69 @@ class _SendWidgetState extends State<SendWidget> {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    String defaultNumber = settingsLogic.devMode ? "549805380" : "";
+    IsoCode code = settingsLogic.devMode ? IsoCode.IL : IsoCode.US;
+
+    phoneController =
+        PhoneController(PhoneNumber(isoCode: code, nsn: defaultNumber));
+  }
+
+  @override
+  void dispose() {
+    phoneController.dispose();
+    super.dispose();
+  }
+
+  void setPhoneNumberCallback(api_types.Contact selectedContact) {
+    debugPrint('setPhoneNumberCallback: $selectedContact');
+    setState(() {
+      phoneController.value =
+          PhoneNumber.parse(selectedContact.mobileNumber.number);
+      appState.sendDestination.value = Destination.phoneNumber;
+      appState.sendDestinationPhoneNumber.value =
+          selectedContact.mobileNumber.number;
+    });
+  }
+
+  Widget _getContactsRow(BuildContext context) {
+    List<Widget> widgets = [];
+
+    if (PlatformInfo.isMobile) {
+      // mobile phone contacts integration
+      widgets.add(ContactsImporter(null, phoneController));
+      widgets.add(const SizedBox(width: 34));
+    }
+
+    // karma coin contacts
+    widgets.add(CupertinoButton(
+      padding: const EdgeInsets.only(left: 0),
+      onPressed: () {
+        Navigator.of(context).push(CupertinoPageRoute(
+            fullscreenDialog: true,
+            builder: ((context) => KarmaCoinUserSelector(
+                communityId: 0,
+                setPhoneNumberCallback: setPhoneNumberCallback))));
+      },
+      child: Text(
+        'User',
+        style: CupertinoTheme.of(context).textTheme.actionTextStyle.merge(
+              const TextStyle(fontSize: 15),
+            ),
+      ),
+    ));
+
+    return Row(mainAxisAlignment: MainAxisAlignment.center, children: widgets);
+  }
+
+  @override
   build(BuildContext context) {
     return CupertinoPageScaffold(
       child: CustomScrollView(
         slivers: [
-          const CupertinoSliverNavigationBar(
-            padding: EdgeInsetsDirectional.zero,
-            largeTitle: Center(child: Text('Send Karma Coins')),
-          ),
+          kcNavBar(context, 'SEND KARMA COINS'),
           SliverFillRemaining(
             hasScrollBody: false,
             child: Padding(
@@ -219,7 +292,8 @@ class _SendWidgetState extends State<SendWidget> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const SendDestination(),
+                    SendDestination(null, phoneController),
+                    _getContactsRow(context),
                     const SizedBox(height: 12),
                     Column(
                       children: [
@@ -229,8 +303,12 @@ class _SendWidgetState extends State<SendWidget> {
                                 .pickerTextStyle),
                         CupertinoButton(
                           onPressed: () {
-                            Navigator.of(context).restorablePush(
-                                _paymentAmountInputModelBuilder);
+                            Navigator.of(context).push(CupertinoPageRoute(
+                                fullscreenDialog: true,
+                                builder: ((context) => const AmountInputWidget(
+                                    coinKind: CoinKind.kCoins,
+                                    feeType: FeeType.payment,
+                                    title: 'Amount to send'))));
                           },
                           child: ValueListenableBuilder<Int64>(
                               valueListenable: appState.kCentsAmount,
@@ -244,9 +322,12 @@ class _SendWidgetState extends State<SendWidget> {
                                 .pickerTextStyle),
                         CupertinoButton(
                           onPressed: () {
-                            // todo: show dedicated fee picker - kcents only
-                            Navigator.of(context)
-                                .restorablePush(_feeAmountInputModelBuilder);
+                            Navigator.of(context).push(CupertinoPageRoute(
+                                fullscreenDialog: true,
+                                builder: ((context) => const AmountInputWidget(
+                                    coinKind: CoinKind.kCents,
+                                    feeType: FeeType.fee,
+                                    title: 'Network fee'))));
                           },
                           child: ValueListenableBuilder<Int64>(
                               valueListenable: appState.kCentsFeeAmount,

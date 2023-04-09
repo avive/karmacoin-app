@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/kc_user.dart';
+import 'package:karma_coin/data/personality_traits.dart';
 import 'package:karma_coin/data/phone_number_formatter.dart';
 import 'package:karma_coin/data/user.dart';
 import 'package:karma_coin/services/api/api.pb.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/ui/widgets/pill.dart';
 import 'package:status_alert/status_alert.dart';
 
 // Karma coin users selector
 class KarmaCoinUserSelector extends StatefulWidget {
   final int communityId;
   final String title;
+  final bool enableSelection;
+
+  // todo: alwyas enbable selection and trigger appreciation of user if tapped/clicked
 
   final Function(Contact)? setPhoneNumberCallback;
 
@@ -20,7 +25,8 @@ class KarmaCoinUserSelector extends StatefulWidget {
       {super.key,
       this.communityId = 0,
       this.setPhoneNumberCallback,
-      this.title = 'Karma Coin Users'});
+      this.title = 'Karma Coin Users',
+      this.enableSelection = true});
 
   @override
   State<KarmaCoinUserSelector> createState() => _KarmaCoinUserSelectorState();
@@ -162,24 +168,78 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
     String displayName =
         '${contact.userName} ${getCommunitiesBadge(contact)}'.trim();
 
-    return CupertinoListTile(
+    return CupertinoListTile.notched(
       key: Key(index.toString()),
       padding: const EdgeInsets.only(top: 0, bottom: 6, left: 14, right: 14),
-      title: Text(
-        displayName,
-        style: const TextStyle(
-          fontSize: 22,
-          fontWeight: FontWeight.w300,
-        ),
+      title: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            displayName,
+            style: CupertinoTheme.of(context).textTheme.pickerTextStyle.merge(
+                  const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            phoneNumber,
+            style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                  const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+          ),
+        ],
       ),
-      subtitle: Text(phoneNumber,
-          style: CupertinoTheme.of(context).textTheme.textStyle),
       leading: const Icon(CupertinoIcons.person, size: 28),
-      onTap: () {
-        widget.setPhoneNumberCallback?.call(contact);
-        context.pop();
-      },
+      subtitle: _getAppreciationsStrip(context, contact),
+      onTap: widget.enableSelection
+          ? () {
+              widget.setPhoneNumberCallback?.call(contact);
+              context.pop();
+            }
+          : null,
     );
+  }
+
+  Widget? _getAppreciationsStrip(BuildContext context, Contact contact) {
+    List<Widget> pills = [];
+    for (TraitScore score in contact.traitScores) {
+      PersonalityTrait trait = GenesisConfig.personalityTraits[score.traitId];
+
+      String title = '${trait.emoji} ${trait.name}';
+
+      if (score.communityId > 0) {
+        String communityEmoji =
+            GenesisConfig.communities[score.communityId]!.emoji;
+
+        title = '$communityEmoji $title';
+      }
+
+      if (score.score > 1) {
+        title += ' x${score.score}';
+      }
+      pills.add(
+        Padding(
+          padding: const EdgeInsets.only(right: 4, bottom: 4),
+          child: Pill(title: title, count: 0),
+        ),
+      );
+    }
+
+    if (pills.isNotEmpty) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 6, bottom: 6),
+        child: Wrap(children: pills),
+      );
+    }
+
+    return null;
   }
 
   Color _getNavBarBackgroundColor() {
@@ -213,9 +273,7 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
 
   Border? _getNavBarBorder() {
     if (widget.communityId == 0) {
-      return const Border(
-        bottom: BorderSide(color: Color.fromARGB(255, 255, 184, 0), width: 2),
-      );
+      return kcOrangeBorder;
     } else {
       return null;
     }

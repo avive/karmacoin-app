@@ -153,9 +153,7 @@ class _AboutScreenState extends State<AboutScreen> {
         child: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
-              const CupertinoSliverNavigationBar(
-                largeTitle: Text('About Karma Coin'),
-              ),
+              kcNavBar(context, 'About Karma Coin'),
             ];
           },
           body: MediaQuery.removePadding(

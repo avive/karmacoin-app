@@ -254,9 +254,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           if (!mounted) return [];
           return <Widget>[
-            const CupertinoSliverNavigationBar(
-              largeTitle: Text('Actions'),
-            ),
+            kcNavBar(context, 'Actions'),
           ];
         },
         body: MediaQuery.removePadding(

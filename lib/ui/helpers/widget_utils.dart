@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:status_alert/status_alert.dart';
 import 'package:karma_coin/common_libs.dart';
@@ -6,6 +7,39 @@ import 'package:url_launcher/url_launcher.dart';
 // common widget helper functions
 
 const statusAlertWidth = 300.0;
+
+const Color kcPurple = Color.fromARGB(255, 88, 40, 138);
+const Color kcOrange = Color.fromARGB(255, 255, 184, 0);
+const Border kcOrangeBorder = Border(
+  bottom: BorderSide(color: kcOrange, width: 2),
+);
+
+CupertinoSliverNavigationBar kcNavBar(context, String title) {
+  return CupertinoSliverNavigationBar(
+    largeTitle: Text(
+      title,
+      style: getNavBarTitleTextStyle(context),
+      textAlign: TextAlign.center,
+    ),
+    backgroundColor: kcPurple,
+    border: kcOrangeBorder,
+  );
+}
+
+TextStyle getNavBarTitleTextStyle(BuildContext context, {int communityId = 0}) {
+  if (communityId == 0) {
+    return CupertinoTheme.of(context)
+        .textTheme
+        .navLargeTitleTextStyle
+        .merge(const TextStyle(
+          color: Colors.white,
+          fontSize: 30,
+          fontWeight: FontWeight.w400,
+        ));
+  } else {
+    return CupertinoTheme.of(context).textTheme.navLargeTitleTextStyle;
+  }
+}
 
 showNoConnectionAlert(BuildContext context) {
   StatusAlert.show(context,

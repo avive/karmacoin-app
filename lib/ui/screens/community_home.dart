@@ -9,6 +9,7 @@ import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/ui/widgets/appreciate.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/ui/widgets/traits_scores_wheel.dart';
+import 'package:karma_coin/ui/widgets/users_selector.dart';
 import 'package:status_alert/status_alert.dart';
 
 class CommunityHomeScreen extends StatefulWidget {
@@ -23,13 +24,6 @@ class CommunityHomeScreen extends StatefulWidget {
 
 class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
   late final Community community;
-
-  static Route<void> _activityModelBuilder(
-      BuildContext context, Object? arguments) {
-    return CupertinoModalPopupRoute<void>(builder: (BuildContext context) {
-      return AppreciateWidget(communityId: arguments as int);
-    });
-  }
 
   @override
   void initState() {
@@ -193,9 +187,11 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
                       color: bcgColr,
                       onPressed: () async {
                         if (!context.mounted) return;
-                        Navigator.of(context).restorablePush(
-                            _activityModelBuilder,
-                            arguments: widget.communityId);
+                        Navigator.of(context).push(CupertinoPageRoute(
+                            fullscreenDialog: true,
+                            builder: ((context) => AppreciateWidget(
+                                  communityId: widget.communityId,
+                                ))));
                       },
                       child: Text(
                         GenesisConfig
@@ -237,6 +233,20 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
         });
   }
 
+  void setPhoneNumberCallback(Contact selectedContact) {
+    // start appreciate with selected contact
+
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (!context.mounted) return;
+      Navigator.of(context).push(CupertinoPageRoute(
+          fullscreenDialog: true,
+          builder: ((context) => AppreciateWidget(
+                communityId: widget.communityId,
+                contact: selectedContact,
+              ))));
+    });
+  }
+
   @override
   build(BuildContext context) {
     CommunityDesignTheme theme =
@@ -256,7 +266,19 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
           //middle: const Text(''),
           trailing: adjustNavigationBarButtonPosition(
               CupertinoButton(
-                onPressed: () => {},
+                onPressed: () => {
+                  Navigator.of(context).push(
+                    CupertinoPageRoute(
+                      fullscreenDialog: true,
+                      builder: (context) => KarmaCoinUserSelector(
+                        title: 'Members',
+                        communityId: community.id,
+                        enableSelection: true,
+                        setPhoneNumberCallback: setPhoneNumberCallback,
+                      ),
+                    ),
+                  ),
+                },
                 child: const Icon(CupertinoIcons.person_3, size: 38),
               ),
               -6,
