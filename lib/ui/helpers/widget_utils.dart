@@ -19,7 +19,7 @@ CupertinoSliverNavigationBar kcNavBar(context, String title) {
     largeTitle: Text(
       title,
       style: getNavBarTitleTextStyle(context),
-      textAlign: TextAlign.center,
+      textAlign: TextAlign.left,
     ),
     backgroundColor: kcPurple,
     border: kcOrangeBorder,

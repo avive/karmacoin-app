@@ -254,7 +254,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           if (!mounted) return [];
           return <Widget>[
-            kcNavBar(context, 'Actions'),
+            kcNavBar(context, 'ACTIONS'),
           ];
         },
         body: MediaQuery.removePadding(

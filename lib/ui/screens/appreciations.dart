@@ -82,8 +82,8 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
             return <Widget>[
               CupertinoSliverNavigationBar(
                 largeTitle: Text(
-                  'Appreciations',
-                  textAlign: TextAlign.center,
+                  'APPRECIATIONS',
+                  textAlign: TextAlign.left,
                   style: getNavBarTitleTextStyle(context),
                 ),
                 backgroundColor: kcPurple,
