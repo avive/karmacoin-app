@@ -52,7 +52,7 @@ class ScreenPaths {
   // Restore account screen
   static String restoreAccount = '/restore-words';
 
-  /// Guest home screen (playground for now)
+  /// Guest home screen
   static String welcome = '/';
 
   /// Signed up user screen

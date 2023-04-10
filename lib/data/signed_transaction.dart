@@ -162,14 +162,14 @@ class SignedTransactionWithStatusEx {
   String getTransactionTypeDisplayName() {
     switch (getTxType()) {
       case TransactionType.TRANSACTION_TYPE_NEW_USER_V1:
-        return 'Signup transaction';
+        return 'SIGNUP';
       case TransactionType.TRANSACTION_TYPE_PAYMENT_V1:
         {
           PaymentTransactionV1 payment = txData as PaymentTransactionV1;
           if (payment.charTraitId != 0) {
-            return 'Appreciation';
+            return 'APPRECIATION';
           } else {
-            return 'Payment';
+            return 'PAYMENT';
           }
         }
       case TransactionType.TRANSACTION_TYPE_UPDATE_USER_V1:

@@ -274,11 +274,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
         child: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
-              CupertinoSliverNavigationBar(
-                largeTitle: Text(title),
-                trailing: adjustNavigationBarButtonPosition(
-                    const Icon(CupertinoIcons.share, size: 24), 0, 0),
-              ),
+              kcNavBar(context, title),
             ];
           },
           body: MediaQuery.removePadding(
@@ -311,7 +307,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
           padding: EdgeInsetsDirectional.zero,
           border: Border.all(color: Colors.transparent),
           middle: Text(
-            '$emoji Appreciation',
+            '$emoji APPRECIATION',
             style: CupertinoTheme.of(context).textTheme.navTitleTextStyle.merge(
                   TextStyle(fontSize: 24, color: theme.textColor),
                 ),

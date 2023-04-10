@@ -27,7 +27,7 @@ class KarmaCoinUserSelector extends StatefulWidget {
       {super.key,
       this.communityId = 0,
       this.setPhoneNumberCallback,
-      this.title = 'Karma Coin Users',
+      this.title = 'KARMA COIN USERS',
       this.enableSelection = true});
 
   @override
@@ -324,11 +324,20 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
 
       String title = '${trait.emoji} ${trait.name}';
 
-      if (score.communityId > 0) {
-        String communityEmoji =
-            GenesisConfig.communities[score.communityId]!.emoji;
+      Color backgroundColor = CupertinoColors.activeBlue;
 
-        title = '$communityEmoji $title';
+      if (score.communityId > 0) {
+        Community? community = GenesisConfig.communities[score.communityId];
+
+        if (community != null) {
+          backgroundColor =
+              GenesisConfig.communityColors[score.communityId]!.backgroundColor;
+
+          String communityEmoji =
+              GenesisConfig.communities[score.communityId]!.emoji;
+
+          title = '$communityEmoji $title';
+        }
       }
 
       if (score.score > 1) {
@@ -337,7 +346,11 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
       pills.add(
         Padding(
           padding: const EdgeInsets.only(right: 4, bottom: 4),
-          child: Pill(title: title, count: 0),
+          child: Pill(
+            title: title,
+            count: 0,
+            backgroundColor: backgroundColor,
+          ),
         ),
       );
     }

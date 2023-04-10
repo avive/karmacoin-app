@@ -93,7 +93,7 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
               CupertinoSliverNavigationBar(
-                largeTitle: const Text('Verifiction Code'),
+                largeTitle: const Text('Verification Code'),
                 leading: Container(),
               ),
             ];

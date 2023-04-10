@@ -29,6 +29,12 @@ flutter build ipa --release
 ### Dealing with iOS Archive issues
 https://github.com/flutter/flutter/issues/123852
 
+Modify line 44 of 'Target Support Files/Pods-Runner/Pods-Runner-frameworks.sh' to make it:
+
+```
+source="$(readlink -f "${source}")"
+```
+
 Copyright (c) 2022 by the KarmaCoin Authors. This work is licensed under the [KarmaCoin License](https://github.com/karma-coin/.github/blob/main/LICENSE).
 
 
