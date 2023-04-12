@@ -1,9 +1,9 @@
+import 'package:countup/countup.dart';
 import 'package:fixnum/fixnum.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter/foundation.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/genesis_config.dart';
-import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/services/api/api.pb.dart';
@@ -22,14 +22,33 @@ class UserHomeScreen extends StatefulWidget {
   State<UserHomeScreen> createState() => _UserHomeScreenState();
 }
 
+const smallScreenHeight = 1334;
+
 class _UserHomeScreenState extends State<UserHomeScreen> {
-  final coinWidth = 140.0;
-  final coinLabelFontSize = 10.0;
-  final coinNumberFontSize = 60.0;
+  // default values
+  int animationDuration = 2;
+  double coinWidth = 160.0;
+  double coinLabelFontSize = 14.0;
+  double coinNumberFontSize = 60.0;
+  double coinOutlineWidth = 8.0;
+  FontWeight digitFontWeight = FontWeight.w600;
+  FontWeight coinLabelWeight = FontWeight.w600;
 
   @override
   void initState() {
     super.initState();
+
+    Size size = WidgetsBinding.instance.window.physicalSize;
+    double height = size.height;
+    if (height <= smallScreenHeight && !kIsWeb) {
+      coinWidth = 120.0;
+      coinLabelFontSize = 11.0;
+      coinNumberFontSize = 40.0;
+      coinOutlineWidth = 4.0;
+    }
+
+    debugPrint(height.toString());
+
     WidgetsBinding.instance
         .addPostFrameCallback((_) => _postFrameCallback(context));
   }
@@ -267,7 +286,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 shape: BoxShape.circle,
                 color: kcPurple,
                 border: Border.all(
-                    width: 6, color: const Color.fromARGB(255, 255, 184, 0)),
+                    width: coinOutlineWidth,
+                    color: const Color.fromARGB(255, 255, 184, 0)),
               ),
               child: Padding(
                 padding: const EdgeInsets.only(left: 8, right: 8),
@@ -277,20 +297,21 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       FittedBox(
-                        child: Text(
-                          NumberFormat.compact().format(value),
-                          style: CupertinoTheme.of(context)
-                              .textTheme
-                              .textStyle
-                              .merge(
-                                TextStyle(
-                                    fontSize: coinNumberFontSize,
-                                    color:
-                                        const Color.fromARGB(255, 255, 184, 0),
-                                    fontWeight: FontWeight.w400),
-                              ),
-                        ),
-                      ),
+                          child: Countup(
+                        begin: 0,
+                        end: value.toDouble(),
+                        duration: Duration(seconds: animationDuration),
+                        separator: ',',
+                        style: CupertinoTheme.of(context)
+                            .textTheme
+                            .textStyle
+                            .merge(
+                              TextStyle(
+                                  fontSize: coinNumberFontSize,
+                                  color: const Color.fromARGB(255, 255, 184, 0),
+                                  fontWeight: digitFontWeight),
+                            ),
+                      )),
                       Text(
                         'KARMA SCORE',
                         style: CupertinoTheme.of(context)
@@ -300,7 +321,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                               TextStyle(
                                   fontSize: coinLabelFontSize,
                                   color: const Color.fromARGB(255, 255, 184, 0),
-                                  fontWeight: FontWeight.w600),
+                                  fontWeight: coinLabelWeight),
                             ),
                       ),
                     ],
@@ -316,27 +337,44 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     return ValueListenableBuilder<Int64>(
         valueListenable: accountLogic.karmaCoinUser.value!.balance,
         builder: (context, value, child) {
-          String balance = KarmaCoinAmountFormatter.formatAmount(value);
-          String unitsLabel = KarmaCoinAmountFormatter.getUnitsLabel(value);
+          // kcents value
+          double dispValue = value.toDouble();
+          String labelText = 'KARMA CENTS';
+          if (value > 1000000) {
+            dispValue /= 1000000;
+            labelText = 'KARMA COINS';
+          }
 
-          return Container(
-            height: coinWidth,
-            width: coinWidth,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: kcPurple,
-              border: Border.all(width: 6, color: kcOrange),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.only(left: 8, right: 8),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    FittedBox(
-                      child: Text(
-                        balance,
+          //String balance = KarmaCoinAmountFormatter.formatAmount(value);
+          //String unitsLabel = KarmaCoinAmountFormatter.getUnitsLabel(value);
+
+          return GestureDetector(
+            onTap: () async {
+              debugPrint('Tapped karma coin');
+              if (!context.mounted) return;
+              context.push(ScreenPaths.account);
+            },
+            child: Container(
+              height: coinWidth,
+              width: coinWidth,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: kcPurple,
+                border: Border.all(width: coinOutlineWidth, color: kcOrange),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8, right: 8),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      FittedBox(
+                          child: Countup(
+                        begin: 0,
+                        end: dispValue,
+                        duration: Duration(seconds: animationDuration),
+                        separator: ',',
                         style: CupertinoTheme.of(context)
                             .textTheme
                             .textStyle
@@ -344,23 +382,23 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                               TextStyle(
                                   fontSize: coinNumberFontSize,
                                   color: const Color.fromARGB(255, 255, 184, 0),
-                                  fontWeight: FontWeight.w400),
+                                  fontWeight: digitFontWeight),
+                            ),
+                      )),
+                      Text(
+                        labelText,
+                        style: CupertinoTheme.of(context)
+                            .textTheme
+                            .textStyle
+                            .merge(
+                              TextStyle(
+                                  fontSize: coinLabelFontSize,
+                                  color: const Color.fromARGB(255, 255, 184, 0),
+                                  fontWeight: coinLabelWeight),
                             ),
                       ),
-                    ),
-                    Text(
-                      unitsLabel.toUpperCase(),
-                      style: CupertinoTheme.of(context)
-                          .textTheme
-                          .textStyle
-                          .merge(
-                            TextStyle(
-                                fontSize: coinLabelFontSize,
-                                color: const Color.fromARGB(255, 255, 184, 0),
-                                fontWeight: FontWeight.w600),
-                          ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

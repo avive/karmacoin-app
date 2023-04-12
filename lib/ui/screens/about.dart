@@ -47,7 +47,7 @@ class _AboutScreenState extends State<AboutScreen> {
     tiles.add(
       CupertinoListTile.notched(
         padding: const EdgeInsets.only(top: 6, bottom: 6, left: 12),
-        title: const Text('Karma Coin Website'),
+        title: const Text('Website'),
         leading: const Icon(CupertinoIcons.compass),
         subtitle: CupertinoButton(
           padding: const EdgeInsets.only(left: 0),
@@ -130,7 +130,7 @@ class _AboutScreenState extends State<AboutScreen> {
       const CupertinoListTile.notched(
         title: SizedBox(
           height: 64,
-          child: Text('Made with ❤️ in 🌎 by team Karma Coin'),
+          child: Flexible(child: Text('Made with ❤️ in 🌎 by team Karma Coin')),
         ),
       ),
     );
@@ -153,7 +153,7 @@ class _AboutScreenState extends State<AboutScreen> {
         child: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
-              kcNavBar(context, 'About Karma Coin'),
+              kcNavBar(context, '☥ KARMA COIN'),
             ];
           },
           body: MediaQuery.removePadding(
