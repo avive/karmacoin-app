@@ -15,6 +15,8 @@ import 'package:karma_coin/ui/widgets/traits_scores_wheel.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:status_alert/status_alert.dart';
 
+const smallScreenHeight = 1334;
+
 class UserHomeScreen extends StatefulWidget {
   const UserHomeScreen({super.key});
 
@@ -22,11 +24,9 @@ class UserHomeScreen extends StatefulWidget {
   State<UserHomeScreen> createState() => _UserHomeScreenState();
 }
 
-const smallScreenHeight = 1334;
-
 class _UserHomeScreenState extends State<UserHomeScreen> {
   // default values
-  int animationDuration = 2;
+  int animationDuration = 1;
   double coinWidth = 160.0;
   double coinLabelFontSize = 14.0;
   double coinNumberFontSize = 60.0;
@@ -54,8 +54,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   }
 
   void _postFrameCallback(BuildContext context) {
-    debugPrint('post frame handler');
-
     Future.delayed(Duration.zero, () async {
       if (appState.signedUpInCurentSession.value && mounted) {
         appState.signedUpInCurentSession.value = false;
@@ -94,7 +92,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           StatusAlert.show(context,
               duration: const Duration(seconds: 4),
               title: 'Ooops',
-              subtitle: 'Karma coin down.',
+              subtitle: 'Karma Coin server down.',
               configuration: const IconConfiguration(
                   icon: CupertinoIcons.exclamationmark_triangle),
               dismissOnBackgroundTap: true,
@@ -234,37 +232,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         });
   }
 
-  /*
-  Widget _getCommunityWidget(BuildContext context) {
-    return ValueListenableBuilder<List<CommunityMembership>>(
-        valueListenable: accountLogic.karmaCoinUser.value!.communities,
-        builder: (context, value, child) {
-          if (value.isEmpty) {
-            return Container();
-          }
-
-          return ListView.builder(
-              shrinkWrap: true,
-              itemCount: value.length,
-              itemBuilder: (context, index) {
-                CommunityMembership membership = value[index];
-                if (membership.communityId != 1) {
-                  // only 1 community for now
-                  return Container();
-                }
-
-                return CupertinoButton(
-                  onPressed: () => context.push(GenesisConfig
-                      .CommunityHomeScreenPaths[membership.communityId]!),
-                  child: Image(
-                      height: 86,
-                      image: AssetImage(GenesisConfig
-                          .CommunityTileAssets[membership.communityId]!)),
-                );
-              });
-        });
-  }*/
-
   Widget _getKarmaScoreWidget(BuildContext context) {
     return ValueListenableBuilder<int>(
         valueListenable: accountLogic.karmaCoinUser.value!.karmaScore,
@@ -341,7 +308,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           double dispValue = value.toDouble();
           String labelText = 'KARMA CENTS';
           if (value > 1000000) {
-            dispValue /= 1000000;
+            dispValue /= 1000000.0;
             labelText = 'KARMA COINS';
           }
 
@@ -487,41 +454,14 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 padding: EdgeInsetsDirectional.zero,
               ),
               SliverFillRemaining(
-                child: _getWidgetForUser(context),
+                child: Stack(children: <Widget>[
+                  Positioned.fill(
+                    child: _getWidgetForUser(context),
+                  ),
+                ]),
               ),
             ]),
       ),
-      /*
-        child: CustomScrollView(
-            physics: const NeverScrollableScrollPhysics(),
-            slivers: [
-              CupertinoSliverNavigationBar(
-                
-                // border: Border.all(color: Colors.transparent),
-                // backgroundColor: Colors.transparent,
-                // backgroundColor: CupertinoColors.activeOrange,
-                leading: adjustNavigationBarButtonPosition(
-                    CupertinoButton(
-                      onPressed: () => context.push(ScreenPaths.actions),
-                      child: const Icon(CupertinoIcons.person_3, size: 38),
-                    ),
-                    0,
-                    -6),
-                trailing: adjustNavigationBarButtonPosition(
-                    CupertinoButton(
-                      onPressed: () => context.push(ScreenPaths.actions),
-                      child:
-                          const Icon(CupertinoIcons.ellipsis_circle, size: 24),
-                    ),
-                    0,
-                    0),
-                largeTitle: Center(child: Text('Karma Coin')),
-                padding: EdgeInsetsDirectional.zero,
-              ),
-              SliverFillRemaining(
-                child: _getWidgetForUser(context),
-              ),
-            ]),*/
     );
   }
 }
