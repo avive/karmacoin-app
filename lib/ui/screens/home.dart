@@ -9,6 +9,8 @@ import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/services/api/api.pb.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/ui/widgets/animated_background.dart';
+import 'package:karma_coin/ui/widgets/animated_wave.dart';
+import 'package:karma_coin/ui/widgets/animated_wave_right.dart';
 import 'package:karma_coin/ui/widgets/appreciate.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/ui/widgets/leaderboard.dart';
@@ -456,7 +458,35 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               ),
               SliverFillRemaining(
                 child: Stack(children: <Widget>[
-                  Positioned(child: AnimatedBackground()),
+                  const Positioned(child: AnimatedBackground()),
+                  onLeft(const AnimatedWave(
+                    height: 180,
+                    speed: 1.0,
+                  )),
+                  onLeft(const AnimatedWave(
+                    height: 120,
+                    speed: 0.9,
+                    offset: pi,
+                  )),
+                  onLeft(const AnimatedWave(
+                    height: 220,
+                    speed: 1.2,
+                    offset: pi / 2,
+                  )),
+                  onRight(const AnimatedRightWave(
+                    height: 180,
+                    speed: 1.0,
+                  )),
+                  onRight(const AnimatedRightWave(
+                    height: 120,
+                    speed: 0.9,
+                    offset: pi,
+                  )),
+                  onRight(const AnimatedRightWave(
+                    height: 220,
+                    speed: 1.2,
+                    offset: pi / 2,
+                  )),
                   Positioned.fill(
                     child: _getWidgetForUser(context),
                   ),
@@ -466,4 +496,18 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       ),
     );
   }
+
+  onLeft(Widget child) => Positioned.fill(
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: child,
+        ),
+      );
+
+  onRight(Widget child) => Positioned.fill(
+        child: Align(
+          alignment: Alignment.centerRight,
+          child: child,
+        ),
+      );
 }
