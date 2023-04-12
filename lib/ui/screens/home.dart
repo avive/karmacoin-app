@@ -8,6 +8,7 @@ import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/services/api/api.pb.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
+import 'package:karma_coin/ui/widgets/animated_background.dart';
 import 'package:karma_coin/ui/widgets/appreciate.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/ui/widgets/leaderboard.dart';
@@ -455,6 +456,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               ),
               SliverFillRemaining(
                 child: Stack(children: <Widget>[
+                  Positioned(child: AnimatedBackground()),
                   Positioned.fill(
                     child: _getWidgetForUser(context),
                   ),
