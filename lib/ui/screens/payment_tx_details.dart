@@ -120,8 +120,11 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
 
     tiles.add(
       CupertinoListTile.notched(
-        title:
-            Text(amount, style: CupertinoTheme.of(context).textTheme.textStyle),
+        title: Text('Amount',
+            style: CupertinoTheme.of(context).textTheme.textStyle),
+        trailing: Text(amount,
+            textAlign: TextAlign.right,
+            style: CupertinoTheme.of(context).textTheme.textStyle),
         subtitle: Text(usdEstimate),
         leading: const Icon(CupertinoIcons.money_dollar, size: 28),
       ),
@@ -225,6 +228,21 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
         trailing: Text(tx.getNonce().toString(),
             style: CupertinoTheme.of(context).textTheme.textStyle),
         leading: const Icon(CupertinoIcons.number, size: 28),
+      ),
+    );
+
+    String feeAmount = KarmaCoinAmountFormatter.formatMinimal(tx.txBody.fee);
+    String feeAmountusdEstimate =
+        KarmaCoinAmountFormatter.formatUSDEstimate(tx.txBody.fee);
+
+    tiles.add(
+      CupertinoListTile.notched(
+        title: Text('Network Fee',
+            style: CupertinoTheme.of(context).textTheme.textStyle),
+        trailing: Text(feeAmount,
+            style: CupertinoTheme.of(context).textTheme.textStyle),
+        subtitle: Text(feeAmountusdEstimate),
+        leading: const Icon(CupertinoIcons.money_dollar, size: 28),
       ),
     );
 
