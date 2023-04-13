@@ -20,6 +20,7 @@ flutter build apk
 
 ### Build Web App
 - Push to remote github branch 'web-deploy'
+- Run the deploy action when the build action completes.
 
 ### Build an iOS release
 ```bash

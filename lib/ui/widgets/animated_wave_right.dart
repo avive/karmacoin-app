@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:simple_animations/simple_animations.dart';

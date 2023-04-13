@@ -32,8 +32,8 @@ abstract class TrnasactionGenerator {
       transactionType: TransactionType.TRANSACTION_TYPE_PAYMENT_V1,
     );
 
-    SignedTransactionWithStatus signedTx =
-        _createSignedTransaction(txData, karmaCoinUser, keyPair);
+    SignedTransactionWithStatus signedTx = _createSignedTransaction(
+        txData, karmaCoinUser, keyPair, data.kCentsFeeAmount);
 
     SubmitTransactionResponse resp = SubmitTransactionResponse();
 
@@ -91,8 +91,8 @@ abstract class TrnasactionGenerator {
       transactionType: TransactionType.TRANSACTION_TYPE_NEW_USER_V1,
     );
 
-    SignedTransactionWithStatus signedTx =
-        _createSignedTransaction(txData, karmaCoinUser, keyPair);
+    SignedTransactionWithStatus signedTx = _createSignedTransaction(
+        txData, karmaCoinUser, keyPair, GenesisConfig.kCentsDefaultFee);
 
     SubmitTransactionResponse resp = SubmitTransactionResponse();
 
@@ -157,8 +157,8 @@ abstract class TrnasactionGenerator {
       transactionType: TransactionType.TRANSACTION_TYPE_UPDATE_USER_V1,
     );
 
-    SignedTransactionWithStatus signedTx =
-        _createSignedTransaction(txData, karmaCoinUser, keyPair);
+    SignedTransactionWithStatus signedTx = _createSignedTransaction(
+        txData, karmaCoinUser, keyPair, GenesisConfig.kCentsDefaultFee);
 
     SubmitTransactionResponse resp = SubmitTransactionResponse();
 
@@ -200,14 +200,13 @@ abstract class TrnasactionGenerator {
   }
 
   /// Create a new signed transaction with the local account data and the given transaction data
-  SignedTransactionWithStatus _createSignedTransaction(
-      TransactionData data, KarmaCoinUser karmaCoinUser, ed.KeyPair keyPair) {
+  SignedTransactionWithStatus _createSignedTransaction(TransactionData data,
+      KarmaCoinUser karmaCoinUser, ed.KeyPair keyPair, Int64 fee) {
     //
     // create a new transaction body
     TransactionBody txBody = TransactionBody(
       nonce: karmaCoinUser.nonce.value + 1,
-      fee: GenesisConfig
-          .kCentsDefaultFee, // todo: get default tx fee from genesis
+      fee: fee, // todo: get default tx fee from genesis
       netId: GenesisConfig.netId,
       timestamp: Int64(DateTime.now().millisecondsSinceEpoch),
       transactionData: data,
