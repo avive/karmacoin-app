@@ -18,6 +18,8 @@ abstract class AccountLogicInterface {
   // Set the user reuqested user name
   Future<void> setRequestedUserName(String requestedUserName);
 
+  Future<void> setDisplayedKarmaRewardsScreen(bool value);
+
   /// Clear all local account data
   Future<void> clear();
 
@@ -39,6 +41,9 @@ abstract class AccountLogicInterface {
 
   // Requested user name, if one was set by the user.
   final ValueNotifier<String?> requestedUserName = ValueNotifier<String?>(null);
+
+  /// set to true after karma mining screen is displayed once
+  final ValueNotifier<bool> karmaMiningScreenDisplayed = ValueNotifier(false);
 
   // Create a new karma coin (not firebase) user from local account data
   // and store it locally. This user's data is going to be updated with on-chain data

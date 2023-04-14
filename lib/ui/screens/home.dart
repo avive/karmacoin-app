@@ -8,6 +8,7 @@ import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/services/api/api.pb.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
+import 'package:karma_coin/ui/widgets/about_karma_mining.dart';
 import 'package:karma_coin/ui/widgets/animated_background.dart';
 import 'package:karma_coin/ui/widgets/animated_wave.dart';
 import 'package:karma_coin/ui/widgets/animated_wave_right.dart';
@@ -36,6 +37,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   double coinOutlineWidth = 8.0;
   FontWeight digitFontWeight = FontWeight.w600;
   FontWeight coinLabelWeight = FontWeight.w600;
+  GenesisData? genesisData;
 
   @override
   void initState() {
@@ -87,7 +89,21 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       }
 
       try {
-        await api.apiServiceClient.getGenesisData(GetGenesisDataRequest());
+        GetGenesisDataResponse resp =
+            await api.apiServiceClient.getGenesisData(GetGenesisDataRequest());
+        setState(() {
+          genesisData = resp.genesisData;
+          if (!accountLogic.karmaMiningScreenDisplayed.value) {
+            if (!context.mounted) return;
+            Navigator.of(context).push(
+              CupertinoPageRoute(
+                fullscreenDialog: true,
+                builder: ((context) => const AboutKarmaMining()),
+              ),
+            );
+          }
+        });
+
         // todo: update genesis data
       } catch (e) {
         debugPrint('Can\'t get genesis data from api: $e');
@@ -496,18 +512,4 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       ),
     );
   }
-
-  onLeft(Widget child) => Positioned.fill(
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: child,
-        ),
-      );
-
-  onRight(Widget child) => Positioned.fill(
-        child: Align(
-          alignment: Alignment.centerRight,
-          child: child,
-        ),
-      );
 }

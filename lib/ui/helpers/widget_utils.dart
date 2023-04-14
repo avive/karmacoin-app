@@ -52,6 +52,20 @@ showNoConnectionAlert(BuildContext context) {
       maxWidth: statusAlertWidth);
 }
 
+onLeft(Widget child) => Positioned.fill(
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: child,
+      ),
+    );
+
+onRight(Widget child) => Positioned.fill(
+      child: Align(
+        alignment: Alignment.centerRight,
+        child: child,
+      ),
+    );
+
 Future<bool> openUrl(String url) async {
   final Uri uri = Uri.parse(url);
   return await launchUrl(uri);

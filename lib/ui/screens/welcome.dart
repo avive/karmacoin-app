@@ -1,9 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/api/api.pb.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
+import 'package:karma_coin/ui/widgets/animated_background.dart';
+import 'package:karma_coin/ui/widgets/animated_wave.dart';
+import 'package:karma_coin/ui/widgets/animated_wave_right.dart';
 import 'package:status_alert/status_alert.dart';
 
 /// temp screen with some
@@ -68,7 +70,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     res.add(const SizedBox(height: 12));
     res.add(Image.asset('assets/images/logo_400.png', width: 160));
     res.add(const SizedBox(height: 24));
-    res.add(Text('Welcome to Karma Coin', style: textTheme.navTitleTextStyle));
+    res.add(Text(
+      'Welcome to Karma Coin',
+      style: textTheme.navTitleTextStyle.merge(
+        const TextStyle(fontSize: 20),
+      ),
+    ));
     res.add(const SizedBox(height: 12));
     res.add(
       Padding(
@@ -80,8 +87,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         ),
       ),
     );
-    res.add(const SizedBox(height: 12));
-    //if (user == null) {
+    res.add(const SizedBox(height: 18));
     res.add(CupertinoButton.filled(
       onPressed: () {
         context.push(ScreenPaths.signup);
@@ -106,44 +112,72 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         return Title(
-            color: CupertinoColors.black, // This is required
-            title: 'Karma Coin - Welcome',
-            child: CupertinoPageScaffold(
-              child: NestedScrollView(
-                headerSliverBuilder:
-                    (BuildContext context, bool innerBoxIsScrolled) {
-                  return <Widget>[
-                    CupertinoSliverNavigationBar(
-                      border: const Border(),
-                      //border: Border(
-                      //  bottom: BorderSide(color: Colors.orange, width: 2),
-                      //),
-                      backgroundColor: const Color.fromARGB(255, 88, 40, 138),
-                      largeTitle: Center(
-                          child: Text(
-                        widget.title,
-                        style: CupertinoTheme.of(context)
-                            .textTheme
-                            .navLargeTitleTextStyle
-                            .merge(const TextStyle(
-                              color: Colors.white,
-                              fontSize: 30,
-                              fontWeight: FontWeight.w400,
-                            )),
-                      )),
-                    )
-                  ];
-                },
-                body: SafeArea(
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: _getWidgets(context, snapshot.data),
+          color: CupertinoColors.black, // This is required
+          title: 'Karma Coin - Welcome',
+          child: CupertinoPageScaffold(
+            resizeToAvoidBottomInset: true,
+            child: CustomScrollView(
+                physics: const NeverScrollableScrollPhysics(),
+                slivers: [
+                  CupertinoSliverNavigationBar(
+                    border: kcOrangeBorder,
+                    backgroundColor: kcPurple,
+                    // backgroundColor: CupertinoColors.activeOrange,
+
+                    largeTitle: Center(
+                      child: Text(
+                        '☥ KARMA COIN',
+                        style: getNavBarTitleTextStyle(context),
+                      ),
                     ),
+                    padding: EdgeInsetsDirectional.zero,
                   ),
-                ),
-              ),
-            ));
+                  SliverFillRemaining(
+                    child: Stack(children: <Widget>[
+                      const Positioned(child: AnimatedBackground()),
+                      onLeft(const AnimatedWave(
+                        height: 180,
+                        speed: 1.0,
+                      )),
+                      onLeft(const AnimatedWave(
+                        height: 120,
+                        speed: 0.9,
+                        offset: pi,
+                      )),
+                      onLeft(const AnimatedWave(
+                        height: 220,
+                        speed: 1.2,
+                        offset: pi / 2,
+                      )),
+                      onRight(const AnimatedRightWave(
+                        height: 180,
+                        speed: 1.0,
+                      )),
+                      onRight(const AnimatedRightWave(
+                        height: 120,
+                        speed: 0.9,
+                        offset: pi,
+                      )),
+                      onRight(const AnimatedRightWave(
+                        height: 220,
+                        speed: 1.2,
+                        offset: pi / 2,
+                      )),
+                      Positioned.fill(
+                        child: SafeArea(
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: _getWidgets(context, snapshot.data),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ]),
+                  ),
+                ]),
+          ),
+        );
       },
     );
   }

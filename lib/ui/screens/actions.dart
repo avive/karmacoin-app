@@ -1,5 +1,6 @@
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
+import 'package:karma_coin/ui/widgets/about_karma_mining.dart';
 import 'package:karma_coin/ui/widgets/communities_list.dart';
 import 'package:karma_coin/ui/widgets/delete_account_tile.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -72,6 +73,19 @@ class _ActionsScreenState extends State<ActionsScreen> {
                 leading: _getAppreciationsIcon(context),
                 trailing: const CupertinoListTileChevron(),
                 onTap: () => context.push(ScreenPaths.appreciations)),
+            CupertinoListTile.notched(
+                title: const Text('Karma Rewards'),
+                leading: const Icon(CupertinoIcons.wand_rays, size: 28),
+                trailing: const CupertinoListTileChevron(),
+                onTap: () {
+                  if (!context.mounted) return;
+                  Navigator.of(context).push(
+                    CupertinoPageRoute(
+                      fullscreenDialog: true,
+                      builder: ((context) => const AboutKarmaMining()),
+                    ),
+                  );
+                }),
           ]),
       CupertinoListSection.insetGrouped(
         header: Text(

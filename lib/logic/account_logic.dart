@@ -30,6 +30,7 @@ class _AccountStoreKeys {
   static String phoneNumber = 'phone_number';
   static String karmaCoinUser = 'karma_coin_user';
   static String verificationData = 'verification_data';
+  static String displayKarmaMiningScreen = 'display_karma_mining_screen';
 }
 
 /// Local karmaCoin account logic. We seperate between authentication and account. Authentication is handled by Firebase Auth.
@@ -76,6 +77,14 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
 
       if (localModeData != null) {
         localMode.value = localModeData.toLowerCase() == 'true';
+      }
+
+      var displayKarmaMiningScreenData = await _secureStorage.read(
+          key: _AccountStoreKeys.displayKarmaMiningScreen, aOptions: _aOptions);
+
+      if (displayKarmaMiningScreenData != null) {
+        karmaMiningScreenDisplayed.value =
+            displayKarmaMiningScreenData.toLowerCase() == 'true';
       }
 
       String? karmaCoinUserData = await _secureStorage.read(
@@ -392,6 +401,9 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
         key: _AccountStoreKeys.seed, aOptions: _aOptions);
 
     await _secureStorage.delete(
+        key: _AccountStoreKeys.displayKarmaMiningScreen, aOptions: _aOptions);
+
+    await _secureStorage.delete(
         key: _AccountStoreKeys.seedSecurityWords, aOptions: _aOptions);
 
     await _secureStorage.delete(
@@ -414,6 +426,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
 
     // clear all state from memory
     requestedUserName.value = null;
+    karmaMiningScreenDisplayed.value = false;
     phoneNumber.value = null;
     signedUpOnChain.value = false;
     localMode.value = false;
@@ -473,6 +486,16 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
         value: requestedUserName,
         aOptions: _aOptions);
     this.requestedUserName.value = requestedUserName;
+  }
+
+  @override
+  Future<void> setDisplayedKarmaRewardsScreen(bool value) async {
+    await _secureStorage.write(
+        key: _AccountStoreKeys.displayKarmaMiningScreen,
+        value: value.toString(),
+        aOptions: _aOptions);
+
+    karmaMiningScreenDisplayed.value = value;
   }
 
   /// Create a new karma coin user from account data

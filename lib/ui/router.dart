@@ -106,6 +106,9 @@ class ScreenNames {
   /// A signed up user settings screen
   static String actions = 'actions';
 
+  /// About rewards
+  static String rewards = 'rewards';
+
   /// Chain info
   static String karmaChain = 'karmachain';
 

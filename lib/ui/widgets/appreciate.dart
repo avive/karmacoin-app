@@ -413,6 +413,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                   )),
         ),
         //SizedBox(height: 2),
+        /*
         CupertinoButton(
           child: Text(
             'Add a thank you note',
@@ -423,7 +424,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
           onPressed: () {
             // todo: show personal note taker...
           },
-        ),
+        ),*/
       ],
     ));
 
