@@ -195,7 +195,7 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
           _getCoinWidget(context, karmaReward),
           const SizedBox(width: 16),
           Flexible(
-            child: Text('Weekly Karma Rewards',
+            child: Text('Weekly Karma Reward',
                 style: textTheme.textStyle.merge(
                   const TextStyle(fontSize: 22),
                 )),

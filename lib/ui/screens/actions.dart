@@ -173,12 +173,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
         ),
         children: <CupertinoListTile>[
           CupertinoListTile.notched(
-              title: const Text('Send Feedback'),
-              leading: const Icon(CupertinoIcons.ellipses_bubble, size: 28),
-              trailing: const CupertinoListTileChevron(),
-              onTap: () => {}),
-          CupertinoListTile.notched(
-            title: const Text('Get Support'),
+            title: const Text('Feedback & Support'),
             leading: const Icon(CupertinoIcons.question, size: 28),
             onTap: () async => {await openUrl(_supportUrl)},
           ),
