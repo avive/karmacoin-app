@@ -80,6 +80,7 @@ dependencies:
      git:
       url: https://github.com/avive/flutter_native_contact_picker
       ref: master # branch name
+  firebase_messaging: ^14.4.0
 
 
 dev_dependencies:
