@@ -146,8 +146,6 @@ class _RestoreAccountIntroScreenState extends State<RestoreAccountIntroScreen> {
             '\nDid you backup your current account so you can restore it later?'),
         actions: <CupertinoDialogAction>[
           CupertinoDialogAction(
-            /// This parameter indicates this action is the default,
-            /// and turns the action's text to bold text.
             isDefaultAction: true,
             onPressed: () {
               Navigator.pop(context);
@@ -159,12 +157,9 @@ class _RestoreAccountIntroScreenState extends State<RestoreAccountIntroScreen> {
             /// a destructive action such as deletion, and turns
             /// the action's text color to red.
             isDestructiveAction: true,
-            onPressed: () async {
+            onPressed: () {
               Navigator.pop(context);
-              context.pop();
-              Future.delayed(const Duration(milliseconds: 300), () async {
-                context.push(ScreenPaths.restoreAccount);
-              });
+              context.go(ScreenPaths.restoreAccount);
             },
             child: const Text('Yes'),
           ),

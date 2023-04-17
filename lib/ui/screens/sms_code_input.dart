@@ -53,8 +53,7 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
       }
     }
 
-    // attempt auto sign-in in case there's already an account on chain for the
-    // local accountId with this phone number
+    // Attempt auto sign-in in case there's already an account on chain for the local accountId with this phone number
     if (await accountLogic.attemptAutoSignIn()) {
       setState(() {
         isWorking = false;

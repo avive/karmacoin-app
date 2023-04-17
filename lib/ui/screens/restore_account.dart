@@ -13,7 +13,9 @@ class RestoreAccountScreen extends StatefulWidget {
 class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
   List<String> backupWords = List<String>.generate(24, (int index) => '');
 
-  _RestoreAccountScreenState();
+  _RestoreAccountScreenState() {
+    appState.triggerSignupAfterRestore.value = false;
+  }
 
   /// Return the list secionts
   List<CupertinoListSection> _getSections(BuildContext context) {
@@ -98,7 +100,7 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
             size: 28, color: CupertinoColors.destructiveRed),
         title: CupertinoButton(
           onPressed: () async {
-            await submitUserInput();
+            await submitUserInput(context);
           },
           padding: const EdgeInsets.only(left: 0),
           child: Text(
@@ -166,7 +168,7 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
     );
   }
 
-  Future<void> submitUserInput() async {
+  Future<void> submitUserInput(BuildContext context) async {
     bool valid = true;
     int firstMissingWordIdx = 0;
 
@@ -208,7 +210,7 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
       debugPrint('set keypair error: $e');
       StatusAlert.show(
         context,
-        duration: const Duration(seconds: 2),
+        duration: const Duration(seconds: 4),
         configuration: const IconConfiguration(
             icon: CupertinoIcons.exclamationmark_triangle),
         title: 'Invalid Words',
@@ -230,11 +232,14 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
     // only trigger after the above to continue the flow
     appState.triggerSignupAfterRestore.value = true;
 
-    //Future.delayed(Duration.zero, () async {
-    // todo: only if not came from welcome?
-    if (context.mounted) {
-      context.push(ScreenPaths.signup, extra: 'Verify Number');
-    }
-    //});
+    Future.delayed(Duration.zero, () async {
+      // todo: only if not came from welcome?
+      if (context.mounted) {
+        debugPrint("mounted - puhsing signup screen");
+        context.go(ScreenPaths.signup, extra: 'Verify Number');
+      } else {
+        debugPrint('unmounted - not pushing signup screen');
+      }
+    });
   }
 }

@@ -97,11 +97,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     res.add(const SizedBox(height: 12));
 
     res.add(CupertinoButton(
-      onPressed: () => context.push(ScreenPaths.restoreAccount),
+      onPressed: () => context.go(ScreenPaths.restoreAccount),
       child: const Text('Restore Account'),
     ));
 
-    res.add(_processRestoreAccountFlow(context));
+    //res.add(_processRestoreAccountFlow(context));
 
     return res;
   }
@@ -182,6 +182,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     );
   }
 
+  /*
   Widget _processRestoreAccountFlow(BuildContext context) {
     return ValueListenableBuilder<bool?>(
         valueListenable: appState.triggerSignupAfterRestore,
@@ -197,5 +198,5 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
           return Container();
         });
-  }
+  }*/
 }

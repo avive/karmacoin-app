@@ -374,11 +374,11 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
               if (!mounted) return;
               StatusAlert.show(
                 context,
-                duration: const Duration(seconds: 1),
+                duration: const Duration(seconds: 5),
                 configuration: const IconConfiguration(
                     icon: CupertinoIcons.exclamationmark_triangle),
                 title: 'Restore Account',
-                subtitle: 'Sign up to complete restoration',
+                subtitle: 'Verifty your phone number',
                 dismissOnBackgroundTap: true,
                 maxWidth: statusAlertWidth,
               );
