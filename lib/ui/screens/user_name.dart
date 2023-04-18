@@ -24,10 +24,12 @@ class SetUserNameScreen extends StatefulWidget {
 class _SetUserNameScreenState extends State<SetUserNameScreen> {
   String deafaultName = settingsLogic.devMode ? "avive" : "";
   late final _textController = TextEditingController(text: deafaultName);
+  bool isSubmitInProgress = false;
 
   @override
   void initState() {
     super.initState();
+    isSubmitInProgress = false;
     WidgetsBinding.instance
         .addPostFrameCallback((_) => _postFrameCallback(context));
   }
@@ -82,9 +84,11 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
                       _getAvailabilityStatus(context),
                       const SizedBox(height: 14),
                       CupertinoButton.filled(
-                        onPressed: () async {
-                          await _submitName(context);
-                        },
+                        onPressed: isSubmitInProgress
+                            ? null
+                            : () async {
+                                await _submitName(context);
+                              },
                         child: submitButtonText,
                       ),
                     ]),
@@ -167,6 +171,10 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
 
     if (userNameAvailabilityLogic.status ==
         UserNameAvailabilityStatus.available) {
+      setState(() {
+        isSubmitInProgress = true;
+      });
+
       // store the user's reuqested name in account logic
       await accountLogic.setRequestedUserName(_textController.text);
 
@@ -183,7 +191,9 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
 
             switch (resp.submitTransactionResult) {
               case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
+                /*
                 if (context.mounted) {
+                  
                   StatusAlert.show(
                     context,
                     duration: const Duration(seconds: 2),
@@ -192,7 +202,11 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
                         const IconConfiguration(icon: CupertinoIcons.wand_rays),
                     maxWidth: statusAlertWidth,
                   );
+                  setState(() {
+                    isSubmitInProgress = false;
+                  });
                 }
+                */
                 debugPrint(
                     'Update user name transaction submitted and accepted');
                 break;
@@ -207,6 +221,9 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
                         icon: CupertinoIcons.exclamationmark_triangle),
                     maxWidth: statusAlertWidth,
                   );
+                  setState(() {
+                    isSubmitInProgress = false;
+                  });
                 }
                 break;
             }
@@ -221,6 +238,9 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
                     icon: CupertinoIcons.exclamationmark_triangle),
                 maxWidth: statusAlertWidth,
               );
+              setState(() {
+                isSubmitInProgress = false;
+              });
             }
           }
           break;
@@ -237,6 +257,9 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
               icon: CupertinoIcons.exclamationmark_triangle),
           maxWidth: statusAlertWidth,
         );
+        setState(() {
+          isSubmitInProgress = false;
+        });
       }
     }
   }

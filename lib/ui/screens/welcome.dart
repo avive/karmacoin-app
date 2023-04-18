@@ -101,8 +101,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       child: const Text('Restore Account'),
     ));
 
-    //res.add(_processRestoreAccountFlow(context));
-
     return res;
   }
 
@@ -181,22 +179,4 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       },
     );
   }
-
-  /*
-  Widget _processRestoreAccountFlow(BuildContext context) {
-    return ValueListenableBuilder<bool?>(
-        valueListenable: appState.triggerSignupAfterRestore,
-        builder: (context, value, child) {
-          if (value == null || value == false) {
-            return Container();
-          }
-
-          Future.delayed(const Duration(milliseconds: 200), () async {
-            if (!mounted) return;
-            context.push(ScreenPaths.signup);
-          });
-
-          return Container();
-        });
-  }*/
 }

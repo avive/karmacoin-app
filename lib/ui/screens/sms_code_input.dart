@@ -13,22 +13,22 @@ class SmsCodeInputScreen extends StatefulWidget {
 }
 
 class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
-  bool isWorking = false;
-  String code = '';
+  bool submitInProgress = false;
 
   @override
   initState() {
     super.initState();
-    isWorking = false;
+    submitInProgress = false;
   }
 
-  Future<void> _submitCode(BuildContext context) async {
+  Future<void> _submitCode(BuildContext context, String currCode) async {
     // Create a PhoneAuthCredential with the code
     PhoneAuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: appState.phoneAuthVerificationCodeId, smsCode: code);
+        verificationId: appState.phoneAuthVerificationCodeId,
+        smsCode: currCode);
 
     setState(() {
-      isWorking = true;
+      submitInProgress = true;
     });
 
     // Sign the user in (or link) with the credential
@@ -46,7 +46,7 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
         );
 
         setState(() {
-          isWorking = false;
+          submitInProgress = false;
         });
 
         return;
@@ -56,7 +56,7 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
     // Attempt auto sign-in in case there's already an account on chain for the local accountId with this phone number
     if (await accountLogic.attemptAutoSignIn()) {
       setState(() {
-        isWorking = false;
+        submitInProgress = false;
       });
 
       Future.delayed(Duration.zero, () {
@@ -66,13 +66,13 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
       });
     } else {
       Future.delayed(Duration.zero, () {
-        context.push(ScreenPaths.newUserName);
+        pushNamedAndRemoveUntil(ScreenPaths.newUserName);
       });
     }
   }
 
   Widget _getIndicator(BuildContext context) {
-    if (isWorking) {
+    if (submitInProgress) {
       return const CupertinoActivityIndicator(
         radius: 20,
         animating: true,
@@ -120,18 +120,8 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
                             //set to true to show as box or false to show as dash
                             showFieldAsBox: true,
                             clearText: false,
-                            //runs when a code is typed in
-                            onCodeChanged: (String verificationCode) {
-                              setState(() {
-                                code = verificationCode;
-                              });
-                            },
-                            //runs when every textfield is filled
                             onSubmit: (String verificationCode) async {
-                              setState(() {
-                                code = verificationCode;
-                              });
-                              await _submitCode(context);
+                              await _submitCode(context, verificationCode);
                             }, // end onSubmit
                           ),
                         ),
