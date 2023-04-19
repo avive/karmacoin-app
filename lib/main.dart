@@ -3,9 +3,9 @@ import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:karma_coin/ui/widgets/app.dart';
-//import 'package:url_strategy/url_strategy.dart';
 import 'firebase_options.dart';
 import 'logic/app.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -22,9 +22,9 @@ void main() async {
     PhoneAuthProvider(),
   ]);
 
-  //FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+  FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
-  //analytics.logEvent(name: "app_started");
+  analytics.logEvent(name: "app_started");
 
   // this removes the # from web routes for go router
   // setPathUrlStrategy();
