@@ -146,7 +146,7 @@ class GenesisConfig {
     PersonalityTrait(49, 'a Commander', '👨‍✈️'),
     PersonalityTrait(50, 'a Visionary', '👁️'),
     PersonalityTrait(51, 'a Teacher', '👩‍🏫'),
-    PersonalityTrait(52, 'an Craftsperson', '🛠️'),
+    PersonalityTrait(52, 'a Craftsperson', '🛠️'),
     PersonalityTrait(53, 'an Inspector', '🔍'),
     PersonalityTrait(54, 'a Composer', '📝'),
     PersonalityTrait(55, 'a Protector', '⚔️'),
