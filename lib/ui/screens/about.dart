@@ -128,14 +128,9 @@ class _AboutScreenState extends State<AboutScreen> {
 
     tiles.add(
       const CupertinoListTile.notched(
-        title: SizedBox(
-          height: 64,
-          child: Flexible(child: Text('Made with ❤️ in 🌎 by team Karma Coin')),
-        ),
+        title: Text('Made with 💜 by team Karma Coin'),
       ),
     );
-
-    // todo: number format
 
     return [
       CupertinoListSection.insetGrouped(
