@@ -91,10 +91,7 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
         child: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
-              CupertinoSliverNavigationBar(
-                largeTitle: const Text('Verification Code'),
-                leading: Container(),
-              ),
+              kcNavBar(context, 'VERIFICATION CODE'),
             ];
           },
           body: SafeArea(

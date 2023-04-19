@@ -168,7 +168,7 @@ final GoRouter appRouter = GoRouter(
       name: ScreenNames.signup,
       path: ScreenPaths.signup,
       builder: (BuildContext context, GoRouterState state) {
-        String title = 'Sign Up';
+        String title = 'SIGN UP';
         if (state.extra != null) {
           title = state.extra as String;
         }
@@ -197,7 +197,7 @@ final GoRouter appRouter = GoRouter(
         builder: (BuildContext context, GoRouterState state) {
           debugPrint('**** userName route builder called');
           return const SetUserNameScreen(
-              title: 'Your User Name', operation: Operation.signUp);
+              title: 'YOUR USER NAME', operation: Operation.signUp);
         }),
     GoRoute(
         // New User name input screen

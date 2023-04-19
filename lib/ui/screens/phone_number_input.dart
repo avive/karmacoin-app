@@ -11,7 +11,7 @@ import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart
 class PhoneInputScreen extends StatefulWidget {
   final String title;
 
-  const PhoneInputScreen({super.key, this.title = 'Sign Up'});
+  const PhoneInputScreen({super.key, this.title = 'SIGN UP'});
 
   @override
   State<PhoneInputScreen> createState() => _PhoneInputScreenState();
