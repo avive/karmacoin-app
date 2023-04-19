@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
+import 'package:pinput/pinput.dart';
 import 'package:status_alert/status_alert.dart';
 
 class SmsCodeInputScreen extends StatefulWidget {
@@ -113,17 +113,14 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
                                 .navTitleTextStyle),
                         const SizedBox(height: 16),
                         Material(
-                          child: OtpTextField(
-                            numberOfFields: 6,
-                            autoFocus: true,
-                            borderColor: const Color(0xFF512DA8),
-                            //set to true to show as box or false to show as dash
-                            showFieldAsBox: true,
-                            clearText: false,
-                            onSubmit: (String verificationCode) async {
-                              await _submitCode(context, verificationCode);
-                            }, // end onSubmit
-                          ),
+                          child: Pinput(
+                              androidSmsAutofillMethod:
+                                  AndroidSmsAutofillMethod.smsUserConsentApi,
+                              autofocus: true,
+                              length: 6,
+                              onCompleted: (pin) async {
+                                await _submitCode(context, pin);
+                              }),
                         ),
                         const SizedBox(height: 36),
                         _getIndicator(context),

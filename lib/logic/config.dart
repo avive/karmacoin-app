@@ -13,7 +13,7 @@ class ConfigLogic {
   final bool apiLocalMode = false;
 
   // dev mode has some text field input shortcuts to save time in dev
-  final bool devMode = false;
+  final bool devMode = true;
 
   // check internet connections and show error messages
   final bool enableInternetConnectionChecking = false;

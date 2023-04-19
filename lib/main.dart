@@ -22,6 +22,10 @@ void main() async {
     PhoneAuthProvider(),
   ]);
 
+  //FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+
+  //analytics.logEvent(name: "app_started");
+
   // this removes the # from web routes for go router
   // setPathUrlStrategy();
 

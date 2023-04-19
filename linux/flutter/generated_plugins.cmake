@@ -6,6 +6,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   desktop_webview_auth
   desktop_window
   flutter_secure_storage_linux
+  smart_auth
   url_launcher_linux
 )
 

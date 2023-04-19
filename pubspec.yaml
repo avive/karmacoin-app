@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.9+2
+version: 1.0.10+2
 
 environment:
   sdk: '>=2.19.2 <4.0.0'
@@ -63,7 +63,6 @@ dependencies:
   phone_numbers_parser: ^7.0.2
   intl: ^0.17.0
   status_alert: ^1.0.1
-  flutter_otp_text_field: ^1.1.1
   font_awesome_flutter: ^10.4.0
   badges: ^3.0.2
   device_info_plus: ^8.1.0
@@ -80,8 +79,8 @@ dependencies:
      git:
       url: https://github.com/avive/flutter_native_contact_picker
       ref: master # branch name
-  firebase_messaging: ^14.4.0
-
+  firebase_analytics: ^10.2.1
+  pinput: ^2.2.31
 
 dev_dependencies:
   flutter_test:
