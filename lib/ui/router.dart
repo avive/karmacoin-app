@@ -205,7 +205,7 @@ final GoRouter appRouter = GoRouter(
         path: ScreenPaths.updateUserName,
         builder: (BuildContext context, GoRouterState state) {
           return const SetUserNameScreen(
-              title: 'Change User Name', operation: Operation.updateUserName);
+              title: 'CHANGE USER NAME', operation: Operation.updateUserName);
         }),
     GoRoute(
         // Initial app screen (playground for now)

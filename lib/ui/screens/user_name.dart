@@ -191,9 +191,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
 
             switch (resp.submitTransactionResult) {
               case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
-                /*
                 if (context.mounted) {
-                  
                   StatusAlert.show(
                     context,
                     duration: const Duration(seconds: 2),
@@ -205,8 +203,8 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
                   setState(() {
                     isSubmitInProgress = false;
                   });
+                  context.pop();
                 }
-                */
                 debugPrint(
                     'Update user name transaction submitted and accepted');
                 break;

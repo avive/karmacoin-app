@@ -26,9 +26,11 @@ class ConfigLogic {
   late final verifierHostPort = ValueNotifier<int>(9080);
   late final verifierSecureConnection = ValueNotifier<bool>(false);
 
-  // this is default dev mode verifier account id.
+  // Public key of the verifier account id
+  // Client should only accept verifier responses signed by this account
   late final verifierAccountId = ValueNotifier<String>(
-      'a885bf7ac670b0f01a3551740020e115641005a93f59472002bfd1dc665f4a4e');
+      'fe9d0c0df86c72ae733bf9ec0eeaff6e43e29bad4488f5e4845e455ea1095bf3');
+
   // requested user name entered by the user. For the canonical user-name, check AccountLogic
   late final requestedUserName = ValueNotifier<String>('');
 

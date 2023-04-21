@@ -573,6 +573,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
 
     // todo: compare the response accountId with the verifier's account id
     // from genesis config and reject if they don't match
+    // or hard-coded at ConfigLogic.verifierAccountId
 
     if (!enrichedResponse.verifySignature(
         ed.PublicKey(userVerificationData.verifierAccountId.data))) {

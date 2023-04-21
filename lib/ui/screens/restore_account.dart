@@ -56,13 +56,15 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
       ),
     );
 
-    // temp hack to fill the form
-    if (accountLogic.accountSecurityWords.value != null) {
-      backupWords = accountLogic.accountSecurityWords.value!.split(' ');
-    } else {
-      backupWords =
-          'marriage hair defense warm chest estate property short olive elevator cat wall key ankle artefact lobster steak wage predict illegal sort either demise advance'
-              .split(' ');
+    if (settingsLogic.devMode) {
+      // fill the form with current accont restore words so no typing needed
+      if (accountLogic.accountSecurityWords.value != null) {
+        backupWords = accountLogic.accountSecurityWords.value!.split(' ');
+      } else {
+        backupWords =
+            'marriage hair defense warm chest estate property short olive elevator cat wall key ankle artefact lobster steak wage predict illegal sort either demise advance'
+                .split(' ');
+      }
     }
 
     for (int i = 0; i < 24; i++) {
