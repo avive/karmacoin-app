@@ -336,15 +336,22 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
         titleWeight = FontWeight.w600;
       }
 
-      String detailsLabel;
+      String detailsLabel = "";
       if (tx.incoming) {
-        final types.User sender = tx.getFromUser();
-        final senderPhoneNumber =
-            sender.mobileNumber.number.formatPhoneNumber();
-        detailsLabel = 'From · ${sender.userName} · $senderPhoneNumber ';
+        final types.User? sender = tx.getFromUser();
+
+        if (sender != null) {
+          detailsLabel = 'From · ${sender.userName}';
+
+          if (sender.mobileNumber.number.isNotEmpty) {
+            final senderPhoneNumber =
+                sender.mobileNumber.number.formatPhoneNumber();
+
+            detailsLabel += ' · $senderPhoneNumber';
+          }
+        }
       } else {
         final types.User? receiver = tx.getToUser();
-
         detailsLabel = 'To ';
 
         if (receiver != null) {
@@ -355,6 +362,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
           detailsLabel +=
               '${appreciation.toAccountId.data.toShortHexString()} · ';
         }
+
         if (appreciation.toNumber.number.isNotEmpty) {
           final toPhoneNumber =
               appreciation.toNumber.number.formatPhoneNumber();

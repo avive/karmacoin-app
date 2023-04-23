@@ -48,8 +48,14 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
     SignedTransactionWithStatusEx tx = transaction!;
 
     List<CupertinoListTile> tiles = [];
-    final types.User sender = tx.getFromUser();
-    final senderPhoneNumber = sender.mobileNumber.number.formatPhoneNumber();
+    final types.User? sender = tx.getFromUser();
+    String senderName = sender != null ? sender.userName : "n/a";
+
+    final senderPhoneNumber = sender != null &&
+            sender.hasMobileNumber() &&
+            sender.mobileNumber.number.isNotEmpty
+        ? sender.mobileNumber.number.formatPhoneNumber()
+        : "";
 
     TransactionStatus status = TransactionStatus.pending;
     String operationLabel = 'Sent by you';
@@ -140,6 +146,11 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
       ),
     );
 
+    List<Widget> senderWidgets = [Text(senderName)];
+    if (sender != null) {
+      senderWidgets.add(Text(sender.accountId.data.toShortHexString()));
+    }
+
     tiles.add(
       CupertinoListTile.notched(
           title: Text('From',
@@ -147,11 +158,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
           subtitle: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(sender.userName),
-              Text(sender.accountId.data.toShortHexString()),
-              const SizedBox(height: 6),
-            ],
+            children: senderWidgets,
           ),
           trailing: Text(senderPhoneNumber,
               style: CupertinoTheme.of(context).textTheme.textStyle),
