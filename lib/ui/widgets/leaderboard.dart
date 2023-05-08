@@ -187,7 +187,7 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
             ),
           ),
           SliverFillRemaining(
-            hasScrollBody: false,
+            hasScrollBody: true,
             child: _getBodyContent(context),
           ),
         ],

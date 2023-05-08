@@ -70,7 +70,7 @@ class KarmaCoinUser {
 
     karmaScore.value = user.karmaScore;
 
-    debugPrint('*** Updating karma score from chaint to ${user.karmaScore}');
+    debugPrint('*** Updating karma score from chain to ${user.karmaScore}');
     userData.karmaScore = user.karmaScore;
 
     userData.userName = user.userName;
