@@ -53,6 +53,7 @@ abstract class TrnasactionGenerator {
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
         debugPrint('Payment transaction submitted to api!');
         signedTx.status = TransactionStatus.TRANSACTION_STATUS_SUBMITTED;
+
         // store in txboss as outgoing
         txsBoss.updateWithTx(enriched);
 
@@ -61,6 +62,8 @@ abstract class TrnasactionGenerator {
         karmaCoinUser.balance.value -= data.kCentsAmount;
         // inc nonce locally so user can keep submitting txs
         await karmaCoinUser.incNonce();
+
+        debugPrint("finished updating state");
 
         break;
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:

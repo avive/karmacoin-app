@@ -41,6 +41,7 @@ class TransactionsBoss extends TransactionsBossInterface {
 
   /// Update observable data with current internal state
   void _updateObservables() {
+    debugPrint("Updating observables...");
     List<dst.SignedTransactionWithStatusEx> newIncomingAppreciations =
         _incomingAppreciations.values.toList();
 
@@ -112,6 +113,7 @@ class TransactionsBoss extends TransactionsBossInterface {
     outgoingAppreciationsNotifer.value = newOutgoingAppreciations;
     accountTxsNotifer.value = newAccountTxs;
 
+    debugPrint("Notify listeners...");
     notifyListeners();
   }
 
@@ -217,7 +219,7 @@ class TransactionsBoss extends TransactionsBossInterface {
     await updateWithTxs([transaction]);
   }
 
-  /// Add one or more transactions
+  /// Add one or more transactions to the local store
   /// This is public as it is called to store locally submitted user transactions
   /// If a locally created trnsaction, it will be submitted as soon as client
   /// knows that the user is on-chain
@@ -345,7 +347,6 @@ class TransactionsBoss extends TransactionsBossInterface {
     }
 
     _updateObservables();
-    notifyListeners();
   }
 
   /// Load txs and events from local data file
@@ -381,7 +382,6 @@ class TransactionsBoss extends TransactionsBossInterface {
     });
 
     _updateObservables();
-    notifyListeners();
   }
 
   /// Fetch transactions from the chain via the Karma Coin API
