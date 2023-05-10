@@ -26,6 +26,9 @@ class AppState {
   //// Mobile phone number canonical format for send KC transaction destination
   final ValueNotifier<String> sendDestinationPhoneNumber = ValueNotifier('');
 
+  //// Apprecaite dest when signup is complete
+  final ValueNotifier<bool> appreciateAfterSignup = ValueNotifier(false);
+
 //// Mobile phone number canonical format for send KC transaction destination
   final ValueNotifier<Destination> sendDestination =
       ValueNotifier(Destination.accountAddress);

@@ -1,6 +1,7 @@
-import 'package:countup/countup.dart';
+//import 'package:countup/countup.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/genesis_config.dart';
@@ -29,6 +30,8 @@ class UserHomeScreen extends StatefulWidget {
 }
 
 class _UserHomeScreenState extends State<UserHomeScreen> {
+  final NumberFormat _deicmalFormat = NumberFormat("#,###.#");
+
   final int animationDuration = 1;
   double coinWidth = 160.0;
   double coinLabelFontSize = 14.0;
@@ -55,6 +58,16 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   }
 
   void _postFrameCallback(BuildContext context) {
+    // handle appreciate after signup
+    if (appState.appreciateAfterSignup.value =
+        true && appState.sendDestinationPhoneNumber.value.isNotEmpty) {
+      appState.appreciateAfterSignup.value = false;
+      Navigator.of(context).push(CupertinoPageRoute(
+          fullscreenDialog: true,
+          builder: ((context) => const AppreciateWidget(communityId: 0))));
+      return;
+    }
+
     debugPrint("UserHomeScreen._postFrameCallback");
     Future.delayed(Duration.zero, () async {
       if (appState.signedUpInCurentSession.value && mounted) {
@@ -151,7 +164,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     duration: const Duration(seconds: 2),
                     configuration: const IconConfiguration(
                         icon: CupertinoIcons.stop_circle),
-                    title: 'Internal Error',
+                    title: 'Karmachain Error',
                     subtitle: 'Sorry, please try again later.',
                     dismissOnBackgroundTap: true,
                     maxWidth: statusAlertWidth,
@@ -184,32 +197,12 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      /*
-                      FittedBox(
-                        child: Text(
-                          'MORE BOUNCE TO THE OUNCE',
-                          textAlign: TextAlign.center,
-                          style: CupertinoTheme.of(context)
-                              .textTheme
-                              .textStyle
-                              .merge(
-                                const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.w400,
-                                    color: CupertinoColors.activeOrange),
-                              ),
-                        ),
-                      ),*/
                       const SizedBox(height: 20),
                       _getKarmaScoreWidget(context),
                       const TraitsScoresWheel(null, 0),
                       _getKarmaCoinWidget(context),
-                      //_getBalanceWidget(context),
                     ],
                   ),
-
-                  // _getCommunityWidget(context),
-
                   const SizedBox(height: 24),
                   CupertinoButton.filled(
                     onPressed: () async {
@@ -236,10 +229,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               debugPrint('Tapped karma score');
               if (!context.mounted) return;
 
-              Navigator.of(context).push(CupertinoPageRoute(
+              Navigator.of(context).push(
+                CupertinoPageRoute(
                   fullscreenDialog: true,
                   builder: ((context) =>
-                      const LeaderboardWidget(communityId: 0))));
+                      const LeaderboardWidget(communityId: 0)),
+                ),
+              );
             },
             child: Container(
               height: coinWidth,
@@ -301,13 +297,10 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           // kcents value
           double dispValue = value.toDouble();
           String labelText = 'KARMA CENTS';
-          if (value > 1000000) {
+          if (value >= 1000000) {
             dispValue /= 1000000.0;
             labelText = 'KARMA COINS';
           }
-
-          //String balance = KarmaCoinAmountFormatter.formatAmount(value);
-          //String unitsLabel = KarmaCoinAmountFormatter.getUnitsLabel(value);
 
           return GestureDetector(
             onTap: () async {
@@ -332,7 +325,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     children: [
                       FittedBox(
                         child: Text(
-                          dispValue.toString(),
+                          _deicmalFormat.format(dispValue),
                           style: CupertinoTheme.of(context)
                               .textTheme
                               .textStyle

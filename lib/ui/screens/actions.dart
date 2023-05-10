@@ -113,6 +113,17 @@ class _ActionsScreenState extends State<ActionsScreen> {
             onTap: () => context.push(ScreenPaths.account),
           ),
           CupertinoListTile.notched(
+            title: const Text('Public Profile'),
+            leading: const Icon(CupertinoIcons.bookmark, size: 28),
+            trailing: const CupertinoListTileChevron(),
+            onTap: () {
+              String userName =
+                  accountLogic.karmaCoinUser.value!.userName.value;
+              context.pushNamed(ScreenNames.profile,
+                  params: {'username': userName});
+            },
+          ),
+          CupertinoListTile.notched(
             title: const Text('Restore Account'),
             leading:
                 const Icon(CupertinoIcons.arrow_counterclockwise, size: 28),

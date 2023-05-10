@@ -4,6 +4,7 @@ import 'package:karma_coin/ui/screens/about.dart';
 import 'package:karma_coin/ui/screens/backup_account.dart';
 import 'package:karma_coin/ui/screens/community_home.dart';
 import 'package:karma_coin/ui/screens/karmachain.dart';
+import 'package:karma_coin/ui/screens/profile.dart';
 import 'package:karma_coin/ui/screens/restore_account.dart';
 import 'package:karma_coin/ui/screens/restore_account_intro.dart';
 import 'package:karma_coin/ui/screens/actions.dart';
@@ -55,6 +56,9 @@ class ScreenPaths {
   /// Guest home screen
   static String welcome = '/';
 
+  /// public profile url
+  static String profile = '/p/:username';
+
   /// Signed up user screen
   static String home = '/home';
 
@@ -99,6 +103,9 @@ class ScreenNames {
 
   /// Send KC screen
   static String send = 'send';
+
+  // public profile page / screen
+  static String profile = 'profile';
 
   /// Signed up user screen
   static String home = 'home';
@@ -189,6 +196,16 @@ final GoRouter appRouter = GoRouter(
         path: ScreenPaths.home,
         builder: (BuildContext context, GoRouterState state) {
           return const UserHomeScreen();
+        }),
+    GoRoute(
+        // Signed-in user home screen
+        path: ScreenPaths.profile,
+        name: ScreenNames.profile,
+        builder: (BuildContext context, GoRouterState state) {
+          final String userName = Uri.decodeFull(state.params['username']!);
+
+          // todo: show public profile screen of username
+          return ProfileScreen(ValueKey(userName), userName);
         }),
     GoRoute(
         // New User name input screen

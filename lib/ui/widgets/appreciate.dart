@@ -77,6 +77,12 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     phoneController =
         PhoneController(PhoneNumber(isoCode: code, nsn: defaultNumber));
 
+    // use phone number from state if available
+    if (appState.sendDestinationPhoneNumber.value.isNotEmpty) {
+      phoneController.value =
+          PhoneNumber.parse(appState.sendDestinationPhoneNumber.value);
+    }
+
     if (PlatformInfo.isMobile) {
       // contact picker only available in native mobile iOs or Android
       _contactPicker = contact_picker.FlutterContactPicker();
