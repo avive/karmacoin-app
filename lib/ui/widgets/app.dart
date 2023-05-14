@@ -34,7 +34,6 @@ class KarmaCoinApp extends StatelessWidget with GetItMixin {
                 scrollBehavior: MouseDragScrollBehavior(),
                 routerConfig: appRouter,
                 debugShowCheckedModeBanner: false,
-                useInheritedMediaQuery: true,
                 title: 'Karma Coin',
                 theme: const CupertinoThemeData(
                   primaryColor: CupertinoColors.activeOrange,

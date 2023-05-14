@@ -53,6 +53,20 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
 
         KarmaCoinUser user = accountLogic.karmaCoinUser.value!;
 
+        if (prefix != null &&
+            prefix.isNotEmpty &&
+            prefix[0].toLowerCase() == prefix[0]) {
+          // upper case search hack until server is update to be case neutral
+
+          String prefix1 = prefix[0].toUpperCase() + prefix.substring(1);
+
+          GetContactsResponse resp1 = await api.apiServiceClient.getContacts(
+              GetContactsRequest(
+                  prefix: prefix1, communityId: widget.communityId));
+
+          resp.contacts.addAll(resp1.contacts);
+        }
+
         // remove contacts without mobile numbers or user name
         resp.contacts
             .removeWhere((contact) => contact.userName == user.userName.value);

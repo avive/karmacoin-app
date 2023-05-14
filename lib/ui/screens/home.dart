@@ -99,6 +99,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       }
     });
 
+    /*
     if (!accountLogic.karmaMiningScreenDisplayed.value) {
       if (!context.mounted) return;
       Navigator.of(context).push(
@@ -107,7 +108,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           builder: ((context) => const AboutKarmaMining()),
         ),
       );
-    }
+    }*/
   }
 
   Widget _getAppreciationListener(BuildContext context) {

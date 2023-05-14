@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 
 class PlatformInfo {
@@ -17,8 +16,8 @@ class PlatformInfo {
   static bool get isMobile =>
       _mobilePlatforms.contains(defaultTargetPlatform) && !kIsWeb;
 
-  static double get pixelRatio =>
-      WidgetsBinding.instance.window.devicePixelRatio;
+  //static double get pixelRatio =>
+  //    WidgetsBinding.instance.window.devicePixelRatio;
 
   static bool get isWindows => defaultTargetPlatform == TargetPlatform.windows;
   static bool get isLinux => defaultTargetPlatform == TargetPlatform.linux;
