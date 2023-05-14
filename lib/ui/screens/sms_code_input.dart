@@ -15,6 +15,8 @@ class SmsCodeInputScreen extends StatefulWidget {
 class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
   bool submitInProgress = false;
 
+  final _formKey = GlobalKey<FormState>();
+
   @override
   initState() {
     super.initState();
@@ -100,28 +102,32 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 480),
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text('Enter the verification code sent to your phone',
-                            textAlign: TextAlign.center,
-                            style: CupertinoTheme.of(context)
-                                .textTheme
-                                .navTitleTextStyle),
-                        const SizedBox(height: 16),
-                        Material(
-                          child: Pinput(
-                              androidSmsAutofillMethod:
-                                  AndroidSmsAutofillMethod.smsUserConsentApi,
-                              autofocus: true,
-                              length: 6,
-                              onCompleted: (pin) async {
-                                await _submitCode(context, pin);
-                              }),
-                        ),
-                        const SizedBox(height: 36),
-                        _getIndicator(context),
-                      ]),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text('Enter the verification code sent to your phone',
+                              textAlign: TextAlign.center,
+                              style: CupertinoTheme.of(context)
+                                  .textTheme
+                                  .navTitleTextStyle),
+                          const SizedBox(height: 16),
+                          Material(
+                            child: Pinput(
+                                androidSmsAutofillMethod:
+                                    AndroidSmsAutofillMethod.smsUserConsentApi,
+                                autofocus: true,
+                                keyboardType: TextInputType.number,
+                                length: 6,
+                                onCompleted: (pin) async {
+                                  await _submitCode(context, pin);
+                                }),
+                          ),
+                          const SizedBox(height: 36),
+                          _getIndicator(context),
+                        ]),
+                  ),
                 ),
               ),
             ),

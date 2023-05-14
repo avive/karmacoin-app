@@ -1,6 +1,4 @@
 PODS:
-  - desktop_webview_auth (0.0.1):
-    - Flutter
   - device_info_plus (0.0.1):
     - Flutter
   - Firebase/Analytics (10.7.0):
@@ -13,9 +11,6 @@ PODS:
     - FirebaseAnalytics (~> 10.7.0)
   - Firebase/CoreOnly (10.7.0):
     - FirebaseCore (= 10.7.0)
-  - Firebase/DynamicLinks (10.7.0):
-    - Firebase/CoreOnly
-    - FirebaseDynamicLinks (~> 10.7.0)
   - firebase_analytics (10.2.1):
     - Firebase/Analytics (= 10.7.0)
     - firebase_core
@@ -24,12 +19,8 @@ PODS:
     - Firebase/Auth (= 10.7.0)
     - firebase_core
     - Flutter
-  - firebase_core (2.10.0):
+  - firebase_core (2.12.0):
     - Firebase/CoreOnly (= 10.7.0)
-    - Flutter
-  - firebase_dynamic_links (5.0.17):
-    - Firebase/DynamicLinks (= 10.7.0)
-    - firebase_core
     - Flutter
   - FirebaseAnalytics (10.7.0):
     - FirebaseAnalytics/AdIdSupport (= 10.7.0)
@@ -60,8 +51,6 @@ PODS:
     - GoogleUtilities/Logger (~> 7.8)
   - FirebaseCoreInternal (10.8.0):
     - "GoogleUtilities/NSData+zlib (~> 7.8)"
-  - FirebaseDynamicLinks (10.7.0):
-    - FirebaseCore (~> 10.0)
   - FirebaseInstallations (10.8.0):
     - FirebaseCore (~> 10.0)
     - GoogleUtilities/Environment (~> 7.8)
@@ -134,18 +123,16 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
-  - desktop_webview_auth (from `.symlinks/plugins/desktop_webview_auth/ios`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - firebase_analytics (from `.symlinks/plugins/firebase_analytics/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
-  - firebase_dynamic_links (from `.symlinks/plugins/firebase_dynamic_links/ios`)
   - Flutter (from `Flutter`)
   - flutter_native_contact_picker (from `.symlinks/plugins/flutter_native_contact_picker/ios`)
   - flutter_native_splash (from `.symlinks/plugins/flutter_native_splash/ios`)
   - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
-  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/ios`)
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/ios`)
   - smart_auth (from `.symlinks/plugins/smart_auth/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
@@ -157,7 +144,6 @@ SPEC REPOS:
     - FirebaseAuth
     - FirebaseCore
     - FirebaseCoreInternal
-    - FirebaseDynamicLinks
     - FirebaseInstallations
     - GoogleAppMeasurement
     - GoogleUtilities
@@ -166,8 +152,6 @@ SPEC REPOS:
     - PromisesObjC
 
 EXTERNAL SOURCES:
-  desktop_webview_auth:
-    :path: ".symlinks/plugins/desktop_webview_auth/ios"
   device_info_plus:
     :path: ".symlinks/plugins/device_info_plus/ios"
   firebase_analytics:
@@ -176,8 +160,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_auth/ios"
   firebase_core:
     :path: ".symlinks/plugins/firebase_core/ios"
-  firebase_dynamic_links:
-    :path: ".symlinks/plugins/firebase_dynamic_links/ios"
   Flutter:
     :path: Flutter
   flutter_native_contact_picker:
@@ -189,7 +171,7 @@ EXTERNAL SOURCES:
   package_info_plus:
     :path: ".symlinks/plugins/package_info_plus/ios"
   path_provider_foundation:
-    :path: ".symlinks/plugins/path_provider_foundation/ios"
+    :path: ".symlinks/plugins/path_provider_foundation/darwin"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/ios"
   smart_auth:
@@ -198,18 +180,15 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
-  desktop_webview_auth: d645139460ef203d50bd0cdb33356785dd939cce
   device_info_plus: e5c5da33f982a436e103237c0c85f9031142abed
   Firebase: 0219acf760880eeec8ce479895bd7767466d9f81
   firebase_analytics: e8e294333de66e5429d4aac365966281b4dbfb7d
   firebase_auth: c7c7a37827bf9c810a01d9c76aa9275da73f985d
-  firebase_core: 18d44f087248303a4a8f05d0099a000c46e3c77a
-  firebase_dynamic_links: 90f97c9dcb90d1d05162b81f14c6ccd408a45bfe
+  firebase_core: 312d0d81b346ec20540822c8498e626d6918ef48
   FirebaseAnalytics: f8133442ee6f8512e28ff19e62ce15398bfaeace
   FirebaseAuth: dd64c01631df724b09f33e584625775c52f7d71f
   FirebaseCore: e317665b9d744727a97e623edbbed009320afdd7
   FirebaseCoreInternal: fa2899eb1f340054858d289e5a0fb935a0a74e52
-  FirebaseDynamicLinks: 16a8fae3697fba66fed7a1d646fe59f30d42aa31
   FirebaseInstallations: b2a05a3fe707df764345d68685534d07d0664af3
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
   flutter_native_contact_picker: bd430ba0fbf82768bb50c2c52a69a65759a8f907

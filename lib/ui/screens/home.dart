@@ -9,7 +9,6 @@ import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/services/api/api.pb.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
-import 'package:karma_coin/ui/widgets/about_karma_mining.dart';
 import 'package:karma_coin/ui/widgets/animated_background.dart';
 import 'package:karma_coin/ui/widgets/animated_wave.dart';
 import 'package:karma_coin/ui/widgets/animated_wave_right.dart';
@@ -44,7 +43,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   void initState() {
     super.initState();
 
-    Size size = WidgetsBinding.instance.window.physicalSize;
+    Size size = View.of(context).physicalSize;
     double height = size.height;
     if (height <= smallScreenHeight && !kIsWeb) {
       coinWidth = 120.0;

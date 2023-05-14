@@ -7,7 +7,9 @@ class AnimatedBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Brightness brightness = WidgetsBinding.instance.window.platformBrightness;
+    Brightness brightness =
+        WidgetsBinding.instance.platformDispatcher.platformBrightness;
+
     Color bcgColor =
         brightness == Brightness.dark ? Colors.black : Colors.white;
 
