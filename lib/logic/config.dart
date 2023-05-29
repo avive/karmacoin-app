@@ -5,7 +5,7 @@ import 'package:karma_coin/common/platform_info.dart';
 
 // todo: migrate from json file to a hive box
 
-/// App settings logic
+/// App config logic
 class ConfigLogic {
   // constants - should come from config
 
@@ -30,6 +30,9 @@ class ConfigLogic {
   // Client should only accept verifier responses signed by this account
   late final verifierAccountId = ValueNotifier<String>(
       'fe9d0c0df86c72ae733bf9ec0eeaff6e43e29bad4488f5e4845e455ea1095bf3');
+
+  late final firebaseWebPushPubKey =
+      "BPCf2pl7oLrgSWJJjEXzKfTIe4atfDay5-Aw9u0Ge8IgtfozLq1jkYPfJ0ccEY9D9cdqoAgxcbx4rGEhQC5nMN4";
 
   // requested user name entered by the user. For the canonical user-name, check AccountLogic
   late final requestedUserName = ValueNotifier<String>('');

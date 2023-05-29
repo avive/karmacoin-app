@@ -198,9 +198,11 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
         appState.phoneAuthVerificationCodeId = verificationId;
         accountLogic.phoneNumber.value = number;
 
-        setState(() {
-          isSigninIn = false;
-        });
+        if (mounted) {
+          setState(() {
+            isSigninIn = false;
+          });
+        }
 
         Future.delayed(Duration.zero, () {
           context.push(ScreenPaths.verify);

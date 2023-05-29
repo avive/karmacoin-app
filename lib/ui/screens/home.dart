@@ -1,4 +1,4 @@
-//import 'package:countup/countup.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
@@ -43,6 +43,15 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   void initState() {
     super.initState();
 
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _postFrameCallback(context));
+  }
+
+  @override
+  @mustCallSuper
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
     Size size = View.of(context).physicalSize;
     double height = size.height;
     if (height <= smallScreenHeight && !kIsWeb) {
@@ -51,9 +60,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       coinNumberFontSize = 40.0;
       coinOutlineWidth = 4.0;
     }
-
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => _postFrameCallback(context));
   }
 
   void _postFrameCallback(BuildContext context) {
@@ -95,6 +101,16 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               maxWidth: statusAlertWidth);
         }
         return;
+      }
+
+      if (PlatformInfo.isIOS) {
+        // iOS push notes - will trigger dialog box to allow notificaitons
+        final fcmToken = await FirebaseMessaging.instance.getToken();
+        debugPrint('FCM Token: $fcmToken');
+      } else if (kIsWeb) {
+        final fcmToken = await FirebaseMessaging.instance
+            .getToken(vapidKey: settingsLogic.firebaseWebPushPubKey);
+        debugPrint('FCM Token: $fcmToken');
       }
     });
 
