@@ -81,4 +81,10 @@ abstract class AccountLogicInterface {
   bool validateDataForNewKarmCoinUser();
   bool validateDataForPhoneVerification();
   bool validateDataForNewUserTransaction();
+
+  // Set received FCM push note token
+  Future<void> setFCMPushNoteToken(String token);
+
+  // Get known FCM push note token
+  final ValueNotifier<String?> fcmToken = ValueNotifier<String?>(null);
 }

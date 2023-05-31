@@ -31,6 +31,7 @@ class _AccountStoreKeys {
   static String karmaCoinUser = 'karma_coin_user';
   static String verificationData = 'verification_data';
   static String displayKarmaMiningScreen = 'display_karma_mining_screen';
+  static String fcmTokenKey = "fcm_token";
 }
 
 /// Local karmaCoin account logic. We seperate between authentication and account. Authentication is handled by Firebase Auth.
@@ -133,8 +134,23 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
           UserVerificationData.fromBuffer(base64.decode(verificationData));
     }
 
+    // Read last known fcm token for device
+    String? token = await _secureStorage.read(
+        key: _AccountStoreKeys.fcmTokenKey, aOptions: _aOptions);
+    if (token != null) {
+      fcmToken.value = token;
+    }
+
     _registerFirebase();
     _registerCallbacks();
+  }
+
+  @override
+  Future<void> setFCMPushNoteToken(String token) async {
+    await _secureStorage.write(
+        key: _AccountStoreKeys.fcmTokenKey, value: token, aOptions: _aOptions);
+
+    fcmToken.value = token;
   }
 
   /// Register on firebase user changes and update account logic when user changes
@@ -434,6 +450,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     accountSecurityWords.value = null;
     karmaCoinUser.value = null;
     _userVerificationData = null;
+    fcmToken.value = null;
 
     // reset account setup state
     accountSetupController.setStatus(AccountSetupStatus.readyToSignup);

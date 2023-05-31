@@ -48,8 +48,13 @@ dependencies:
   flutter_secure_storage: ^7.0.1
   ed25519_edwards: ^0.3.1
   bip39: ^1.0.6
+ 
   firebase_core: ^2.4.1
   firebase_auth: ^4.2.5
+  firebase_analytics: ^10.4.1
+  firebase_messaging: ^14.6.2
+  cloud_firestore: ^4.8.0
+
   hex: ^0.2.0
   path_provider: ^2.0.11
   quiver: ^3.2.1
@@ -78,9 +83,7 @@ dependencies:
      git:
       url: https://github.com/avive/flutter_native_contact_picker
       ref: master # branch name
-  firebase_analytics: ^10.4.1
   pinput: ^2.2.31
-  firebase_messaging: ^14.6.1
 
 dev_dependencies:
   flutter_test:

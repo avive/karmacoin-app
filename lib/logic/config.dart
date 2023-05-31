@@ -1,5 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/common/platform_info.dart';
+import 'package:karma_coin/data/kc_user.dart';
 
 // todo: add settings interface
 
@@ -7,8 +12,6 @@ import 'package:karma_coin/common/platform_info.dart';
 
 /// App config logic
 class ConfigLogic {
-  // constants - should come from config
-
   /// Set to true to work against localhost servers. Otherwise production servers are used
   final bool apiLocalMode = false;
 
@@ -64,5 +67,134 @@ class ConfigLogic {
     }
   }
 
-  // final bool useBlurs = !PlatformInfo.isAndroid;
+  // push notificaiton handling
+  ////////////////////
+
+  /// Handle push token change
+  /// Note: This callback is fired at each app startup and whenever a new
+  /// token is generated.
+
+  Future<void> setupPushNotifications() async {
+    debugPrint('Setting up push notes...');
+    FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
+      String? lastToken = accountLogic.fcmToken.value;
+
+      if (lastToken != null && lastToken == fcmToken) {
+        // we already sent this token to the server and it is stored locally
+        return;
+      }
+
+      _sendUserTokenToServer(fcmToken);
+    }).onError((err) {
+      // Error getting token.
+    });
+
+    // Get any messages which caused the application to open from a
+    // terminated state.
+    RemoteMessage? initialMessage =
+        await FirebaseMessaging.instance.getInitialMessage();
+
+    if (initialMessage != null) {
+      _handleMessage(initialMessage);
+    }
+
+    // Also handle any interaction when the app is in the background via a stream listener
+    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
+  }
+
+  /// Send the user's push token to the server
+  Future<void> _sendUserTokenToServer(String token) async {
+    final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+    if (firebaseAuth.currentUser == null) {
+      debugPrint(
+          'User not firebase authenticated. Cannot send token to server.');
+      return;
+    }
+
+    KarmaCoinUser? karmaUser = accountLogic.karmaCoinUser.value;
+    if (karmaUser == null) {
+      debugPrint('No local karma coin user. Cannot send token to server.');
+      return;
+    }
+
+    final fireStore = FirebaseFirestore.instance;
+    String userId = firebaseAuth.currentUser!.uid;
+    debugPrint('Firebase auth user id: $userId');
+    final data = <String, String>{
+      'token': token,
+      'timeStamp': DateTime.now().millisecondsSinceEpoch.toString(),
+    };
+
+    await fireStore.collection('users').doc(userId).get().then((doc) async {
+      if (!doc.exists) {
+        debugPrint('User not found in firestore. creating record...');
+
+        await fireStore.collection('users').doc(userId).set({
+          'tokens': FieldValue.arrayUnion([data]),
+          'accountId': karmaUser.userData.accountId.data.toBase64(),
+          'phoneNumber': karmaUser.userData.mobileNumber.number,
+          'userName': karmaUser.userData.userName,
+        });
+
+        debugPrint("Stored token in firestore");
+      } else {
+        debugPrint('user tokens exist - read the tokens and update as needed');
+
+        dynamic tokens = doc.data()!['tokens'] as List<dynamic>;
+
+        for (Map<String, dynamic> tokenData in tokens) {
+          String? aToken = tokenData['token'];
+          if (token == aToken) {
+            debugPrint('Token already stored in cloud firestore');
+
+            tokenData['timeStamp'] = data['timeStamp'];
+            await fireStore.collection('users').doc(userId).update({
+              'tokens': tokens,
+            });
+            debugPrint('Updated token timestamp in cloud firestore');
+            return;
+          }
+        }
+
+        // token not in fire store - add it...
+        await fireStore.collection('users').doc(userId).update({
+          'tokens': FieldValue.arrayUnion([token]),
+        });
+
+        debugPrint("Added token to firestore");
+      }
+    });
+
+    // store locally in account logic
+    await accountLogic.setFCMPushNoteToken(token);
+  }
+
+  /// Register for push notes - may show dialog box to allow notifications
+  Future<void> registerPushNotifications() async {
+    try {
+      if (PlatformInfo.isIOS) {
+        // iOS push notes - will trigger dialog box to allow notificaitons
+        final fcmToken = await FirebaseMessaging.instance.getToken();
+        debugPrint('Got FCM Token: $fcmToken');
+        if (fcmToken != null) {
+          await _sendUserTokenToServer(fcmToken);
+        }
+      } else if (kIsWeb) {
+        final fcmToken = await FirebaseMessaging.instance
+            .getToken(vapidKey: settingsLogic.firebaseWebPushPubKey);
+        debugPrint('Got FCM Token: $fcmToken');
+        if (fcmToken != null) {
+          await _sendUserTokenToServer(fcmToken);
+        }
+      }
+    } catch (err) {
+      debugPrint('Error registering for push notifications: $err');
+    }
+  }
+
+  /// Handle a received push notificaiton
+  void _handleMessage(RemoteMessage message) {
+    debugPrint('Got push notification: $message');
+    // todo: implement me
+  }
 }

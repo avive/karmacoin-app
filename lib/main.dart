@@ -20,10 +20,10 @@ void main() async {
 
   analytics.logEvent(name: "app_started");
 
-  // this removes the # from web routes for go router
-  // setPathUrlStrategy();
-
   await appLogic.bootstrap();
+
+  // setup push notes (but don't wait on it per docs)
+  settingsLogic.setupPushNotifications();
 
   runApp(KarmaCoinApp());
   FlutterNativeSplash.remove();

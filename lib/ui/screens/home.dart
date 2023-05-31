@@ -1,4 +1,3 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
@@ -103,27 +102,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         return;
       }
 
-      if (PlatformInfo.isIOS) {
-        // iOS push notes - will trigger dialog box to allow notificaitons
-        final fcmToken = await FirebaseMessaging.instance.getToken();
-        debugPrint('FCM Token: $fcmToken');
-      } else if (kIsWeb) {
-        final fcmToken = await FirebaseMessaging.instance
-            .getToken(vapidKey: settingsLogic.firebaseWebPushPubKey);
-        debugPrint('FCM Token: $fcmToken');
-      }
+      // register for push notes but don't wait on it - may show dialog
+      settingsLogic.registerPushNotifications();
     });
-
-    /*
-    if (!accountLogic.karmaMiningScreenDisplayed.value) {
-      if (!context.mounted) return;
-      Navigator.of(context).push(
-        CupertinoPageRoute(
-          fullscreenDialog: true,
-          builder: ((context) => const AboutKarmaMining()),
-        ),
-      );
-    }*/
   }
 
   Widget _getAppreciationListener(BuildContext context) {
