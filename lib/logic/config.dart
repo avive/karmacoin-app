@@ -73,7 +73,6 @@ class ConfigLogic {
   /// Handle push token change
   /// Note: This callback is fired at each app startup and whenever a new
   /// token is generated.
-
   Future<void> setupPushNotifications() async {
     debugPrint('Setting up push notes...');
     FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
@@ -84,7 +83,7 @@ class ConfigLogic {
         return;
       }
 
-      _sendUserTokenToServer(fcmToken);
+      _processPushNoteToken(fcmToken);
     }).onError((err) {
       // Error getting token.
     });
@@ -102,8 +101,9 @@ class ConfigLogic {
     FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
   }
 
-  /// Send the user's push token to the server
-  Future<void> _sendUserTokenToServer(String token) async {
+  /// Process a push note token.
+  /// Store it in cloud firestore for the user and locally.
+  Future<void> _processPushNoteToken(String token) async {
     final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
     if (firebaseAuth.currentUser == null) {
       debugPrint(
@@ -172,19 +172,31 @@ class ConfigLogic {
   /// Register for push notes - may show dialog box to allow notifications
   Future<void> registerPushNotifications() async {
     try {
+      // request permissions before FCM registraiton
+      // ref: https://firebase.google.com/codelabs/firebase-fcm-flutter#3
+      final settings = await FirebaseMessaging.instance.requestPermission(
+        alert: true,
+        announcement: false,
+        badge: true,
+        carPlay: false,
+        criticalAlert: false,
+        provisional: false,
+        sound: true,
+      );
+
       if (PlatformInfo.isIOS) {
         // iOS push notes - will trigger dialog box to allow notificaitons
         final fcmToken = await FirebaseMessaging.instance.getToken();
         debugPrint('Got FCM Token: $fcmToken');
         if (fcmToken != null) {
-          await _sendUserTokenToServer(fcmToken);
+          await _processPushNoteToken(fcmToken);
         }
       } else if (kIsWeb) {
         final fcmToken = await FirebaseMessaging.instance
             .getToken(vapidKey: settingsLogic.firebaseWebPushPubKey);
         debugPrint('Got FCM Token: $fcmToken');
         if (fcmToken != null) {
-          await _sendUserTokenToServer(fcmToken);
+          await _processPushNoteToken(fcmToken);
         }
       }
     } catch (err) {

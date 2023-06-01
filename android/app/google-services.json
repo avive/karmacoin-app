@@ -7,84 +7,36 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:18491747418:android:046d4f8663fbe8a4a73c63",
-        "android_client_info": {
-          "package_name": "com.example.firebase_auth_demo"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "18491747418-6uj8882h97ru1nfs9jq82kuc0q6hfqtp.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCFRIu5QhlWHvxvDlU-CrhF5ZqMJd-9D3E"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "18491747418-6uj8882h97ru1nfs9jq82kuc0q6hfqtp.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "18491747418-5tt7c8g8cfbui123hdr4okq56d9eil6d.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "in.karmaco.app.RunnerTests"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:18491747418:android:8d7b3f9ba06fd9bea73c63",
-        "android_client_info": {
-          "package_name": "com.example.flutter_application_1"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "18491747418-6uj8882h97ru1nfs9jq82kuc0q6hfqtp.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCFRIu5QhlWHvxvDlU-CrhF5ZqMJd-9D3E"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "18491747418-6uj8882h97ru1nfs9jq82kuc0q6hfqtp.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "18491747418-5tt7c8g8cfbui123hdr4okq56d9eil6d.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "in.karmaco.app.RunnerTests"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:18491747418:android:f616de2070a4e67ca73c63",
         "android_client_info": {
           "package_name": "in.karmaco.app"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "18491747418-6c7u5ufmclidi8krdkkhb95slm0pr7uq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "in.karmaco.app",
+            "certificate_hash": "da39a3ee5e6b4b0d3255bfef95601890afd80709"
+          }
+        },
+        {
+          "client_id": "18491747418-9f33v4j6l1sir4tvmkl16j6gpa7rpskv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "in.karmaco.app",
+            "certificate_hash": "d3e4aaf9352d2116868704cb565a2f7af9ad6bfa"
+          }
+        },
+        {
+          "client_id": "18491747418-l92jcebcqflk7p34na3bvhujjj9fejth.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "in.karmaco.app",
+            "certificate_hash": "6a57a273d7c5330fbcac2b9ba7fc949addb88895"
+          }
+        },
         {
           "client_id": "18491747418-6uj8882h97ru1nfs9jq82kuc0q6hfqtp.apps.googleusercontent.com",
           "client_type": 3

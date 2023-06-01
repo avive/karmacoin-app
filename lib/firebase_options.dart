@@ -45,12 +45,12 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyAqi1ZsG1XdQ7nRXVU0xbzEuwaqD7SkBik',
-    appId: '1:18491747418:web:fc9f8a3275d34349a73c63',
+    appId: '1:18491747418:web:6e0edb0f24103ca0a73c63',
     messagingSenderId: '18491747418',
     projectId: 'karmacoin-83d45',
     authDomain: 'karmacoin-83d45.firebaseapp.com',
     storageBucket: 'karmacoin-83d45.appspot.com',
-    measurementId: 'G-9B92JFMTS6',
+    measurementId: 'G-BY4MSSGR0C',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
@@ -67,16 +67,18 @@ class DefaultFirebaseOptions {
     messagingSenderId: '18491747418',
     projectId: 'karmacoin-83d45',
     storageBucket: 'karmacoin-83d45.appspot.com',
+    androidClientId: '18491747418-6c7u5ufmclidi8krdkkhb95slm0pr7uq.apps.googleusercontent.com',
     iosClientId: '18491747418-rk55e4alj06fibpid95o1n2acuqpicbs.apps.googleusercontent.com',
     iosBundleId: 'in.karmaco.app',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyBSdm_ICSvy4AdKYTc398zDvPpWr0_LaSo',
-    appId: '1:18491747418:ios:c103f6064d1ad3e9a73c63',
+    appId: '1:18491747418:ios:53c65ab065dfac77a73c63',
     messagingSenderId: '18491747418',
     projectId: 'karmacoin-83d45',
     storageBucket: 'karmacoin-83d45.appspot.com',
+    androidClientId: '18491747418-6c7u5ufmclidi8krdkkhb95slm0pr7uq.apps.googleusercontent.com',
     iosClientId: '18491747418-5tt7c8g8cfbui123hdr4okq56d9eil6d.apps.googleusercontent.com',
     iosBundleId: 'in.karmaco.app.RunnerTests',
   );
