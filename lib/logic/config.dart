@@ -174,7 +174,7 @@ class ConfigLogic {
     try {
       // request permissions before FCM registraiton
       // ref: https://firebase.google.com/codelabs/firebase-fcm-flutter#3
-      final settings = await FirebaseMessaging.instance.requestPermission(
+      await FirebaseMessaging.instance.requestPermission(
         alert: true,
         announcement: false,
         badge: true,
@@ -184,7 +184,7 @@ class ConfigLogic {
         sound: true,
       );
 
-      if (PlatformInfo.isIOS) {
+      if (PlatformInfo.isMobile) {
         // iOS push notes - will trigger dialog box to allow notificaitons
         final fcmToken = await FirebaseMessaging.instance.getToken();
         debugPrint('Got FCM Token: $fcmToken');

@@ -9,13 +9,17 @@ Web, iOS, Android
 ## Scripts
 
 ### Create native splash screen
+Needed if you modify `flutter_native_splash.yaml`
 ```bash
 flutter pub run flutter_native_splash:create
 ```
 
 ### Build an Android Relase
 ```bash
+# apk for app stores
 flutter build apk
+# app bundle for google play store
+flutter build appbundle
 ```
 
 ### Build Web App
