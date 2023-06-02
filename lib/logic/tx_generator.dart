@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:karma_coin/data/genesis_config.dart';
@@ -39,6 +40,8 @@ abstract class TrnasactionGenerator {
 
     debugPrint('submitting payment tx via the api...');
 
+    await FirebaseAnalytics.instance.logEvent(name: "submit_payment_tx");
+
     try {
       resp = await api.apiServiceClient.submitTransaction(
           SubmitTransactionRequest(transaction: signedTx.transaction));
@@ -65,11 +68,21 @@ abstract class TrnasactionGenerator {
 
         debugPrint("finished updating state");
 
+        await FirebaseAnalytics.instance
+            .logEvent(name: "submit_payment_tx_success", parameters: {
+          "amount": data.kCentsAmount,
+          "trait_id": paymentTx.charTraitId,
+          "community_id": paymentTx.communityId
+        });
+
         break;
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
         signedTx.status = TransactionStatus.TRANSACTION_STATUS_REJECTED;
 
         debugPrint('transaction rejected by api');
+
+        await FirebaseAnalytics.instance
+            .logEvent(name: "submit_payment_tx_rejected");
 
         // store via txs boss so tx can be resent later by user
         txsBoss.updateWithTx(enriched);

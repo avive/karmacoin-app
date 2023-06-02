@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:karma_coin/services/api/api.pbgrpc.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 import '../common_libs.dart';
@@ -91,6 +92,7 @@ class AccountSetupController extends ChangeNotifier {
           if (_status != AccountSetupStatus.signedUp) {
             setStatus(AccountSetupStatus.signedUp);
             appState.signedUpInCurentSession.value = true;
+            await FirebaseAnalytics.instance.logEvent(name: "sign_up");
             debugPrint('*** going to user home...');
             pushNamedAndRemoveUntil(ScreenPaths.home);
           }

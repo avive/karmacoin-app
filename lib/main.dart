@@ -16,9 +16,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-
-  analytics.logEvent(name: "app_started");
+  FirebaseAnalytics.instance.logEvent(name: "app_started");
 
   await appLogic.bootstrap();
 
