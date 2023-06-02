@@ -108,11 +108,21 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
     String number =
         '+${phoneController.value!.countryCode}${phoneController.value!.nsn}';
     debugPrint(
-        'Phone number canonical string: $number. Calling firebase api...');
+        'Phone number canonical string: $number. Calling feirebase api...');
 
     setState(() {
       isSigninIn = true;
     });
+
+    // override verification on emulator
+    if (PlatformInfo.isAndroid) {
+      if (await PlatformInfo.isRunningOnAndroidEmulator()) {
+        FirebaseAuth.instance.setSettings(
+            appVerificationDisabledForTesting: true, forceRecaptchaFlow: true);
+      } else {
+        FirebaseAuth.instance.setSettings(forceRecaptchaFlow: true);
+      }
+    }
 
     await FirebaseAuth.instance.verifyPhoneNumber(
       phoneNumber: number,
