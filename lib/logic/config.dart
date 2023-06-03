@@ -130,7 +130,7 @@ class ConfigLogic {
         debugPrint('User not found in firestore. creating record...');
 
         await fireStore.collection('users').doc(userId).set({
-          'tokens': FieldValue.arrayUnion([data]),
+          'tokens': [data],
           'accountId': karmaUser.userData.accountId.data.toBase64(),
           'phoneNumber': karmaUser.userData.mobileNumber.number,
           'userName': karmaUser.userData.userName,
@@ -146,7 +146,6 @@ class ConfigLogic {
           String? aToken = tokenData['token'];
           if (token == aToken) {
             debugPrint('Token already stored in cloud firestore');
-
             tokenData['timeStamp'] = data['timeStamp'];
             await fireStore.collection('users').doc(userId).update({
               'tokens': tokens,
@@ -158,7 +157,7 @@ class ConfigLogic {
 
         // token not in fire store - add it...
         await fireStore.collection('users').doc(userId).update({
-          'tokens': FieldValue.arrayUnion([token]),
+          'tokens': FieldValue.arrayUnion([data]),
         });
 
         debugPrint("Added token to firestore");
