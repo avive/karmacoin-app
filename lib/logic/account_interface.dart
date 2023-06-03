@@ -68,6 +68,9 @@ abstract class AccountLogicInterface {
   Future<SubmitTransactionResponse> submitPaymentTransaction(
       PaymentTransactionData data);
 
+  /// Submit delete account tx
+  Future<SubmitTransactionResponse> submitDeleteAccountTransaction();
+
   final ValueNotifier<KarmaCoinUser?> karmaCoinUser =
       ValueNotifier<KarmaCoinUser?>(null);
 

@@ -153,6 +153,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
         setState(() {
           isSigninIn = false;
         });
+
         Future.delayed(Duration.zero, () {
           debugPrint('navigate to user name...');
           context.push(ScreenPaths.newUserName);
@@ -198,6 +199,10 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
         debugPrint('verification code id: $verificationId');
         appState.phoneAuthVerificationCodeId = verificationId;
         accountLogic.phoneNumber.value = number;
+
+        setState(() {
+          isSigninIn = false;
+        });
 
         Future.delayed(Duration.zero, () {
           context.push(ScreenPaths.verify);

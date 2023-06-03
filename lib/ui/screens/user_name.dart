@@ -180,7 +180,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
 
       switch (widget.operation) {
         case Operation.signUp:
-          debugPrint('*** astarting signup flow...');
+          debugPrint('*** starting signup flow...');
           await accountSetupController.signUpUser();
           break;
         case Operation.updateUserName:

@@ -14,8 +14,9 @@ class SmsCodeInputScreen extends StatefulWidget {
 
 class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
   bool submitInProgress = false;
-
   final _formKey = GlobalKey<FormState>();
+  final pinController = TextEditingController();
+  final pinputFocusNode = FocusNode();
 
   @override
   initState() {
@@ -46,6 +47,9 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
           configuration: const IconConfiguration(icon: CupertinoIcons.bookmark),
           maxWidth: statusAlertWidth,
         );
+
+        pinController.clear();
+        pinputFocusNode.requestFocus();
 
         setState(() {
           submitInProgress = false;
@@ -115,6 +119,8 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
                           const SizedBox(height: 16),
                           Material(
                             child: Pinput(
+                                controller: pinController,
+                                focusNode: pinputFocusNode,
                                 androidSmsAutofillMethod:
                                     AndroidSmsAutofillMethod.smsUserConsentApi,
                                 autofocus: true,

@@ -683,6 +683,20 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
   }
 
   @override
+  Future<SubmitTransactionResponse> submitDeleteAccountTransaction() async {
+    // delete account on chain
+    SubmitTransactionResponse resp = await submitDeleteAccountTransactionImp(
+        karmaCoinUser.value!, keyPair.value!);
+
+    // clear local data
+    await accountLogic.clear();
+    await authLogic.signOut();
+
+    debugPrint("Delete response: ${resp.submitTransactionResult}");
+    return resp;
+  }
+
+  @override
   Future<SubmitTransactionResponse> submitPaymentTransaction(
       PaymentTransactionData data) async {
     // We submit it to chain even if we are in local mode as the tx will go

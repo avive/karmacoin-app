@@ -1,4 +1,21 @@
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 import '../../common_libs.dart';
+
+class DeleteDataTile extends StatelessWidget {
+  const DeleteDataTile({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoListTile.notched(
+      title: const Text('Delete Local App Data'),
+      leading: const Icon(CupertinoIcons.trash, size: 28),
+      onTap: () {
+        _displayDeleteDataWarning(context);
+      },
+    );
+  }
+}
 
 class DeleteAccountTile extends StatelessWidget {
   const DeleteAccountTile({super.key});
@@ -6,16 +23,16 @@ class DeleteAccountTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoListTile.notched(
-      title: const Text('Delete App Data'),
-      leading: const Icon(CupertinoIcons.delete, size: 28),
+      title: const Text('Delete Account'),
+      leading: const FaIcon(FontAwesomeIcons.userXmark, size: 22),
       onTap: () {
-        _displayWarning(context);
+        _displayDeleteAccountWarning(context);
       },
     );
   }
 }
 
-void _displayWarning(BuildContext context) {
+void _displayDeleteDataWarning(BuildContext context) {
   showCupertinoModalPopup<void>(
     context: context,
     builder: (BuildContext context) => CupertinoAlertDialog(
@@ -24,8 +41,6 @@ void _displayWarning(BuildContext context) {
           '\nAre you sure that you backed up your account, you want to delete all local account data and sign out?'),
       actions: <CupertinoDialogAction>[
         CupertinoDialogAction(
-          /// This parameter indicates this action is the default,
-          /// and turns the action's text to bold text.
           isDefaultAction: true,
           onPressed: () {
             Navigator.pop(context);
@@ -33,9 +48,6 @@ void _displayWarning(BuildContext context) {
           child: const Text('No'),
         ),
         CupertinoDialogAction(
-          /// This parameter indicates the action would perform
-          /// a destructive action such as deletion, and turns
-          /// the action's text color to red.
           isDestructiveAction: true,
           onPressed: () async {
             if (context.canPop()) {
@@ -49,6 +61,39 @@ void _displayWarning(BuildContext context) {
                 await authLogic.signOut();
               });
             });
+          },
+          child: const Text('Yes'),
+        ),
+      ],
+    ),
+  );
+}
+
+void _displayDeleteAccountWarning(BuildContext context) {
+  showCupertinoModalPopup<void>(
+    context: context,
+    builder: (BuildContext context) => CupertinoAlertDialog(
+      title: const Text('Delete Account'),
+      content: const Text(
+          '\nAre you sure that you want to delete your account? You will lose all your Karma Coins and Karma. There is no undo.'),
+      actions: <CupertinoDialogAction>[
+        CupertinoDialogAction(
+          isDefaultAction: true,
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: const Text('No'),
+        ),
+        CupertinoDialogAction(
+          isDestructiveAction: true,
+          onPressed: () async {
+            if (context.canPop()) {
+              Navigator.pop(context);
+              context.pop();
+              context.go(ScreenPaths.welcome);
+            }
+
+            await accountLogic.submitDeleteAccountTransaction();
           },
           child: const Text('Yes'),
         ),

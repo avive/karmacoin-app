@@ -215,10 +215,41 @@ abstract class TrnasactionGenerator {
     return resp;
   }
 
+  /// Submit a new update user transaction to update user name or phone number
+  /// requestedUserName should be provided to update the user name.
+  /// To update phone number, newMoibleNumber and corresponding verification code should be provided
+  Future<SubmitTransactionResponse> submitDeleteAccountTransactionImp(
+      KarmaCoinUser karmaCoinUser, ed.KeyPair keyPair) async {
+    //
+    // Create the update tx
+    DeleteUserTransactionV1 tx = DeleteUserTransactionV1();
+
+    TransactionData txData = TransactionData(
+      transactionData: tx.writeToBuffer(),
+      transactionType: TransactionType.TRANSACTION_TYPE_DELETE_USER_V1,
+    );
+
+    SubmitTransactionResponse resp = SubmitTransactionResponse();
+
+    try {
+      SignedTransactionWithStatus signedTx = _createSignedTransaction(
+          txData, karmaCoinUser, keyPair, GenesisConfig.kCentsDefaultFee);
+
+      debugPrint('submitting delete tx via the api...');
+
+      resp = await api.apiServiceClient.submitTransaction(
+          SubmitTransactionRequest(transaction: signedTx.transaction));
+    } catch (e) {
+      debugPrint('failed to submit delete transaction to api: $e');
+      // rethrow;
+      // todo: show throw here so ui can handle this error
+    }
+    return resp;
+  }
+
   /// Create a new signed transaction with the local account data and the given transaction data
   SignedTransactionWithStatus _createSignedTransaction(TransactionData data,
       KarmaCoinUser karmaCoinUser, ed.KeyPair keyPair, Int64 fee) {
-    //
     // create a new transaction body
     TransactionBody txBody = TransactionBody(
       nonce: karmaCoinUser.nonce.value + 1,

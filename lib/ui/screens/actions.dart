@@ -7,7 +7,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:badges/badges.dart' as badges;
 
 const _privacyUrl = 'https://karmaco.in/docs/privacy';
-
 const _supportUrl = 'https://karmaco.in/docs/support';
 const _twitterUrl = 'https://twitter.com/TeamKarmaCoin';
 const _tgramUrl = 'https://t.me/karmacoinapp/13';
@@ -148,6 +147,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
             trailing: const CupertinoListTileChevron(),
             onTap: () => {},
           ),
+          const DeleteDataTile().build(context) as CupertinoListTile,
           const DeleteAccountTile().build(context) as CupertinoListTile,
         ],
       ),
@@ -166,12 +166,13 @@ class _ActionsScreenState extends State<ActionsScreen> {
             trailing: const CupertinoListTileChevron(),
             onTap: () => context.push(ScreenPaths.securityWords),
           ),
+          /*
           CupertinoListTile.notched(
             title: const Text('Enable FaceId'),
             leading: const Icon(CupertinoIcons.lock, size: 28),
             trailing: const CupertinoListTileChevron(),
             onTap: () => {},
-          ),
+          ),*/
         ],
       ),
       CupertinoListSection.insetGrouped(

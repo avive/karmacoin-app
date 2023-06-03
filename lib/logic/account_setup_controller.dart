@@ -38,7 +38,6 @@ class AccountSetupController extends ChangeNotifier {
   /// This has the side effect of setting the local karma coin user
   Future<void> signUpUser() async {
     setStatus(AccountSetupStatus.readyToSignup);
-    debugPrint('starting signup flow...');
     await _getValidatorEvidence();
   }
 
@@ -123,6 +122,7 @@ class AccountSetupController extends ChangeNotifier {
     setStatus(AccountSetupStatus.submittingTransaction);
 
     if (!accountLogic.validateDataForNewUserTransaction()) {
+    
       setStatus(AccountSetupStatus.missingData);
       return;
     }

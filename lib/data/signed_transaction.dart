@@ -44,7 +44,12 @@ class SignedTransactionWithStatusEx {
         txData = UpdateUserTransactionV1.fromBuffer(
             txBody.transactionData.transactionData);
         break;
+      case TransactionType.TRANSACTION_TYPE_DELETE_USER_V1:
+        txData = DeleteUserTransactionV1.fromBuffer(
+            txBody.transactionData.transactionData);
+        break;
       default:
+        debugPrint("Unknown transaction type");
         throw Exception('Unknown transaction type');
     }
   }
