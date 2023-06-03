@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "18491747418-8elrcr7qfe4i09ntag75ghd9njhdsvg9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "in.karmaco.app",
+            "certificate_hash": "bdd123dbc3563dccef4564354919467e382daba5"
+          }
+        },
+        {
           "client_id": "18491747418-9f33v4j6l1sir4tvmkl16j6gpa7rpskv.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

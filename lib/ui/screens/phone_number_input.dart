@@ -182,8 +182,8 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
         StatusAlert.show(
           context,
           duration: const Duration(seconds: 2),
-          title: 'Oopps',
-          subtitle: 'Something\'s wrong. Please try again later.',
+          title: 'Signup Error',
+          subtitle: '${e.message} - ${e.code}',
           configuration:
               const IconConfiguration(icon: CupertinoIcons.stop_circle),
           maxWidth: statusAlertWidth,
