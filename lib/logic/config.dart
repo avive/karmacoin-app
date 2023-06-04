@@ -131,7 +131,8 @@ class ConfigLogic {
 
         await fireStore.collection('users').doc(userId).set({
           'tokens': [data],
-          'accountId': karmaUser.userData.accountId.data.toBase64(),
+          'accountId':
+              karmaUser.userData.accountId.data.toBase64(),
           'phoneNumber': karmaUser.userData.mobileNumber.number,
           'userName': karmaUser.userData.userName,
         });

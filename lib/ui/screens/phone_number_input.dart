@@ -162,15 +162,17 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
       verificationFailed: (FirebaseAuthException e) async {
         debugPrint('firebase auth exception: $e');
         if (e.code == 'invalid-phone-number') {
-          StatusAlert.show(
-            context,
-            duration: const Duration(seconds: 2),
-            title: 'Oopps',
-            subtitle: 'The phone number you entered is invalid.',
-            configuration:
-                const IconConfiguration(icon: CupertinoIcons.stop_circle),
-            maxWidth: statusAlertWidth,
-          );
+          if (context.mounted) {
+            StatusAlert.show(
+              context,
+              duration: const Duration(seconds: 2),
+              title: 'Oopps',
+              subtitle: 'The phone number you entered is invalid.',
+              configuration:
+                  const IconConfiguration(icon: CupertinoIcons.stop_circle),
+              maxWidth: statusAlertWidth,
+            );
+          }
           setState(() {
             isSigninIn = false;
           });
@@ -178,16 +180,17 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
         }
 
         // todo: check for more codes to give better error messages to users....
-
-        StatusAlert.show(
-          context,
-          duration: const Duration(seconds: 2),
-          title: 'Signup Error',
-          subtitle: '${e.message} - ${e.code}',
-          configuration:
-              const IconConfiguration(icon: CupertinoIcons.stop_circle),
-          maxWidth: statusAlertWidth,
-        );
+        if (context.mounted) {
+          StatusAlert.show(
+            context,
+            duration: const Duration(seconds: 2),
+            title: 'Signup Error',
+            subtitle: '${e.message} - ${e.code}',
+            configuration:
+                const IconConfiguration(icon: CupertinoIcons.stop_circle),
+            maxWidth: statusAlertWidth,
+          );
+        }
 
         setState(() {
           isSigninIn = false;
