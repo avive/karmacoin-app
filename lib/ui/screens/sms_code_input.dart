@@ -24,18 +24,26 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
     submitInProgress = false;
   }
 
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    pinController.dispose();
+    pinputFocusNode.dispose();
+    super.dispose();
+  }
+
   Future<void> _submitCode(BuildContext context, String currCode) async {
-    // Create a PhoneAuthCredential with the code
-    PhoneAuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: appState.phoneAuthVerificationCodeId,
-        smsCode: currCode);
-
-    setState(() {
-      submitInProgress = true;
-    });
-
     // Sign the user in (or link) with the credential
     try {
+      // Create a PhoneAuthCredential with the code
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+          verificationId: appState.phoneAuthVerificationCodeId,
+          smsCode: currCode);
+
+      setState(() {
+        submitInProgress = true;
+      });
+
       await FirebaseAuth.instance.signInWithCredential(credential);
     } catch (e) {
       if (mounted) {
@@ -122,7 +130,7 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
                                 controller: pinController,
                                 focusNode: pinputFocusNode,
                                 androidSmsAutofillMethod:
-                                    AndroidSmsAutofillMethod.smsUserConsentApi,
+                                    AndroidSmsAutofillMethod.none,
                                 autofocus: true,
                                 keyboardType: TextInputType.number,
                                 length: 6,

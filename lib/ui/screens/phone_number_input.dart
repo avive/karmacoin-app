@@ -119,9 +119,9 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
       if (await PlatformInfo.isRunningOnAndroidEmulator()) {
         FirebaseAuth.instance.setSettings(
             appVerificationDisabledForTesting: true, forceRecaptchaFlow: true);
-      } else {
+      } /*else {
         FirebaseAuth.instance.setSettings(forceRecaptchaFlow: true);
-      }
+      }*/
     }
 
     await FirebaseAuth.instance.verifyPhoneNumber(
