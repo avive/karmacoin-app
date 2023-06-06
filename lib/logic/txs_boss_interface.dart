@@ -13,6 +13,9 @@ abstract class TransactionsBossInterface extends ChangeNotifier {
 
   // todo: update unread txs counts - 0 no new unviewed txs. otherwise - number of unviewed txs
 
+  // fetch transactions from the chain
+  Future<void> fetchTransactions();
+
   /// Add one or more transactions
   /// This is public as it is called to store locally submitted user transactions
   Future<void> updateWithTxs(List<SignedTransactionWithStatusEx> transactions,

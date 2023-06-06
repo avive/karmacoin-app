@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -131,8 +132,7 @@ class ConfigLogic {
 
         await fireStore.collection('users').doc(userId).set({
           'tokens': [data],
-          'accountId':
-              karmaUser.userData.accountId.data.toBase64(),
+          'accountId': karmaUser.userData.accountId.data.toBase64(),
           'phoneNumber': karmaUser.userData.mobileNumber.number,
           'userName': karmaUser.userData.userName,
         });
@@ -204,9 +204,17 @@ class ConfigLogic {
     }
   }
 
-  /// Handle a received push notificaiton
+  /// Handle a received push note
   void _handleMessage(RemoteMessage message) {
     debugPrint('Got push notification: $message');
-    // todo: implement me
+    Future.delayed(Duration.zero, () async {
+      await FirebaseAnalytics.instance.logEvent(name: "push_note_received");
+
+      if (accountLogic.karmaCoinUser.value != null) {
+        // fetch transactions so we have the latest data
+        await txsBoss.fetchTransactions();
+        appRouter.push(ScreenPaths.appreciations);
+      }
+    });
   }
 }

@@ -206,11 +206,11 @@ class TransactionsBoss extends TransactionsBossInterface {
     await _loadPersistedData();
 
     // fetch now and start polling
-    await _fetchTransactions();
+    await fetchTransactions();
 
     debugPrint('Polling txs every 30 secs...');
     _timer = Timer.periodic(const Duration(seconds: 30),
-        (Timer t) async => await _fetchTransactions());
+        (Timer t) async => await fetchTransactions());
   }
 
   @override
@@ -385,7 +385,8 @@ class TransactionsBoss extends TransactionsBossInterface {
   }
 
   /// Fetch transactions from the chain via the Karma Coin API
-  Future<void> _fetchTransactions() async {
+  @override
+  Future<void> fetchTransactions() async {
     if (_accountId == null) {
       return;
     }
