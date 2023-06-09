@@ -1,7 +1,6 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
-import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/kc_user.dart';
@@ -13,6 +12,7 @@ import 'package:karma_coin/ui/widgets/animated_wave.dart';
 import 'package:karma_coin/ui/widgets/animated_wave_right.dart';
 import 'package:karma_coin/ui/widgets/appreciate.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
+import 'package:karma_coin/ui/widgets/into.dart';
 import 'package:karma_coin/ui/widgets/leaderboard.dart';
 import 'package:karma_coin/ui/widgets/traits_scores_wheel.dart';
 import 'package:pull_down_button/pull_down_button.dart';
@@ -62,46 +62,31 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   }
 
   void _postFrameCallback(BuildContext context) {
+    debugPrint("UserHomeScreen._postFrameCallback");
+
     // handle appreciate after signup
     if (appState.appreciateAfterSignup.value =
         true && appState.sendDestinationPhoneNumber.value.isNotEmpty) {
       appState.appreciateAfterSignup.value = false;
-      Navigator.of(context).push(CupertinoPageRoute(
+      Navigator.of(context).push(
+        CupertinoPageRoute(
           fullscreenDialog: true,
-          builder: ((context) => const AppreciateWidget(communityId: 0))));
+          builder: ((context) => const AppreciateWidget(communityId: 0)),
+        ),
+      );
       return;
     }
 
-    debugPrint("UserHomeScreen._postFrameCallback");
     Future.delayed(Duration.zero, () async {
       if (appState.signedUpInCurentSession.value && mounted) {
         appState.signedUpInCurentSession.value = false;
-        StatusAlert.show(
-          context,
-          duration: const Duration(seconds: 4),
-          title: 'Signed up',
-          subtitle: 'Welcome to Karma Coin!',
-          configuration:
-              const IconConfiguration(icon: CupertinoIcons.check_mark_circled),
-          maxWidth: statusAlertWidth,
+        Navigator.of(context).push(
+          CupertinoPageRoute(
+            fullscreenDialog: true,
+            builder: ((context) => const IntroScreen()),
+          ),
         );
       }
-
-      bool isConnected = await PlatformInfo.isConnected();
-      if (!isConnected) {
-        if (context.mounted) {
-          StatusAlert.show(context,
-              duration: const Duration(seconds: 4),
-              title: 'No Internet',
-              subtitle: 'Check your connection',
-              configuration: const IconConfiguration(
-                  icon: CupertinoIcons.exclamationmark_triangle),
-              dismissOnBackgroundTap: true,
-              maxWidth: statusAlertWidth);
-        }
-        return;
-      }
-
       // register for push notes but don't wait on it - may show dialog
       settingsLogic.registerPushNotifications();
     });

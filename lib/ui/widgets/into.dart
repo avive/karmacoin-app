@@ -1,11 +1,8 @@
 import 'package:countup/countup.dart';
-//import 'package:karma_coin/services/api/api.pb.dart';
+import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
-//import 'package:status_alert/status_alert.dart';
-
-const _karmaRewardsInfoUrl = 'https://karmaco.in/karmarewards/';
 
 class IntroScreen extends StatefulWidget {
   final GenesisData? genesisData;
@@ -19,10 +16,6 @@ class IntroScreen extends StatefulWidget {
 
 class _IntroScreenState extends State<IntroScreen> {
   // we assume api is available until we know otherwise
-  bool apiOffline = false;
-
-  GenesisData? genesisData;
-  BlockchainStats? blockchainStats;
 
   @override
   initState() {
@@ -30,24 +23,6 @@ class _IntroScreenState extends State<IntroScreen> {
   }
 
   Widget _getBodyContent(BuildContext context) {
-    if (apiOffline) {
-      return Padding(
-        padding: const EdgeInsets.only(left: 24, right: 24),
-        child: Center(
-          child: Text(
-              'The Karma Coin Server is down.\n\nPlease try again later.',
-              textAlign: TextAlign.center,
-              style: CupertinoTheme.of(context).textTheme.pickerTextStyle),
-        ),
-      );
-    }
-
-    if (genesisData == null) {
-      return const Center(
-        child: CupertinoActivityIndicator(),
-      );
-    }
-
     return Padding(
       padding: const EdgeInsets.only(left: 0, right: 12, top: 0, bottom: 24),
       child: Column(
@@ -57,10 +32,84 @@ class _IntroScreenState extends State<IntroScreen> {
     );
   }
 
+  List<Widget> _getWidgets(BuildContext context) {
+    List<Widget> res = <Widget>[];
+
+    CupertinoTextThemeData textTheme = CupertinoTheme.of(context).textTheme;
+
+    res.add(const SizedBox(height: 16));
+    res.add(
+      Padding(
+        padding: const EdgeInsets.only(top: 6, bottom: 20, left: 16, right: 16),
+        child: Text(
+          'You got 10 Karma Coins to spend.',
+          style: textTheme.navTitleTextStyle.merge(
+            const TextStyle(fontSize: 30, fontWeight: FontWeight.w400),
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+
+    res.add(const SizedBox(height: 18));
+
+    res.add(
+      Padding(
+        padding: const EdgeInsets.only(top: 6, bottom: 20, left: 16, right: 16),
+        child: Text(
+          'Now think about who you\'re grateful for, the first person that comes to mind - send em an appreciation!',
+          style: textTheme.navTitleTextStyle.merge(
+            const TextStyle(fontSize: 30, fontWeight: FontWeight.w400),
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+
+    res.add(const SizedBox(height: 18));
+
+    res.add(_getCoinWidget(context, 10));
+
+    res.add(const SizedBox(height: 6));
+
+    res.add(
+      Padding(
+        padding: const EdgeInsets.only(top: 6, bottom: 20, left: 16, right: 16),
+        child: Text(
+          'You get a 10 Karma Coins reward once they receive your appreciation!',
+          style: textTheme.navTitleTextStyle.merge(
+            const TextStyle(fontSize: 30, fontWeight: FontWeight.w400),
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+
+    res.add(const SizedBox(height: 18));
+
+    CommunityDesignTheme theme = GenesisConfig.communityColors[1]!;
+
+    res.add(CupertinoButton(
+      color: kcOrange,
+      onPressed: () {
+        context.pop();
+      },
+      child: Text(
+        'GOT IT',
+        style: CupertinoTheme.of(context)
+            .textTheme
+            .textStyle
+            .merge(TextStyle(color: theme.textColor)),
+      ),
+    ));
+
+    return res;
+  }
+
   Widget _getCoinWidget(BuildContext context, int amount) {
     return Container(
-      height: 72,
-      width: 72,
+      height: 160,
+      width: 160,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: kcPurple,
@@ -81,16 +130,16 @@ class _IntroScreenState extends State<IntroScreen> {
                 separator: ',',
                 style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                       const TextStyle(
-                          fontSize: 30,
+                          fontSize: 64,
                           color: kcOrange,
                           fontWeight: FontWeight.w600),
                     ),
               ),
               Text(
-                'KC',
+                'Karma Coins',
                 style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                       const TextStyle(
-                          fontSize: 8,
+                          fontSize: 14,
                           color: kcOrange,
                           fontWeight: FontWeight.w800),
                     ),
@@ -101,96 +150,6 @@ class _IntroScreenState extends State<IntroScreen> {
         ),
       ),
     );
-  }
-
-  List<Widget> _getWidgets(BuildContext context) {
-    List<Widget> res = <Widget>[];
-
-    CupertinoTextThemeData textTheme = CupertinoTheme.of(context).textTheme;
-
-    res.add(const SizedBox(height: 16));
-    res.add(
-      Padding(
-        padding: const EdgeInsets.only(top: 6, bottom: 20, left: 16, right: 16),
-        child: Text(
-          'The more you give, the more you get...',
-          style: textTheme.navTitleTextStyle.merge(
-            const TextStyle(fontSize: 30, fontWeight: FontWeight.w400),
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ),
-    );
-
-    // get data from genesis config
-    int signupReward = genesisData!.signupRewardPhase1Amount.toInt() ~/ 1000000;
-    int referralReward =
-        genesisData!.referralRewardPhase1Amount.toInt() ~/ 1000000;
-    int karmaReward = genesisData!.karmaRewardAmount.toInt() ~/ 1000000;
-
-    res.add(Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-          const SizedBox(width: 24),
-          _getCoinWidget(context, signupReward),
-          const SizedBox(width: 16),
-          Text('Sign up reward',
-              style: textTheme.textStyle.merge(
-                const TextStyle(fontSize: 22),
-              )),
-        ]),
-        const SizedBox(height: 14),
-        Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-          const SizedBox(width: 24),
-          _getCoinWidget(context, referralReward),
-          const SizedBox(width: 16),
-          Flexible(
-            child: Text('Referral reward',
-                style: textTheme.textStyle.merge(
-                  const TextStyle(fontSize: 22),
-                )),
-          ),
-        ]),
-        const SizedBox(height: 14),
-        Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-          const SizedBox(width: 24),
-          _getCoinWidget(context, karmaReward),
-          const SizedBox(width: 16),
-          Flexible(
-            child: Text('Weekly Karma Reward',
-                style: textTheme.textStyle.merge(
-                  const TextStyle(fontSize: 22),
-                )),
-          ),
-        ]),
-        const SizedBox(height: 14),
-        Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-          const SizedBox(width: 24),
-          _getCoinWidget(context, 0),
-          const SizedBox(width: 16),
-          Flexible(
-            child: Text('No transaction fee for first 10 appreciations',
-                style: textTheme.textStyle.merge(
-                  const TextStyle(fontSize: 22),
-                )),
-          ),
-        ]),
-      ],
-    ));
-
-    res.add(const SizedBox(height: 18));
-    res.add(
-      CupertinoButton(
-        onPressed: () => openUrl(_karmaRewardsInfoUrl),
-        child: Text(
-          'Learn more',
-          style: textTheme.actionTextStyle.merge(const TextStyle(fontSize: 22)),
-        ),
-      ),
-    );
-
-    return res;
   }
 
   @override

@@ -66,5 +66,7 @@
 		</array>
 		<key>UIViewControllerBasedStatusBarAppearance</key>
 		<false/>
+		<key>NSContactsUsageDescription</key>
+		<string>This app may access to your contacts, only after your explicit consent, to send Karma Coin to one of you contacts using its phone number.</string>
 	</dict>
 </plist>
