@@ -170,6 +170,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 break;
             }
             // clear the user tx data
+            debugPrint("clearing local tx data");
             appState.paymentTransactionData.value = null;
           });
 

@@ -8,6 +8,8 @@ import 'package:status_alert/status_alert.dart';
 import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart'
     as contact_picker;
 
+const _privacyUrl = 'https://karmaco.in/docs/privacy';
+
 class PhoneInputScreen extends StatefulWidget {
   final String title;
 
@@ -285,6 +287,20 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                         ),
                         const SizedBox(height: 12),
                         _getContactsButton(context),
+                        const SizedBox(height: 24),
+                        Text('By singing up, you agree to our',
+                            textAlign: TextAlign.center,
+                            style: CupertinoTheme.of(context)
+                                .textTheme
+                                .textStyle
+                                .merge(
+                                  const TextStyle(fontSize: 16),
+                                )),
+                        CupertinoButton(
+                            onPressed: () async {
+                              await openUrl(_privacyUrl);
+                            },
+                            child: const Text('Terms of service')),
                         const SizedBox(height: 24),
                         CupertinoButton.filled(
                           onPressed: isSigninIn

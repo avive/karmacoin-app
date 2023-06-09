@@ -213,7 +213,11 @@ class ConfigLogic {
       if (accountLogic.karmaCoinUser.value != null) {
         // fetch transactions so we have the latest data
         await txsBoss.fetchTransactions();
-        appRouter.push(ScreenPaths.appreciations);
+        if (message.data["type"] == "payment") {
+          if (appRouter.location != ScreenPaths.appreciations) {
+            appRouter.push(ScreenPaths.appreciations);
+          }
+        }
       }
     });
   }

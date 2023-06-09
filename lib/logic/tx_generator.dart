@@ -70,7 +70,7 @@ abstract class TrnasactionGenerator {
 
         await FirebaseAnalytics.instance
             .logEvent(name: "submit_payment_tx_success", parameters: {
-          "amount": data.kCentsAmount,
+          "amount": data.kCentsAmount.toString(),
           "trait_id": paymentTx.charTraitId,
           "community_id": paymentTx.communityId
         });

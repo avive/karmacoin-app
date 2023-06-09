@@ -67,8 +67,10 @@ class DefaultFirebaseOptions {
     messagingSenderId: '18491747418',
     projectId: 'karmacoin-83d45',
     storageBucket: 'karmacoin-83d45.appspot.com',
-    androidClientId: '18491747418-6c7u5ufmclidi8krdkkhb95slm0pr7uq.apps.googleusercontent.com',
-    iosClientId: '18491747418-n6131nol2snlk8cm6qjmn16k5abns6br.apps.googleusercontent.com',
+    androidClientId:
+        '18491747418-6c7u5ufmclidi8krdkkhb95slm0pr7uq.apps.googleusercontent.com',
+    iosClientId:
+        '18491747418-n6131nol2snlk8cm6qjmn16k5abns6br.apps.googleusercontent.com',
     iosBundleId: 'in.karmaco.app',
   );
 
@@ -78,8 +80,10 @@ class DefaultFirebaseOptions {
     messagingSenderId: '18491747418',
     projectId: 'karmacoin-83d45',
     storageBucket: 'karmacoin-83d45.appspot.com',
-    androidClientId: '18491747418-6c7u5ufmclidi8krdkkhb95slm0pr7uq.apps.googleusercontent.com',
-    iosClientId: '18491747418-5tt7c8g8cfbui123hdr4okq56d9eil6d.apps.googleusercontent.com',
+    androidClientId:
+        '18491747418-6c7u5ufmclidi8krdkkhb95slm0pr7uq.apps.googleusercontent.com',
+    iosClientId:
+        '18491747418-5tt7c8g8cfbui123hdr4okq56d9eil6d.apps.googleusercontent.com',
     iosBundleId: 'in.karmaco.app.RunnerTests',
   );
 }
