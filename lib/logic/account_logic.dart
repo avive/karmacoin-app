@@ -130,8 +130,12 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     String? verificationData = await _secureStorage.read(
         key: _AccountStoreKeys.verificationData, aOptions: _aOptions);
     if (verificationData != null) {
-      _userVerificationData =
-          UserVerificationData.fromBuffer(base64.decode(verificationData));
+      try {
+        _userVerificationData =
+            UserVerificationData.fromBuffer(base64.decode(verificationData));
+      } catch (e) {
+        debugPrint('failed to parse verification data: $e');
+      }
     }
 
     // Read last known fcm token for device

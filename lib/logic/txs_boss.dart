@@ -373,9 +373,13 @@ class TransactionsBoss extends TransactionsBossInterface {
     });
 
     (await accountTxsBox?.getAllValues())?.forEach((key, value) {
-      dst.SignedTransactionWithStatusEx tx =
-          dst.SignedTransactionWithStatusEx.fromJson(jsonDecode(value));
-      _accountTransactions[key] = tx;
+      try {
+        dst.SignedTransactionWithStatusEx tx =
+            dst.SignedTransactionWithStatusEx.fromJson(jsonDecode(value));
+        _accountTransactions[key] = tx;
+      } catch (e) {
+        debugPrint('failed to parse signup tx from json: $e');
+      }
     });
 
     (await events?.getAllValues())?.forEach((key, value) {
