@@ -44,7 +44,7 @@ class _IntroScreenState extends State<IntroScreen> {
         child: Text(
           'You got 10 Karma Coins to spend.',
           style: textTheme.navTitleTextStyle.merge(
-            const TextStyle(fontSize: 30, fontWeight: FontWeight.w400),
+            const TextStyle(fontSize: 24, fontWeight: FontWeight.w400),
           ),
           textAlign: TextAlign.center,
         ),
@@ -59,7 +59,7 @@ class _IntroScreenState extends State<IntroScreen> {
         child: Text(
           'Now think about who you\'re grateful for, the first person that comes to mind - send em an appreciation!',
           style: textTheme.navTitleTextStyle.merge(
-            const TextStyle(fontSize: 30, fontWeight: FontWeight.w400),
+            const TextStyle(fontSize: 24, fontWeight: FontWeight.w400),
           ),
           textAlign: TextAlign.center,
         ),
@@ -78,7 +78,7 @@ class _IntroScreenState extends State<IntroScreen> {
         child: Text(
           'You get a 10 Karma Coins reward once they receive your appreciation!',
           style: textTheme.navTitleTextStyle.merge(
-            const TextStyle(fontSize: 30, fontWeight: FontWeight.w400),
+            const TextStyle(fontSize: 24, fontWeight: FontWeight.w400),
           ),
           textAlign: TextAlign.center,
         ),

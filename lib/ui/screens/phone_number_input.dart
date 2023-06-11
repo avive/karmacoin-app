@@ -288,7 +288,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                         const SizedBox(height: 12),
                         _getContactsButton(context),
                         const SizedBox(height: 24),
-                        Text('By singing up, you agree to our',
+                        Text('By signing up, you agree to our',
                             textAlign: TextAlign.center,
                             style: CupertinoTheme.of(context)
                                 .textTheme
