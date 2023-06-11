@@ -313,6 +313,7 @@ class TransactionsBoss extends TransactionsBossInterface {
           debugPrint('rejecting new user transaction with invalid signature');
           continue;
         }
+
         // store the tx as the signup tx for the local user
         newUserTransaction.value = tx;
       }
