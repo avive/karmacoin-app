@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
@@ -78,14 +80,16 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     }
 
     Future.delayed(Duration.zero, () async {
-      if (appState.signedUpInCurentSession.value && mounted) {
-        appState.signedUpInCurentSession.value = false;
-        Navigator.of(context).push(
-          CupertinoPageRoute(
-            fullscreenDialog: true,
-            builder: ((context) => const IntroScreen()),
-          ),
-        );
+      if (!Platform.isIOS) {
+        if (appState.signedUpInCurentSession.value && mounted) {
+          appState.signedUpInCurentSession.value = false;
+          Navigator.of(context).push(
+            CupertinoPageRoute(
+              fullscreenDialog: true,
+              builder: ((context) => const IntroScreen()),
+            ),
+          );
+        }
       }
       // register for push notes but don't wait on it - may show dialog
       settingsLogic.registerPushNotifications();

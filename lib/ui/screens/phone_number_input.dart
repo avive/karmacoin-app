@@ -252,7 +252,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Text('Enter your phone number',
+                        Text('Sign up with your phone number',
                             style: CupertinoTheme.of(context)
                                 .textTheme
                                 .navTitleTextStyle),
@@ -279,8 +279,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                                 border: outlineBorder
                                     ? const OutlineInputBorder()
                                     : const UnderlineInputBorder(),
-                                hintText:
-                                    withLabel ? '' : 'Your mobile phone number',
+                                hintText: withLabel ? '' : 'Your mobile number',
                               ),
                             ),
                           ),
@@ -288,19 +287,29 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                         const SizedBox(height: 12),
                         _getContactsButton(context),
                         const SizedBox(height: 24),
-                        Text('By signing up, you agree to our',
+                        Text(
+                            'By signing up, you agree to our terms of service.',
                             textAlign: TextAlign.center,
                             style: CupertinoTheme.of(context)
                                 .textTheme
                                 .textStyle
                                 .merge(
-                                  const TextStyle(fontSize: 16),
+                                  const TextStyle(fontSize: 15),
                                 )),
                         CupertinoButton(
-                            onPressed: () async {
-                              await openUrl(_privacyUrl);
-                            },
-                            child: const Text('Terms of service')),
+                          onPressed: () async {
+                            await openUrl(_privacyUrl);
+                          },
+                          child: Text(
+                            'Terms of service and privacy policy',
+                            style: CupertinoTheme.of(context)
+                                .textTheme
+                                .actionTextStyle
+                                .merge(
+                                  const TextStyle(fontSize: 15),
+                                ),
+                          ),
+                        ),
                         const SizedBox(height: 24),
                         CupertinoButton.filled(
                           onPressed: isSigninIn
@@ -323,6 +332,82 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
     );
   }
 
+  Future<void> _pickContact(BuildContext context) async {
+    contact_picker.Contact? contact = await _contactPicker!.selectContact();
+
+    if (contact != null) {
+      String? phoneNumber = contact.phoneNumbers?.first;
+      debugPrint('Contact number: $phoneNumber');
+
+      if (phoneNumber == null) {
+        return;
+      }
+
+      // Set iso code from ui or default value
+      IsoCode isoCode = phoneController.value?.isoCode ?? IsoCode.US;
+      PhoneNumber? newNumber;
+
+      String numberNoDashes = phoneNumber
+          .replaceAll('-', '')
+          .replaceAll('(', '')
+          .replaceAll(')', '')
+          .replaceAll(' ', '')
+          .trim();
+
+      if (numberNoDashes.length <= 10) {
+        // not an international number - use default iso
+        if (numberNoDashes.startsWith('0')) {
+          numberNoDashes = numberNoDashes.substring(1);
+        }
+        newNumber = PhoneNumber(isoCode: isoCode, nsn: numberNoDashes);
+      } else {
+        PhoneNumber pn = PhoneNumber.parse(phoneNumber);
+        String iso = pn.countryCode;
+        String nsn = pn.nsn;
+        if (nsn.startsWith(iso)) {
+          nsn = nsn.substring(iso.length);
+        }
+        if (nsn.startsWith('0')) {
+          nsn = nsn.substring(1);
+        }
+
+        newNumber = PhoneNumber(isoCode: pn.isoCode, nsn: nsn);
+      }
+
+      debugPrint(newNumber.toString());
+      phoneController.value = newNumber;
+    }
+  }
+
+  void _showContactAlert(BuildContext context) {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => CupertinoAlertDialog(
+        title: const Text('Pick Contact'),
+        content: const Text(
+            '\nPick your own contact from device contacts to auto-fill your phone number instead of typing it.'),
+        actions: <CupertinoDialogAction>[
+          CupertinoDialogAction(
+            isDefaultAction: false,
+            onPressed: () {
+              context.pop();
+            },
+            child: const Text('Cancel'),
+          ),
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            isDestructiveAction: false,
+            onPressed: () async {
+              context.pop();
+              await _pickContact(context);
+            },
+            child: const Text('Got it'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _getContactsButton(BuildContext context) {
     if (!PlatformInfo.isMobile) {
       return const SizedBox(height: 0);
@@ -337,49 +422,10 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
             ),
       ),
       onPressed: () async {
-        contact_picker.Contact? contact = await _contactPicker!.selectContact();
-
-        if (contact != null) {
-          String? phoneNumber = contact.phoneNumbers?.first;
-          debugPrint('Contact number: $phoneNumber');
-
-          if (phoneNumber == null) {
-            return;
-          }
-
-          // Set iso code from ui or default value
-          IsoCode isoCode = phoneController.value?.isoCode ?? IsoCode.US;
-          PhoneNumber? newNumber;
-
-          String numberNoDashes = phoneNumber
-              .replaceAll('-', '')
-              .replaceAll('(', '')
-              .replaceAll(')', '')
-              .replaceAll(' ', '')
-              .trim();
-
-          if (numberNoDashes.length <= 10) {
-            // not an international number - use default iso
-            if (numberNoDashes.startsWith('0')) {
-              numberNoDashes = numberNoDashes.substring(1);
-            }
-            newNumber = PhoneNumber(isoCode: isoCode, nsn: numberNoDashes);
-          } else {
-            PhoneNumber pn = PhoneNumber.parse(phoneNumber);
-            String iso = pn.countryCode;
-            String nsn = pn.nsn;
-            if (nsn.startsWith(iso)) {
-              nsn = nsn.substring(iso.length);
-            }
-            if (nsn.startsWith('0')) {
-              nsn = nsn.substring(1);
-            }
-
-            newNumber = PhoneNumber(isoCode: pn.isoCode, nsn: nsn);
-          }
-
-          debugPrint(newNumber.toString());
-          phoneController.value = newNumber;
+        if (PlatformInfo.isIOS) {
+          _showContactAlert(context);
+        } else {
+          await _pickContact(context);
         }
       },
     );

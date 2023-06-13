@@ -68,21 +68,25 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
       ),
     );
 
+    var numberDisplay =
+        '+${widget.user!.mobileNumber.number.formatPhoneNumber()}';
+
     tiles.add(
       CupertinoListTile.notched(
         title: Text('Mobile Number',
             style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
         leading: const Icon(CupertinoIcons.phone, size: 28),
         // todo: number format
-        subtitle: Text(
-            '+${widget.user!.mobileNumber.number.formatPhoneNumber()}',
+        subtitle: Text(numberDisplay,
             style: CupertinoTheme.of(context).textTheme.textStyle),
         trailing: const Icon(CupertinoIcons.share),
         onTap: () async {
-          // todo: copy account id to clipboard
+          await Clipboard.setData(ClipboardData(text: numberDisplay));
         },
       ),
     );
+
+    String accountId = widget.user!.accountId.data.toHexString();
 
     techSectionTiles.add(
       CupertinoListTile.notched(
@@ -94,7 +98,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
           padding: const EdgeInsets.only(top: 6, right: 12),
           child: Text(
             maxLines: 3,
-            widget.user!.accountId.data.toHexString(),
+            accountId,
             style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                   TextStyle(
                       fontSize: 16,
@@ -106,7 +110,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
         leading: const Icon(CupertinoIcons.creditcard, size: 28),
         trailing: const Icon(CupertinoIcons.share),
         onTap: () async {
-          // todo: copy account id to clipboard
+          await Clipboard.setData(ClipboardData(text: accountId));
         },
       ),
     );
@@ -131,9 +135,6 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
           ),
         ),
         leading: const Icon(CupertinoIcons.money_dollar, size: 28),
-        onTap: () async {
-          // todo: copy account id to clipboard
-        },
       ),
     );
 
@@ -239,7 +240,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
           children: karmaTiles),
       CupertinoListSection.insetGrouped(
           header: Text(
-            'Techincal',
+            'Technical',
             style: CupertinoTheme.of(context).textTheme.tabLabelTextStyle.merge(
                   TextStyle(
                       fontSize: 14,
