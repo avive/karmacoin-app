@@ -35,6 +35,10 @@ class ConfigLogic {
   late final verifierAccountId = ValueNotifier<String>(
       'fe9d0c0df86c72ae733bf9ec0eeaff6e43e29bad4488f5e4845e455ea1095bf3');
 
+  late final learnYoutubePlaylistUrl =
+      'https://www.youtube.com/playlist?list=PLF4zx8ioKJTszWMz1MKiHwStfMCdxh8MP';
+
+
   late final firebaseWebPushPubKey =
       "BPCf2pl7oLrgSWJJjEXzKfTIe4atfDay5-Aw9u0Ge8IgtfozLq1jkYPfJ0ccEY9D9cdqoAgxcbx4rGEhQC5nMN4";
 

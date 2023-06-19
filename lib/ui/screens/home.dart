@@ -201,6 +201,20 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     },
                     child: const Text('Appreciate'),
                   ),
+                  CupertinoButton(
+                    onPressed: () async {
+                      await openUrl(settingsLogic.learnYoutubePlaylistUrl);
+                    },
+                    child: Text(
+                      'Learn more',
+                      style: CupertinoTheme.of(context)
+                          .textTheme
+                          .actionTextStyle
+                          .merge(
+                            const TextStyle(fontSize: 15),
+                          ),
+                    ),
+                  ),
                   _getAppreciationListener(context),
                 ]),
           );
@@ -351,7 +365,15 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         valueListenable: accountLogic.karmaCoinUser.value!.communities,
         builder: (context, value, child) {
           if (value.isEmpty) {
-            return Container();
+            return adjustNavigationBarButtonPosition(
+                CupertinoButton(
+                  onPressed: () async {
+                    await openUrl(settingsLogic.learnYoutubePlaylistUrl);
+                  },
+                  child: const Icon(CupertinoIcons.question_circle, size: 24),
+                ),
+                0,
+                0);
           }
 
           List<PullDownMenuEntry> items = [

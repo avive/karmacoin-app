@@ -310,7 +310,21 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                                 ),
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        CupertinoButton(
+                          onPressed: () async {
+                            await openUrl(
+                                settingsLogic.learnYoutubePlaylistUrl);
+                          },
+                          child: Text(
+                            'Learn more',
+                            style: CupertinoTheme.of(context)
+                                .textTheme
+                                .actionTextStyle
+                                .merge(
+                                  const TextStyle(fontSize: 15),
+                                ),
+                          ),
+                        ),
                         CupertinoButton.filled(
                           onPressed: isSigninIn
                               ? null

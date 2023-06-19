@@ -23,6 +23,15 @@ CupertinoSliverNavigationBar kcNavBar(context, String title) {
     ),
     backgroundColor: kcPurple,
     border: kcOrangeBorder,
+    trailing: adjustNavigationBarButtonPosition(
+        CupertinoButton(
+          onPressed: () async {
+            await openUrl(settingsLogic.learnYoutubePlaylistUrl);
+          },
+          child: const Icon(CupertinoIcons.question_circle, size: 24),
+        ),
+        16,
+        0),
   );
 }
 

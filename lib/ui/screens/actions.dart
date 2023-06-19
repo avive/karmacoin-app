@@ -85,6 +85,12 @@ class _ActionsScreenState extends State<ActionsScreen> {
                     ),
                   );
                 }),
+            CupertinoListTile.notched(
+                title: const Text('Learn More'),
+                leading: const Icon(CupertinoIcons.question_circle, size: 28),
+                onTap: () async {
+                  await openUrl(settingsLogic.learnYoutubePlaylistUrl);
+                }),
           ]),
       CupertinoListSection.insetGrouped(
         header: Text(

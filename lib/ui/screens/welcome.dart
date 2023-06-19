@@ -101,6 +101,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       child: const Text('Restore Account'),
     ));
 
+    res.add(CupertinoButton(
+      onPressed: () async {
+        await openUrl(settingsLogic.learnYoutubePlaylistUrl);
+      },
+      child: const Text('Learn More'),
+    ));
+
     return res;
   }
 
