@@ -2,7 +2,7 @@ import 'package:flutter_js/flutter_js.dart';
 import 'package:karma_coin/common_libs.dart';
 
 class KarmachainService {
-  final JavascriptRuntime jsRuntime = getJavascriptRuntime();
+  final JavascriptRuntime jsRuntime = getJavascriptRuntime(xhr: false);
 
   // Init the JS engine
   Future<void> init() async {
@@ -11,7 +11,6 @@ class KarmachainService {
       JsEvalResult res =
           jsRuntime.evaluate("""var window = global = globalThis;""");
       res = jsRuntime.evaluate(karmaJs);
-      debugPrint(res.stringResult);
     } on PlatformException catch (e) {
       debugPrint('Failed to init js engine: ${e.details}');
       rethrow;
@@ -22,7 +21,7 @@ class KarmachainService {
   void connectToApi(String wsUrl, bool createTestAccounts) {
     try {
       JsEvalResult res =
-          jsRuntime.evaluate("""init(wsUrl, $createTestAccounts);""");
+          jsRuntime.evaluate("""init2("$wsUrl", $createTestAccounts);""");
       debugPrint('Karma JS api result: ${res.stringResult}');
     } on PlatformException catch (e) {
       debugPrint('Failed to connect to api: ${e.details}');
