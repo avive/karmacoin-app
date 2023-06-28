@@ -7,6 +7,7 @@ import 'package:phone_form_field/phone_form_field.dart';
 import 'package:status_alert/status_alert.dart';
 import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart'
     as contact_picker;
+import 'package:email_validator/email_validator.dart';
 
 const _privacyUrl = 'https://karmaco.in/docs/privacy';
 
@@ -21,6 +22,7 @@ class PhoneInputScreen extends StatefulWidget {
 
 class _PhoneInputScreenState extends State<PhoneInputScreen> {
   late PhoneController phoneController;
+  TextEditingController emailController = TextEditingController();
   late PhoneNumberInputValidator validator;
   bool outlineBorder = false;
   bool mobileOnly = true;
@@ -103,6 +105,31 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
         isSigninIn = false;
       });
       return;
+    }
+
+    final emailAddress = emailController.text;
+
+    if (emailAddress.isNotEmpty) {
+      if (!EmailValidator.validate(emailAddress)) {
+        if (context.mounted) {
+          StatusAlert.show(context,
+              duration: const Duration(seconds: 4),
+              title: 'Invalid email',
+              subtitle: 'Enter a valid email address',
+              configuration: const IconConfiguration(
+                  icon: CupertinoIcons.exclamationmark_triangle),
+              dismissOnBackgroundTap: true,
+              maxWidth: statusAlertWidth);
+        }
+
+        setState(() {
+          isSigninIn = false;
+        });
+        return;
+      }
+
+      // store for signup
+      appState.userProvidedEmailAddress = emailAddress;
     }
 
     debugPrint(
@@ -286,6 +313,15 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                         ),
                         const SizedBox(height: 12),
                         _getContactsButton(context),
+                        const SizedBox(height: 12),
+                        CupertinoTextField(
+                          autocorrect: false,
+                          controller: emailController,
+                          placeholder: 'Your email address (Optional)',
+                          decoration: const BoxDecoration(),
+                        ),
+                        const Divider(
+                            thickness: 2, color: CupertinoColors.activeBlue),
                         const SizedBox(height: 24),
                         Text(
                             'By signing up, you agree to our terms of service.',

@@ -85,6 +85,7 @@ dependencies:
       url: https://github.com/avive/flutter_native_contact_picker
       ref: master # branch name
   pinput: ^2.2.31
+  email_validator: ^2.1.17
 
 dev_dependencies:
   flutter_test:

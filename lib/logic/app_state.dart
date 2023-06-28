@@ -50,6 +50,8 @@ class AppState {
   /// Verificaiton id obtained from firebase as part of Firebase phone auth flow
   String phoneAuthVerificationCodeId = '';
 
+  String userProvidedEmailAddress = '';
+
   /// Last user selected personality trait from ui
   final ValueNotifier<PersonalityTrait> selectedPersonalityTrait =
       ValueNotifier(GenesisConfig.personalityTraits[0]);

@@ -490,6 +490,16 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
       return;
     }
 
+    try {
+      // store user email address
+      final emailAddress = appState.userProvidedEmailAddress;
+      if (emailAddress.isNotEmpty) {
+        await user.updateEmail(emailAddress);
+      }
+    } catch(e) {
+      debugPrint('Error updating firebase user\'s email address: $e');
+    }
+
     debugPrint(
         'User account id: ${keyPair.value!.publicKey.bytes.toShortHexString()} stored on firebase.');
   }
