@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:karma_coin/common_libs.dart';
 import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart'
     as contact_picker;

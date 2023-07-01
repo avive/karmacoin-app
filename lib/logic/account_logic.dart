@@ -496,7 +496,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
       if (emailAddress.isNotEmpty) {
         await user.updateEmail(emailAddress);
       }
-    } catch(e) {
+    } catch (e) {
       debugPrint('Error updating firebase user\'s email address: $e');
     }
 
@@ -595,6 +595,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
       userVerificationData = response.userVerificationData;
     } catch (e) {
       debugPrint('Error calling verifier api: $e');
+      // todo: handle this error in ui
       rethrow;
     }
 

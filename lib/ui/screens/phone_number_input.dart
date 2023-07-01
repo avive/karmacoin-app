@@ -249,11 +249,8 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
           setState(() {
             isSigninIn = false;
           });
-        }
-
-        Future.delayed(Duration.zero, () {
           context.push(ScreenPaths.verify);
-        });
+        }
       },
     );
   }

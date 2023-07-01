@@ -489,7 +489,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
       widgets.add(const SizedBox(width: 34));
     }
 
-    // karma coin contacts
+    // karma coin users
     widgets.add(CupertinoButton(
       padding: const EdgeInsets.only(left: 0),
       onPressed: () {
