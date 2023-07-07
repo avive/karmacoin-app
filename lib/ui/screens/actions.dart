@@ -147,12 +147,6 @@ class _ActionsScreenState extends State<ActionsScreen> {
             trailing: const CupertinoListTileChevron(),
             onTap: () => {},
           ),
-          CupertinoListTile.notched(
-            title: const Text('Account Operations'),
-            leading: const Icon(CupertinoIcons.doc, size: 28),
-            trailing: const CupertinoListTileChevron(),
-            onTap: () => {},
-          ),
           const DeleteDataTile().build(context) as CupertinoListTile,
           const DeleteAccountTile().build(context) as CupertinoListTile,
         ],
