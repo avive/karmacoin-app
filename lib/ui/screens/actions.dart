@@ -75,7 +75,6 @@ class _ActionsScreenState extends State<ActionsScreen> {
             CupertinoListTile.notched(
                 title: const Text('Karma Rewards'),
                 leading: const Icon(CupertinoIcons.wand_rays, size: 28),
-                trailing: const CupertinoListTileChevron(),
                 onTap: () {
                   if (!context.mounted) return;
                   Navigator.of(context).push(

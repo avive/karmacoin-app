@@ -14,6 +14,7 @@ import 'package:karma_coin/ui/widgets/animated_wave.dart';
 import 'package:karma_coin/ui/widgets/animated_wave_right.dart';
 import 'package:karma_coin/ui/widgets/appreciate.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
+import 'package:karma_coin/ui/widgets/appreciation_progress.dart';
 import 'package:karma_coin/ui/widgets/into.dart';
 import 'package:karma_coin/ui/widgets/leaderboard.dart';
 import 'package:karma_coin/ui/widgets/traits_scores_wheel.dart';
@@ -106,6 +107,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             return Container();
           }
 
+          // todo: customize the progress screen for just coin sending...
+
+          /*
           debugPrint('Data: $value');
 
           String sendingTitle = 'Sending Appreciation...';
@@ -114,50 +118,18 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           if (value.personalityTrait.index == 0) {
             sendingTitle = 'Sending Karma Coins...';
             sentTitle = 'Karma Coins Sent';
-          }
+          }*/
 
-          // show sending alert
-          Future.delayed(Duration.zero, () async {
-            StatusAlert.show(context,
-                duration: const Duration(seconds: 2),
-                title: sendingTitle,
-                configuration:
-                    const IconConfiguration(icon: CupertinoIcons.wand_stars),
-                dismissOnBackgroundTap: true,
-                maxWidth: statusAlertWidth);
+          Future.delayed(const Duration(milliseconds: 200), () async {
+            if (!context.mounted) return;
 
-            SubmitTransactionResponse resp =
-                await accountLogic.submitPaymentTransaction(value);
+            Navigator.of(context).push(
+              CupertinoPageRoute(
+                fullscreenDialog: true,
+                builder: ((context) => AppreciationProgress(data: value)),
+              ),
+            );
 
-            switch (resp.submitTransactionResult) {
-              case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
-                if (mounted) {
-                  StatusAlert.show(
-                    context,
-                    duration: const Duration(seconds: 4),
-                    configuration: const IconConfiguration(
-                        icon: CupertinoIcons.check_mark_circled),
-                    title: sentTitle,
-                    dismissOnBackgroundTap: true,
-                    maxWidth: statusAlertWidth,
-                  );
-                }
-                break;
-              case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
-                if (mounted) {
-                  StatusAlert.show(
-                    context,
-                    duration: const Duration(seconds: 2),
-                    configuration: const IconConfiguration(
-                        icon: CupertinoIcons.stop_circle),
-                    title: 'Karmachain Error',
-                    subtitle: 'Sorry, please try again later.',
-                    dismissOnBackgroundTap: true,
-                    maxWidth: statusAlertWidth,
-                  );
-                }
-                break;
-            }
             // clear the user tx data
             debugPrint("clearing local tx data");
             appState.paymentTransactionData.value = null;
