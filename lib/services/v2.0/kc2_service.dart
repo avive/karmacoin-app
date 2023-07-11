@@ -3,7 +3,7 @@ import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/services/v2.0/keyring.dart';
 import 'package:polkadart/polkadart.dart' as polkadart;
 import 'package:polkadart_scale_codec/polkadart_scale_codec.dart';
-import 'package:ss58/ss58.dart';
+import 'package:ss58/ss58.dart' as ss58;
 import 'package:substrate_metadata/models/models.dart';
 import 'package:substrate_metadata/substrate_metadata.dart';
 import 'package:convert/convert.dart';
@@ -35,7 +35,6 @@ class KarmachainService {
 
       final metadata = await karmachain.send('state_getMetadata', []);
       final DecodedMetadata decodedMetadata = MetadataDecoder.instance.decode(metadata.result.toString());
-      decodedMetadata.metadata['lookup']['types'].forEach((e) => print(e));
       chainInfo = ChainInfo.fromMetadata(decodedMetadata);
       debugPrint('Fetched chain metadata');
 
@@ -43,14 +42,16 @@ class KarmachainService {
         'Extra': '(CheckMortality, CheckNonce, ChargeTransactionPaymentWithSubsidies)',
         'Additional': '(u32, u32, H256, H256)',
         'UnsignedPayload': '(Call, Extra, Additional)',
-        'Extrinsic': 'Option<(MultiAddress, MultiSignature, Extra)>'
+        'Extrinsic': '(MultiAddress, MultiSignature, Extra)'
       });
 
       if (createTestAccounts) {
         final mnemonic = keyring.generateMnemonic();
         keyring.setKeypairFromMnemonic(mnemonic);
+        debugPrint('Generated mnemonic: $mnemonic');
 
-        debugPrint('Generate mnemonic: $mnemonic');
+        final accountId = ss58.Codec(42).encode(keyring.getPublicKey());
+        await newUser(accountId, 'Test', '52a092c005b621bd57e501a0aed950a76fefbb00d07aa43dadd6f53402cc25413749f0d3c62e8ca0a7dbae344841adea51d53f8b61d969a15d4a6318b576b8ac');
       }
     } on PlatformException catch (e) {
       debugPrint('Failed to connect to api: ${e.details}');
@@ -65,7 +66,7 @@ class KarmachainService {
     }
   }
 
-  void sendAppreciation(String hexPhoneNumberHash, int amount, int communityId, int charTraitId) async {
+  Future<void> sendAppreciation(String hexPhoneNumberHash, int amount, int communityId, int charTraitId) async {
     try {
       final call = MapEntry('Appreciation', MapEntry('appreciation', {
         'to': MapEntry('PhoneNumberHash', hex.decode(hexPhoneNumberHash)),
@@ -74,29 +75,29 @@ class KarmachainService {
         'char_trait_id': Option.some(charTraitId),
       }));
 
-      _signAndSendTransaction('5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY', call);
+      await _signAndSendTransaction(call);
     } on PlatformException catch (e) {
       debugPrint('Failed to bootstrap karma: ${e.details}');
       rethrow;
     }
   }
 
-  void newUser(String accountId, String username, String hexPhoneNumberHash) async {
+  Future<void> newUser(String accountId, String username, String hexPhoneNumberHash) async {
     try {
       final call = MapEntry('Identity', MapEntry('new_user', {
-        'account_id': Address.decode(accountId).pubkey,
+        'account_id': ss58.Address.decode(accountId).pubkey,
         'username': username,
         'phone_number_hash': hex.decode(hexPhoneNumberHash),
       }));
 
-      _signAndSendTransaction('5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY', call);
+      await _signAndSendTransaction(call);
     } on PlatformException catch (e) {
       debugPrint('Failed to bootstrap karma: ${e.details}');
       rethrow;
     }
   }
 
-  Future<String> _signTransaction(String signer, MapEntry<String, dynamic> call) async {
+  Future<String> _signTransaction(String signer, List<int> pk, MapEntry<String, dynamic> call) async {
     const EXTRINSIC_FORMAT_VERSION = 4;
     final nonce = await karmachain.send('system_accountNextIndex', [signer])
       .then((v) => v.result);
@@ -106,14 +107,15 @@ class KarmachainService {
         .then((v) => v.result.toString().substring(2))
         .then((v) => hex.decode(v));
 
+    // How long should this call "last" in the transaction pool before
+    // being deemed "out of date" and discarded?
+    // period = null and phase = null means `Immortal`
+    final Map<String, int> mortality = {};
     // As well as the call data above, we need to include some extra information along
     // with our transaction. See the "signed_extension" types here to know what we need to
     // include:
     final extra = [
-      // How long should this call "last" in the transaction pool before
-      // being deemed "out of date" and discarded?
-      // period = 0 and phase = 0 means `Immortal`
-      { "period": 0, "phase": 0 },
+      mortality,
       // How many prior transactions have occurred from this account? This
       // Helps protect against replay attacks or accidental double-submissions.
       nonce,
@@ -140,23 +142,22 @@ class KarmachainService {
       genesisHash
     ];
 
-
     final output = ByteOutput();
     chainInfo.scaleCodec.encodeTo('UnsignedPayload', [call, extra, additional], output);
-    debugPrint(output.toString());
+    debugPrint('Data to sign: ${output.toHex()}');
     final signature = keyring.sign(output.toBytes());
-    debugPrint('Signature ${hex.encode(signature)}');
+    debugPrint('Signature: ${hex.encode(signature)}');
 
     // This is the format of the signature part of the transaction. If we want to
     // experiment with an unsigned transaction here, we can set this to None::<()> instead.
-    final signatureToEncode = Option.some([
+    final signatureToEncode = [
       // The account ID that's signing the payload:
-      MapEntry('Id', Address.decode(signer).pubkey),
+      MapEntry('Id', ss58.Address.decode(signer).pubkey),
       // The actual signature, computed above:
       MapEntry('Ed25519', signature),
       // Extra information to be included in the transaction:
       extra
-    ]);
+    ];
 
     // Encode the extrinsic, which amounts to combining the signature and call information
     // in a certain way:
@@ -182,8 +183,10 @@ class KarmachainService {
     return payloadHex.toString();
   }
 
-  Future<void> _signAndSendTransaction(String signer, MapEntry<String, dynamic> call) async {
-    final encodedHex = await _signTransaction(signer, call);
+  Future<void> _signAndSendTransaction(MapEntry<String, dynamic> call) async {
+    final signer = ss58.Codec(42).encode(keyring.getPublicKey());
+    final encodedHex = await _signTransaction(signer, keyring.getPublicKey(), call);
+    debugPrint('Encoded extrinsic: $encodedHex');
     final result = await karmachain.send('author_submitExtrinsic', [encodedHex]);
     debugPrint('Submit extrinsic result: ${result.result.toString()}');
   }

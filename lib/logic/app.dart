@@ -116,11 +116,6 @@ class AppLogic with AppLogicInterface {
     await karmachainService.init();
 
     await karmachainService.connectToApi('ws://127.0.0.1:9944', true);
-    karmachainService.newUser(
-        '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
-        'dev',
-        '52a092c005b621bd57e501a0aed950a76fefbb00d07aa43dadd6f53402cc25413749f0d3c62e8ca0a7dbae344841adea51d53f8b61d969a15d4a6318b576b8ac'
-    );
 
     if (authLogic.isUserAuthenticated()) {
       debugPrint('user is Firebase authenticated on app startup');
