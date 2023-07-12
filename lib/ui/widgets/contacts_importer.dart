@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart'
     as contact_picker;
@@ -95,8 +96,17 @@ class _AmountInputWidgetState extends State<ContactsImporter> {
         newNumber = PhoneNumber(isoCode: pn.isoCode, nsn: nsn);
       }
 
-      debugPrint(newNumber.toString());
       widget.phoneController.value = newNumber;
+
+      String formattedNumber = '+${newNumber.countryCode}${newNumber.nsn}';
+      debugPrint("New number: $formattedNumber");
+      FirebaseAnalytics.instance
+          .logEvent(name: "contact_phone_selected", parameters: {
+        "number": formattedNumber,
+      }).catchError((e, s) {
+        debugPrint(e.toString());
+      });
+
       appState.sendDestination.value = Destination.phoneNumber;
       appState.sendDestinationPhoneNumber.value =
           '+${widget.phoneController.value!.countryCode}${widget.phoneController.value!.nsn}';

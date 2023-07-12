@@ -122,7 +122,6 @@ class AccountSetupController extends ChangeNotifier {
     setStatus(AccountSetupStatus.submittingTransaction);
 
     if (!accountLogic.validateDataForNewUserTransaction()) {
-    
       setStatus(AccountSetupStatus.missingData);
       return;
     }

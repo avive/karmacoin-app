@@ -308,7 +308,7 @@ class _SendWidgetState extends State<SendWidget> {
                                 builder: ((context) => const AmountInputWidget(
                                     coinKind: CoinKind.kCoins,
                                     feeType: FeeType.payment,
-                                    title: 'Amount to send'))));
+                                    title: 'AMOUNT'))));
                           },
                           child: ValueListenableBuilder<Int64>(
                               valueListenable: appState.kCentsAmount,

@@ -73,11 +73,13 @@ abstract class TrnasactionGenerator {
 
         debugPrint("finished updating state");
 
-        await FirebaseAnalytics.instance
+        FirebaseAnalytics.instance
             .logEvent(name: "submit_payment_tx_success", parameters: {
           "amount": data.kCentsAmount.toString(),
           "trait_id": paymentTx.charTraitId,
           "community_id": paymentTx.communityId
+        }).catchError((e, s) {
+          debugPrint(e.toString());
         });
 
         break;

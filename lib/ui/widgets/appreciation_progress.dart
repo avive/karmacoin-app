@@ -1,11 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 
-const _tgramUrl = 'https://t.me/karmacoinapp/13';
+const _tgramUrl = 'https://t.me/karmacoinapp/1';
 
 class AppreciationProgress extends StatefulWidget {
   final PaymentTransactionData data;

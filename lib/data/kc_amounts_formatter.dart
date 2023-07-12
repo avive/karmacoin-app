@@ -13,11 +13,21 @@ abstract class KarmaCoinAmountFormatter {
     String centsLabel = amount > 1 ? 'Karma Cents' : 'Karma Cent';
 
     double amountCoins = amount.toDouble() / GenesisConfig.kCentsPerCoin;
-    if (amount <= _kCentsDisplayUpperLimit) {
-      return '${_deicmalFormat.format(amount)} $centsLabel (\$${NumberFormat.currency(
+    if (amount < _kCentsDisplayUpperLimit) {
+      String usdEstimate = NumberFormat.currency(
         decimalDigits: 8,
-        customPattern: '#.## USD',
-      ).format(amountCoins * _kToUsdExchangeRate)})';
+        customPattern: '#.##',
+      ).format(amountCoins * _kToUsdExchangeRate);
+
+      if (usdEstimate.contains(".")) {
+        while (usdEstimate.endsWith("0")) {
+          usdEstimate = usdEstimate.substring(0, usdEstimate.length - 1);
+        }
+      }
+
+      usdEstimate = "\$ ($usdEstimate USD)";
+
+      return '${_deicmalFormat.format(amount)} $centsLabel $usdEstimate';
     }
 
     String label = amount >= GenesisConfig.kCentsPerCoin * 2

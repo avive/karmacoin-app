@@ -38,6 +38,9 @@ class AppState {
   //// Apprecaite dest when signup is complete
   final ValueNotifier<bool> appreciateAfterSignup = ValueNotifier(false);
 
+  //// True if appreciation intro was already displayed in an app session
+  final ValueNotifier<bool> appreciateIntroDisplayed = ValueNotifier(false);
+
 //// Mobile phone number canonical format for send KC transaction destination
   final ValueNotifier<Destination> sendDestination =
       ValueNotifier(Destination.accountAddress);

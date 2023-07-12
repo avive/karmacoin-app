@@ -100,10 +100,6 @@ class _AmountInputWidgetState extends State<AmountInputWidget> {
                 ),
                 const SizedBox(height: 24),
                 _getPickerWidget(coinKind),
-                CupertinoButton(
-                  onPressed: () {},
-                  child: const Text('Another amount...'),
-                ),
               ],
             ),
           ),

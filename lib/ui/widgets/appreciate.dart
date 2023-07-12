@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/data/genesis_config.dart';
@@ -370,7 +371,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
 
     widgets.add(Column(
       children: [
-        Text('Amount to send',
+        Text('Amount',
             style: CupertinoTheme.of(context).textTheme.pickerTextStyle),
         CupertinoButton(
           onPressed: () {
@@ -380,7 +381,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                 builder: ((context) => const AmountInputWidget(
                     coinKind: CoinKind.kCoins,
                     feeType: FeeType.payment,
-                    title: 'Amount to send'))));
+                    title: 'AMOUNT'))));
           },
           child: ValueListenableBuilder<Int64>(
               valueListenable: appState.kCentsAmount,
@@ -394,8 +395,8 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                         ),
                   )),
         ),
-        const SizedBox(height: 6),
-        Text('Network fee',
+        const SizedBox(height: 12),
+        Text('Network Fee',
             style: CupertinoTheme.of(context).textTheme.pickerTextStyle),
         CupertinoButton(
           onPressed: () {
@@ -404,7 +405,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                 builder: ((context) => const AmountInputWidget(
                     coinKind: CoinKind.kCents,
                     feeType: FeeType.fee,
-                    title: 'Network fee'))));
+                    title: 'NETWORK FEE'))));
           },
           child: ValueListenableBuilder<Int64>(
               valueListenable: appState.kCentsFeeAmount,
@@ -418,19 +419,6 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                         ),
                   )),
         ),
-        //SizedBox(height: 2),
-        /*
-        CupertinoButton(
-          child: Text(
-            'Add a thank you note',
-            style: CupertinoTheme.of(context).textTheme.actionTextStyle.merge(
-                  const TextStyle(fontSize: 15),
-                ),
-          ),
-          onPressed: () {
-            // todo: show personal note taker...
-          },
-        ),*/
       ],
     ));
 
@@ -523,6 +511,14 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     setState(() {
       contact = selectedContact;
       phoneController.value = PhoneNumber.parse(contact!.mobileNumber.number);
+    });
+
+    // call without awaiting but log any errors
+    FirebaseAnalytics.instance
+        .logEvent(name: "kc_user_phone_selected", parameters: {
+      "number": contact!.mobileNumber.number,
+    }).catchError((e, s) {
+      debugPrint(e.toString());
     });
   }
 

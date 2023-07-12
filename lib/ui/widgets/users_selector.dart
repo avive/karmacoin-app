@@ -135,12 +135,23 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
       ),
     );
 
-    if (contacts == null || contacts!.isEmpty) {
+    if (contacts != null && contacts!.isEmpty) {
       widgets.add(
         Padding(
           padding: const EdgeInsets.only(top: 64, bottom: 36),
           child: Center(
             child: Text('😞 No matching users found',
+                textAlign: TextAlign.center,
+                style: CupertinoTheme.of(context).textTheme.pickerTextStyle),
+          ),
+        ),
+      );
+    } else if (contacts == null) {
+      widgets.add(
+        Padding(
+          padding: const EdgeInsets.only(top: 64, bottom: 36),
+          child: Center(
+            child: Text('⌛️ One sec please...',
                 textAlign: TextAlign.center,
                 style: CupertinoTheme.of(context).textTheme.pickerTextStyle),
           ),
