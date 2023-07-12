@@ -12,7 +12,9 @@ class PlatformInfo {
 
   static bool get isDesktop =>
       !kIsWeb && _desktopPlatforms.contains(defaultTargetPlatform);
+
   static bool get isDesktopOrWeb => kIsWeb || isDesktop;
+
   static bool get isMobile =>
       !kIsWeb && _mobilePlatforms.contains(defaultTargetPlatform);
 

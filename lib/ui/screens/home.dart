@@ -80,7 +80,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     }
 
     Future.delayed(Duration.zero, () async {
-      if (!Platform.isIOS) {
+      if (kIsWeb || !Platform.isIOS) {
         if (appState.signedUpInCurentSession.value && mounted) {
           appState.signedUpInCurentSession.value = false;
           Navigator.of(context).push(
