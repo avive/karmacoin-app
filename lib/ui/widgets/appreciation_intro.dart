@@ -38,7 +38,7 @@ class _AppreciationIntroState extends State<AppreciationIntro> {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'You can appreciate anyone and anywhere.',
+                  'You can appreciate anyone anywhere.',
                   style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                         const TextStyle(fontSize: fontSize),
                       ),
@@ -58,7 +58,7 @@ class _AppreciationIntroState extends State<AppreciationIntro> {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'Just pick a contact from your phone contacts or enter recipient\'s phone number.',
+                  'Just pick a contact from your phone\'s contacts or enter recipient\'s phone number.',
                   style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                         const TextStyle(fontSize: fontSize),
                       ),
@@ -78,7 +78,7 @@ class _AppreciationIntroState extends State<AppreciationIntro> {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'Ask recipient to sign up to Karma Coin with their phone number.',
+                  'Ask recipient to sign up to Karma Coin with its phone number.',
                   style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                         const TextStyle(fontSize: fontSize),
                       ),
@@ -98,7 +98,7 @@ class _AppreciationIntroState extends State<AppreciationIntro> {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'You get a referral reward once your recipient signs up.',
+                  'You get a referral reward when recipient signs up.',
                   style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                         const TextStyle(fontSize: fontSize),
                       ),

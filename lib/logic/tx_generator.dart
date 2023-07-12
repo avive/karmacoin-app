@@ -78,7 +78,7 @@ abstract class TrnasactionGenerator {
           "amount": data.kCentsAmount.toString(),
           "trait_id": paymentTx.charTraitId,
           "community_id": paymentTx.communityId
-        }).catchError((e, s) {
+        }).catchError((e) {
           debugPrint(e.toString());
         });
 

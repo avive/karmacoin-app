@@ -103,7 +103,7 @@ class _AmountInputWidgetState extends State<ContactsImporter> {
       FirebaseAnalytics.instance
           .logEvent(name: "contact_phone_selected", parameters: {
         "number": formattedNumber,
-      }).catchError((e, s) {
+      }).catchError((e) {
         debugPrint(e.toString());
       });
 

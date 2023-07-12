@@ -517,7 +517,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     FirebaseAnalytics.instance
         .logEvent(name: "kc_user_phone_selected", parameters: {
       "number": contact!.mobileNumber.number,
-    }).catchError((e, s) {
+    }).catchError((e) {
       debugPrint(e.toString());
     });
   }
