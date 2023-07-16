@@ -3,6 +3,7 @@ import 'package:karma_coin/services/api/api.pb.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:random_avatar/random_avatar.dart';
 import 'package:status_alert/status_alert.dart';
 
 class LeaderboardWidget extends StatefulWidget {
@@ -157,7 +158,7 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
           fontWeight: FontWeight.w300,
         ),
       ),
-      leading: const Icon(CupertinoIcons.person, size: 28),
+      leading: RandomAvatar(entry.userName, height: 50, width: 50),
     );
   }
 

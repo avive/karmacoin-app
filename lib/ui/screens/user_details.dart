@@ -5,6 +5,7 @@ import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/data/personality_traits.dart';
 import 'package:karma_coin/data/phone_number_formatter.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
+import 'package:random_avatar/random_avatar.dart';
 
 /// Display user details for provided user or for local user
 class UserDetailsScreen extends StatefulWidget {
@@ -36,6 +37,20 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
 
     List<CupertinoListTile> tiles = [];
     List<CupertinoListTile> techSectionTiles = [];
+
+    Widget pict = Padding(
+      padding: const EdgeInsets.only(),
+      child: RandomAvatar(widget.user!.userName, height: 30, width: 30),
+    );
+
+    tiles.add(
+      CupertinoListTile.notched(
+          title: Text('Profile image',
+              style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
+          leading: const Icon(CupertinoIcons.person, size: 28),
+          // todo: number format
+          trailing: pict),
+    );
 
     tiles.add(
       CupertinoListTile.notched(
@@ -256,6 +271,16 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
 
   @override
   build(BuildContext context) {
+    Row row = Row(children: [
+      RandomAvatar(widget.user!.userName, height: 30, width: 30),
+      const SizedBox(width: 8),
+      Text(
+        widget.user!.userName,
+        style: getNavBarTitleTextStyle(context),
+        textAlign: TextAlign.left,
+      ),
+    ]);
+
     /*
     Widget trailingWidget = Container();
     if (widget.isLocal) {
@@ -274,7 +299,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
       child: CupertinoPageScaffold(
         child: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-            return <Widget>[kcNavBar(context, widget.user!.userName)];
+            return <Widget>[kcNavBarWidget(context, row)];
           },
           body: MediaQuery.removePadding(
             context: context,

@@ -35,6 +35,23 @@ CupertinoSliverNavigationBar kcNavBar(context, String title) {
   );
 }
 
+CupertinoSliverNavigationBar kcNavBarWidget(context, Widget titleWidget) {
+  return CupertinoSliverNavigationBar(
+    largeTitle: titleWidget,
+    backgroundColor: kcPurple,
+    border: kcOrangeBorder,
+    trailing: adjustNavigationBarButtonPosition(
+        CupertinoButton(
+          onPressed: () async {
+            await openUrl(settingsLogic.learnYoutubePlaylistUrl);
+          },
+          child: const Icon(CupertinoIcons.question_circle, size: 24),
+        ),
+        16,
+        0),
+  );
+}
+
 TextStyle getNavBarTitleTextStyle(BuildContext context, {int communityId = 0}) {
   if (communityId == 0) {
     return CupertinoTheme.of(context)
