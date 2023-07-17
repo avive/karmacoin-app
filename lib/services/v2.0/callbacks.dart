@@ -38,7 +38,7 @@ abstract class EventHandler {
 
   void onTransfer(TransactionMetadata metadata, String? signer, String to,
       BigInt amount, MapEntry<String, Object?>? failedReason) {
-    debugPrint('Transfer $metadata $signer $to $amount $failedReason');
+    debugPrint('Transfer ${metadata.hash} $signer $to $amount $failedReason');
   }
 }
 

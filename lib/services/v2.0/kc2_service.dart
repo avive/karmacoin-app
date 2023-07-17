@@ -48,8 +48,7 @@ class KarmachainService {
       debugPrint('Fetched chain metadata');
 
       chainInfo.scaleCodec.registry.registerCustomCodec({
-        'Extra':
-            '(CheckMortality, CheckNonce, ChargeTransactionPaymentWithSubsidies)',
+        'Extra': '(CheckMortality, CheckNonce, ChargeTransactionPaymentWithSubsidies)',
         'Additional': '(u32, u32, H256, H256)',
         'UnsignedPayload': '(Call, Extra, Additional)',
         'Extrinsic': '(MultiAddress, MultiSignature, Extra)',
@@ -62,7 +61,7 @@ class KarmachainService {
 
         final accountId = ss58.Codec(42).encode(keyring.getPublicKey());
         await newUser(accountId, 'Test',
-            '52a092c005b621bd57e501a0aed950a76fefbb00d07aa43dadd6f53402cc25413749f0d3c62e8ca0a7dbae344841adea51d53f8b61d969a15d4a6318b576b8ac');
+            '0123456789');
 
         final userInfo = await getUserInfoByAccountId(
             '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY');
@@ -95,11 +94,21 @@ class KarmachainService {
   // Transactions
 
   Future<void> newUser(
-      String accountId, String username, String hexPhoneNumberHash) async {
+      String accountId, String username, String phoneNumber) async {
     try {
+      // TODO: remove `'dummy'` for release
+      final evidence = await karmachain.send('verifier_verify', [accountId, username, phoneNumber, 'dummy'])
+          .then((v) => v.result);
+      debugPrint('Evidence - $evidence');
+
+      final phoneNumberHash = const Blake2bHasher(64).hashString(phoneNumber);
+      final hexPhoneNumberHash = hex.encode(phoneNumberHash);
+
       final call = MapEntry(
           'Identity',
           MapEntry('new_user', {
+            'verifier_public_key': ss58.Codec(42).decode(evidence['verifier_account_id']),
+            'verifier_signature': hex.decode(evidence['signature']),
             'account_id': ss58.Address.decode(accountId).pubkey,
             'username': username,
             'phone_number_hash': hex.decode(hexPhoneNumberHash),
@@ -220,8 +229,14 @@ class KarmachainService {
     final output = ByteOutput();
     chainInfo.scaleCodec
         .encodeTo('UnsignedPayload', [call, extra, additional], output);
-    debugPrint('Data to sign: ${output.toHex()}');
-    final signature = keyring.sign(output.toBytes());
+    debugPrint('Data length: ${output.length} Data to sign: ${output.toHex()}');
+    final signature;
+    // If payload is longer than 256 bytes, we hash it and sign the hash instead:
+    if (output.length > 256) {
+      signature = keyring.sign(Hasher.blake2b256.hash(output.toBytes()));
+    } else {
+      signature = keyring.sign(output.toBytes());
+    }
     debugPrint('Signature: ${hex.encode(signature)}');
 
     // This is the format of the signature part of the transaction. If we want to
