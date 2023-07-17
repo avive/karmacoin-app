@@ -45,6 +45,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   bool useRtl = false;
   bool isUsercommunityAdmin = false;
   api_types.Contact? contact;
+  IsoCode defaultIsoCode = IsoCode.US;
 
   // country selector ux
   late CountrySelectorNavigator selectorNavigator;
@@ -60,7 +61,14 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     super.initState();
 
     String defaultNumber = settingsLogic.devMode ? "549805380" : "";
-    IsoCode code = settingsLogic.devMode ? IsoCode.IL : IsoCode.US;
+    defaultIsoCode = settingsLogic.devMode ? IsoCode.IL : IsoCode.US;
+
+    // pick default iso code from user's phone number!
+    KarmaCoinUser? user = accountLogic.karmaCoinUser.value;
+    PhoneNumber? phoneNumber = user?.getPhoneNumber();
+    if (phoneNumber != null) {
+      defaultIsoCode = phoneNumber.isoCode;
+    }
 
     if (widget.communityId == 0) {
       traitsPicker =
@@ -75,8 +83,8 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
 
     selectorNavigator = const CountrySelectorNavigator.draggableBottomSheet();
 
-    phoneController =
-        PhoneController(PhoneNumber(isoCode: code, nsn: defaultNumber));
+    phoneController = PhoneController(
+        PhoneNumber(isoCode: defaultIsoCode, nsn: defaultNumber));
 
     // use phone number from state if available
     if (appState.sendDestinationPhoneNumber.value.isNotEmpty) {
@@ -277,7 +285,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   }
 
   Widget _getCommunityMemberInfo() {
-    String phoneNumber = '+${contact!.mobileNumber.number.formatPhoneNumber()}';
+    String phoneNumber = contact!.mobileNumber.number.formatPhoneNumber();
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [

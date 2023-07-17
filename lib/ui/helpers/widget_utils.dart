@@ -31,7 +31,7 @@ CupertinoSliverNavigationBar kcNavBar(context, String title) {
           child: const Icon(CupertinoIcons.question_circle, size: 24),
         ),
         16,
-        0),
+        -6),
   );
 }
 
@@ -48,7 +48,7 @@ CupertinoSliverNavigationBar kcNavBarWidget(context, Widget titleWidget) {
           child: const Icon(CupertinoIcons.question_circle, size: 24),
         ),
         16,
-        0),
+        -6),
   );
 }
 
