@@ -6,8 +6,7 @@ class KarmachainKeyring {
   late ed.PrivateKey privateKey;
   // Init the JS engine
   Future<void> init() async {
-    try {
-    } on PlatformException catch (e) {
+    try {} on PlatformException catch (e) {
       debugPrint('Failed to init js engine: ${e.details}');
       rethrow;
     }

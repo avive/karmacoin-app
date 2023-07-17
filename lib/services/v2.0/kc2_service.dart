@@ -41,12 +41,14 @@ class KarmachainService {
       debugPrint('Api initialized');
 
       final metadata = await karmachain.send('state_getMetadata', []);
-      final DecodedMetadata decodedMetadata = MetadataDecoder.instance.decode(metadata.result.toString());
+      final DecodedMetadata decodedMetadata =
+          MetadataDecoder.instance.decode(metadata.result.toString());
       chainInfo = ChainInfo.fromMetadata(decodedMetadata);
       debugPrint('Fetched chain metadata');
 
       chainInfo.scaleCodec.registry.registerCustomCodec({
-        'Extra': '(CheckMortality, CheckNonce, ChargeTransactionPaymentWithSubsidies)',
+        'Extra':
+            '(CheckMortality, CheckNonce, ChargeTransactionPaymentWithSubsidies)',
         'Additional': '(u32, u32, H256, H256)',
         'UnsignedPayload': '(Call, Extra, Additional)',
         'Extrinsic': '(MultiAddress, MultiSignature, Extra)',
@@ -58,9 +60,11 @@ class KarmachainService {
         debugPrint('Generated mnemonic: $mnemonic');
 
         final accountId = ss58.Codec(42).encode(keyring.getPublicKey());
-        await newUser(accountId, 'Test', '52a092c005b621bd57e501a0aed950a76fefbb00d07aa43dadd6f53402cc25413749f0d3c62e8ca0a7dbae344841adea51d53f8b61d969a15d4a6318b576b8ac');
+        await newUser(accountId, 'Test',
+            '52a092c005b621bd57e501a0aed950a76fefbb00d07aa43dadd6f53402cc25413749f0d3c62e8ca0a7dbae344841adea51d53f8b61d969a15d4a6318b576b8ac');
 
-        final userInfo = await getUserInfoByAccountId('5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY');
+        final userInfo = await getUserInfoByAccountId(
+            '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY');
         debugPrint('$userInfo');
       }
     } on PlatformException catch (e) {
@@ -72,26 +76,33 @@ class KarmachainService {
   // RPC
 
   Future<Map<String, dynamic>?> getUserInfoByAccountId(String accountId) async {
-    return await karmachain.send('identity_getUserInfoByAccountId', [accountId]).then((v) => v.result);
+    return await karmachain.send(
+        'identity_getUserInfoByAccountId', [accountId]).then((v) => v.result);
   }
 
   Future<Map<String, dynamic>?> getUserInfoByUsername(String username) async {
-    return await karmachain.send('identity_getUserInfoByUsername', [username]).then((v) => v.result);
+    return await karmachain.send(
+        'identity_getUserInfoByUsername', [username]).then((v) => v.result);
   }
 
-  Future<Map<String, dynamic>?> getUserInfoByPhoneNumberHash(String phoneNumberHash) async {
-    return await karmachain.send('identity_getUserInfoByPhoneNumberHash', [phoneNumberHash]).then((v) => v.result);
+  Future<Map<String, dynamic>?> getUserInfoByPhoneNumberHash(
+      String phoneNumberHash) async {
+    return await karmachain.send('identity_getUserInfoByPhoneNumberHash',
+        [phoneNumberHash]).then((v) => v.result);
   }
 
   // Transactions
 
-  Future<void> newUser(String accountId, String username, String hexPhoneNumberHash) async {
+  Future<void> newUser(
+      String accountId, String username, String hexPhoneNumberHash) async {
     try {
-      final call = MapEntry('Identity', MapEntry('new_user', {
-        'account_id': ss58.Address.decode(accountId).pubkey,
-        'username': username,
-        'phone_number_hash': hex.decode(hexPhoneNumberHash),
-      }));
+      final call = MapEntry(
+          'Identity',
+          MapEntry('new_user', {
+            'account_id': ss58.Address.decode(accountId).pubkey,
+            'username': username,
+            'phone_number_hash': hex.decode(hexPhoneNumberHash),
+          }));
 
       await _signAndSendTransaction(call);
     } on PlatformException catch (e) {
@@ -102,13 +113,18 @@ class KarmachainService {
 
   Future<void> updateUser(String? username, String? hexPhoneNumberHash) async {
     try {
-      final usernameOption = username == null ? const Option.none() : Option.some(username);
-      final hexPhoneNumberHashOption = hexPhoneNumberHash == null ? const Option.none() : Option.some(hex.decode(hexPhoneNumberHash));
+      final usernameOption =
+          username == null ? const Option.none() : Option.some(username);
+      final hexPhoneNumberHashOption = hexPhoneNumberHash == null
+          ? const Option.none()
+          : Option.some(hex.decode(hexPhoneNumberHash));
 
-      final call = MapEntry('Identity', MapEntry('update_user', {
-        'username': usernameOption,
-        'phone_number_hash': hexPhoneNumberHashOption,
-      }));
+      final call = MapEntry(
+          'Identity',
+          MapEntry('update_user', {
+            'username': usernameOption,
+            'phone_number_hash': hexPhoneNumberHashOption,
+          }));
 
       await _signAndSendTransaction(call);
     } on PlatformException catch (e) {
@@ -117,14 +133,17 @@ class KarmachainService {
     }
   }
 
-  Future<void> sendAppreciation(String hexPhoneNumberHash, int amount, int communityId, int charTraitId) async {
+  Future<void> sendAppreciation(String hexPhoneNumberHash, int amount,
+      int communityId, int charTraitId) async {
     try {
-      final call = MapEntry('Appreciation', MapEntry('appreciation', {
-        'to': MapEntry('PhoneNumberHash', hex.decode(hexPhoneNumberHash)),
-        'amount': BigInt.from(amount),
-        'community_id': Option.some(communityId),
-        'char_trait_id': Option.some(charTraitId),
-      }));
+      final call = MapEntry(
+          'Appreciation',
+          MapEntry('appreciation', {
+            'to': MapEntry('PhoneNumberHash', hex.decode(hexPhoneNumberHash)),
+            'amount': BigInt.from(amount),
+            'community_id': Option.some(communityId),
+            'char_trait_id': Option.some(charTraitId),
+          }));
 
       await _signAndSendTransaction(call);
     } on PlatformException catch (e) {
@@ -135,10 +154,13 @@ class KarmachainService {
 
   Future<void> setAdmin(int communityId, String accountId) async {
     try {
-      final call = MapEntry('Appreciation', MapEntry('set_admin', {
-        'community_id': communityId,
-        'new_admin': MapEntry('AccountId', ss58.Address.decode(accountId).pubkey),
-      }));
+      final call = MapEntry(
+          'Appreciation',
+          MapEntry('set_admin', {
+            'community_id': communityId,
+            'new_admin':
+                MapEntry('AccountId', ss58.Address.decode(accountId).pubkey),
+          }));
 
       await _signAndSendTransaction(call);
     } on PlatformException catch (e) {
@@ -147,13 +169,15 @@ class KarmachainService {
     }
   }
 
-  Future<String> _signTransaction(String signer, List<int> pk, MapEntry<String, dynamic> call) async {
+  Future<String> _signTransaction(
+      String signer, List<int> pk, MapEntry<String, dynamic> call) async {
     const EXTRINSIC_FORMAT_VERSION = 4;
-    final nonce = await karmachain.send('system_accountNextIndex', [signer])
-      .then((v) => v.result);
+    final nonce = await karmachain
+        .send('system_accountNextIndex', [signer]).then((v) => v.result);
     final runtimeVersion = await api.getRuntimeVersion();
     // Removing '0x' prefix
-    final genesisHash = await karmachain.send('chain_getBlockHash', [0])
+    final genesisHash = await karmachain
+        .send('chain_getBlockHash', [0])
         .then((v) => v.result.toString().substring(2))
         .then((v) => hex.decode(v));
 
@@ -193,7 +217,8 @@ class KarmachainService {
     ];
 
     final output = ByteOutput();
-    chainInfo.scaleCodec.encodeTo('UnsignedPayload', [call, extra, additional], output);
+    chainInfo.scaleCodec
+        .encodeTo('UnsignedPayload', [call, extra, additional], output);
     debugPrint('Data to sign: ${output.toHex()}');
     final signature = keyring.sign(output.toBytes());
     debugPrint('Signature: ${hex.encode(signature)}');
@@ -215,9 +240,11 @@ class KarmachainService {
     // 1 byte for version ID + "is there a signature".
     // The top bit is 1 if signature present, 0 if not.
     // The remaining 7 bits encode the version number.
-    U8Codec.codec.encodeTo(EXTRINSIC_FORMAT_VERSION.toInt() | 128, payloadScaleEncoded);
+    U8Codec.codec
+        .encodeTo(EXTRINSIC_FORMAT_VERSION.toInt() | 128, payloadScaleEncoded);
     // Encode the signature itself
-    chainInfo.scaleCodec.encodeTo('Extrinsic', signatureToEncode, payloadScaleEncoded);
+    chainInfo.scaleCodec
+        .encodeTo('Extrinsic', signatureToEncode, payloadScaleEncoded);
     // Encode the call itself after this version+signature stuff.
     chainInfo.scaleCodec.encodeTo('Call', call, payloadScaleEncoded);
 
@@ -235,9 +262,11 @@ class KarmachainService {
 
   Future<void> _signAndSendTransaction(MapEntry<String, dynamic> call) async {
     final signer = ss58.Codec(42).encode(keyring.getPublicKey());
-    final encodedHex = await _signTransaction(signer, keyring.getPublicKey(), call);
+    final encodedHex =
+        await _signTransaction(signer, keyring.getPublicKey(), call);
     debugPrint('Encoded extrinsic: $encodedHex');
-    final result = await karmachain.send('author_submitExtrinsic', [encodedHex]);
+    final result =
+        await karmachain.send('author_submitExtrinsic', [encodedHex]);
     debugPrint('Submit extrinsic result: ${result.result.toString()}');
   }
 
@@ -263,15 +292,18 @@ class KarmachainService {
 
     final value = await api.getStorage(bytes.toBytes());
 
-    final List<Event> events = chainInfo.scaleCodec.decode('EventCodec', ByteInput(value!))
+    final List<Event> events = chainInfo.scaleCodec
+        .decode('EventCodec', ByteInput(value!))
         .map<Event>((e) => Event.fromSubstrateEvent(e))
         .toList();
 
     return events;
   }
 
-  Future<String> _processBlock(String address, String? previousBlockNumber) async {
-    final header = await karmachain.send('chain_getHeader', []).then((v) => v.result);
+  Future<String> _processBlock(
+      String address, String? previousBlockNumber) async {
+    final header =
+        await karmachain.send('chain_getHeader', []).then((v) => v.result);
     debugPrint('Retrieve chain head: $header');
     final blockNumber = header['number'];
     // Do not process same block twice
@@ -279,40 +311,48 @@ class KarmachainService {
       return blockNumber;
     }
 
-    final blockHash = await karmachain.send('chain_getBlockHash', [blockNumber]).then((v) => v.result);
+    final blockHash = await karmachain
+        .send('chain_getBlockHash', [blockNumber]).then((v) => v.result);
     debugPrint('Retrieve current block hash: $blockHash');
     final events = await _getEvents(blockHash);
-    final block = await karmachain.send('chain_getBlock', [blockHash]).then((v) => v.result);
+    final block = await karmachain
+        .send('chain_getBlock', [blockHash]).then((v) => v.result);
     final extrinsics = block['block']['extrinsics']
-        .map((encodedExtrinsic) => ExtrinsicsCodec(chainInfo: chainInfo).decode(Input.fromHex(encodedExtrinsic)))
+        .map((encodedExtrinsic) => ExtrinsicsCodec(chainInfo: chainInfo)
+            .decode(Input.fromHex(encodedExtrinsic)))
         .toList();
 
-    final timestamp = extrinsics.firstWhere(
-            (extrinsic) =>
-              extrinsic['calls'].key == 'Timestamp'
-                  && extrinsic['calls'].value.key == 'set')['calls'].value.value['now'];
+    final timestamp = extrinsics
+        .firstWhere((extrinsic) =>
+            extrinsic['calls'].key == 'Timestamp' &&
+            extrinsic['calls'].value.key == 'set')['calls']
+        .value
+        .value['now'];
 
     extrinsics.asMap().forEach((extrinsicIndex, extrinsic) {
-      final extrinsicEvents = events.where((event) => event.extrinsicIndex == extrinsicIndex);
+      final extrinsicEvents =
+          events.where((event) => event.extrinsicIndex == extrinsicIndex);
 
       final pallet = extrinsic['calls'].key;
       final method = extrinsic['calls'].value.key;
       final args = extrinsic['calls'].value.value;
       final signer = _getTransactionSigner(extrinsic);
-      final failedReason = extrinsicEvents.where((event) => event.eventName == 'ExtrinsicFailed').firstOrNull?.data['dispatch_error'];
+      final failedReason = extrinsicEvents
+          .where((event) => event.eventName == 'ExtrinsicFailed')
+          .firstOrNull
+          ?.data['dispatch_error'];
       debugPrint('$pallet $method $args $signer $failedReason');
 
       if (pallet == 'Identity' && method == 'new_user') {
         _processNewUserTransaction(address, signer, args, failedReason);
-      }
-      else if (pallet == 'Identity' && method == 'update_user') {
+      } else if (pallet == 'Identity' && method == 'update_user') {
         _processUpdateUserTransaction(address, signer, args, failedReason);
-      }
-      else if (pallet == 'Appreciation' && method == 'appreciation') {
+      } else if (pallet == 'Appreciation' && method == 'appreciation') {
         _processAppreciationTransaction(address, signer, args, failedReason);
       } else if (pallet == 'Appreciation' && method == 'set_admin') {
         _processSetAdminTransaction(address, signer, args, failedReason);
-      } else if (pallet == 'Balances' && (method == 'transfer_keep_alive' || method == 'transfer')) {
+      } else if (pallet == 'Balances' &&
+          (method == 'transfer_keep_alive' || method == 'transfer')) {
         _processTransferTransaction(address, signer, args, failedReason);
       } else {
         debugPrint('Skip pallet: $pallet method: $method');
@@ -337,7 +377,8 @@ class KarmachainService {
     return ss58.Codec(42).encode(address.cast<int>());
   }
 
-  void _processNewUserTransaction(String address, String? signer, Map<String, dynamic> args, MapEntry<String, Object?>? failedReason) {
+  void _processNewUserTransaction(String address, String? signer,
+      Map<String, dynamic> args, MapEntry<String, Object?>? failedReason) {
     final accountId = ss58.Codec(42).encode(args['account_id'].cast<int>());
     final username = args['username'];
     final phoneNumberHash = hex.encode(args['phone_number_hash'].cast<int>());
@@ -347,17 +388,25 @@ class KarmachainService {
     }
   }
 
-  void _processUpdateUserTransaction(String address, String? signer, Map<String, dynamic> args, MapEntry<String, Object?>? failedReason) {
+  void _processUpdateUserTransaction(String address, String? signer,
+      Map<String, dynamic> args, MapEntry<String, Object?>? failedReason) {
     final username = args['username'].value;
     final phoneNumberHashOption = args['phone_number_hash'].value;
-    final phoneNumberHash = phoneNumberHashOption == null ? null : hex.encode(phoneNumberHashOption.cast<int>());
+    final phoneNumberHash = phoneNumberHashOption == null
+        ? null
+        : hex.encode(phoneNumberHashOption.cast<int>());
 
     if (signer == address) {
-      eventHandler.onUpdateUser(signer, username, phoneNumberHash, failedReason);
+      eventHandler.onUpdateUser(
+          signer, username, phoneNumberHash, failedReason);
     }
   }
 
-  void _processAppreciationTransaction(String address, String? signer, Map<String, dynamic> args, MapEntry<String, Object?>? failedReason) async {
+  void _processAppreciationTransaction(
+      String address,
+      String? signer,
+      Map<String, dynamic> args,
+      MapEntry<String, Object?>? failedReason) async {
     final to = args['to'];
     final amount = args['amount'];
     final communityId = args['communityId'];
@@ -382,15 +431,19 @@ class KarmachainService {
         break;
     }
 
-    if (signer == address ||accountId == address) {
-      eventHandler.onAppreciation(signer, accountId, amount, communityId, charTraitId, failedReason);
+    if (signer == address || accountId == address) {
+      eventHandler.onAppreciation(
+          signer, accountId, amount, communityId, charTraitId, failedReason);
     }
   }
 
-  void _processSetAdminTransaction(String address, String? signer, Map<String, dynamic> args, MapEntry<String, Object?>? failedReason) async {
+  void _processSetAdminTransaction(
+      String address,
+      String? signer,
+      Map<String, dynamic> args,
+      MapEntry<String, Object?>? failedReason) async {
     final communityId = args['community_id'];
     final newAdmin = args['new_admin'];
-
 
     final accountIdentityType = newAdmin.key;
     final accountIdentityValue = newAdmin.value;
@@ -416,7 +469,8 @@ class KarmachainService {
     }
   }
 
-  void _processTransferTransaction(String address, String? signer, Map<String, dynamic> args, MapEntry<String, Object?>? failedReason) {
+  void _processTransferTransaction(String address, String? signer,
+      Map<String, dynamic> args, MapEntry<String, Object?>? failedReason) {
     final dest = ss58.Codec(42).encode(args['dest'].value.cast<int>());
     final amount = args['value'];
 
