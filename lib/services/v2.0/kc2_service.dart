@@ -12,6 +12,7 @@ import 'package:ss58/ss58.dart' as ss58;
 import 'package:substrate_metadata_fixed/models/models.dart';
 import 'package:substrate_metadata_fixed/substrate_metadata.dart';
 import 'package:convert/convert.dart';
+import 'package:substrate_metadata_fixed/types/metadata_types.dart';
 
 class KarmachainService {
   late polkadart.Provider karmachain;
@@ -72,6 +73,14 @@ class KarmachainService {
 
   Future<Map<String, dynamic>?> getUserInfoByAccountId(String accountId) async {
     return await karmachain.send('identity_getUserInfoByAccountId', [accountId]).then((v) => v.result);
+  }
+
+  Future<Map<String, dynamic>?> getUserInfoByUsername(String username) async {
+    return await karmachain.send('identity_getUserInfoByUsername', [username]).then((v) => v.result);
+  }
+
+  Future<Map<String, dynamic>?> getUserInfoByPhoneNumberHash(String phoneNumberHash) async {
+    return await karmachain.send('identity_getUserInfoByPhoneNumberHash', [phoneNumberHash]).then((v) => v.result);
   }
 
   // Transactions
@@ -234,10 +243,11 @@ class KarmachainService {
 
   // Subscribe to account txs and events
 
-  Timer subscribeToAccountEvents(String address) {
-    String? blockHash;
+  /// Subscribe to account transactions and events
+  Timer subscribeToAccount(String address) {
+    String? blockNumber;
     return Timer.periodic(const Duration(seconds: 12), (Timer t) async {
-      blockHash = await _processBlock(address, blockHash);
+      blockNumber = await _processBlock(address, blockNumber);
     });
   }
 
@@ -260,68 +270,152 @@ class KarmachainService {
     return events;
   }
 
-  Future<String> _processBlock(String address, String? previousBlockHash) async {
+  Future<String> _processBlock(String address, String? previousBlockNumber) async {
     final header = await karmachain.send('chain_getHeader', []).then((v) => v.result);
     debugPrint('Retrieve chain head: $header');
-    final blockHash = await karmachain.send('chain_getBlockHash', [header['number']]).then((v) => v.result);
-    debugPrint('Retrieve current block hash: $blockHash');
-
+    final blockNumber = header['number'];
     // Do not process same block twice
-    if (previousBlockHash == blockHash) {
-      return blockHash;
+    if (previousBlockNumber == blockNumber) {
+      return blockNumber;
     }
 
+    final blockHash = await karmachain.send('chain_getBlockHash', [blockNumber]).then((v) => v.result);
+    debugPrint('Retrieve current block hash: $blockHash');
     final events = await _getEvents(blockHash);
+    final block = await karmachain.send('chain_getBlock', [blockHash]).then((v) => v.result);
 
-    // Group events by transaction they belong to
-    groupBy(events, (e) => e.extrinsicIndex)
-        .forEach((index, events) {
-      final failed = events.any((e) => e.eventName == 'ExtrinsicFailed');
-      final appreciation = events.any((e) => e.eventName == 'Appreciation');
+    block['block']['extrinsics'].asMap().forEach((extrinsicIndex, encodedExtrinsic) {
+      final extrinsic = ExtrinsicsCodec(chainInfo: chainInfo).decode(Input.fromHex(encodedExtrinsic));
+      final extrinsicEvents = events.where((event) => event.extrinsicIndex == extrinsicIndex);
 
-      for (var event in events) {
-        // As soon one of generic event find we can skip all others
-        if (event.eventName == 'Appreciation') {
-          final payer = ss58.Codec(42).encode(event.data['payer'].cast<int>());
-          final payee = ss58.Codec(42).encode(event.data['payee'].cast<int>());
-          final amount = event.data['amount'];
-          final communityId = event.data['community'];
-          final charTraitId = event.data['charTraitId'];
-          eventHandler.onAppreciation(failed, payer, payee, amount, communityId, charTraitId);
-          break;
-        }
-        // Transfer event may happened in appreciation tx
-        // in this case skip processing transfer event
-        else if (event.eventName == 'Transfer' && !appreciation) {
-          final from = ss58.Codec(42).encode(event.data['from'].cast<int>());
-          final to = ss58.Codec(42).encode(event.data['to'].cast<int>());
-          final amount = event.data['amount'];
-          eventHandler.onTransfer(failed, from, to, amount);
-          break;
-        }
-        else if (event.eventName == 'AccountUpdated') {
-          debugPrint('${event.data}');
-          final accountId = ss58.Codec(42).encode(event.data['account_id'].cast<int>());
-          final username = event.data['username'];
-          final newUsername = event.data['new_username'].value;
-          final phoneNumberHash = hex.encode(event.data['phone_number_hash'].cast<int>());
-          final newPhoneNumberHash = event.data['new_phone_number_hash'].value;
-          final newPhoneNumberHashHex = newPhoneNumberHash == null ? null : hex.encode(newPhoneNumberHash.cast<int>());
-          eventHandler.onUpdate(failed, accountId, username, newUsername, phoneNumberHash, newPhoneNumberHashHex);
-          break;
-        }
-        else if (event.eventName == 'NewCommunityAdmin') {
-          final communityId = event.data['communityId'];
-          final communityName = event.data['communityName'];
-          final accountId = ss58.Codec(42).encode(event.data['accountId'].cast<int>());
-          final username = event.data['username'];
-          final phoneNumberHash = hex.encode(event.data['phoneNumberHash'].cast<int>());
-          eventHandler.onNewCommunityAdmin(failed, communityId, communityName, accountId, username, phoneNumberHash);
-          break;
-        }
+      final pallet = extrinsic['calls'].key;
+      final method = extrinsic['calls'].value.key;
+      final args = extrinsic['calls'].value.value;
+      final signer = _getTransactionSigner(extrinsic);
+      final failedReason = extrinsicEvents.where((event) => event.eventName == 'ExtrinsicFailed').firstOrNull?.data['dispatch_error'];
+
+      debugPrint('$pallet $method $args $signer $failedReason');
+
+      if (pallet == 'Identity' && method == 'new_user') {
+        _processNewUserTransaction(address, signer, args, failedReason);
+      }
+      else if (pallet == 'Identity' && method == 'update_user') {
+        _processUpdateUserTransaction(address, signer, args, failedReason);
+      }
+      else if (pallet == 'Appreciation' && method == 'appreciation') {
+        _processAppreciationTransaction(address, signer, args, failedReason);
+      } else if (pallet == 'Appreciation' && method == 'set_admin') {
+        _processSetAdminTransaction(address, signer, args, failedReason);
+      } else if (pallet == 'Balances' && (method == 'transfer_keep_alive' || method == 'transfer')) {
+        _processTransferTransaction(address, signer, args, failedReason);
+      } else {
+        debugPrint('Skip pallet: $pallet method: $method');
       }
     });
 
-    return blockHash;
+    return blockNumber;
+  }
+
+  /// Decode transaction signer, return `null` if transaction is `unsigned`
+  String? _getTransactionSigner(Map<String, dynamic> extrinsic) {
+    final signature = extrinsic['signature'];
+    if (signature == null) {
+      return null;
+    }
+
+    final address = signature['address'].value;
+    if (address == null) {
+      return null;
+    }
+
+    return ss58.Codec(42).encode(address.cast<int>());
+  }
+
+  void _processNewUserTransaction(String address, String? signer, Map<String, dynamic> args, MapEntry<String, Object?>? failedReason) {
+    final accountId = ss58.Codec(42).encode(args['account_id'].cast<int>());
+    final username = args['username'];
+    final phoneNumberHash = hex.encode(args['phone_number_hash'].cast<int>());
+
+    if (signer == address || accountId == address) {
+      eventHandler.onNewUser(signer, username, phoneNumberHash, failedReason);
+    }
+  }
+
+  void _processUpdateUserTransaction(String address, String? signer, Map<String, dynamic> args, MapEntry<String, Object?>? failedReason) {
+    final username = args['username'].value;
+    final phoneNumberHashOption = args['phone_number_hash'].value;
+    final phoneNumberHash = phoneNumberHashOption == null ? null : hex.encode(phoneNumberHashOption.cast<int>());
+
+    if (signer == address) {
+      eventHandler.onUpdateUser(signer, username, phoneNumberHash, failedReason);
+    }
+  }
+
+  void _processAppreciationTransaction(String address, String? signer, Map<String, dynamic> args, MapEntry<String, Object?>? failedReason) async {
+    final to = args['to'];
+    final amount = args['amount'];
+    final communityId = args['communityId'];
+    final charTraitId = args['charTraitId'];
+
+    final accountIdentityType = to.key;
+    final accountIdentityValue = to.value;
+    String? accountId;
+
+    switch (accountIdentityType) {
+      case 'AccountId':
+        accountId = ss58.Codec(42).encode(accountIdentityValue.cast<int>());
+        break;
+      case 'Username':
+        final result = await getUserInfoByUsername(accountIdentityValue);
+        accountId = result?['account_id'];
+        break;
+      default:
+        final phoneNumberHashHex = hex.encode(accountIdentityValue.cast<int>());
+        final result = await getUserInfoByPhoneNumberHash(phoneNumberHashHex);
+        accountId = result?['account_id'];
+        break;
+    }
+
+    if (signer == address ||accountId == address) {
+      eventHandler.onAppreciation(signer, accountId, amount, communityId, charTraitId, failedReason);
+    }
+  }
+
+  void _processSetAdminTransaction(String address, String? signer, Map<String, dynamic> args, MapEntry<String, Object?>? failedReason) async {
+    final communityId = args['community_id'];
+    final newAdmin = args['new_admin'];
+
+
+    final accountIdentityType = newAdmin.key;
+    final accountIdentityValue = newAdmin.value;
+    String accountId;
+
+    switch (accountIdentityType) {
+      case 'AccountId':
+        accountId = ss58.Codec(42).encode(accountIdentityValue.cast<int>());
+        break;
+      case 'Username':
+        final result = await getUserInfoByUsername(accountIdentityValue);
+        accountId = result?['account_id'];
+        break;
+      default:
+        final phoneNumberHashHex = hex.encode(accountIdentityValue.cast<int>());
+        final result = await getUserInfoByPhoneNumberHash(phoneNumberHashHex);
+        accountId = result?['account_id'];
+        break;
+    }
+
+    if (signer == address || accountId == address) {
+      eventHandler.onSetAdmin(signer, communityId, accountId, failedReason);
+    }
+  }
+
+  void _processTransferTransaction(String address, String? signer, Map<String, dynamic> args, MapEntry<String, Object?>? failedReason) {
+    final dest = ss58.Codec(42).encode(args['dest'].value.cast<int>());
+    final amount = args['value'];
+
+    if (signer == address || dest == address) {
+      eventHandler.onTransfer(signer, dest, amount, failedReason);
+    }
   }
 }

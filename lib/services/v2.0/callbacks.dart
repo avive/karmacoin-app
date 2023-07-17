@@ -1,20 +1,24 @@
 import 'package:karma_coin/common_libs.dart';
 
 abstract class EventHandler {
-  void onAppreciation(bool failed, String payer, String payee, BigInt amount, int? communityId, int? charTraitId) {
-    debugPrint('Appreciation $failed $payer $payee $amount $communityId $charTraitId');
+  void onNewUser(String? signer, String username, String phoneNumberHash, MapEntry<String, Object?>? failedReason) {
+    debugPrint('NewUser $signer $username $phoneNumberHash $failedReason');
   }
 
-  void onTransfer(bool failed, String from, String to, BigInt amount) {
-    debugPrint('Transfer $failed $from $to $amount');
+  void onUpdateUser(String? signer, String? username, String? phoneNumberHash, MapEntry<String, Object?>? failedReason) {
+    debugPrint('UpdateUser $signer $username $phoneNumberHash $failedReason');
   }
 
-  void onUpdate(bool failed, String accountId, String username, String? newUsername, String phoneNumberHash, String? newPhoneNumberHash) {
-    debugPrint('Update account $failed $accountId $username $newUsername $phoneNumberHash $newPhoneNumberHash');
+  void onAppreciation(String? signer, String? payee, BigInt amount, int? communityId, int? charTraitId, MapEntry<String, Object?>? failedReason) {
+    debugPrint('Appreciation $signer $payee $amount $communityId $charTraitId $failedReason');
   }
 
-  void onNewCommunityAdmin(bool failed, int communityId, String communityName, String accountId, String username, String phoneNumberHash) {
-    debugPrint('New community admin $failed $communityId $communityName $accountId $username $phoneNumberHash');
+  void onSetAdmin(String? signer, int communityId, String? newAdmin, MapEntry<String, Object?>? failedReason) {
+    debugPrint('SetAdmin $signer $communityId $newAdmin $failedReason');
+  }
+
+  void onTransfer(String? signer, String to, BigInt amount, MapEntry<String, Object?>? failedReason) {
+    debugPrint('Transfer $signer $to $amount $failedReason');
   }
 }
 
