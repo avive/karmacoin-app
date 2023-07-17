@@ -1052,10 +1052,18 @@ packages:
     source: hosted
     version: "1.2.0"
   substrate_metadata:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: substrate_metadata
       sha256: "8c0b7216595664fd28007fb042ea3561bac133884edbbb353d3f6f5880074f13"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
+  substrate_metadata_fixed:
+    dependency: "direct main"
+    description:
+      name: substrate_metadata_fixed
+      sha256: cd6b4082b7ef7ac35f2a028f9da6365b5127d3d94a362208d97cb1d502574d29
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"

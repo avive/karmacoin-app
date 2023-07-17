@@ -89,7 +89,7 @@ dependencies:
   flutter_js: ^0.7.0
   polkadart: ^0.1.0
   polkadart_scale_codec: ^1.1.0
-  substrate_metadata: ^1.1.0
+  substrate_metadata_fixed: ^1.1.0
   ss58: ^1.1.0
   convert: ^3.1.1
   
