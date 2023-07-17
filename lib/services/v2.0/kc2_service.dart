@@ -7,6 +7,7 @@ import 'package:karma_coin/services/v2.0/callbacks.dart';
 import 'package:karma_coin/services/v2.0/keyring.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:polkadart/polkadart.dart' as polkadart;
+import 'package:polkadart/substrate/substrate.dart';
 import 'package:polkadart_scale_codec/polkadart_scale_codec.dart';
 import 'package:ss58/ss58.dart' as ss58;
 import 'package:substrate_metadata_fixed/models/models.dart';
@@ -317,19 +318,28 @@ class KarmachainService {
     final events = await _getEvents(blockHash);
     final block = await karmachain
         .send('chain_getBlock', [blockHash]).then((v) => v.result);
-    final extrinsics = block['block']['extrinsics']
-        .map((encodedExtrinsic) => ExtrinsicsCodec(chainInfo: chainInfo)
-            .decode(Input.fromHex(encodedExtrinsic)))
-        .toList();
+    final extrinsics = block['block']['extrinsics'].map((encodedExtrinsic) {
+      final extrinsic = ExtrinsicsCodec(chainInfo: chainInfo)
+          .decode(Input.fromHex(encodedExtrinsic));
+      final extrinsicHash =
+          hex.encode(Hasher.twoxx128.hashString(encodedExtrinsic));
+
+      return MapEntry(extrinsicHash, extrinsic);
+    }).toList();
 
     final timestamp = extrinsics
-        .firstWhere((extrinsic) =>
-            extrinsic['calls'].key == 'Timestamp' &&
-            extrinsic['calls'].value.key == 'set')['calls']
+        .firstWhere((e) =>
+            e.value['calls'].key == 'Timestamp' &&
+            e.value['calls'].value.key == 'set')
+        .value['calls']
         .value
         .value['now'];
 
-    extrinsics.asMap().forEach((extrinsicIndex, extrinsic) {
+    extrinsics.asMap().forEach((extrinsicIndex, e) {
+      final extrinsicHash = e.key;
+      final extrinsic = e.value;
+      final extrinsicMetadata = TransactionMetadata(extrinsicHash, timestamp);
+
       final extrinsicEvents =
           events.where((event) => event.extrinsicIndex == extrinsicIndex);
 
@@ -344,16 +354,21 @@ class KarmachainService {
       debugPrint('$pallet $method $args $signer $failedReason');
 
       if (pallet == 'Identity' && method == 'new_user') {
-        _processNewUserTransaction(address, signer, args, failedReason);
+        _processNewUserTransaction(
+            extrinsicMetadata, address, signer, args, failedReason);
       } else if (pallet == 'Identity' && method == 'update_user') {
-        _processUpdateUserTransaction(address, signer, args, failedReason);
+        _processUpdateUserTransaction(
+            extrinsicMetadata, address, signer, args, failedReason);
       } else if (pallet == 'Appreciation' && method == 'appreciation') {
-        _processAppreciationTransaction(address, signer, args, failedReason);
+        _processAppreciationTransaction(
+            extrinsicMetadata, address, signer, args, failedReason);
       } else if (pallet == 'Appreciation' && method == 'set_admin') {
-        _processSetAdminTransaction(address, signer, args, failedReason);
+        _processSetAdminTransaction(
+            extrinsicMetadata, address, signer, args, failedReason);
       } else if (pallet == 'Balances' &&
           (method == 'transfer_keep_alive' || method == 'transfer')) {
-        _processTransferTransaction(address, signer, args, failedReason);
+        _processTransferTransaction(
+            extrinsicMetadata, address, signer, args, failedReason);
       } else {
         debugPrint('Skip pallet: $pallet method: $method');
       }
@@ -377,19 +392,28 @@ class KarmachainService {
     return ss58.Codec(42).encode(address.cast<int>());
   }
 
-  void _processNewUserTransaction(String address, String? signer,
-      Map<String, dynamic> args, MapEntry<String, Object?>? failedReason) {
+  void _processNewUserTransaction(
+      TransactionMetadata metadata,
+      String address,
+      String? signer,
+      Map<String, dynamic> args,
+      MapEntry<String, Object?>? failedReason) {
     final accountId = ss58.Codec(42).encode(args['account_id'].cast<int>());
     final username = args['username'];
     final phoneNumberHash = hex.encode(args['phone_number_hash'].cast<int>());
 
     if (signer == address || accountId == address) {
-      eventHandler.onNewUser(signer, username, phoneNumberHash, failedReason);
+      eventHandler.onNewUser(
+          metadata, signer, username, phoneNumberHash, failedReason);
     }
   }
 
-  void _processUpdateUserTransaction(String address, String? signer,
-      Map<String, dynamic> args, MapEntry<String, Object?>? failedReason) {
+  void _processUpdateUserTransaction(
+      TransactionMetadata metadata,
+      String address,
+      String? signer,
+      Map<String, dynamic> args,
+      MapEntry<String, Object?>? failedReason) {
     final username = args['username'].value;
     final phoneNumberHashOption = args['phone_number_hash'].value;
     final phoneNumberHash = phoneNumberHashOption == null
@@ -398,11 +422,12 @@ class KarmachainService {
 
     if (signer == address) {
       eventHandler.onUpdateUser(
-          signer, username, phoneNumberHash, failedReason);
+          metadata, signer, username, phoneNumberHash, failedReason);
     }
   }
 
   void _processAppreciationTransaction(
+      TransactionMetadata metadata,
       String address,
       String? signer,
       Map<String, dynamic> args,
@@ -432,12 +457,13 @@ class KarmachainService {
     }
 
     if (signer == address || accountId == address) {
-      eventHandler.onAppreciation(
-          signer, accountId, amount, communityId, charTraitId, failedReason);
+      eventHandler.onAppreciation(metadata, signer, accountId, amount,
+          communityId, charTraitId, failedReason);
     }
   }
 
   void _processSetAdminTransaction(
+      TransactionMetadata metadata,
       String address,
       String? signer,
       Map<String, dynamic> args,
@@ -465,17 +491,22 @@ class KarmachainService {
     }
 
     if (signer == address || accountId == address) {
-      eventHandler.onSetAdmin(signer, communityId, accountId, failedReason);
+      eventHandler.onSetAdmin(
+          metadata, signer, communityId, accountId, failedReason);
     }
   }
 
-  void _processTransferTransaction(String address, String? signer,
-      Map<String, dynamic> args, MapEntry<String, Object?>? failedReason) {
+  void _processTransferTransaction(
+      TransactionMetadata metadata,
+      String address,
+      String? signer,
+      Map<String, dynamic> args,
+      MapEntry<String, Object?>? failedReason) {
     final dest = ss58.Codec(42).encode(args['dest'].value.cast<int>());
     final amount = args['value'];
 
     if (signer == address || dest == address) {
-      eventHandler.onTransfer(signer, dest, amount, failedReason);
+      eventHandler.onTransfer(metadata, signer, dest, amount, failedReason);
     }
   }
 }

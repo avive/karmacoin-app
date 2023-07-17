@@ -15,7 +15,7 @@ class Event {
 
 class TransactionMetadata {
   String hash;
-  int timestamp;
+  BigInt timestamp;
 
   TransactionMetadata(this.hash, this.timestamp);
 }
