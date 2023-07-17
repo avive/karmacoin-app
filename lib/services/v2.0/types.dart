@@ -12,3 +12,10 @@ class Event {
       eventName = event['event'].value.key,
       data = event['event'].value.value;
 }
+
+class TransactionMetadata {
+  String hash;
+  int timestamp;
+
+  TransactionMetadata(this.hash, this.timestamp);
+}

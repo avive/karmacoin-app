@@ -283,9 +283,16 @@ class KarmachainService {
     debugPrint('Retrieve current block hash: $blockHash');
     final events = await _getEvents(blockHash);
     final block = await karmachain.send('chain_getBlock', [blockHash]).then((v) => v.result);
+    final extrinsics = block['block']['extrinsics']
+        .map((encodedExtrinsic) => ExtrinsicsCodec(chainInfo: chainInfo).decode(Input.fromHex(encodedExtrinsic)))
+        .toList();
 
-    block['block']['extrinsics'].asMap().forEach((extrinsicIndex, encodedExtrinsic) {
-      final extrinsic = ExtrinsicsCodec(chainInfo: chainInfo).decode(Input.fromHex(encodedExtrinsic));
+    final timestamp = extrinsics.firstWhere(
+            (extrinsic) =>
+              extrinsic['calls'].key == 'Timestamp'
+                  && extrinsic['calls'].value.key == 'set')['calls'].value.value['now'];
+
+    extrinsics.asMap().forEach((extrinsicIndex, extrinsic) {
       final extrinsicEvents = events.where((event) => event.extrinsicIndex == extrinsicIndex);
 
       final pallet = extrinsic['calls'].key;
@@ -293,7 +300,6 @@ class KarmachainService {
       final args = extrinsic['calls'].value.value;
       final signer = _getTransactionSigner(extrinsic);
       final failedReason = extrinsicEvents.where((event) => event.eventName == 'ExtrinsicFailed').firstOrNull?.data['dispatch_error'];
-
       debugPrint('$pallet $method $args $signer $failedReason');
 
       if (pallet == 'Identity' && method == 'new_user') {
