@@ -7,18 +7,18 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
-import 'package:karma_coin/services/api/api.pb.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/ui/widgets/animated_background.dart';
 import 'package:karma_coin/ui/widgets/animated_wave.dart';
 import 'package:karma_coin/ui/widgets/animated_wave_right.dart';
 import 'package:karma_coin/ui/widgets/appreciate.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
+import 'package:karma_coin/ui/widgets/appreciation_intro.dart';
+import 'package:karma_coin/ui/widgets/appreciation_progress.dart';
 import 'package:karma_coin/ui/widgets/into.dart';
 import 'package:karma_coin/ui/widgets/leaderboard.dart';
 import 'package:karma_coin/ui/widgets/traits_scores_wheel.dart';
 import 'package:pull_down_button/pull_down_button.dart';
-import 'package:status_alert/status_alert.dart';
 
 const smallScreenHeight = 1334;
 
@@ -80,7 +80,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     }
 
     Future.delayed(Duration.zero, () async {
-      if (!Platform.isIOS) {
+      if (kIsWeb || !Platform.isIOS) {
         if (appState.signedUpInCurentSession.value && mounted) {
           appState.signedUpInCurentSession.value = false;
           Navigator.of(context).push(
@@ -106,6 +106,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             return Container();
           }
 
+          // todo: customize the progress screen for just coin sending...
+
+          /*
           debugPrint('Data: $value');
 
           String sendingTitle = 'Sending Appreciation...';
@@ -114,50 +117,18 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           if (value.personalityTrait.index == 0) {
             sendingTitle = 'Sending Karma Coins...';
             sentTitle = 'Karma Coins Sent';
-          }
+          }*/
 
-          // show sending alert
-          Future.delayed(Duration.zero, () async {
-            StatusAlert.show(context,
-                duration: const Duration(seconds: 2),
-                title: sendingTitle,
-                configuration:
-                    const IconConfiguration(icon: CupertinoIcons.wand_stars),
-                dismissOnBackgroundTap: true,
-                maxWidth: statusAlertWidth);
+          Future.delayed(const Duration(milliseconds: 200), () async {
+            if (!context.mounted) return;
 
-            SubmitTransactionResponse resp =
-                await accountLogic.submitPaymentTransaction(value);
+            Navigator.of(context).push(
+              CupertinoPageRoute(
+                fullscreenDialog: true,
+                builder: ((context) => AppreciationProgress(data: value)),
+              ),
+            );
 
-            switch (resp.submitTransactionResult) {
-              case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
-                if (mounted) {
-                  StatusAlert.show(
-                    context,
-                    duration: const Duration(seconds: 4),
-                    configuration: const IconConfiguration(
-                        icon: CupertinoIcons.check_mark_circled),
-                    title: sentTitle,
-                    dismissOnBackgroundTap: true,
-                    maxWidth: statusAlertWidth,
-                  );
-                }
-                break;
-              case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
-                if (mounted) {
-                  StatusAlert.show(
-                    context,
-                    duration: const Duration(seconds: 2),
-                    configuration: const IconConfiguration(
-                        icon: CupertinoIcons.stop_circle),
-                    title: 'Karmachain Error',
-                    subtitle: 'Sorry, please try again later.',
-                    dismissOnBackgroundTap: true,
-                    maxWidth: statusAlertWidth,
-                  );
-                }
-                break;
-            }
             // clear the user tx data
             debugPrint("clearing local tx data");
             appState.paymentTransactionData.value = null;
@@ -165,6 +136,40 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
           return Container();
         });
+  }
+
+  Future<void> onAppreciateButtonPressed(BuildContext context) async {
+    if (!context.mounted) return;
+
+    if (appState.appreciateIntroDisplayed.value) {
+      Navigator.of(context).push(
+        CupertinoPageRoute(
+          fullscreenDialog: true,
+          builder: ((context) => const AppreciateWidget(communityId: 0)),
+        ),
+      );
+      return;
+    }
+
+    appState.appreciateIntroDisplayed.value = true;
+
+    Navigator.of(context)
+        .push(CupertinoPageRoute(
+            fullscreenDialog: true,
+            builder: ((context) =>
+                // push intro screen here
+                const AppreciationIntro())))
+        .then((completion) {
+      Future.delayed(const Duration(milliseconds: 250), () async {
+        if (!context.mounted) return;
+        Navigator.of(context).push(
+          CupertinoPageRoute(
+            fullscreenDialog: true,
+            builder: ((context) => const AppreciateWidget(communityId: 0)),
+          ),
+        );
+      });
+    });
   }
 
   Widget _getWidgetForUser(BuildContext context) {
@@ -175,6 +180,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           if (value == null) {
             return Container();
           }
+
           return Padding(
             padding: const EdgeInsets.all(0),
             child: Column(
@@ -192,13 +198,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   ),
                   const SizedBox(height: 24),
                   CupertinoButton.filled(
-                    onPressed: () async {
-                      if (!context.mounted) return;
-                      Navigator.of(context).push(CupertinoPageRoute(
-                          fullscreenDialog: true,
-                          builder: ((context) =>
-                              const AppreciateWidget(communityId: 0))));
-                    },
+                    onPressed: () => onAppreciateButtonPressed(context),
                     child: const Text('Appreciate'),
                   ),
                   CupertinoButton(

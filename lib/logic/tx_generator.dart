@@ -4,6 +4,7 @@ import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
+import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/services/api/api.pbgrpc.dart';
 import 'package:karma_coin/common_libs.dart';
@@ -16,6 +17,8 @@ abstract class TrnasactionGenerator {
       PaymentTransactionData data,
       KarmaCoinUser karmaCoinUser,
       ed.KeyPair keyPair) async {
+    appState.txSubmissionStatus.value = TxSubmissionStatus.submitting;
+
     PaymentTransactionV1 paymentTx = PaymentTransactionV1(
         from: AccountId(data: keyPair.publicKey.bytes),
         toNumber: data.mobilePhoneNumber.isNotEmpty
@@ -47,6 +50,7 @@ abstract class TrnasactionGenerator {
           SubmitTransactionRequest(transaction: signedTx.transaction));
     } catch (e) {
       debugPrint('failed to submit transaction to api: $e');
+      appState.txSubmissionStatus.value = TxSubmissionStatus.error;
     }
 
     est.SignedTransactionWithStatusEx enriched =
@@ -54,6 +58,7 @@ abstract class TrnasactionGenerator {
 
     switch (resp.submitTransactionResult) {
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
+        appState.txSubmissionStatus.value = TxSubmissionStatus.submitted;
         debugPrint('Payment transaction submitted to api!');
         signedTx.status = TransactionStatus.TRANSACTION_STATUS_SUBMITTED;
 
@@ -68,15 +73,18 @@ abstract class TrnasactionGenerator {
 
         debugPrint("finished updating state");
 
-        await FirebaseAnalytics.instance
+        FirebaseAnalytics.instance
             .logEvent(name: "submit_payment_tx_success", parameters: {
           "amount": data.kCentsAmount.toString(),
           "trait_id": paymentTx.charTraitId,
           "community_id": paymentTx.communityId
+        }).catchError((e) {
+          debugPrint(e.toString());
         });
 
         break;
       case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
+        appState.txSubmissionStatus.value = TxSubmissionStatus.error;
         signedTx.status = TransactionStatus.TRANSACTION_STATUS_REJECTED;
 
         debugPrint('transaction rejected by api');

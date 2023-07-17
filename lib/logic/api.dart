@@ -7,8 +7,6 @@ class Api {
   late ApiServiceClient apiServiceClient;
 
   Api() {
-    // todo: add support to secure channel for production api usage
-
     debugPrint(
         'Api config: ${settingsLogic.apiHostName.value}:${settingsLogic.apiHostPort.value}');
 

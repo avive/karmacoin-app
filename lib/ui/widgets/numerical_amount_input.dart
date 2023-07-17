@@ -110,7 +110,7 @@ class _NumericalAmountInputWidgetState
                 ],
               ),
             ),
-            Text('1 million Karma Cents is 1 Karma Coin',
+            Text('One million Karma Cents is one Karma Coin.',
                 style: CupertinoTheme.of(context).textTheme.textStyle),
           ],
         ),

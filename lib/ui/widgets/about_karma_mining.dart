@@ -152,7 +152,7 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
         child: Text(
           'The more you give, the more you get...',
           style: textTheme.navTitleTextStyle.merge(
-            const TextStyle(fontSize: 30, fontWeight: FontWeight.w400),
+            const TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
           ),
           textAlign: TextAlign.center,
         ),
@@ -172,7 +172,7 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
           const SizedBox(width: 24),
           _getCoinWidget(context, signupReward),
           const SizedBox(width: 16),
-          Text('Sign up reward',
+          Text('Sign up reward.',
               style: textTheme.textStyle.merge(
                 const TextStyle(fontSize: 22),
               )),
@@ -183,7 +183,7 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
           _getCoinWidget(context, referralReward),
           const SizedBox(width: 16),
           Flexible(
-            child: Text('Referral reward',
+            child: Text('Referral reward when someone you appreciate signs up.',
                 style: textTheme.textStyle.merge(
                   const TextStyle(fontSize: 22),
                 )),
@@ -195,7 +195,7 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
           _getCoinWidget(context, karmaReward),
           const SizedBox(width: 16),
           Flexible(
-            child: Text('Weekly Karma Reward',
+            child: Text('Weekly Karma Reward.',
                 style: textTheme.textStyle.merge(
                   const TextStyle(fontSize: 22),
                 )),
@@ -207,7 +207,7 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
           _getCoinWidget(context, 0),
           const SizedBox(width: 16),
           Flexible(
-            child: Text('No transaction fee for first 10 appreciations',
+            child: Text('No transaction fee for first 10 appreciations.',
                 style: textTheme.textStyle.merge(
                   const TextStyle(fontSize: 22),
                 )),

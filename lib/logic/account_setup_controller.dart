@@ -66,7 +66,7 @@ class AccountSetupController extends ChangeNotifier {
     try {
       await accountLogic.verifyPhoneNumber();
     } catch (e) {
-      debugPrint('verify exception: $e');
+      debugPrint('verification exception: $e');
       setStatus(AccountSetupStatus.validatorError);
       return;
     }
@@ -122,7 +122,6 @@ class AccountSetupController extends ChangeNotifier {
     setStatus(AccountSetupStatus.submittingTransaction);
 
     if (!accountLogic.validateDataForNewUserTransaction()) {
-    
       setStatus(AccountSetupStatus.missingData);
       return;
     }

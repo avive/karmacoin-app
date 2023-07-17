@@ -89,7 +89,7 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
     widgets.add(Padding(
         padding: const EdgeInsets.only(left: 24, right: 24, top: 12),
         child: Text(
-            'People eligable for the next round of karma rewards minting',
+            'Users eligable for the next round of karma rewards minting.',
             textAlign: TextAlign.center,
             style: CupertinoTheme.of(context).textTheme.pickerTextStyle)));
 

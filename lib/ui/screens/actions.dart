@@ -13,6 +13,7 @@ const _tgramUrl = 'https://t.me/karmacoinapp/13';
 const _linkedInUrl = 'https://www.linkedin.com/company/karmacoin';
 const _blogUrl = 'https://connect.karmaco.in';
 const _discordUrl = 'http://bit.ly/3z9fvNe';
+const _tikTokUrl = 'https://www.tiktok.com/@karmadivaaa';
 
 class ActionsScreen extends StatefulWidget {
   const ActionsScreen({super.key});
@@ -75,7 +76,6 @@ class _ActionsScreenState extends State<ActionsScreen> {
             CupertinoListTile.notched(
                 title: const Text('Karma Rewards'),
                 leading: const Icon(CupertinoIcons.wand_rays, size: 28),
-                trailing: const CupertinoListTileChevron(),
                 onTap: () {
                   if (!context.mounted) return;
                   Navigator.of(context).push(
@@ -147,12 +147,6 @@ class _ActionsScreenState extends State<ActionsScreen> {
             trailing: const CupertinoListTileChevron(),
             onTap: () => {},
           ),
-          CupertinoListTile.notched(
-            title: const Text('Account Operations'),
-            leading: const Icon(CupertinoIcons.doc, size: 28),
-            trailing: const CupertinoListTileChevron(),
-            onTap: () => {},
-          ),
           const DeleteDataTile().build(context) as CupertinoListTile,
           const DeleteAccountTile().build(context) as CupertinoListTile,
         ],
@@ -212,6 +206,16 @@ class _ActionsScreenState extends State<ActionsScreen> {
         ),
         children: <CupertinoListTile>[
           CupertinoListTile.notched(
+            title: const Text('Telegram'),
+            leading: const FaIcon(FontAwesomeIcons.telegram, size: 24),
+            onTap: () async => {await openUrl(_tgramUrl)},
+          ),
+          CupertinoListTile.notched(
+            title: const Text('TikTok'),
+            leading: const FaIcon(FontAwesomeIcons.tiktok, size: 24),
+            onTap: () async => {await openUrl(_tikTokUrl)},
+          ),
+          CupertinoListTile.notched(
             title: const Text('Twitter'),
             leading: const FaIcon(FontAwesomeIcons.twitter, size: 24),
             onTap: () async => {await openUrl(_twitterUrl)},
@@ -221,18 +225,6 @@ class _ActionsScreenState extends State<ActionsScreen> {
             leading: const FaIcon(FontAwesomeIcons.discord, size: 24),
             onTap: () async => {await openUrl(_discordUrl)},
           ),
-          CupertinoListTile.notched(
-            title: const Text('Telegram'),
-            leading: const FaIcon(FontAwesomeIcons.telegram, size: 24),
-            onTap: () async => {await openUrl(_tgramUrl)},
-          ),
-          /*
-          CupertinoListTile.notched(
-            title: const Text('Discord'),
-            leading: const FaIcon(FontAwesomeIcons.discord, size: 24),
-            onTap: () async => {await openUrl(context, _supportUrl)},
-          ),
-          */
           CupertinoListTile.notched(
             title: const Text('Blog'),
             leading: const FaIcon(FontAwesomeIcons.blog, size: 24),

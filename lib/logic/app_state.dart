@@ -8,6 +8,8 @@ enum FeeType { payment, fee }
 
 enum CoinKind { kCents, kCoins }
 
+enum TxSubmissionStatus { idle, submitting, submitted, error }
+
 enum Destination { accountAddress, phoneNumber }
 
 // misc runtime state such as kc amount input. Includes lifted up state from widgets
@@ -23,11 +25,21 @@ class AppState {
   //// Account address of send KC transaction destination
   final ValueNotifier<String> sendDestinationAddress = ValueNotifier('');
 
+  //// Transaction submission status for ui feedback
+  final ValueNotifier<TxSubmissionStatus> txSubmissionStatus =
+      ValueNotifier(TxSubmissionStatus.idle);
+
+  //// Error message for ui feedback. todo: implement me
+  final ValueNotifier<String> txSubmissionError = ValueNotifier('');
+
   //// Mobile phone number canonical format for send KC transaction destination
   final ValueNotifier<String> sendDestinationPhoneNumber = ValueNotifier('');
 
   //// Apprecaite dest when signup is complete
   final ValueNotifier<bool> appreciateAfterSignup = ValueNotifier(false);
+
+  //// True if appreciation intro was already displayed in an app session
+  final ValueNotifier<bool> appreciateIntroDisplayed = ValueNotifier(false);
 
 //// Mobile phone number canonical format for send KC transaction destination
   final ValueNotifier<Destination> sendDestination =
@@ -49,6 +61,8 @@ class AppState {
 
   /// Verificaiton id obtained from firebase as part of Firebase phone auth flow
   String phoneAuthVerificationCodeId = '';
+
+  String userProvidedEmailAddress = '';
 
   /// Last user selected personality trait from ui
   final ValueNotifier<PersonalityTrait> selectedPersonalityTrait =
