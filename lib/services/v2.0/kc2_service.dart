@@ -25,14 +25,15 @@ class KarmachainService {
   Future<void> init() async {
     try {
       keyring = KarmachainKeyring();
-      await keyring.init();
     } on PlatformException catch (e) {
       debugPrint('Failed to init js engine: ${e.details}');
       rethrow;
     }
   }
 
-  // Connect to a karmachain api service. e.g  "ws://127.0.0.1:9944"
+  // Connect to a karmachain api service. e.g
+  // Local running node - "ws://127.0.0.1:9944"
+  // Testnet - "wss://testnet.karmaco.in/testnet/ws"
   Future<void> connectToApi(String wsUrl, bool createTestAccounts) async {
     try {
       karmachain = polkadart.Provider(Uri.parse(wsUrl));
@@ -181,7 +182,7 @@ class KarmachainService {
 
   Future<String> _signTransaction(
       String signer, List<int> pk, MapEntry<String, dynamic> call) async {
-    const EXTRINSIC_FORMAT_VERSION = 4;
+    const extrinsicFormatVersion = 4;
     final nonce = await karmachain
         .send('system_accountNextIndex', [signer]).then((v) => v.result);
     final runtimeVersion = await api.getRuntimeVersion();
@@ -230,7 +231,7 @@ class KarmachainService {
     chainInfo.scaleCodec
         .encodeTo('UnsignedPayload', [call, extra, additional], output);
     debugPrint('Data length: ${output.length} Data to sign: ${output.toHex()}');
-    final signature;
+    final Uint8List signature;
     // If payload is longer than 256 bytes, we hash it and sign the hash instead:
     if (output.length > 256) {
       signature = keyring.sign(Hasher.blake2b256.hash(output.toBytes()));
@@ -257,7 +258,7 @@ class KarmachainService {
     // The top bit is 1 if signature present, 0 if not.
     // The remaining 7 bits encode the version number.
     U8Codec.codec
-        .encodeTo(EXTRINSIC_FORMAT_VERSION.toInt() | 128, payloadScaleEncoded);
+        .encodeTo(extrinsicFormatVersion.toInt() | 128, payloadScaleEncoded);
     // Encode the signature itself
     chainInfo.scaleCodec
         .encodeTo('Extrinsic', signatureToEncode, payloadScaleEncoded);
