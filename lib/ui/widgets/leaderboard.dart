@@ -3,6 +3,7 @@ import 'package:karma_coin/services/api/api.pb.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:random_avatar/random_avatar.dart';
 import 'package:status_alert/status_alert.dart';
 
 class LeaderboardWidget extends StatefulWidget {
@@ -89,7 +90,7 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
     widgets.add(Padding(
         padding: const EdgeInsets.only(left: 24, right: 24, top: 12),
         child: Text(
-            'Users eligable for the next round of karma rewards minting.',
+            'Users eligible for the next round of karma rewards minting.',
             textAlign: TextAlign.center,
             style: CupertinoTheme.of(context).textTheme.pickerTextStyle)));
 
@@ -107,7 +108,7 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
           Padding(
             padding: const EdgeInsets.only(top: 64, bottom: 36),
             child: Center(
-              child: Text('😞 No one is eligable yet.',
+              child: Text('😞 No one is eligible yet.',
                   textAlign: TextAlign.center,
                   style: CupertinoTheme.of(context).textTheme.pickerTextStyle),
             ),
@@ -157,7 +158,7 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
           fontWeight: FontWeight.w300,
         ),
       ),
-      leading: const Icon(CupertinoIcons.person, size: 28),
+      leading: RandomAvatar(entry.userName, height: 50, width: 50),
     );
   }
 

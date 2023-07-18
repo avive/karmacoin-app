@@ -9,6 +9,7 @@ import 'package:karma_coin/data/signed_transaction.dart';
 import 'package:karma_coin/services/api/types.pb.dart' as types;
 import 'package:karma_coin/ui/helpers/transactions.dart';
 import 'package:karma_coin/ui/widgets/pill.dart';
+import 'package:random_avatar/random_avatar.dart';
 
 /// Display transaction details for a a locally available transaction
 class TransactionDetailsScreen extends StatefulWidget {
@@ -51,6 +52,10 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
     final types.User? sender = tx.getFromUser();
     String senderName = sender != null ? sender.userName : "n/a";
 
+    Widget senderWidget = sender != null
+        ? RandomAvatar(senderName, height: 30, width: 30)
+        : const Icon(CupertinoIcons.arrow_right, size: 28);
+
     final senderPhoneNumber = sender != null &&
             sender.hasMobileNumber() &&
             sender.mobileNumber.number.isNotEmpty
@@ -76,6 +81,10 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
       toUserName = toUser.userName;
       toUserAccount = toUser.accountId.data.toShortHexString();
     }
+
+    Widget toWidget = toUser != null
+        ? RandomAvatar(toUserName, height: 30, width: 30)
+        : const Icon(CupertinoIcons.arrow_left, size: 28);
 
     if (paymentData.toAccountId.hasData()) {
       toUserAccount = paymentData.toAccountId.data.toShortHexString();
@@ -162,7 +171,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
           ),
           trailing: Text(senderPhoneNumber,
               style: CupertinoTheme.of(context).textTheme.textStyle),
-          leading: const Icon(CupertinoIcons.arrow_right, size: 28),
+          leading: senderWidget,
           onTap: () {
             if (tx.incoming) {
               context.push(ScreenPaths.account, extra: sender);
@@ -203,7 +212,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
         ),
         trailing: Text(reciverRowTrailingLabel,
             style: CupertinoTheme.of(context).textTheme.textStyle),
-        leading: const Icon(CupertinoIcons.arrow_left, size: 28),
+        leading: toWidget,
         onTap: () {
           if (toUser == null) {
             return;

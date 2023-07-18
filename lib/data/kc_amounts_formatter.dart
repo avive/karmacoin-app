@@ -25,7 +25,7 @@ abstract class KarmaCoinAmountFormatter {
         }
       }
 
-      usdEstimate = "\$ ($usdEstimate USD)";
+      usdEstimate = "(\$$usdEstimate USD)";
 
       return '${_deicmalFormat.format(amount)} $centsLabel $usdEstimate';
     }

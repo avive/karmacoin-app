@@ -10,6 +10,7 @@ import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/ui/widgets/leaderboard.dart';
 import 'package:karma_coin/ui/widgets/traits_scores_wheel.dart';
 import 'package:karma_coin/ui/widgets/traits_viewer.dart';
+import 'package:random_avatar/random_avatar.dart';
 import 'package:status_alert/status_alert.dart';
 
 const smallScreenHeight = 1334;
@@ -186,6 +187,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: const Icon(CupertinoIcons.share),
                 onPressed: () async {
                   await Clipboard.setData(ClipboardData(text: uri));
+                  /*
+                  if (context.mounted) {
+                    StatusAlert.show(context,
+                        duration: const Duration(seconds: 1),
+                        title: 'Copied!',
+                        configuration: const IconConfiguration(
+                            icon: CupertinoIcons.hand_thumbsup),
+                        dismissOnBackgroundTap: true,
+                        maxWidth: statusAlertWidth);
+                  }*/
                 }),
             Text(
               uri,
@@ -259,6 +270,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   build(BuildContext context) {
+    Widget titleWidget = Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        RandomAvatar(widget.userName, height: 40, width: 40),
+        const SizedBox(width: 10),
+        Text(
+          widget.userName,
+          style: getNavBarTitleTextStyle(context),
+        ),
+      ],
+    );
+
     return Title(
       color: CupertinoColors.black, // This is required
       title: 'Karma Coin - ${widget.userName}',
@@ -272,12 +295,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 backgroundColor: kcPurple,
                 // backgroundColor: CupertinoColors.activeOrange,
                 largeTitle: Center(
-                  child: Text(
-                    '☥ ${widget.userName}',
-                    style: getNavBarTitleTextStyle(context),
-                  ),
+                  child: titleWidget,
                 ),
-                padding: EdgeInsetsDirectional.zero,
               ),
               SliverFillRemaining(
                 child: Stack(children: <Widget>[

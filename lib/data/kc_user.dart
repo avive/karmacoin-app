@@ -2,6 +2,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
+import 'package:phone_form_field/phone_form_field.dart';
 
 /// An enriched KC user class supporting observable data and persistence.
 /// Setting data will persist the data to local secure storage and notify all listeners
@@ -49,6 +50,10 @@ class KarmaCoinUser {
         .isNotEmpty;
   }
 
+  PhoneNumber getPhoneNumber() {
+    return PhoneNumber.parse(mobileNumber.value.number);
+  }
+
   /// Update user with provided user data in an observable way
   Future<void> updatWithUserData(User user, bool persist) async {
     userData.accountId = user.accountId;
@@ -94,21 +99,6 @@ class KarmaCoinUser {
         newScores[score.communityId]?.add(score);
       }
     }
-
-    // hack giraffes appreciations for demo purposes
-    /*
-    newScores[1] = [
-      TraitScore(traitId: 10, score: 5, communityId: 1),
-      TraitScore(traitId: 4, score: 1, communityId: 1),
-      TraitScore(traitId: 3, score: 1, communityId: 1),
-      TraitScore(traitId: 11, score: 2, communityId: 1),
-      TraitScore(traitId: 15, score: 1, communityId: 1),
-      TraitScore(traitId: 18, score: 3, communityId: 1),
-      TraitScore(traitId: 39, score: 1, communityId: 1),
-      TraitScore(traitId: 42, score: 1, communityId: 1),
-      TraitScore(traitId: 60, score: 4, communityId: 1)
-    ];
-    */
 
     traitScores.value = newScores;
 

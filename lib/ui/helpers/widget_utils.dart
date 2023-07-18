@@ -31,7 +31,24 @@ CupertinoSliverNavigationBar kcNavBar(context, String title) {
           child: const Icon(CupertinoIcons.question_circle, size: 24),
         ),
         16,
-        0),
+        -6),
+  );
+}
+
+CupertinoSliverNavigationBar kcNavBarWidget(context, Widget titleWidget) {
+  return CupertinoSliverNavigationBar(
+    largeTitle: titleWidget,
+    backgroundColor: kcPurple,
+    border: kcOrangeBorder,
+    trailing: adjustNavigationBarButtonPosition(
+        CupertinoButton(
+          onPressed: () async {
+            await openUrl(settingsLogic.learnYoutubePlaylistUrl);
+          },
+          child: const Icon(CupertinoIcons.question_circle, size: 24),
+        ),
+        16,
+        -6),
   );
 }
 
