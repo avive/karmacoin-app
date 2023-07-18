@@ -281,7 +281,7 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
   Widget _getContactWidget(BuildContext context, Contact contact, int index) {
     // todo: add personality trait emojis from appre
     // show appreciations strip for user :-)
-    String phoneNumber = contact.mobileNumber.number.formatPhoneNumber();
+    String phoneNumber = '+${contact.mobileNumber.number.formatPhoneNumber()}';
     String displayName =
         '${contact.userName} ${getCommunitiesBadge(contact)}'.trim();
 

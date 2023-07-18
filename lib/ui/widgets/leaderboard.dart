@@ -90,7 +90,7 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
     widgets.add(Padding(
         padding: const EdgeInsets.only(left: 24, right: 24, top: 12),
         child: Text(
-            'Users eligible for the next round of karma rewards minting.',
+            'Users eligable for the next round of karma rewards minting.',
             textAlign: TextAlign.center,
             style: CupertinoTheme.of(context).textTheme.pickerTextStyle)));
 
@@ -108,7 +108,7 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
           Padding(
             padding: const EdgeInsets.only(top: 64, bottom: 36),
             child: Center(
-              child: Text('😞 No one is eligible yet.',
+              child: Text('😞 No one is eligable yet.',
                   textAlign: TextAlign.center,
                   style: CupertinoTheme.of(context).textTheme.pickerTextStyle),
             ),

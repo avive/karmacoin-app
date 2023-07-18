@@ -1,4 +1,4 @@
-//import 'package:cloud_functions/cloud_functions.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -20,15 +20,14 @@ void main() async {
     debugPrint(e.toString());
   });
 
-  /*
   try {
     final result = await FirebaseFunctions.instance
-        .httpsCallable('getUserIdEx')
+        .httpsCallable('getUserId')
         .call({'phoneNumber': '+972549805380'});
     debugPrint(result.data.toString());
   } on FirebaseFunctionsException catch (error) {
     debugPrint('${error.code}, ${error.details}, ${error.message}}');
-  }*/
+  }
 
   await appLogic.bootstrap();
 

@@ -23,7 +23,6 @@ class SendWidget extends StatefulWidget {
 
 class _SendWidgetState extends State<SendWidget> {
   late PhoneController phoneController;
-  IsoCode defaultIsoCode = IsoCode.US;
 
   // country selector ux
   CountrySelectorNavigator selectorNavigator =
@@ -225,18 +224,10 @@ class _SendWidgetState extends State<SendWidget> {
     super.initState();
 
     String defaultNumber = settingsLogic.devMode ? "549805380" : "";
+    IsoCode code = settingsLogic.devMode ? IsoCode.IL : IsoCode.US;
 
-    defaultIsoCode = settingsLogic.devMode ? IsoCode.IL : IsoCode.US;
-
-    // pick default iso code from user's phone number!
-    KarmaCoinUser? user = accountLogic.karmaCoinUser.value;
-    PhoneNumber? phoneNumber = user?.getPhoneNumber();
-    if (phoneNumber != null) {
-      defaultIsoCode = phoneNumber.isoCode;
-    }
-
-    phoneController = PhoneController(
-        PhoneNumber(isoCode: defaultIsoCode, nsn: defaultNumber));
+    phoneController =
+        PhoneController(PhoneNumber(isoCode: code, nsn: defaultNumber));
   }
 
   @override

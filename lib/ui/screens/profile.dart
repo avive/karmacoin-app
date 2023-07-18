@@ -187,16 +187,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: const Icon(CupertinoIcons.share),
                 onPressed: () async {
                   await Clipboard.setData(ClipboardData(text: uri));
-                  /*
-                  if (context.mounted) {
-                    StatusAlert.show(context,
-                        duration: const Duration(seconds: 1),
-                        title: 'Copied!',
-                        configuration: const IconConfiguration(
-                            icon: CupertinoIcons.hand_thumbsup),
-                        dismissOnBackgroundTap: true,
-                        maxWidth: statusAlertWidth);
-                  }*/
                 }),
             Text(
               uri,

@@ -6,7 +6,6 @@ import 'package:karma_coin/data/personality_traits.dart';
 import 'package:karma_coin/data/phone_number_formatter.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:random_avatar/random_avatar.dart';
-//import 'package:status_alert/status_alert.dart';
 
 /// Display user details for provided user or for local user
 class UserDetailsScreen extends StatefulWidget {
@@ -39,7 +38,6 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
     List<CupertinoListTile> tiles = [];
     List<CupertinoListTile> techSectionTiles = [];
 
-    /*
     Widget pict = Padding(
       padding: const EdgeInsets.only(),
       child: RandomAvatar(widget.user!.userName, height: 30, width: 30),
@@ -52,7 +50,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
           leading: const Icon(CupertinoIcons.person, size: 28),
           // todo: number format
           trailing: pict),
-    );*/
+    );
 
     tiles.add(
       CupertinoListTile.notched(
@@ -85,7 +83,8 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
       ),
     );
 
-    var numberDisplay = widget.user!.mobileNumber.number.formatPhoneNumber();
+    var numberDisplay =
+        '+${widget.user!.mobileNumber.number.formatPhoneNumber()}';
 
     tiles.add(
       CupertinoListTile.notched(
@@ -98,16 +97,6 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
         trailing: const Icon(CupertinoIcons.share),
         onTap: () async {
           await Clipboard.setData(ClipboardData(text: numberDisplay));
-          /*
-          if (context.mounted) {
-            StatusAlert.show(context,
-                duration: const Duration(seconds: 1),
-                title: 'Copied!',
-                configuration:
-                    const IconConfiguration(icon: CupertinoIcons.hand_thumbsup),
-                dismissOnBackgroundTap: true,
-                maxWidth: statusAlertWidth);
-          }*/
         },
       ),
     );
@@ -137,16 +126,6 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
         trailing: const Icon(CupertinoIcons.share),
         onTap: () async {
           await Clipboard.setData(ClipboardData(text: accountId));
-          /*
-          if (context.mounted) {            
-            StatusAlert.show(context,
-                duration: const Duration(seconds: 1),
-                title: 'Copied!',
-                configuration:
-                    const IconConfiguration(icon: CupertinoIcons.hand_thumbsup),
-                dismissOnBackgroundTap: true,
-                maxWidth: statusAlertWidth);
-          }*/
         },
       ),
     );
