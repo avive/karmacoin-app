@@ -86,6 +86,13 @@ dependencies:
       url: https://github.com/avive/flutter_native_contact_picker
       ref: master # branch name
   pinput: ^2.2.31
+  javascript: ^0.0.2
+  flutter_js: ^0.7.0
+  polkadart: ^0.1.0
+  polkadart_scale_codec: ^1.1.0
+  substrate_metadata_fixed: ^1.1.0
+  ss58: ^1.1.0
+  convert: ^3.1.1
   email_validator: ^2.1.17
   random_avatar: ^0.0.8
 
@@ -111,17 +118,12 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets: 
+    - assets/js/kc2.js
     - assets/images/
     - assets/images/giraffes_tile.png
     - assets/images/giraffes_banner.png
     - assets/ca/lets-encrypt-r3.pem
     
-
-  # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
-
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 

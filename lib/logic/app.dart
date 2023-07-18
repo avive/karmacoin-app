@@ -14,6 +14,7 @@ import 'package:karma_coin/logic/txs_boss.dart';
 import 'package:karma_coin/logic/txs_boss_interface.dart';
 import 'package:karma_coin/logic/user_name_availability.dart';
 import 'package:karma_coin/logic/verifier.dart';
+import 'package:karma_coin/services/v2.0/kc2_service.dart';
 import 'account_logic.dart';
 import 'account_interface.dart';
 import 'api.dart';
@@ -42,6 +43,8 @@ TransactionsBossInterface get txsBoss =>
     GetIt.I.get<TransactionsBossInterface>();
 
 AppState get appState => GetIt.I.get<AppState>();
+
+KarmachainService get karmachainService => GetIt.I.get<KarmachainService>();
 
 mixin AppLogicInterface {
   /// Indicates to the rest of the app that bootstrap has not completed.
@@ -84,6 +87,7 @@ class AppLogic with AppLogicInterface {
     GetIt.I.registerLazySingleton<TransactionsBossInterface>(
         () => TransactionsBoss());
     GetIt.I.registerLazySingleton<AppState>(() => AppState());
+    GetIt.I.registerLazySingleton<KarmachainService>(() => KarmachainService());
   }
 
   /// Initialize the app and singleton services
@@ -107,6 +111,12 @@ class AppLogic with AppLogicInterface {
 
     // Int the auth logic
     await authLogic.init();
+
+    // Init kc2 logic
+    await karmachainService.init();
+
+    await karmachainService.connectToApi('ws://127.0.0.1:9944', true);
+    karmachainService.subscribeToAccount('5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY');
 
     if (authLogic.isUserAuthenticated()) {
       debugPrint('user is Firebase authenticated on app startup');

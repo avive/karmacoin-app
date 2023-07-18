@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   desktop_window
+  flutter_js
   flutter_secure_storage_linux
   smart_auth
   url_launcher_linux

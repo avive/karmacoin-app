@@ -78,7 +78,8 @@ android {
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.release
             // config for flutter_js. ref: https://pub.dev/packages/flutter_js#release-deploy
-            minifyEnabled true           
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'           
         }
     }
 }
