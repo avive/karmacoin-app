@@ -1,5 +1,5 @@
-import 'dart:io';
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 import 'package:karma_coin/common_libs.dart';
@@ -97,7 +97,6 @@ class KarmachainService {
   Future<void> newUser(
       String accountId, String username, String phoneNumber) async {
     try {
-      // TODO: remove `'dummy'` for release
       final evidence = await karmachain.send('verifier_verify', [accountId, username, phoneNumber, 'dummy'])
           .then((v) => v.result);
       debugPrint('Evidence - $evidence');

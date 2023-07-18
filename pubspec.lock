@@ -146,7 +146,7 @@ packages:
     source: hosted
     version: "4.5.4"
   collection:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: collection
       sha256: "4a07be6cb69c84d677a6c3096fcf960cc3285a8330b4603e0d463d15d9bd934c"
@@ -1332,5 +1332,5 @@ packages:
     source: hosted
     version: "1.1.2+1"
 sdks:
-  dart: ">=3.0.3 <4.0.0"
+  dart: ">=3.0.0 <4.0.0"
   flutter: ">=3.10.0"
