@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/services/v2.0/callbacks.dart';
+import 'package:karma_coin/services/v2.0/events.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
 import 'package:karma_coin/services/v2.0/keyring.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
@@ -26,7 +26,8 @@ class KarmachainService implements K2ServiceInterface {
   @override
   late KarmachainKeyring keyring;
 
-  final EventHandler eventHandler = EventDataPrinter();
+  @override
+  final KC2EventsHandler eventsHandler = KC2EventsHandler();
 
   @override
   Future<void> init() async {
@@ -436,7 +437,7 @@ class KarmachainService implements K2ServiceInterface {
     final phoneNumberHash = hex.encode(args['phone_number_hash'].cast<int>());
 
     if (signer == address || accountId == address) {
-      eventHandler.onNewUser(
+      eventsHandler.onNewUser(
           metadata, signer, username, phoneNumberHash, failedReason);
     }
   }
@@ -454,7 +455,7 @@ class KarmachainService implements K2ServiceInterface {
         : hex.encode(phoneNumberHashOption.cast<int>());
 
     if (signer == address) {
-      eventHandler.onUpdateUser(
+      eventsHandler.onUpdateUser(
           metadata, signer, username, phoneNumberHash, failedReason);
     }
   }
@@ -490,7 +491,7 @@ class KarmachainService implements K2ServiceInterface {
     }
 
     if (signer == address || accountId == address) {
-      eventHandler.onAppreciation(metadata, signer, accountId, amount,
+      eventsHandler.onAppreciation(metadata, signer, accountId, amount,
           communityId, charTraitId, failedReason);
     }
   }
@@ -524,7 +525,7 @@ class KarmachainService implements K2ServiceInterface {
     }
 
     if (signer == address || accountId == address) {
-      eventHandler.onSetAdmin(
+      eventsHandler.onSetAdmin(
           metadata, signer, communityId, accountId, failedReason);
     }
   }
@@ -539,7 +540,7 @@ class KarmachainService implements K2ServiceInterface {
     final amount = args['value'];
 
     if (signer == address || dest == address) {
-      eventHandler.onTransfer(metadata, signer, dest, amount, failedReason);
+      eventsHandler.onTransfer(metadata, signer, dest, amount, failedReason);
     }
   }
 }

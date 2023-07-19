@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:karma_coin/services/v2.0/events.dart';
 import 'package:karma_coin/services/v2.0/keyring.dart';
 import 'package:substrate_metadata_fixed/models/models.dart';
 
@@ -9,6 +10,9 @@ abstract class K2ServiceInterface {
 
   /// Available after connectToApi() called and completed without an error
   ChainInfo get chainInfo;
+
+  // Get the event handler and register on callbacks
+  KC2EventsHandler get eventsHandler;
 
   // Initialize the service
   Future<void> init();
