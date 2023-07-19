@@ -14,6 +14,7 @@ import 'package:karma_coin/logic/txs_boss.dart';
 import 'package:karma_coin/logic/txs_boss_interface.dart';
 import 'package:karma_coin/logic/user_name_availability.dart';
 import 'package:karma_coin/logic/verifier.dart';
+import 'package:karma_coin/services/v2.0/kc2.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
 import 'account_logic.dart';
 import 'account_interface.dart';
@@ -44,7 +45,7 @@ TransactionsBossInterface get txsBoss =>
 
 AppState get appState => GetIt.I.get<AppState>();
 
-KarmachainService get karmachainService => GetIt.I.get<KarmachainService>();
+K2ServiceInterface get karmachainService => GetIt.I.get<K2ServiceInterface>();
 
 mixin AppLogicInterface {
   /// Indicates to the rest of the app that bootstrap has not completed.
@@ -87,7 +88,8 @@ class AppLogic with AppLogicInterface {
     GetIt.I.registerLazySingleton<TransactionsBossInterface>(
         () => TransactionsBoss());
     GetIt.I.registerLazySingleton<AppState>(() => AppState());
-    GetIt.I.registerLazySingleton<KarmachainService>(() => KarmachainService());
+    GetIt.I
+        .registerLazySingleton<K2ServiceInterface>(() => KarmachainService());
   }
 
   /// Initialize the app and singleton services
@@ -113,10 +115,24 @@ class AppLogic with AppLogicInterface {
     await authLogic.init();
 
     // Init kc2 logic
-    await karmachainService.init();
+    try {
+      await karmachainService.init();
+    } catch (e) {
+      debugPrint('error initializing kc2 service: $e');
+    }
 
-    await karmachainService.connectToApi('ws://127.0.0.1:9944', true);
-    karmachainService.subscribeToAccount('5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY');
+    try {
+      await karmachainService.connectToApi('ws://127.0.0.1:9944', true);
+    } catch (e) {
+      debugPrint('error connecting to kc2 api: $e');
+    }
+
+    try {
+      karmachainService.subscribeToAccount(
+          '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY');
+    } catch (e) {
+      debugPrint('error subscribing to kc2 account: $e');
+    }
 
     if (authLogic.isUserAuthenticated()) {
       debugPrint('user is Firebase authenticated on app startup');
