@@ -19,6 +19,7 @@ import 'package:substrate_metadata_fixed/types/metadata_types.dart';
 class KarmachainService implements K2ServiceInterface {
   late polkadart.Provider karmachain;
   late polkadart.StateApi api;
+  Blake2bHasher hasher = const Blake2bHasher(64);
 
   @override
   late ChainInfo chainInfo;
@@ -113,7 +114,7 @@ class KarmachainService implements K2ServiceInterface {
           [accountId, username, phoneNumber, 'dummy']).then((v) => v.result);
       debugPrint('Evidence - $evidence');
 
-      final phoneNumberHash = const Blake2bHasher(64).hashString(phoneNumber);
+      final phoneNumberHash = hasher.hashString(phoneNumber);
       final hexPhoneNumberHash = hex.encode(phoneNumberHash);
 
       final call = MapEntry(
@@ -204,6 +205,12 @@ class KarmachainService implements K2ServiceInterface {
     return Timer.periodic(const Duration(seconds: 12), (Timer t) async {
       blockNumber = await _processBlock(address, blockNumber);
     });
+  }
+
+  @override
+  String getPhoneNumberHash(String phoneNumber) {
+    final phoneNumberHash = hasher.hashString(phoneNumber);
+    return hex.encode(phoneNumberHash);
   }
 
   ////// private implementation methods below

@@ -122,6 +122,8 @@ class AppLogic with AppLogicInterface {
     }
 
     try {
+      // Local running node - "ws://127.0.0.1:9944"
+      // Testnet - "wss://testnet.karmaco.in/testnet/ws"
       await karmachainService.connectToApi('ws://127.0.0.1:9944', true);
     } catch (e) {
       debugPrint('error connecting to kc2 api: $e');

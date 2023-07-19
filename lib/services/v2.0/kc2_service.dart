@@ -11,7 +11,7 @@ abstract class K2ServiceInterface {
   /// Available after connectToApi() called and completed without an error
   ChainInfo get chainInfo;
 
-  // Get the event handler and register on callbacks
+  // Get the service's events handler and register on events using its props
   KC2EventsHandler get eventsHandler;
 
   // Initialize the service
@@ -24,6 +24,7 @@ abstract class K2ServiceInterface {
 
   // rpc methods
 
+  // accountId - ss58 address
   Future<Map<String, dynamic>?> getUserInfoByAccountId(String accountId);
 
   Future<Map<String, dynamic>?> getUserInfoByUsername(String username);
@@ -33,16 +34,26 @@ abstract class K2ServiceInterface {
 
   // transactions
 
+  // accountId - ss58 encoded user's public ed25519 key
+  // userName - unique username. Must not be empty
+  // phoneNumber - user's phone number. Including country code. Excluding leading +
   Future<void> newUser(String accountId, String username, String phoneNumber);
 
-  Future<void> updateUser(String? username, String? hexPhoneNumberHash);
+  Future<void> updateUser(String? username, String? phoneNumberHash);
 
+  // phoneNumberHash - canonical hex string of phone number hash using blake32.
+  // use getPhoneNumberHash() to get hash from a number
   Future<void> sendAppreciation(
-      String hexPhoneNumberHash, int amount, int communityId, int charTraitId);
+      String phoneNumberHash, int amount, int communityId, int charTraitId);
 
   Future<void> setAdmin(int communityId, String accountId);
 
   // events
-
+  // address - ss58 formatted address
   Timer subscribeToAccount(String address);
+
+  // helpers
+
+  /// Get canonical hex string of a phone number
+  String getPhoneNumberHash(String phoneNumber);
 }

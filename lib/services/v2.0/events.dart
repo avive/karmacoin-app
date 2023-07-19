@@ -39,8 +39,8 @@ typedef TransferCallback = Future<void> Function(
     MapEntry<String, Object?>? failedReason);
 
 class KC2EventsHandler {
+  // Client callback methods
   // To subscribe to events, register an event callback function by setting the following props
-
   NewUserCallback? newUserCallback;
   UpdateUserCallback? updateUserCallback;
   AppreciationCallback? apreciationCallback;
