@@ -100,10 +100,29 @@ class KarmachainService implements K2ServiceInterface {
   }
 
   @override
-  Future<List<dynamic>?> getAccountTransactions(String accountId) async {
-    return await karmachain.send(
+  Future<void> getTransactions(String accountId) async {
+    // final accountId = ss58.Codec(42).encode(keyring.getPublicKey());
+    final transactions = await karmachain.send(
         'transactions_getTransactions', [accountId]).then((v) => v.result);
+
+  transactions?.forEach((transaction) async {
+        final bytes = transaction['signed_transaction']['transaction_body'];
+        final transactionBody =
+            _decodeTransaction(Input.fromBytes(bytes.cast<int>()));
+        final timestamp = transaction['timestamp'];
+        final blockNumber = transaction['block_number'];
+        final transactionIndex = transaction['transaction_index'];
+        final events = await kc2Service.getTransactionEvents(
+            blockNumber, transactionIndex);
+
+        _processTransaction(
+            accountId, transactionBody, events, BigInt.from(timestamp), null);
+      });
+
+
+    debugPrint('Account transactions: $transactions');
   }
+
 
   @override
   Future<List<Event>> getTransactionEvents(
@@ -374,7 +393,7 @@ class KarmachainService implements K2ServiceInterface {
     final block = await karmachain
         .send('chain_getBlock', [blockHash]).then((v) => v.result);
     final extrinsics = block['block']['extrinsics'].map((encodedExtrinsic) {
-      final extrinsic = decodeTransaction(Input.fromHex(encodedExtrinsic));
+      final extrinsic = _decodeTransaction(Input.fromHex(encodedExtrinsic));
       final extrinsicHash =
           hex.encode(Hasher.twoxx128.hashString(encodedExtrinsic));
 
@@ -397,20 +416,18 @@ class KarmachainService implements K2ServiceInterface {
           .where((event) => event.extrinsicIndex == transactionIndex)
           .toList();
 
-      processTransaction(
+      _processTransaction(
           address, transaction, transactionEvents, timestamp, transactionHash);
     });
 
     return blockNumber;
   }
 
-  @override
-  Map<String, dynamic> decodeTransaction(Input input) {
+  Map<String, dynamic> _decodeTransaction(Input input) {
     return ExtrinsicsCodec(chainInfo: chainInfo).decode(input);
   }
 
-  @override
-  void processTransaction(
+  void _processTransaction(
       String address,
       Map<String, dynamic> transaction,
       List<Event> transactionEvents,

@@ -18,7 +18,6 @@ import 'package:karma_coin/logic/user_name_availability.dart';
 import 'package:karma_coin/logic/verifier.dart';
 import 'package:karma_coin/services/v2.0/kc2.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
-import 'package:polkadart/scale_codec.dart';
 import 'account_logic.dart';
 import 'account_interface.dart';
 import 'api.dart';
@@ -131,31 +130,16 @@ class AppLogic with AppLogicInterface {
     }
 
     try {
+      // only call the following 2 methods after setting txs callbacks as these will send the txs to the callbacks
+
+      // Get all on-chain txs to and from the account
+      kc2Service.getTransactions(identity.accountId);
+
+      // subscribe to new account txs
       kc2Service.subscribeToAccount(
           '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY');
     } catch (e) {
       debugPrint('error subscribing to kc2 account: $e');
-    }
-
-    try {
-      const accountId = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
-      final transactions = await kc2Service.getAccountTransactions(accountId);
-
-      transactions?.forEach((transaction) async {
-        final bytes = transaction['signed_transaction']['transaction_body'];
-        final transactionBody =
-            kc2Service.decodeTransaction(Input.fromBytes(bytes.cast<int>()));
-        final timestamp = transaction['timestamp'];
-        final blockNumber = transaction['block_number'];
-        final transactionIndex = transaction['transaction_index'];
-        final events = await kc2Service.getTransactionEvents(
-            blockNumber, transactionIndex);
-
-        kc2Service.processTransaction(
-            accountId, transactionBody, events, BigInt.from(timestamp), null);
-      });
-    } catch (e) {
-      debugPrint('error load account transaction for kc2 account: $e');
     }
 
     if (authLogic.isUserAuthenticated()) {

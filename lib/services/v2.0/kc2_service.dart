@@ -3,17 +3,16 @@ import 'dart:async';
 import 'package:karma_coin/logic/kc2/keyring.dart';
 import 'package:karma_coin/services/v2.0/events.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
-import 'package:polkadart_scale_codec/io/io.dart';
 import 'package:substrate_metadata_fixed/models/models.dart';
 
 abstract class K2ServiceInterface {
   /// Available after connectToApi() called and completed without an error
   ChainInfo get chainInfo;
 
-  // Get the service's events handler and register on events using its props
+  /// Get the service's events handler and register on events using its props
   KC2EventsHandler get eventsHandler;
 
-  // Set an identity's keyring
+  /// Set an identity's keyring - call with local user's identity keyring on new app session
   void setKeyring(KC2KeyRing keyring);
 
   // Connect to a karmachain api service. e.g
@@ -30,8 +29,6 @@ abstract class K2ServiceInterface {
 
   Future<Map<String, dynamic>?> getUserInfoByPhoneNumberHash(
       String phoneNumberHash);
-
-  Future<List<dynamic>?> getAccountTransactions(String accountId);
 
   Future<List<Event>> getTransactionEvents(
       int blockNumber, int transactionIndex);
@@ -53,13 +50,13 @@ abstract class K2ServiceInterface {
   Future<void> setAdmin(int communityId, String accountId);
 
   // events
-  // address - ss58 formatted address
-  Timer subscribeToAccount(String address);
 
-  Map<String, dynamic> decodeTransaction(Input input);
+  /// Subscribe to new account tranactions  address - ss58 accountId
+  /// Transactions will be delivered to a registered event handler
+  Timer subscribeToAccount(String accountId);
 
-  void processTransaction(String address, Map<String, dynamic> transaction,
-      List<Event> transactionEvents, BigInt timestamp, String? transactionHash);
+  // Get all transactions from chain to or from an account
+  Future<void> getTransactions(String accountId);
 
   // helpers
 
