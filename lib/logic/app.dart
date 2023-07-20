@@ -10,13 +10,14 @@ import 'package:karma_coin/logic/auth.dart';
 import 'package:karma_coin/logic/config.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/logic/account_setup_controller.dart';
+import 'package:karma_coin/logic/kc2/identity.dart';
+import 'package:karma_coin/logic/kc2/identity_interface.dart';
 import 'package:karma_coin/logic/txs_boss.dart';
 import 'package:karma_coin/logic/txs_boss_interface.dart';
 import 'package:karma_coin/logic/user_name_availability.dart';
 import 'package:karma_coin/logic/verifier.dart';
 import 'package:karma_coin/services/v2.0/kc2.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
-import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:polkadart/scale_codec.dart';
 import 'account_logic.dart';
 import 'account_interface.dart';
@@ -116,17 +117,15 @@ class AppLogic with AppLogicInterface {
     // Int the auth logic
     await authLogic.init();
 
-    // Init kc2 logic
-    try {
-      await kc2Service.init();
-    } catch (e) {
-      debugPrint('error initializing kc2 service: $e');
-    }
+    // create a new user's identity and set its keyring on the k2 service
+    IdentityInterface identity = Identity();
+    await identity.init();
+    kc2Service.setKeyring(identity.keyring);
 
     try {
       // Local running node - "ws://127.0.0.1:9944"
       // Testnet - "wss://testnet.karmaco.in/testnet/ws"
-      await kc2Service.connectToApi('ws://127.0.0.1:9944', true);
+      await kc2Service.connectToApi('ws://127.0.0.1:9944');
     } catch (e) {
       debugPrint('error connecting to kc2 api: $e');
     }
@@ -140,20 +139,19 @@ class AppLogic with AppLogicInterface {
 
     try {
       const accountId = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
-      final transactions = await karmachainService.getAccountTransactions(
-          accountId);
+      final transactions = await kc2Service.getAccountTransactions(accountId);
 
       transactions?.forEach((transaction) async {
         final bytes = transaction['signed_transaction']['transaction_body'];
-        final transactionBody = karmachainService.decodeTransaction(
-            Input.fromBytes(bytes.cast<int>()));
+        final transactionBody =
+            kc2Service.decodeTransaction(Input.fromBytes(bytes.cast<int>()));
         final timestamp = transaction['timestamp'];
         final blockNumber = transaction['block_number'];
         final transactionIndex = transaction['transaction_index'];
-        final events = await karmachainService.getTransactionEvents(
+        final events = await kc2Service.getTransactionEvents(
             blockNumber, transactionIndex);
 
-        karmachainService.processTransaction(
+        kc2Service.processTransaction(
             accountId, transactionBody, events, BigInt.from(timestamp), null);
       });
     } catch (e) {

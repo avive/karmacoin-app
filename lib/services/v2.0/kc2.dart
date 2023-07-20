@@ -3,9 +3,9 @@ import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/logic/kc2/keyring.dart';
 import 'package:karma_coin/services/v2.0/events.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
-import 'package:karma_coin/services/v2.0/keyring.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:polkadart/polkadart.dart' as polkadart;
 import 'package:polkadart/substrate/substrate.dart';
@@ -19,32 +19,26 @@ import 'package:substrate_metadata_fixed/types/metadata_types.dart';
 class KarmachainService implements K2ServiceInterface {
   late polkadart.Provider karmachain;
   late polkadart.StateApi api;
+  late KarmachainKeyring keyring;
   Blake2bHasher hasher = const Blake2bHasher(64);
 
   @override
   late ChainInfo chainInfo;
 
   @override
-  late KarmachainKeyring keyring;
-
-  @override
   final KC2EventsHandler eventsHandler = KC2EventsHandler();
 
+  // Set an identity's keyring
   @override
-  Future<void> init() async {
-    try {
-      keyring = KarmachainKeyring();
-    } on PlatformException catch (e) {
-      debugPrint('Failed to create keyring: ${e.details}');
-      rethrow;
-    }
+  void setKeyring(KarmachainKeyring keyring) {
+    this.keyring = keyring;
   }
 
   // Connect to a karmachain api service. e.g
   // Local running node - "ws://127.0.0.1:9944"
   // Testnet - "wss://testnet.karmaco.in/testnet/ws"
   @override
-  Future<void> connectToApi(String wsUrl, bool createTestAccounts) async {
+  Future<void> connectToApi(String wsUrl) async {
     try {
       karmachain = polkadart.Provider(Uri.parse(wsUrl));
       debugPrint('Connected to karmachain');
@@ -66,6 +60,7 @@ class KarmachainService implements K2ServiceInterface {
         'Extrinsic': '(MultiAddress, MultiSignature, Extra)',
       });
 
+      /*
       if (createTestAccounts) {
         final mnemonic = keyring.generateMnemonic();
         keyring.setKeypairFromMnemonic(mnemonic);
@@ -77,7 +72,7 @@ class KarmachainService implements K2ServiceInterface {
         final userInfo = await getUserInfoByAccountId(
             '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY');
         debugPrint('$userInfo');
-      }
+      }*/
     } on PlatformException catch (e) {
       debugPrint('Failed to connect to api: ${e.details}');
       rethrow;
@@ -106,14 +101,18 @@ class KarmachainService implements K2ServiceInterface {
 
   @override
   Future<List<dynamic>?> getAccountTransactions(String accountId) async {
-    return await karmachain.send('transactions_getTransactions', [accountId]).then((v) => v.result);
+    return await karmachain.send(
+        'transactions_getTransactions', [accountId]).then((v) => v.result);
   }
 
   @override
-  Future<List<Event>> getTransactionEvents(int blockNumber, int transactionIndex) async {
-    final blockHash = await karmachain.send('chain_getBlockHash', [blockNumber]).then((v) => v.result);
+  Future<List<Event>> getTransactionEvents(
+      int blockNumber, int transactionIndex) async {
+    final blockHash = await karmachain
+        .send('chain_getBlockHash', [blockNumber]).then((v) => v.result);
     final events = await _getEvents(blockHash);
-    final transactionEvents = events.where((event) => event.extrinsicIndex == transactionIndex)
+    final transactionEvents = events
+        .where((event) => event.extrinsicIndex == transactionIndex)
         .toList();
 
     return transactionEvents;
@@ -394,11 +393,12 @@ class KarmachainService implements K2ServiceInterface {
       final transactionHash = e.key;
       final transaction = e.value;
 
-      final transactionEvents =
-          events.where((event) => event.extrinsicIndex == transactionIndex)
+      final transactionEvents = events
+          .where((event) => event.extrinsicIndex == transactionIndex)
           .toList();
 
-      processTransaction(address, transaction, transactionEvents, timestamp, transactionHash);
+      processTransaction(
+          address, transaction, transactionEvents, timestamp, transactionHash);
     });
 
     return blockNumber;
@@ -416,7 +416,8 @@ class KarmachainService implements K2ServiceInterface {
       List<Event> transactionEvents,
       BigInt timestamp,
       String? transactionHash) {
-    transactionHash ??= hex.encode(ExtrinsicsCodec(chainInfo: chainInfo).encode(transaction));
+    transactionHash ??=
+        hex.encode(ExtrinsicsCodec(chainInfo: chainInfo).encode(transaction));
 
     final pallet = transaction['calls'].key;
     final method = transaction['calls'].value.key;
