@@ -29,12 +29,14 @@ abstract class KC2Transaction {
   late String method;
   late String args;
   late Event? failedReason; // is this a string or other type?
-  late Map<String, dynamic> rawData;
+
   late List<Event> transactionEvents;
   late BigInt timestamp;
   late String? hash;
-  late String blockNumber;
-  late int index;
+  late String? blockNumber;
+  late int? blockIndex;
+
+  late Map<String, dynamic> rawData;
 }
 
 class KC2NewUserTransactionV1 extends KC2Transaction {
@@ -48,7 +50,7 @@ class KC2UpdateUserTransactionV1 extends KC2Transaction {
 }
 
 class KC2AppreciationTransactionV1 extends KC2Transaction {
-  late String? fromAddress;
+  late String fromAddress;
 
   // payee address always known - sometime just phone number????
   late String? toAddress;
