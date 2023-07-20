@@ -45,7 +45,7 @@ TransactionsBossInterface get txsBoss =>
 
 AppState get appState => GetIt.I.get<AppState>();
 
-K2ServiceInterface get karmachainService => GetIt.I.get<K2ServiceInterface>();
+K2ServiceInterface get kc2Service => GetIt.I.get<K2ServiceInterface>();
 
 mixin AppLogicInterface {
   /// Indicates to the rest of the app that bootstrap has not completed.
@@ -116,7 +116,7 @@ class AppLogic with AppLogicInterface {
 
     // Init kc2 logic
     try {
-      await karmachainService.init();
+      await kc2Service.init();
     } catch (e) {
       debugPrint('error initializing kc2 service: $e');
     }
@@ -124,13 +124,13 @@ class AppLogic with AppLogicInterface {
     try {
       // Local running node - "ws://127.0.0.1:9944"
       // Testnet - "wss://testnet.karmaco.in/testnet/ws"
-      await karmachainService.connectToApi('ws://127.0.0.1:9944', true);
+      await kc2Service.connectToApi('ws://127.0.0.1:9944', true);
     } catch (e) {
       debugPrint('error connecting to kc2 api: $e');
     }
 
     try {
-      karmachainService.subscribeToAccount(
+      kc2Service.subscribeToAccount(
           '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY');
     } catch (e) {
       debugPrint('error subscribing to kc2 account: $e');
