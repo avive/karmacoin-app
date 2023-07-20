@@ -16,6 +16,8 @@ import 'package:karma_coin/logic/user_name_availability.dart';
 import 'package:karma_coin/logic/verifier.dart';
 import 'package:karma_coin/services/v2.0/kc2.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
+import 'package:karma_coin/services/v2.0/types.dart';
+import 'package:polkadart/scale_codec.dart';
 import 'account_logic.dart';
 import 'account_interface.dart';
 import 'api.dart';
@@ -134,6 +136,28 @@ class AppLogic with AppLogicInterface {
           '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY');
     } catch (e) {
       debugPrint('error subscribing to kc2 account: $e');
+    }
+
+    try {
+      const accountId = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
+      final transactions = await karmachainService.getAccountTransactions(
+          accountId);
+
+      transactions?.forEach((transaction) async {
+        final bytes = transaction['signed_transaction']['transaction_body'];
+        final transactionBody = karmachainService.decodeTransaction(
+            Input.fromBytes(bytes.cast<int>()));
+        final timestamp = transaction['timestamp'];
+        final blockNumber = transaction['block_number'];
+        final transactionIndex = transaction['transaction_index'];
+        final events = await karmachainService.getTransactionEvents(
+            blockNumber, transactionIndex);
+
+        karmachainService.processTransaction(
+            accountId, transactionBody, events, BigInt.from(timestamp), null);
+      });
+    } catch (e) {
+      debugPrint('error load account transaction for kc2 account: $e');
     }
 
     if (authLogic.isUserAuthenticated()) {

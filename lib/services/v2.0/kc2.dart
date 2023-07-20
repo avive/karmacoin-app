@@ -104,6 +104,21 @@ class KarmachainService implements K2ServiceInterface {
         [phoneNumberHash]).then((v) => v.result);
   }
 
+  @override
+  Future<List<dynamic>?> getAccountTransactions(String accountId) async {
+    return await karmachain.send('transactions_getTransactions', [accountId]).then((v) => v.result);
+  }
+
+  @override
+  Future<List<Event>> getTransactionEvents(int blockNumber, int transactionIndex) async {
+    final blockHash = await karmachain.send('chain_getBlockHash', [blockNumber]).then((v) => v.result);
+    final events = await _getEvents(blockHash);
+    final transactionEvents = events.where((event) => event.extrinsicIndex == transactionIndex)
+        .toList();
+
+    return transactionEvents;
+  }
+
   // Transactions
 
   @override
@@ -360,8 +375,7 @@ class KarmachainService implements K2ServiceInterface {
     final block = await karmachain
         .send('chain_getBlock', [blockHash]).then((v) => v.result);
     final extrinsics = block['block']['extrinsics'].map((encodedExtrinsic) {
-      final extrinsic = ExtrinsicsCodec(chainInfo: chainInfo)
-          .decode(Input.fromHex(encodedExtrinsic));
+      final extrinsic = decodeTransaction(Input.fromHex(encodedExtrinsic));
       final extrinsicHash =
           hex.encode(Hasher.twoxx128.hashString(encodedExtrinsic));
 
@@ -376,46 +390,64 @@ class KarmachainService implements K2ServiceInterface {
         .value
         .value['now'];
 
-    extrinsics.asMap().forEach((extrinsicIndex, e) {
-      final extrinsicHash = e.key;
-      final extrinsic = e.value;
-      final extrinsicMetadata = TransactionMetadata(extrinsicHash, timestamp);
+    extrinsics.asMap().forEach((transactionIndex, e) {
+      final transactionHash = e.key;
+      final transaction = e.value;
 
-      final extrinsicEvents =
-          events.where((event) => event.extrinsicIndex == extrinsicIndex);
+      final transactionEvents =
+          events.where((event) => event.extrinsicIndex == transactionIndex)
+          .toList();
 
-      final pallet = extrinsic['calls'].key;
-      final method = extrinsic['calls'].value.key;
-      final args = extrinsic['calls'].value.value;
-      final signer = _getTransactionSigner(extrinsic);
-      final failedReason = extrinsicEvents
-          .where((event) => event.eventName == 'ExtrinsicFailed')
-          .firstOrNull
-          ?.data['dispatch_error'];
-      debugPrint('$pallet $method $args $signer $failedReason');
-
-      if (pallet == 'Identity' && method == 'new_user') {
-        _processNewUserTransaction(
-            extrinsicMetadata, address, signer, args, failedReason);
-      } else if (pallet == 'Identity' && method == 'update_user') {
-        _processUpdateUserTransaction(
-            extrinsicMetadata, address, signer, args, failedReason);
-      } else if (pallet == 'Appreciation' && method == 'appreciation') {
-        _processAppreciationTransaction(
-            extrinsicMetadata, address, signer, args, failedReason);
-      } else if (pallet == 'Appreciation' && method == 'set_admin') {
-        _processSetAdminTransaction(
-            extrinsicMetadata, address, signer, args, failedReason);
-      } else if (pallet == 'Balances' &&
-          (method == 'transfer_keep_alive' || method == 'transfer')) {
-        _processTransferTransaction(
-            extrinsicMetadata, address, signer, args, failedReason);
-      } else {
-        debugPrint('Skip pallet: $pallet method: $method');
-      }
+      processTransaction(address, transaction, transactionEvents, timestamp, transactionHash);
     });
 
     return blockNumber;
+  }
+
+  @override
+  Map<String, dynamic> decodeTransaction(Input input) {
+    return ExtrinsicsCodec(chainInfo: chainInfo).decode(input);
+  }
+
+  @override
+  void processTransaction(
+      String address,
+      Map<String, dynamic> transaction,
+      List<Event> transactionEvents,
+      BigInt timestamp,
+      String? transactionHash) {
+    transactionHash ??= hex.encode(ExtrinsicsCodec(chainInfo: chainInfo).encode(transaction));
+
+    final pallet = transaction['calls'].key;
+    final method = transaction['calls'].value.key;
+    final args = transaction['calls'].value.value;
+    final signer = _getTransactionSigner(transaction);
+    final extrinsicMetadata = TransactionMetadata(transactionHash, timestamp);
+    final failedReason = transactionEvents
+        .where((event) => event.eventName == 'ExtrinsicFailed')
+        .firstOrNull
+        ?.data['dispatch_error'];
+    debugPrint('$pallet $method $args $signer $failedReason');
+
+    if (pallet == 'Identity' && method == 'new_user') {
+      _processNewUserTransaction(
+          extrinsicMetadata, address, signer, args, failedReason);
+    } else if (pallet == 'Identity' && method == 'update_user') {
+      _processUpdateUserTransaction(
+          extrinsicMetadata, address, signer, args, failedReason);
+    } else if (pallet == 'Appreciation' && method == 'appreciation') {
+      _processAppreciationTransaction(
+          extrinsicMetadata, address, signer, args, failedReason);
+    } else if (pallet == 'Appreciation' && method == 'set_admin') {
+      _processSetAdminTransaction(
+          extrinsicMetadata, address, signer, args, failedReason);
+    } else if (pallet == 'Balances' &&
+        (method == 'transfer_keep_alive' || method == 'transfer')) {
+      _processTransferTransaction(
+          extrinsicMetadata, address, signer, args, failedReason);
+    } else {
+      debugPrint('Skip pallet: $pallet method: $method');
+    }
   }
 
   /// Decode transaction signer, return `null` if transaction is `unsigned`
