@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:karma_coin/services/v2.0/events.dart';
 import 'package:karma_coin/services/v2.0/keyring.dart';
+import 'package:karma_coin/services/v2.0/types.dart';
+import 'package:polkadart_scale_codec/io/io.dart';
 import 'package:substrate_metadata_fixed/models/models.dart';
 
 abstract class K2ServiceInterface {
@@ -32,6 +34,10 @@ abstract class K2ServiceInterface {
   Future<Map<String, dynamic>?> getUserInfoByPhoneNumberHash(
       String phoneNumberHash);
 
+  Future<List<dynamic>?> getAccountTransactions(String accountId);
+
+  Future<List<Event>> getTransactionEvents(int blockNumber, int transactionIndex);
+
   // transactions
 
   // accountId - ss58 encoded user's public ed25519 key
@@ -51,6 +57,15 @@ abstract class K2ServiceInterface {
   // events
   // address - ss58 formatted address
   Timer subscribeToAccount(String address);
+
+  Map<String, dynamic> decodeTransaction(Input input);
+
+  void processTransaction(
+      String address,
+      Map<String, dynamic> transaction,
+      List<Event> transactionEvents,
+      BigInt timestamp,
+      String? transactionHash);
 
   // helpers
 
