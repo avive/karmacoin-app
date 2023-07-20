@@ -55,7 +55,8 @@ abstract class K2ServiceInterface {
   /// Transactions will be delivered to a registered event handler
   Timer subscribeToAccount(String accountId);
 
-  // Get all transactions from chain to or from an account
+  /// Get all transactions from chain to or from an account
+  /// Transactions will be sent to a registered event handler according to their type
   Future<void> getTransactions(String accountId);
 
   // helpers
