@@ -3,11 +3,11 @@ import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:ss58/ss58.dart' as ss58;
 
-class KarmachainKeyring {
+class KC2KeyRing {
   late ed.PrivateKey _privateKey;
   late String _mnemonic;
 
-  KarmachainKeyring({String? mnemonic}) {
+  KC2KeyRing({String? mnemonic}) {
     if (mnemonic == null) {
       _mnemonic = bip39.generateMnemonic();
     }

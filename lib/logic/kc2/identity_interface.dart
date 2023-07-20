@@ -2,13 +2,12 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/kc2/keyring.dart';
 
 abstract class IdentityInterface {
-  /// Attempt to load user identity from secure local storage in case it was
-  /// persisted in a previous app session
-  /// Must be called after creating an IdentityInterface object to initilize it async
-  Future<void> init();
+  /// Initialize the identity. If mnenomic is provided, it will be used to create the
+  /// identity and will be persisted to secure storage. Otherwise, identity is loaded from local store if exists. If not, a new one is created and persisted to local store
+  Future<void> init({String? mnemonic});
 
   // get the identity's keyring
-  KarmachainKeyring get keyring;
+  KC2KeyRing get keyring;
 
   // Get the identity mnemnomic
   String get mnemonic;

@@ -14,7 +14,7 @@ abstract class K2ServiceInterface {
   KC2EventsHandler get eventsHandler;
 
   // Set an identity's keyring
-  void setKeyring(KarmachainKeyring keyring);
+  void setKeyring(KC2KeyRing keyring);
 
   // Connect to a karmachain api service. e.g
   // Local running node - "ws://127.0.0.1:9944"

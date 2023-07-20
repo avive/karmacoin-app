@@ -19,7 +19,7 @@ import 'package:substrate_metadata_fixed/types/metadata_types.dart';
 class KarmachainService implements K2ServiceInterface {
   late polkadart.Provider karmachain;
   late polkadart.StateApi api;
-  late KarmachainKeyring keyring;
+  late KC2KeyRing keyring;
   Blake2bHasher hasher = const Blake2bHasher(64);
 
   @override
@@ -30,7 +30,7 @@ class KarmachainService implements K2ServiceInterface {
 
   // Set an identity's keyring
   @override
-  void setKeyring(KarmachainKeyring keyring) {
+  void setKeyring(KC2KeyRing keyring) {
     this.keyring = keyring;
   }
 

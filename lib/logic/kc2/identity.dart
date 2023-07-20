@@ -1,17 +1,48 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/kc2/identity_interface.dart';
 import 'package:karma_coin/logic/kc2/keyring.dart';
 
+const storeKey = "kc2menomonic";
+
 class Identity implements IdentityInterface {
-  late KarmachainKeyring _keyring;
+  late KC2KeyRing _keyring;
 
+  final _secureStorage = const FlutterSecureStorage();
+  final _sercureStorageOptions = const AndroidOptions(
+    encryptedSharedPreferences: true,
+  );
+
+  /// Initialize the identity. If mnenomic is provided, it will be used to create the
+  /// identity and will be persisted to secure storage. Otherwise, identity is loaded from local store if exists. If not, a new one is created and persisted to local store
   @override
-  Future<void> init() async {
-    // todo: read mnemonic from local store and pass to keyring constructor
-    // or none if not found
+  Future<void> init({String? mnemonic}) async {
+    if (mnemonic != null) {
+      _keyring = KC2KeyRing(mnemonic: mnemonic);
+      await _persistMnemonic();
+      debugPrint('Created identity from provided mnemonic');
+      return;
+    }
 
-    // create a new identity
-    _keyring = KarmachainKeyring();
+    String? storeMnemonic = await _secureStorage.read(
+        key: storeKey, aOptions: _sercureStorageOptions);
+
+    if (storeMnemonic != null) {
+      _keyring = KC2KeyRing(mnemonic: storeMnemonic);
+      debugPrint('Loaded mnemonic from secure storage');
+    } else {
+      _keyring = KC2KeyRing();
+      // persist the mnemonic so it can be loaded on next app session
+      await _persistMnemonic();
+      debugPrint('Created new menonic and saved to secure storage');
+    }
+  }
+
+  Future<void> _persistMnemonic() async {
+    await _secureStorage.write(
+        key: storeKey,
+        value: _keyring.mnemonic,
+        aOptions: _sercureStorageOptions);
   }
 
   @override
@@ -24,7 +55,7 @@ class Identity implements IdentityInterface {
   List<int> get publicKey => _keyring.getPublicKey();
 
   @override
-  KarmachainKeyring get keyring => _keyring;
+  KC2KeyRing get keyring => _keyring;
 
   @override
   Uint8List sign(Uint8List message) {
