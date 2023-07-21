@@ -1,11 +1,31 @@
-class Event {
+// Chain user info returned from various RPCs
+class KC2UserInfo {
+  String accountId;
+  String phoneNumberHash;
+  String userName;
+  BigInt balance;
+  int nonce;
+  int karmascore;
+  // todo: add char traits
+  // todo: add community memberships
+
+  KC2UserInfo.fromChainData(Map<String, dynamic> u)
+      : accountId = u['account_id'],
+        phoneNumberHash = u['phone_number_hash'],
+        userName = u['user_name'],
+        balance = BigInt.from(u['balance']),
+        nonce = u['nonce'],
+        karmascore = u['karma_score'];
+}
+
+class KC2Event {
   String phase;
   int extrinsicIndex;
   String pallet;
   String eventName;
   dynamic data;
 
-  Event.fromSubstrateEvent(Map<String, dynamic> event)
+  KC2Event.fromSubstrateEvent(Map<String, dynamic> event)
       : phase = event['phase'].key,
         extrinsicIndex = event['phase'].value,
         pallet = event['event'].key,
@@ -25,7 +45,7 @@ abstract class KC2Tx {
   late String blockNumber;
   late int blockIndex;
 
-  late List<Event> transactionEvents;
+  late List<KC2Event> transactionEvents;
   late Map<String, dynamic> args;
   late Map<String, dynamic> rawData;
 

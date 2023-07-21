@@ -129,7 +129,7 @@ class KarmachainService implements K2ServiceInterface {
     debugPrint('Account transactions: $transactions');
   }
 
-  Future<List<Event>> _getTransactionEvents(
+  Future<List<KC2Event>> _getTransactionEvents(
       int blockNumber, int transactionIndex) async {
     final blockHash = await karmachain
         .send('chain_getBlockHash', [blockNumber]).then((v) => v.result);
@@ -149,7 +149,7 @@ class KarmachainService implements K2ServiceInterface {
     try {
       final evidence = await karmachain.send('verifier_verify',
           [accountId, username, phoneNumber, 'dummy']).then((v) => v.result);
-      debugPrint('Evidence - $evidence');
+      debugPrint('Verifier evidence - $evidence');
 
       final phoneNumberHash = hasher.hashString(phoneNumber);
       final hexPhoneNumberHash = hex.encode(phoneNumberHash);
@@ -366,7 +366,7 @@ class KarmachainService implements K2ServiceInterface {
 
   /// Retrieves events for specific block by accessing `System` pallet storage
   /// return decoded events
-  Future<List<Event>> _getEvents(String blockHash) async {
+  Future<List<KC2Event>> _getEvents(String blockHash) async {
     final pallet = polkadart.Hasher.twoxx128.hashString('System');
     final storage = polkadart.Hasher.twoxx128.hashString('Events');
 
@@ -376,9 +376,9 @@ class KarmachainService implements K2ServiceInterface {
 
     final value = await api.getStorage(bytes.toBytes());
 
-    final List<Event> events = chainInfo.scaleCodec
+    final List<KC2Event> events = chainInfo.scaleCodec
         .decode('EventCodec', ByteInput(value!))
-        .map<Event>((e) => Event.fromSubstrateEvent(e))
+        .map<KC2Event>((e) => KC2Event.fromSubstrateEvent(e))
         .toList();
 
     return events;
@@ -388,8 +388,9 @@ class KarmachainService implements K2ServiceInterface {
       String address, String? previousBlockNumber) async {
     final header =
         await karmachain.send('chain_getHeader', []).then((v) => v.result);
-    debugPrint('Retrieve chain head: $header');
+    //debugPrint('Retrieve chain head: $header');
     final blockNumber = header['number'];
+    debugPrint("Processing block $blockNumber");
     // Do not process same block twice
     if (previousBlockNumber == blockNumber) {
       return blockNumber;
@@ -439,7 +440,7 @@ class KarmachainService implements K2ServiceInterface {
   void _processTransaction(
     String address,
     Map<String, dynamic> tx,
-    List<Event> txEvents,
+    List<KC2Event> txEvents,
     BigInt timestamp,
     String? hash,
     String blockNumber,
@@ -543,7 +544,7 @@ class KarmachainService implements K2ServiceInterface {
       int blockIndex,
       MapEntry<String, Object?>? failedReason,
       Map<String, dynamic> rawData,
-      List<Event> txEvents) async {
+      List<KC2Event> txEvents) async {
     if (newUserCallback == null) {
       return;
     }
@@ -583,7 +584,7 @@ class KarmachainService implements K2ServiceInterface {
       String blockNumber,
       int blockIndex,
       Map<String, dynamic> rawData,
-      List<Event> txEvents) async {
+      List<KC2Event> txEvents) async {
     final username = args['username'].value;
     final phoneNumberHashOption = args['phone_number_hash'].value;
     final phoneNumberHash = phoneNumberHashOption == null
@@ -621,7 +622,7 @@ class KarmachainService implements K2ServiceInterface {
       String blockNumber,
       int blockIndex,
       Map<String, dynamic> rawData,
-      List<Event> txEvents) async {
+      List<KC2Event> txEvents) async {
     final to = args['to'];
     final amount = args['amount'];
     final communityId = args['communityId'];
@@ -731,7 +732,7 @@ class KarmachainService implements K2ServiceInterface {
       String blockNumber,
       int blockIndex,
       Map<String, dynamic> rawData,
-      List<Event> txEvents) {
+      List<KC2Event> txEvents) {
     final toAddress = ss58.Codec(42).encode(args['dest'].value.cast<int>());
 
     if (signer != address && toAddress == address) {
