@@ -44,7 +44,7 @@ abstract class K2ServiceInterface {
   // phoneNumberHash - canonical hex string of phone number hash using blake32.
   // use getPhoneNumberHash() to get hash from a number
   Future<void> sendAppreciation(
-      String phoneNumberHash, int amount, int communityId, int charTraitId);
+      String phoneNumberHash, BigInt amount, int communityId, int charTraitId);
 
   Future<void> setAdmin(int communityId, String accountId);
 

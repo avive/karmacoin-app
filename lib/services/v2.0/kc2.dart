@@ -196,14 +196,14 @@ class KarmachainService implements K2ServiceInterface {
   }
 
   @override
-  Future<void> sendAppreciation(String hexPhoneNumberHash, int amount,
+  Future<void> sendAppreciation(String hexPhoneNumberHash, BigInt amount,
       int communityId, int charTraitId) async {
     try {
       final call = MapEntry(
           'Appreciation',
           MapEntry('appreciation', {
             'to': MapEntry('PhoneNumberHash', hex.decode(hexPhoneNumberHash)),
-            'amount': BigInt.from(amount),
+            'amount': amount,
             'community_id': Option.some(communityId),
             'char_trait_id': Option.some(charTraitId),
           }));
