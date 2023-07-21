@@ -1,16 +1,21 @@
 import 'dart:async';
 
 import 'package:karma_coin/logic/kc2/keyring.dart';
-import 'package:karma_coin/services/v2.0/events.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:substrate_metadata_fixed/models/models.dart';
+
+// callback types
+typedef NewUserCallback = Future<void> Function(KC2NewUserTransactionV1 tx);
+typedef UpdateUserCallback = Future<void> Function(KC2UpdateUserTxV1 tx);
+typedef AppreciationCallback = Future<void> Function(KC2AppreciationTxV1 tx);
+typedef TransferCallback = Future<void> Function(KC2TransferTxV1 tx);
 
 abstract class K2ServiceInterface {
   /// Available after connectToApi() called and completed without an error
   ChainInfo get chainInfo;
 
   /// Get the service's events handler and register on events using its props
-  KC2EventsHandler get eventsHandler;
+  // KC2EventsHandler get eventsHandler;
 
   /// Set an identity's keyring - call with local user's identity keyring on new app session
   void setKeyring(KC2KeyRing keyring);
@@ -63,4 +68,10 @@ abstract class K2ServiceInterface {
 
   /// Get canonical hex string of a phone number
   String getPhoneNumberHash(String phoneNumber);
+
+  // callbacks
+  NewUserCallback? newUserCallback;
+  UpdateUserCallback? updateUserCallback;
+  AppreciationCallback? appreciationCallback;
+  TransferCallback? transferCallback;
 }

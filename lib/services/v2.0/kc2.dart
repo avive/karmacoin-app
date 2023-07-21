@@ -4,7 +4,6 @@ import 'dart:typed_data';
 import 'package:collection/collection.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/kc2/keyring.dart';
-import 'package:karma_coin/services/v2.0/events.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:polkadart/polkadart.dart' as polkadart;
@@ -26,9 +25,21 @@ class KarmachainService implements K2ServiceInterface {
   late ChainInfo chainInfo;
 
   @override
-  final KC2EventsHandler eventsHandler = KC2EventsHandler();
+  NewUserCallback? newUserCallback;
 
-  // Set an identity's keyring
+  @override
+  AppreciationCallback? appreciationCallback;
+
+  @override
+  TransferCallback? transferCallback;
+
+  @override
+  UpdateUserCallback? updateUserCallback;
+
+  // @override
+  //final KC2EventsHandler eventsHandler = KC2EventsHandler();
+
+  // Set a local user's identity keyring for purpose of signing txs
   @override
   void setKeyring(KC2KeyRing keyring) {
     this.keyring = keyring;
@@ -101,28 +112,25 @@ class KarmachainService implements K2ServiceInterface {
 
   @override
   Future<void> getTransactions(String accountId) async {
-    // final accountId = ss58.Codec(42).encode(keyring.getPublicKey());
     final transactions = await karmachain.send(
         'transactions_getTransactions', [accountId]).then((v) => v.result);
 
-  transactions?.forEach((transaction) async {
-        final bytes = transaction['signed_transaction']['transaction_body'];
-        final transactionBody =
-            _decodeTransaction(Input.fromBytes(bytes.cast<int>()));
-        final timestamp = transaction['timestamp'];
-        final blockNumber = transaction['block_number'];
-        final transactionIndex = transaction['transaction_index'];
-        final events = await kc2Service.getTransactionEvents(
-            blockNumber, transactionIndex);
+    transactions?.forEach((transaction) async {
+      final bytes = transaction['signed_transaction']['transaction_body'];
+      final transactionBody =
+          _decodeTransaction(Input.fromBytes(bytes.cast<int>()));
+      final timestamp = transaction['timestamp'];
+      final blockNumber = transaction['block_number'];
+      final transactionIndex = transaction['transaction_index'];
+      final events =
+          await kc2Service.getTransactionEvents(blockNumber, transactionIndex);
 
-        _processTransaction(
-            accountId, transactionBody, events, BigInt.from(timestamp), null);
-      });
-
+      _processTransaction(accountId, transactionBody, events,
+          BigInt.from(timestamp), null, blockNumber, transactionIndex);
+    });
 
     debugPrint('Account transactions: $transactions');
   }
-
 
   @override
   Future<List<Event>> getTransactionEvents(
@@ -409,15 +417,15 @@ class KarmachainService implements K2ServiceInterface {
         .value['now'];
 
     extrinsics.asMap().forEach((transactionIndex, e) {
-      final transactionHash = e.key;
+      final hash = e.key;
       final transaction = e.value;
 
       final transactionEvents = events
           .where((event) => event.extrinsicIndex == transactionIndex)
           .toList();
 
-      _processTransaction(
-          address, transaction, transactionEvents, timestamp, transactionHash);
+      _processTransaction(address, transaction, transactionEvents, timestamp,
+          hash, blockNumber, transactionIndex);
     });
 
     return blockNumber;
@@ -428,101 +436,179 @@ class KarmachainService implements K2ServiceInterface {
   }
 
   void _processTransaction(
-      String address,
-      Map<String, dynamic> transaction,
-      List<Event> transactionEvents,
-      BigInt timestamp,
-      String? transactionHash) {
-    transactionHash ??=
-        hex.encode(ExtrinsicsCodec(chainInfo: chainInfo).encode(transaction));
+    String address,
+    Map<String, dynamic> tx,
+    List<Event> txEvents,
+    BigInt timestamp,
+    String? hash,
+    String blockNumber,
+    int blockIndex,
+  ) {
+    hash ??= hex.encode(ExtrinsicsCodec(chainInfo: chainInfo).encode(tx));
 
-    final pallet = transaction['calls'].key;
-    final method = transaction['calls'].value.key;
-    final args = transaction['calls'].value.value;
-    final signer = _getTransactionSigner(transaction);
-    final extrinsicMetadata = TransactionMetadata(transactionHash, timestamp);
-    final failedReason = transactionEvents
+    final String pallet = tx['calls'].key;
+    final String method = tx['calls'].value.key;
+    final args = tx['calls'].value.value;
+
+    final String signer = _getTransactionSigner(tx);
+
+    final failedReason = txEvents
         .where((event) => event.eventName == 'ExtrinsicFailed')
         .firstOrNull
         ?.data['dispatch_error'];
-    debugPrint('$pallet $method $args $signer $failedReason');
+
+    // debugPrint('$pallet $method $args $signer $failedReason');
 
     if (pallet == 'Identity' && method == 'new_user') {
-      _processNewUserTransaction(
-          extrinsicMetadata, address, signer, args, failedReason);
-    } else if (pallet == 'Identity' && method == 'update_user') {
-      _processUpdateUserTransaction(
-          extrinsicMetadata, address, signer, args, failedReason);
-    } else if (pallet == 'Appreciation' && method == 'appreciation') {
-      _processAppreciationTransaction(
-          extrinsicMetadata, address, signer, args, failedReason);
-    } else if (pallet == 'Appreciation' && method == 'set_admin') {
-      _processSetAdminTransaction(
-          extrinsicMetadata, address, signer, args, failedReason);
-    } else if (pallet == 'Balances' &&
-        (method == 'transfer_keep_alive' || method == 'transfer')) {
-      _processTransferTransaction(
-          extrinsicMetadata, address, signer, args, failedReason);
-    } else {
-      debugPrint('Skip pallet: $pallet method: $method');
+      final accountId = ss58.Codec(42).encode(args['account_id'].cast<int>());
+      if (signer == address || accountId == address) {
+        _processNewUserTransaction(hash, timestamp, accountId, signer, method,
+            pallet, blockNumber, args, blockIndex, failedReason, tx, txEvents);
+      }
+      return;
     }
+
+    if (pallet == 'Identity' && method == 'update_user' && signer == address) {
+      _processUpdateUserTransaction(hash, timestamp, address, signer, args,
+          failedReason, method, pallet, blockNumber, blockIndex, tx, txEvents);
+      return;
+    }
+
+    if (pallet == 'Appreciation' && method == 'appreciation') {
+      _processAppreciationTransaction(hash, timestamp, address, signer, args,
+          failedReason, method, pallet, blockNumber, blockIndex, tx, txEvents);
+      return;
+    }
+
+    /*
+    if (pallet == 'Appreciation' && method == 'set_admin') {
+      _processSetAdminTransaction(
+          hash, timestamp, address, signer, args, failedReason,
+          method: method,
+          pallet: pallet,
+          blockNumber,
+          blockIndex,
+          tx,
+          txEvents);
+
+      return;
+    }*/
+
+    if (pallet == 'Balances' &&
+        (method == 'transfer_keep_alive' || method == 'transfer')) {
+      _processTransferTransaction(hash, timestamp, address, signer, args,
+          failedReason, method, pallet, blockNumber, blockIndex, tx, txEvents);
+      return;
+    }
+
+    debugPrint('Skip pallet: $pallet method: $method');
   }
 
   /// Decode transaction signer, return `null` if transaction is `unsigned`
-  String? _getTransactionSigner(Map<String, dynamic> extrinsic) {
+  String _getTransactionSigner(Map<String, dynamic> extrinsic) {
     final signature = extrinsic['signature'];
-    if (signature == null) {
-      return null;
-    }
-
     final address = signature['address'].value;
-    if (address == null) {
-      return null;
-    }
-
     return ss58.Codec(42).encode(address.cast<int>());
   }
 
   void _processNewUserTransaction(
-      TransactionMetadata metadata,
-      String address,
-      String? signer,
+      String hash,
+      BigInt timeStamp,
+      String accountId,
+      String signer,
+      String method,
+      String pallet,
+      String blockNumber,
       Map<String, dynamic> args,
-      MapEntry<String, Object?>? failedReason) {
-    final accountId = ss58.Codec(42).encode(args['account_id'].cast<int>());
+      int blockIndex,
+      MapEntry<String, Object?>? failedReason,
+      Map<String, dynamic> rawData,
+      List<Event> txEvents) async {
+    if (newUserCallback == null) {
+      return;
+    }
+
     final username = args['username'];
     final phoneNumberHash = hex.encode(args['phone_number_hash'].cast<int>());
 
-    if (signer == address || accountId == address) {
-      eventsHandler.onNewUser(
-          metadata, signer, username, phoneNumberHash, failedReason);
-    }
+    final newUserTx = KC2NewUserTransactionV1(
+      accountId: accountId,
+      username: username,
+      phoneNumberHash: phoneNumberHash,
+      args: args,
+      pallet: pallet,
+      signer: signer,
+      method: method,
+      failedReason: failedReason,
+      timestamp: timeStamp,
+      hash: hash,
+      blockNumber: blockNumber,
+      blockIndex: blockIndex,
+      transactionEvents: txEvents,
+      rawData: rawData,
+    );
+
+    await newUserCallback!(newUserTx);
   }
 
   void _processUpdateUserTransaction(
-      TransactionMetadata metadata,
+      String hash,
+      BigInt timeStamp,
       String address,
-      String? signer,
+      String signer,
       Map<String, dynamic> args,
-      MapEntry<String, Object?>? failedReason) {
+      MapEntry<String, Object?>? failedReason,
+      String method,
+      String pallet,
+      String blockNumber,
+      int blockIndex,
+      Map<String, dynamic> rawData,
+      List<Event> txEvents) async {
+    if (updateUserCallback == null) {
+      return;
+    }
+
     final username = args['username'].value;
     final phoneNumberHashOption = args['phone_number_hash'].value;
     final phoneNumberHash = phoneNumberHashOption == null
         ? null
         : hex.encode(phoneNumberHashOption.cast<int>());
 
-    if (signer == address) {
-      eventsHandler.onUpdateUser(
-          metadata, signer, username, phoneNumberHash, failedReason);
-    }
+    final updateUserTx = KC2UpdateUserTxV1(
+      username: username,
+      phoneNumberHash: phoneNumberHash,
+      args: args,
+      pallet: pallet,
+      signer: signer,
+      method: method,
+      failedReason: failedReason,
+      timestamp: timeStamp,
+      hash: hash,
+      blockNumber: blockNumber,
+      blockIndex: blockIndex,
+      transactionEvents: txEvents,
+      rawData: rawData,
+    );
+
+    await updateUserCallback!(updateUserTx);
   }
 
   void _processAppreciationTransaction(
-      TransactionMetadata metadata,
+      String hash,
+      BigInt timeStamp,
       String address,
-      String? signer,
+      String signer,
       Map<String, dynamic> args,
-      MapEntry<String, Object?>? failedReason) async {
+      MapEntry<String, Object?>? failedReason,
+      String method,
+      String pallet,
+      String blockNumber,
+      int blockIndex,
+      Map<String, dynamic> rawData,
+      List<Event> txEvents) async {
+    if (appreciationCallback == null) {
+      return;
+    }
     final to = args['to'];
     final amount = args['amount'];
     final communityId = args['communityId'];
@@ -530,31 +616,63 @@ class KarmachainService implements K2ServiceInterface {
 
     final accountIdentityType = to.key;
     final accountIdentityValue = to.value;
-    String? accountId;
 
+    String toAccountId;
+    String? toUserName;
+    String? toPhoneNumberHash;
+
+    // get toAccountId
     switch (accountIdentityType) {
       case 'AccountId':
-        accountId = ss58.Codec(42).encode(accountIdentityValue.cast<int>());
+        toAccountId = ss58.Codec(42).encode(accountIdentityValue.cast<int>());
         break;
       case 'Username':
+        toUserName = accountIdentityValue;
         final result = await getUserInfoByUsername(accountIdentityValue);
-        accountId = result?['account_id'];
+        toAccountId = result?['account_id'];
         break;
       default:
-        final phoneNumberHashHex = hex.encode(accountIdentityValue.cast<int>());
-        final result = await getUserInfoByPhoneNumberHash(phoneNumberHashHex);
-        accountId = result?['account_id'];
+        toPhoneNumberHash = hex.encode(accountIdentityValue.cast<int>());
+        final result = await getUserInfoByPhoneNumberHash(toPhoneNumberHash);
+        toAccountId = result?['account_id'];
         break;
     }
 
-    if (signer == address || accountId == address) {
-      eventsHandler.onAppreciation(metadata, signer, accountId, amount,
-          communityId, charTraitId, failedReason);
+    if (signer != address && toAccountId != address) {
+      // appreciation not to or from watched local account
+      // todo: consider local user phone number hash and don't return if tx
+      // is to or from that phone number!
+      return;
     }
+
+    final appreciationTx = KC2AppreciationTxV1(
+      fromAddress: signer,
+      toAddress: toAccountId,
+      toPhoneNumberHash: toPhoneNumberHash,
+      toUsername: toUserName,
+      amount: amount,
+      communityId: communityId,
+      charTraitId: charTraitId,
+      args: args,
+      pallet: pallet,
+      signer: signer,
+      method: method,
+      failedReason: failedReason,
+      timestamp: timeStamp,
+      hash: hash,
+      blockNumber: blockNumber,
+      blockIndex: blockIndex,
+      transactionEvents: txEvents,
+      rawData: rawData,
+    );
+
+    await appreciationCallback!(appreciationTx);
   }
 
+  /*
   void _processSetAdminTransaction(
-      TransactionMetadata metadata,
+      String hash,
+      BigInt timeStamp,
       String address,
       String? signer,
       Map<String, dynamic> args,
@@ -581,23 +699,55 @@ class KarmachainService implements K2ServiceInterface {
         break;
     }
 
+    /*
     if (signer == address || accountId == address) {
       eventsHandler.onSetAdmin(
           metadata, signer, communityId, accountId, failedReason);
-    }
-  }
+    }*/
+  }*/
 
   void _processTransferTransaction(
-      TransactionMetadata metadata,
+      String hash,
+      BigInt timeStamp,
       String address,
-      String? signer,
+      String signer,
       Map<String, dynamic> args,
-      MapEntry<String, Object?>? failedReason) {
-    final dest = ss58.Codec(42).encode(args['dest'].value.cast<int>());
+      MapEntry<String, Object?>? failedReason,
+      String method,
+      String pallet,
+      String blockNumber,
+      int blockIndex,
+      Map<String, dynamic> rawData,
+      List<Event> txEvents) {
+    if (transferCallback == null) {
+      return;
+    }
+
+    final toAddress = ss58.Codec(42).encode(args['dest'].value.cast<int>());
+
+    if (signer != address && toAddress == address) {
+      return;
+    }
+
     final amount = args['value'];
 
-    if (signer == address || dest == address) {
-      eventsHandler.onTransfer(metadata, signer, dest, amount, failedReason);
-    }
+    final KC2TransferTxV1 transferTx = KC2TransferTxV1(
+      fromAddress: signer,
+      toAddress: toAddress,
+      amount: amount,
+      args: args,
+      pallet: pallet,
+      signer: signer,
+      method: method,
+      failedReason: failedReason,
+      timestamp: timeStamp,
+      hash: hash,
+      blockNumber: blockNumber,
+      blockIndex: blockIndex,
+      transactionEvents: txEvents,
+      rawData: rawData,
+    );
+
+    transferCallback!(transferTx);
   }
 }

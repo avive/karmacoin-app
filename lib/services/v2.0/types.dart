@@ -1,5 +1,3 @@
-import 'package:polkadart/primitives/primitives.dart';
-
 class Event {
   String phase;
   int extrinsicIndex;
@@ -15,68 +13,178 @@ class Event {
         data = event['event'].value.value;
 }
 
-class TransactionMetadata {
-  String hash;
-  BigInt timestamp;
-
-  TransactionMetadata(this.hash, this.timestamp);
-}
-
 abstract class KC2Tx {
-  late String signerAddress;
+  late String signer;
   late String pallet;
-  late RuntimeVersion runtimeVersion;
   late String method;
-  late Event? failedReason; // is this a string or other type?
+  late MapEntry<String, Object?>?
+      failedReason; // is this a string or other type?
 
   late BigInt timestamp;
-  late String? hash;
-  late String? blockNumber;
-  late int? blockIndex;
+  late String hash;
+  late String blockNumber;
+  late int blockIndex;
 
   late List<Event> transactionEvents;
   late Map<String, dynamic> args;
   late Map<String, dynamic> rawData;
+
+  KC2Tx({
+    required this.args,
+    required this.pallet,
+    required this.method,
+    required this.failedReason,
+    required this.timestamp,
+    required this.hash,
+    required this.blockNumber,
+    required this.blockIndex,
+    required this.transactionEvents,
+    required this.rawData,
+    required this.signer,
+  });
 }
 
 class KC2NewUserTransactionV1 extends KC2Tx {
-  late String username;
-  late String phoneNumberHash;
+  String username;
+  String phoneNumberHash;
+  String accountId;
+
+  KC2NewUserTransactionV1({
+    required this.accountId,
+    required this.username,
+    required this.phoneNumberHash,
+    required super.transactionEvents,
+    required super.args,
+    required super.pallet,
+    required super.method,
+    required super.failedReason,
+    required super.timestamp,
+    required super.hash,
+    required super.blockNumber,
+    required super.blockIndex,
+    required super.rawData,
+    required super.signer,
+  });
 }
 
 class KC2UpdateUserTxV1 extends KC2Tx {
-  late String? username;
-  late String? phoneNumberHash;
+  String? username;
+  String? phoneNumberHash;
+
+  KC2UpdateUserTxV1({
+    required this.username,
+    required this.phoneNumberHash,
+    required super.transactionEvents,
+    required super.args,
+    required super.pallet,
+    required super.method,
+    required super.failedReason,
+    required super.timestamp,
+    required super.hash,
+    required super.blockNumber,
+    required super.blockIndex,
+    required super.rawData,
+    required super.signer,
+  });
 }
 
 class KC2AppreciationTxV1 extends KC2Tx {
-  late String fromAddress;
+  String fromAddress;
 
   // payee address always obtained from rpc
-  late String toAddress;
+  String toAddress;
 
   // non-null if apprecaition was to a phone number hash
-  late String? toPhoneNumberHash;
+  String? toPhoneNumberHash;
 
   // non-null if appreciation was to a username
-  late String? toUsername;
+  String? toUsername;
 
-  late BigInt amount;
-  late int communityId;
-  late int charTraitId;
+  BigInt amount;
+  int communityId;
+  int charTraitId;
+
+  KC2AppreciationTxV1({
+    required this.fromAddress,
+    required this.toAddress,
+    required this.toPhoneNumberHash,
+    required this.toUsername,
+    required this.amount,
+    required this.communityId,
+    required this.charTraitId,
+    required super.transactionEvents,
+    required super.args,
+    required super.pallet,
+    required super.method,
+    required super.failedReason,
+    required super.timestamp,
+    required super.hash,
+    required super.blockNumber,
+    required super.blockIndex,
+    required super.rawData,
+    required super.signer,
+  });
 }
 
 class KC2TransferTxV1 extends KC2Tx {
-  late String fromAddress;
-  late String toAddress;
-  late BigInt amount;
+  String fromAddress;
+  String toAddress;
+  BigInt amount;
+
+  KC2TransferTxV1({
+    required this.fromAddress,
+    required this.toAddress,
+    required this.amount,
+    required super.transactionEvents,
+    required super.args,
+    required super.pallet,
+    required super.method,
+    required super.failedReason,
+    required super.timestamp,
+    required super.hash,
+    required super.blockNumber,
+    required super.blockIndex,
+    required super.rawData,
+    required super.signer,
+  });
 }
 
 class KC2SetAdminTxv1 extends KC2Tx {
-  late String adminAddress;
-  late int communityId;
+  String adminAddress;
+  int communityId;
+
+  KC2SetAdminTxv1({
+    required this.adminAddress,
+    required this.communityId,
+    required super.args,
+    required super.pallet,
+    required super.transactionEvents,
+    required super.method,
+    required super.failedReason,
+    required super.timestamp,
+    required super.hash,
+    required super.blockNumber,
+    required super.blockIndex,
+    required super.rawData,
+    required super.signer,
+  });
 }
 
 class KC2DeleteUserTxv1 extends KC2Tx {
-  late String userAddress;
+  String userAddress;
+
+  KC2DeleteUserTxv1({
+    required this.userAddress,
+    required super.transactionEvents,
+    required super.args,
+    required super.pallet,
+    required super.method,
+    required super.failedReason,
+    required super.timestamp,
+    required super.hash,
+    required super.blockNumber,
+    required super.blockIndex,
+    required super.rawData,
+    required super.signer,
+  });
 }
