@@ -45,6 +45,14 @@ Future<void> startKC2Playground() async {
     // subscribe to new account txs
     // ignore: unused_local_variable
     Timer timer = kc2Service.subscribeToAccount(identity.accountId);
+
+    // todo: signup user
+
+    // todo: update user name or phone
+
+    // todo: send appreication to Alice
+
+    // todo: transfer coins to Alice
   } catch (e) {
     debugPrint('error subscribing to kc2 account: $e');
   }
