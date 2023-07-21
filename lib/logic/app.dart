@@ -10,8 +10,6 @@ import 'package:karma_coin/logic/auth.dart';
 import 'package:karma_coin/logic/config.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/logic/account_setup_controller.dart';
-import 'package:karma_coin/logic/kc2/identity.dart';
-import 'package:karma_coin/logic/kc2/identity_interface.dart';
 import 'package:karma_coin/logic/kc2/playground.dart';
 import 'package:karma_coin/logic/txs_boss.dart';
 import 'package:karma_coin/logic/txs_boss_interface.dart';

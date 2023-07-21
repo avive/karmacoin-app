@@ -13,6 +13,8 @@ Future<void> startKC2Playground() async {
 
   await katya.init();
   await punch.init();
+
+  // Set katya as signer
   kc2Service.setKeyring(katya.keyring);
   debugPrint('Local user katya public address: ${katya.accountId}');
   debugPrint('Punch 2nd user public address: ${punch.accountId}');
@@ -28,12 +30,6 @@ Future<void> startKC2Playground() async {
   kc2Service.newUserCallback = (tx) async {
     debugPrint('>> new user tx: $tx');
 
-    // update user name
-    await kc2Service.updateUser("Katyah", null);
-
-    // update user phone number
-    await kc2Service.updateUser("Katyah", "972549805382");
-
     // Katya -> Punch 1000 KCents with appreciation
     await kc2Service.sendAppreciation(
         kc2Service.getPhoneNumberHash("972549805381"),
@@ -44,6 +40,22 @@ Future<void> startKC2Playground() async {
     // Katya -> Punch 345 KCents transfer
     await kc2Service.sendAppreciation(
         kc2Service.getPhoneNumberHash("972549805381"), BigInt.from(345), 0, 0);
+
+    // set punch as local user
+    kc2Service.setKeyring(punch.keyring);
+
+    // Punch -> Katya 666 KCents transfer
+    await kc2Service.sendAppreciation(
+        kc2Service.getPhoneNumberHash("972549805381"), BigInt.from(666), 0, 0);
+
+    // set katya as local user
+    kc2Service.setKeyring(katya.keyring);
+
+    // update katya's user name
+    await kc2Service.updateUser("Katyah", null);
+
+    // update katya's phone number
+    await kc2Service.updateUser("Katyah", "972549805382");
   };
 
   kc2Service.updateUserCallback = (tx) async {
