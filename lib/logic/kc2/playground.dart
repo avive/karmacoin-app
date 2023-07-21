@@ -1,5 +1,7 @@
 // create a new user's identity and set its keyring on the k2 service
 
+// ignore_for_file: unused_local_variable
+
 import 'dart:async';
 
 import 'package:karma_coin/common_libs.dart';
@@ -30,32 +32,44 @@ Future<void> startKC2Playground() async {
   kc2Service.newUserCallback = (tx) async {
     debugPrint('>> new user tx: $tx');
 
-    // Katya -> Punch 1000 KCents with appreciation
-    await kc2Service.sendAppreciation(
-        kc2Service.getPhoneNumberHash("972549805381"),
-        BigInt.from(1000),
-        0,
-        35);
+    // all 3 methods should return's katya's account data
+    var k1 = await kc2Service.getUserInfoByAccountId(katya.accountId);
+    var k2 = await kc2Service.getUserInfoByPhoneNumberHash(
+        kc2Service.getPhoneNumberHash("972549805380"));
+    var k3 = await kc2Service.getUserInfoByUsername("Katya");
 
-    // Katya -> Punch 345 KCents transfer
-    await kc2Service.sendAppreciation(
-        kc2Service.getPhoneNumberHash("972549805381"), BigInt.from(345), 0, 0);
+    // get kayta from api via all ways here
 
-    // set punch as local user
-    kc2Service.setKeyring(punch.keyring);
+    Future.delayed(const Duration(seconds: 24), () async {
+      // Set Punch as signer and sign up punch
+      kc2Service.setKeyring(punch.keyring);
+      await kc2Service.newUser(punch.accountId, "Punch", "972549805381");
 
-    // Punch -> Katya 666 KCents transfer
-    await kc2Service.sendAppreciation(
-        kc2Service.getPhoneNumberHash("972549805381"), BigInt.from(666), 0, 0);
+      Future.delayed(const Duration(seconds: 24), () async {
+        // Set Katya as signer and sign up katya
+        kc2Service.setKeyring(katya.keyring);
 
-    // set katya as local user
-    kc2Service.setKeyring(katya.keyring);
+        // Katya -> Punch 1000 KCents with appreciation
+        await kc2Service.sendAppreciation(
+            kc2Service.getPhoneNumberHash("972549805381"),
+            BigInt.from(1000),
+            0,
+            35);
 
-    // update katya's user name
-    await kc2Service.updateUser("Katyah", null);
+        // Katya -> Punch 345 KCents transfer
+        await kc2Service.sendAppreciation(
+            kc2Service.getPhoneNumberHash("972549805381"),
+            BigInt.from(345),
+            0,
+            0);
 
-    // update katya's phone number
-    await kc2Service.updateUser("Katyah", "972549805382");
+        // update katya's user name
+        // await kc2Service.updateUser("Katyah", null);
+
+        // update katya's phone number
+        // await kc2Service.updateUser("Katyah", "972549805382");
+      });
+    });
   };
 
   kc2Service.updateUserCallback = (tx) async {
@@ -76,21 +90,13 @@ Future<void> startKC2Playground() async {
     // only call the following 2 methods after setting txs callbacks as these will send the txs to the callbacks
 
     // Get all on-chain txs to and from the local user's account
-    await kc2Service.getTransactions(katya.accountId);
+    // await kc2Service.getTransactions(katya.accountId);
 
     // subscribe to new account txs
-    // ignore: unused_local_variable
-    Timer timer = kc2Service.subscribeToAccount(katya.accountId);
+    kc2Service.subscribeToAccount(katya.accountId);
 
-    // signup the 2 users
+    // signup katya
     await kc2Service.newUser(katya.accountId, "Katya", "972549805380");
-    await kc2Service.newUser(punch.accountId, "Punch", "972549805381");
-
-    // todo: update user name or phone
-
-    // todo: send appreication to Alice
-
-    // todo: transfer coins to Alice
   } catch (e) {
     debugPrint('kc2 error: $e');
   }

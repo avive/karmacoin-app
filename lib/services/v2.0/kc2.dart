@@ -58,7 +58,7 @@ class KarmachainService implements K2ServiceInterface {
       final DecodedMetadata decodedMetadata =
           MetadataDecoder.instance.decode(metadata.result.toString());
       chainInfo = ChainInfo.fromMetadata(decodedMetadata);
-      debugPrint('Fetched chain metadata');
+      debugPrint('Fetched chainInfo: ${chainInfo.version}');
 
       chainInfo.scaleCodec.registry.registerCustomCodec({
         'Extra':
@@ -167,7 +167,7 @@ class KarmachainService implements K2ServiceInterface {
 
       await _signAndSendTransaction(call);
     } on PlatformException catch (e) {
-      debugPrint('Failed to bootstrap karma: ${e.details}');
+      debugPrint('Failed to send signup tx: ${e.details}');
       rethrow;
     }
   }
@@ -307,7 +307,7 @@ class KarmachainService implements K2ServiceInterface {
     final output = ByteOutput();
     chainInfo.scaleCodec
         .encodeTo('UnsignedPayload', [call, extra, additional], output);
-    debugPrint('Data length: ${output.length} Data to sign: ${output.toHex()}');
+    // debugPrint('Data length: ${output.length} Data to sign: ${output.toHex()}');
     final Uint8List signature;
     // If payload is longer than 256 bytes, we hash it and sign the hash instead:
     if (output.length > 256) {
@@ -358,7 +358,7 @@ class KarmachainService implements K2ServiceInterface {
     final signer = ss58.Codec(42).encode(keyring.getPublicKey());
     final encodedHex =
         await _signTransaction(signer, keyring.getPublicKey(), call);
-    debugPrint('Encoded extrinsic: $encodedHex');
+    // debugPrint('Encoded extrinsic: $encodedHex');
     final result =
         await karmachain.send('author_submitExtrinsic', [encodedHex]);
     debugPrint('Submit extrinsic result: ${result.result.toString()}');
@@ -451,7 +451,12 @@ class KarmachainService implements K2ServiceInterface {
     final String method = tx['calls'].value.key;
     final args = tx['calls'].value.value;
 
-    final String signer = _getTransactionSigner(tx);
+    final String? signer = _getTransactionSigner(tx);
+
+    if (signer == null) {
+      debugPrint("skipping unsigned tx");
+      return;
+    }
 
     final failedReason = txEvents
         .where((event) => event.eventName == 'ExtrinsicFailed')
@@ -512,10 +517,17 @@ class KarmachainService implements K2ServiceInterface {
     debugPrint('Skipping tx of type: $pallet/$method');
   }
 
-  /// Decode transaction signer, return `null` if transaction is `unsigned`
-  String _getTransactionSigner(Map<String, dynamic> extrinsic) {
+  /// Decode transaction signer address. Return `null` if transaction is `unsigned`
+  String? _getTransactionSigner(Map<String, dynamic> extrinsic) {
     final signature = extrinsic['signature'];
+    if (signature == null) {
+      return null;
+    }
     final address = signature['address'].value;
+    if (address == null) {
+      return null;
+    }
+
     return ss58.Codec(42).encode(address.cast<int>());
   }
 
