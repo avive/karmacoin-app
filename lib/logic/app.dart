@@ -12,6 +12,7 @@ import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/logic/account_setup_controller.dart';
 import 'package:karma_coin/logic/kc2/identity.dart';
 import 'package:karma_coin/logic/kc2/identity_interface.dart';
+import 'package:karma_coin/logic/kc2/playground.dart';
 import 'package:karma_coin/logic/txs_boss.dart';
 import 'package:karma_coin/logic/txs_boss_interface.dart';
 import 'package:karma_coin/logic/user_name_availability.dart';
@@ -116,32 +117,6 @@ class AppLogic with AppLogicInterface {
     // Int the auth logic
     await authLogic.init();
 
-    // create a new user's identity and set its keyring on the k2 service
-    IdentityInterface identity = Identity();
-    await identity.init();
-    kc2Service.setKeyring(identity.keyring);
-
-    try {
-      // Local running node - "ws://127.0.0.1:9944"
-      // Testnet - "wss://testnet.karmaco.in/testnet/ws"
-      await kc2Service.connectToApi('ws://127.0.0.1:9944');
-    } catch (e) {
-      debugPrint('error connecting to kc2 api: $e');
-    }
-
-    try {
-      // only call the following 2 methods after setting txs callbacks as these will send the txs to the callbacks
-
-      // Get all on-chain txs to and from the account
-      kc2Service.getTransactions(identity.accountId);
-
-      // subscribe to new account txs
-      kc2Service.subscribeToAccount(
-          '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY');
-    } catch (e) {
-      debugPrint('error subscribing to kc2 account: $e');
-    }
-
     if (authLogic.isUserAuthenticated()) {
       debugPrint('user is Firebase authenticated on app startup');
     }
@@ -159,6 +134,9 @@ class AppLogic with AppLogicInterface {
       SecurityContext.defaultContext
           .setTrustedCertificatesBytes(data.buffer.asUint8List());
     }
+
+    // Play around with kc2
+    await startKC2Playground();
 
     // Flag bootStrap as complete
     isBootstrapComplete = true;

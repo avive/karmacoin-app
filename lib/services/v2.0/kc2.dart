@@ -244,6 +244,8 @@ class KarmachainService implements K2ServiceInterface {
     });
   }
 
+  // Utility
+
   @override
   String getPhoneNumberHash(String phoneNumber) {
     final phoneNumberHash = hasher.hashString(phoneNumber);
@@ -455,9 +457,9 @@ class KarmachainService implements K2ServiceInterface {
 
     // debugPrint('$pallet $method $args $signer $failedReason');
 
-    if (pallet == 'Identity' &&
-        method == 'new_user' &&
-        newUserCallback != null) {
+    if (newUserCallback != null &&
+        pallet == 'Identity' &&
+        method == 'new_user') {
       final accountId = ss58.Codec(42).encode(args['account_id'].cast<int>());
       if (signer == address || accountId == address) {
         _processNewUserTransaction(hash, timestamp, accountId, signer, method,
@@ -466,18 +468,18 @@ class KarmachainService implements K2ServiceInterface {
       return;
     }
 
-    if (pallet == 'Identity' &&
+    if (updateUserCallback != null &&
+        pallet == 'Identity' &&
         method == 'update_user' &&
-        updateUserCallback != null &&
         signer == address) {
       _processUpdateUserTransaction(hash, timestamp, address, signer, args,
           failedReason, method, pallet, blockNumber, blockIndex, tx, txEvents);
       return;
     }
 
-    if (pallet == 'Appreciation' &&
-        method == 'appreciation' &&
-        appreciationCallback != null) {
+    if (appreciationCallback != null &&
+        pallet == 'Appreciation' &&
+        method == 'appreciation') {
       _processAppreciationTransaction(hash, timestamp, address, signer, args,
           failedReason, method, pallet, blockNumber, blockIndex, tx, txEvents);
       return;
@@ -498,14 +500,13 @@ class KarmachainService implements K2ServiceInterface {
     }*/
 
     if (pallet == 'Balances' &&
-        transferCallback != null &&
         (method == 'transfer_keep_alive' || method == 'transfer')) {
       _processTransferTransaction(hash, timestamp, address, signer, args,
           failedReason, method, pallet, blockNumber, blockIndex, tx, txEvents);
       return;
     }
 
-    debugPrint('Skip pallet: $pallet method: $method');
+    debugPrint('Skipping tx of type: $pallet/$method');
   }
 
   /// Decode transaction signer, return `null` if transaction is `unsigned`

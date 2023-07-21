@@ -6,18 +6,18 @@ abstract class IdentityInterface {
   /// identity and will be persisted to secure storage. Otherwise, identity is loaded from local store if exists. If not, a new one is created and persisted to local store
   Future<void> init({String? mnemonic});
 
-  // get the identity's keyring
+  /// get the identity's keyring
   KC2KeyRing get keyring;
 
-  // Get the identity mnemnomic
+  /// Get the identity mnemnomic
   String get mnemonic;
 
-  // user's public ss58 address
+  /// user's public ss58 address
   String get accountId;
 
-  // identity's public ed key
+  /// identity's public ed key
   List<int> get publicKey;
 
-  // sign messsage with identity private key
+  /// sign messsage with identity private key
   Uint8List sign(Uint8List message);
 }

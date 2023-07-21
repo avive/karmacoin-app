@@ -20,7 +20,7 @@ class Identity implements IdentityInterface {
     if (mnemonic != null) {
       _keyring = KC2KeyRing(mnemonic: mnemonic);
       await _persistMnemonic();
-      debugPrint('Created identity from provided mnemonic');
+      debugPrint('created identity from provided mnemonic');
       return;
     }
 
@@ -29,12 +29,12 @@ class Identity implements IdentityInterface {
 
     if (storeMnemonic != null) {
       _keyring = KC2KeyRing(mnemonic: storeMnemonic);
-      debugPrint('Loaded mnemonic from secure storage');
+      debugPrint('loaded mnemonic ${keyring.mnemonic}ß from secure storage');
     } else {
       _keyring = KC2KeyRing();
       // persist the mnemonic so it can be loaded on next app session
       await _persistMnemonic();
-      debugPrint('Created new menonic and saved to secure storage');
+      debugPrint('created new menonic: ${keyring.mnemonic}, and persisted');
     }
   }
 

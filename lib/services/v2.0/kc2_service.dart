@@ -63,7 +63,7 @@ abstract class K2ServiceInterface {
   /// Get canonical hex string of a phone number
   String getPhoneNumberHash(String phoneNumber);
 
-  // callbacks
+  // available client callbacks
   NewUserCallback? newUserCallback;
   UpdateUserCallback? updateUserCallback;
   AppreciationCallback? appreciationCallback;
