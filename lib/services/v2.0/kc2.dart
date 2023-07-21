@@ -173,13 +173,16 @@ class KarmachainService implements K2ServiceInterface {
   }
 
   @override
-  Future<void> updateUser(String? username, String? hexPhoneNumberHash) async {
+  Future<void> updateUser(String? username, String? phoneNumber) async {
     try {
+      final String? phoneHash =
+          phoneNumber != null ? getPhoneNumberHash(phoneNumber) : null;
+
       final usernameOption =
           username == null ? const Option.none() : Option.some(username);
-      final hexPhoneNumberHashOption = hexPhoneNumberHash == null
+      final hexPhoneNumberHashOption = phoneHash == null
           ? const Option.none()
-          : Option.some(hex.decode(hexPhoneNumberHash));
+          : Option.some(hex.decode(phoneHash));
 
       final call = MapEntry(
           'Identity',

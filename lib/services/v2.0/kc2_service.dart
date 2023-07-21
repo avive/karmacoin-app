@@ -39,7 +39,7 @@ abstract class K2ServiceInterface {
   // phoneNumber - user's phone number. Including country code. Excluding leading +
   Future<void> newUser(String accountId, String username, String phoneNumber);
 
-  Future<void> updateUser(String? username, String? phoneNumberHash);
+  Future<void> updateUser(String? username, String? phoneNumber);
 
   // phoneNumberHash - canonical hex string of phone number hash using blake32.
   // use getPhoneNumberHash() to get hash from a number

@@ -28,6 +28,12 @@ Future<void> startKC2Playground() async {
   kc2Service.newUserCallback = (tx) async {
     debugPrint('>> new user tx: $tx');
 
+    // update user name
+    await kc2Service.updateUser("Katyah", null);
+
+    // update user phone number
+    await kc2Service.updateUser("Katyah", "972549805382");
+
     // Katya -> Punch 1000 KCents with appreciation
     await kc2Service.sendAppreciation(
         kc2Service.getPhoneNumberHash("972549805381"),
@@ -38,8 +44,6 @@ Future<void> startKC2Playground() async {
     // Katya -> Punch 345 KCents transfer
     await kc2Service.sendAppreciation(
         kc2Service.getPhoneNumberHash("972549805381"), BigInt.from(345), 0, 0);
-
-    // Punch -> Katya 300 KCents with appreciation
   };
 
   kc2Service.updateUserCallback = (tx) async {
@@ -76,6 +80,6 @@ Future<void> startKC2Playground() async {
 
     // todo: transfer coins to Alice
   } catch (e) {
-    debugPrint('error subscribing to kc2 account: $e');
+    debugPrint('kc2 error: $e');
   }
 }
