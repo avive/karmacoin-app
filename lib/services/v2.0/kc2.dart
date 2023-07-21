@@ -36,9 +36,6 @@ class KarmachainService implements K2ServiceInterface {
   @override
   UpdateUserCallback? updateUserCallback;
 
-  // @override
-  //final KC2EventsHandler eventsHandler = KC2EventsHandler();
-
   // Set a local user's identity keyring for purpose of signing txs
   @override
   void setKeyring(KC2KeyRing keyring) {
@@ -91,6 +88,7 @@ class KarmachainService implements K2ServiceInterface {
   }
 
   // RPC
+
   @override
   Future<Map<String, dynamic>?> getUserInfoByAccountId(String accountId) async {
     return await karmachain.send(
@@ -122,8 +120,7 @@ class KarmachainService implements K2ServiceInterface {
       final timestamp = transaction['timestamp'];
       final blockNumber = transaction['block_number'];
       final transactionIndex = transaction['transaction_index'];
-      final events =
-          await kc2Service.getTransactionEvents(blockNumber, transactionIndex);
+      final events = await _getTransactionEvents(blockNumber, transactionIndex);
 
       _processTransaction(accountId, transactionBody, events,
           BigInt.from(timestamp), null, blockNumber, transactionIndex);
@@ -132,8 +129,7 @@ class KarmachainService implements K2ServiceInterface {
     debugPrint('Account transactions: $transactions');
   }
 
-  @override
-  Future<List<Event>> getTransactionEvents(
+  Future<List<Event>> _getTransactionEvents(
       int blockNumber, int transactionIndex) async {
     final blockHash = await karmachain
         .send('chain_getBlockHash', [blockNumber]).then((v) => v.result);
@@ -459,7 +455,9 @@ class KarmachainService implements K2ServiceInterface {
 
     // debugPrint('$pallet $method $args $signer $failedReason');
 
-    if (pallet == 'Identity' && method == 'new_user') {
+    if (pallet == 'Identity' &&
+        method == 'new_user' &&
+        newUserCallback != null) {
       final accountId = ss58.Codec(42).encode(args['account_id'].cast<int>());
       if (signer == address || accountId == address) {
         _processNewUserTransaction(hash, timestamp, accountId, signer, method,
@@ -468,13 +466,18 @@ class KarmachainService implements K2ServiceInterface {
       return;
     }
 
-    if (pallet == 'Identity' && method == 'update_user' && signer == address) {
+    if (pallet == 'Identity' &&
+        method == 'update_user' &&
+        updateUserCallback != null &&
+        signer == address) {
       _processUpdateUserTransaction(hash, timestamp, address, signer, args,
           failedReason, method, pallet, blockNumber, blockIndex, tx, txEvents);
       return;
     }
 
-    if (pallet == 'Appreciation' && method == 'appreciation') {
+    if (pallet == 'Appreciation' &&
+        method == 'appreciation' &&
+        appreciationCallback != null) {
       _processAppreciationTransaction(hash, timestamp, address, signer, args,
           failedReason, method, pallet, blockNumber, blockIndex, tx, txEvents);
       return;
@@ -495,6 +498,7 @@ class KarmachainService implements K2ServiceInterface {
     }*/
 
     if (pallet == 'Balances' &&
+        transferCallback != null &&
         (method == 'transfer_keep_alive' || method == 'transfer')) {
       _processTransferTransaction(hash, timestamp, address, signer, args,
           failedReason, method, pallet, blockNumber, blockIndex, tx, txEvents);
@@ -564,10 +568,6 @@ class KarmachainService implements K2ServiceInterface {
       int blockIndex,
       Map<String, dynamic> rawData,
       List<Event> txEvents) async {
-    if (updateUserCallback == null) {
-      return;
-    }
-
     final username = args['username'].value;
     final phoneNumberHashOption = args['phone_number_hash'].value;
     final phoneNumberHash = phoneNumberHashOption == null
@@ -606,9 +606,6 @@ class KarmachainService implements K2ServiceInterface {
       int blockIndex,
       Map<String, dynamic> rawData,
       List<Event> txEvents) async {
-    if (appreciationCallback == null) {
-      return;
-    }
     final to = args['to'];
     final amount = args['amount'];
     final communityId = args['communityId'];
@@ -719,10 +716,6 @@ class KarmachainService implements K2ServiceInterface {
       int blockIndex,
       Map<String, dynamic> rawData,
       List<Event> txEvents) {
-    if (transferCallback == null) {
-      return;
-    }
-
     final toAddress = ss58.Codec(42).encode(args['dest'].value.cast<int>());
 
     if (signer != address && toAddress == address) {

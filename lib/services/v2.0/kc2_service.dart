@@ -14,9 +14,6 @@ abstract class K2ServiceInterface {
   /// Available after connectToApi() called and completed without an error
   ChainInfo get chainInfo;
 
-  /// Get the service's events handler and register on events using its props
-  // KC2EventsHandler get eventsHandler;
-
   /// Set an identity's keyring - call with local user's identity keyring on new app session
   void setKeyring(KC2KeyRing keyring);
 
@@ -34,9 +31,6 @@ abstract class K2ServiceInterface {
 
   Future<Map<String, dynamic>?> getUserInfoByPhoneNumberHash(
       String phoneNumberHash);
-
-  Future<List<Event>> getTransactionEvents(
-      int blockNumber, int transactionIndex);
 
   // transactions
 
