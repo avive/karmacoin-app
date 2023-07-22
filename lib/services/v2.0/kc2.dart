@@ -686,23 +686,38 @@ class KarmachainService implements K2ServiceInterface {
     switch (accountIdentityType) {
       case 'AccountId':
         toAccountId = ss58.Codec(42).encode(accountIdentityValue.cast<int>());
+
+        // call api to get missing fields
+        final res = await getUserInfoByAccountId(toAccountId);
+        if (res == null) {
+          throw 'failed to get user id by username via api';
+        }
+        toUserName = res.userName;
+        toPhoneNumberHash = res.phoneNumberHash;
+
         break;
       case 'Username':
         toUserName = accountIdentityValue;
+
+        // call api to get missing fields
         final res = await getUserInfoByUsername(accountIdentityValue);
         if (res == null) {
           throw 'failed to get user id by username via api';
         }
         toAccountId = res.accountId;
+        toPhoneNumberHash = res.phoneNumberHash;
         break;
       default:
         toPhoneNumberHash = hex.encode(accountIdentityValue.cast<int>());
+
+        // call api to get missing fields
         final res = await getUserInfoByPhoneNumberHash(toPhoneNumberHash);
         // todo: handle null result case
         if (res == null) {
           throw 'failed to get user id by phone hash via api';
         }
         toAccountId = res.accountId;
+        toUserName = res.userName;
         break;
     }
 
