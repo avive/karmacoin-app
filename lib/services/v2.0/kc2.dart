@@ -397,6 +397,8 @@ class KarmachainService implements K2ServiceInterface {
         await karmachain.send('author_submitExtrinsic', [encodedHex]);
 
     // todo: what data is in the response?
+    // @Danylo Kyrieiev
+    // Is the result the extrinsic hash? if yes, we want to return it all the way back to the caller
     debugPrint('Submit extrinsic result: ${result.result.toString()}');
   }
 

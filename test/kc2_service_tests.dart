@@ -145,13 +145,13 @@ void main() {
           return;
         }
 
-        /*
+        // @Danylo Kyrieiev - this test fails every time
         userInfo = await kc2Service.getUserInfoByUsername("Katya");
         if (userInfo == null) {
           debugPrint('Faied to get user info by nickname');
           completer.complete(false);
           return;
-        }*/
+        }
 
         completer.complete(true);
       };
