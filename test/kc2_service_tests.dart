@@ -78,12 +78,8 @@ void main() {
                 return;
               }
 
-              // @Danylo Kyrieiev
-              // send apprecation punch -> kayta
-              // todo: clinet would like to know the hash of this submitted tx
-              // so it can match it with txs returned in callbacks!
-              // We need the api to support - without this feature it is quite difficult to use
-              await kc2Service.sendAppreciation(
+              // TODO: use hash
+              final hash = await kc2Service.sendAppreciation(
                   kc2Service.getPhoneNumberHash("972549805380"),
                   BigInt.from(1000),
                   0,
@@ -157,7 +153,6 @@ void main() {
           return;
         }
 
-        // @Danylo Kyrieiev - this test fails every time
         userInfo = await kc2Service.getUserInfoByUsername("Katya");
         if (userInfo == null) {
           debugPrint('Faied to get user info by nickname');
@@ -223,7 +218,6 @@ void main() {
           return;
         }
 
-        // @Danylo Kyrieiev - this test fails every time
         userInfo = await kc2Service.getUserInfoByUsername("Katya");
         if (userInfo == null) {
           debugPrint('Faied to get user info by nickname');

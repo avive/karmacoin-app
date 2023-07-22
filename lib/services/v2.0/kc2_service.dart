@@ -36,16 +36,16 @@ abstract class K2ServiceInterface {
   // accountId - ss58 encoded user's public ed25519 key
   // userName - unique username. Must not be empty
   // phoneNumber - user's phone number. Including country code. Excluding leading +
-  Future<void> newUser(String accountId, String username, String phoneNumber);
+  Future<String> newUser(String accountId, String username, String phoneNumber);
 
-  Future<void> updateUser(String? username, String? phoneNumber);
+  Future<String> updateUser(String? username, String? phoneNumber);
 
   // phoneNumberHash - canonical hex string of phone number hash using blake32.
   // use getPhoneNumberHash() to get hash from a number
-  Future<void> sendAppreciation(
+  Future<String> sendAppreciation(
       String phoneNumberHash, BigInt amount, int communityId, int charTraitId);
 
-  Future<void> setAdmin(int communityId, String accountId);
+  Future<String> setAdmin(int communityId, String accountId);
 
   // events
 
