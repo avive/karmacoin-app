@@ -18,12 +18,8 @@ void main() {
   GetIt.I.registerLazySingleton<K2ServiceInterface>(() => KarmachainService());
 
   group(
-    'appreciations',
+    'transfer tests',
     () {
-      setUp(() {
-        // runs before every test
-      });
-
       test(
         'Appreciation',
         () async {
@@ -136,159 +132,218 @@ void main() {
       // runs before every test
     });
 
-    test('Signup', () async {
-      debugPrint('Signup test');
+    test(
+      'Signup',
+      () async {
+        debugPrint('Signup test');
 
-      K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
+        K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
-      // Create a new identity for local user
-      IdentityInterface katya = Identity();
+        // Create a new identity for local user
+        IdentityInterface katya = Identity();
 
-      await katya.initNoStorage();
+        await katya.initNoStorage();
 
-      // Set katya as signer
-      kc2Service.setKeyring(katya.keyring);
-      debugPrint('Local user katya public address: ${katya.accountId}');
+        // Set katya as signer
+        kc2Service.setKeyring(katya.keyring);
+        debugPrint('Local user katya public address: ${katya.accountId}');
 
-      final completer = Completer<bool>();
-      String txHash = "";
+        final completer = Completer<bool>();
+        String txHash = "";
 
-      kc2Service.newUserCallback = (tx) async {
-        debugPrint('>> new user callback called');
-        if (tx.failedReason != null) {
-          completer.complete(false);
-          return;
-        }
+        kc2Service.newUserCallback = (tx) async {
+          debugPrint('>> new user callback called');
+          if (tx.failedReason != null) {
+            completer.complete(false);
+            return;
+          }
 
-        if (tx.hash != txHash) {
-          debugPrint('unexecpted tx hash: ${tx.hash} ');
-          completer.complete(false);
-          return;
-        }
+          if (tx.hash != txHash) {
+            debugPrint('unexecpted tx hash: ${tx.hash} ');
+            completer.complete(false);
+            return;
+          }
 
-        expect(tx.accountId, katya.accountId);
-        expect(tx.phoneNumberHash, phoneNumberHash);
-        expect(tx.username, katyaName);
-        expect(tx.signer, katya.accountId);
+          expect(tx.accountId, katya.accountId);
+          expect(tx.phoneNumberHash, phoneNumberHash);
+          expect(tx.username, katyaName);
+          expect(tx.signer, katya.accountId);
 
-        // all 3 methods should return's Katya's account data
-        KC2UserInfo? userInfo =
-            await kc2Service.getUserInfoByAccountId(katya.accountId);
+          // all 3 methods should return's Katya's account data
+          KC2UserInfo? userInfo =
+              await kc2Service.getUserInfoByAccountId(katya.accountId);
 
-        if (userInfo == null) {
-          debugPrint('Faied to get user info by account id');
-          completer.complete(false);
-          return;
-        }
+          if (userInfo == null) {
+            debugPrint('Faied to get user info by account id');
+            completer.complete(false);
+            return;
+          }
 
-        expect(userInfo.accountId, katya.accountId);
-        expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
-        expect(userInfo.userName, katyaName);
+          expect(userInfo.accountId, katya.accountId);
+          expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
+          expect(userInfo.userName, katyaName);
 
-        userInfo = await kc2Service.getUserInfoByPhoneNumberHash(
-            kc2Service.getPhoneNumberHash("972549805380"));
+          userInfo = await kc2Service.getUserInfoByPhoneNumberHash(
+              kc2Service.getPhoneNumberHash("972549805380"));
 
-        if (userInfo == null) {
-          debugPrint('Faied to get user info by phone number');
-          completer.complete(false);
-          return;
-        }
+          if (userInfo == null) {
+            debugPrint('Faied to get user info by phone number');
+            completer.complete(false);
+            return;
+          }
 
-        expect(userInfo.accountId, katya.accountId);
-        expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
-        expect(userInfo.userName, katyaName);
+          expect(userInfo.accountId, katya.accountId);
+          expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
+          expect(userInfo.userName, katyaName);
 
-        userInfo = await kc2Service.getUserInfoByUsername(katyaName);
-        if (userInfo == null) {
-          debugPrint('Faied to get user info by nickname');
-          completer.complete(false);
-          return;
-        }
+          userInfo = await kc2Service.getUserInfoByUsername(katyaName);
+          if (userInfo == null) {
+            debugPrint('Faied to get user info by nickname');
+            completer.complete(false);
+            return;
+          }
 
-        expect(userInfo.accountId, katya.accountId);
-        expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
-        expect(userInfo.userName, katyaName);
+          expect(userInfo.accountId, katya.accountId);
+          expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
+          expect(userInfo.userName, katyaName);
 
-        completer.complete(true);
-      };
+          completer.complete(true);
+        };
 
-      await kc2Service.connectToApi('ws://127.0.0.1:9944');
+        await kc2Service.connectToApi('ws://127.0.0.1:9944');
 
-      // subscribe to new account txs
-      kc2Service.subscribeToAccount(katya.accountId);
+        // subscribe to new account txs
+        kc2Service.subscribeToAccount(katya.accountId);
 
-      // signup katya
+        // signup katya
+        txHash = await kc2Service.newUser(
+            katya.accountId, katyaName, "972549805380");
+
+        // wait for completer and verify test success
+        expect(await completer.future, equals(true));
+        expect(completer.isCompleted, isTrue);
+      },
+      timeout: const Timeout(Duration(seconds: 120)),
+    );
+  });
+
+  test('Update phone number', () async {
+    debugPrint('Signup test');
+
+    K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
+
+    // Create a new identity for local user
+    IdentityInterface katya = Identity();
+
+    await katya.initNoStorage();
+
+    // Set katya as signer
+    kc2Service.setKeyring(katya.keyring);
+    debugPrint('Local user katya public address: ${katya.accountId}');
+
+    final completer = Completer<bool>();
+    String txHash = "";
+    String updateTexHash = "";
+    String updatedPhoneNumberHash =
+        kc2Service.getPhoneNumberHash("972549805381");
+
+    kc2Service.updateUserCallback = (tx) async {
+      debugPrint('>> update user update 1 called');
+      if (tx.failedReason != null) {
+        completer.complete(false);
+        return;
+      }
+
+      if (tx.hash != updateTexHash) {
+        expect(tx.hash, updateTexHash);
+        completer.complete(false);
+        return;
+      }
+
+      expect(tx.phoneNumberHash, updatedPhoneNumberHash);
+      expect(tx.username, katyaName);
+      expect(tx.signer, katya.accountId);
+
+      // all 3 methods should return's Katya's account data
+      KC2UserInfo? userInfo =
+          await kc2Service.getUserInfoByAccountId(katya.accountId);
+
+      if (userInfo == null) {
+        debugPrint('Faied to get user info by account id');
+        completer.complete(false);
+        return;
+      }
+
+      expect(userInfo.accountId, katya.accountId);
+      expect(userInfo.phoneNumberHash, '0x$updatedPhoneNumberHash');
+      expect(userInfo.userName, katyaName);
+
+      // get the user by updated phone number
+      userInfo =
+          await kc2Service.getUserInfoByPhoneNumberHash(updatedPhoneNumberHash);
+
+      if (userInfo == null) {
+        debugPrint('Faied to get user info by phone number');
+        completer.complete(false);
+        return;
+      }
+
+      expect(userInfo.accountId, katya.accountId);
+      expect(userInfo.phoneNumberHash, '0x$updatedPhoneNumberHash');
+      expect(userInfo.userName, katyaName);
+
+      userInfo = await kc2Service.getUserInfoByUsername(katyaName);
+      if (userInfo == null) {
+        debugPrint('Faied to get user info by nickname');
+        completer.complete(false);
+        return;
+      }
+
+      expect(userInfo.accountId, katya.accountId);
+      expect(userInfo.phoneNumberHash, '0x$updatedPhoneNumberHash');
+      expect(userInfo.userName, katyaName);
+
+      completer.complete(true);
+    };
+
+    kc2Service.newUserCallback = (tx) async {
+      debugPrint('>> new user callback called');
+      if (tx.failedReason != null) {
+        completer.complete(false);
+        return;
+      }
+
+      if (tx.hash != txHash) {
+        debugPrint('unexecpted tx hash: ${tx.hash} ');
+        completer.complete(false);
+        return;
+      }
+
+      debugPrint('calling update user...');
+      try {
+        updateTexHash = await kc2Service.updateUser(katyaName, "972549805381");
+      } catch (e) {
+        debugPrint('Failed to update user: $e');
+        completer.complete(false);
+      }
+    };
+
+    await kc2Service.connectToApi('ws://127.0.0.1:9944');
+
+    // subscribe to new account txs
+    kc2Service.subscribeToAccount(katya.accountId);
+
+    // signup katya
+    try {
       txHash =
           await kc2Service.newUser(katya.accountId, katyaName, "972549805380");
+    } catch (e) {
+      debugPrint('Failed to signup katya: $e');
+      completer.complete(false);
+    }
 
-      // wait for completer and verify test success
-      expect(await completer.future, equals(true));
-      expect(completer.isCompleted, isTrue);
-    });
-
-    test('Update user info', () async {
-      debugPrint('Signup test');
-
-      K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
-
-      // Create a new identity for local user
-      IdentityInterface katya = Identity();
-
-      await katya.initNoStorage();
-
-      // Set katya as signer
-      kc2Service.setKeyring(katya.keyring);
-      debugPrint('Local user katya public address: ${katya.accountId}');
-
-      final completer = Completer<bool>();
-
-      kc2Service.newUserCallback = (tx) async {
-        debugPrint('>> new user callback called');
-        if (tx.failedReason != null) {
-          completer.complete(false);
-          return;
-        }
-
-        // all 3 methods should return's Katya's account data
-        KC2UserInfo? userInfo =
-            await kc2Service.getUserInfoByAccountId(katya.accountId);
-
-        if (userInfo == null) {
-          debugPrint('Faied to get user info by account id');
-          completer.complete(false);
-          return;
-        }
-
-        userInfo = await kc2Service.getUserInfoByPhoneNumberHash(
-            kc2Service.getPhoneNumberHash("972549805380"));
-
-        if (userInfo == null) {
-          debugPrint('Faied to get user info by phone number');
-          completer.complete(false);
-          return;
-        }
-
-        userInfo = await kc2Service.getUserInfoByUsername(katyaName);
-        if (userInfo == null) {
-          debugPrint('Faied to get user info by nickname');
-          completer.complete(false);
-          return;
-        }
-
-        completer.complete(true);
-      };
-
-      await kc2Service.connectToApi('ws://127.0.0.1:9944');
-
-      // subscribe to new account txs
-      kc2Service.subscribeToAccount(katya.accountId);
-
-      // signup katya
-      await kc2Service.newUser(katya.accountId, katyaName, "972549805380");
-
-      // wait for completer and verify test success
-      expect(await completer.future, equals(true));
-      expect(completer.isCompleted, isTrue);
-    });
-  });
+    // wait for completer and verify test success
+    expect(await completer.future, equals(true));
+    expect(completer.isCompleted, isTrue);
+  }, timeout: const Timeout(Duration(seconds: 120)));
 }

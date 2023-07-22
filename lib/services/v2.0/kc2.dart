@@ -210,7 +210,7 @@ class KarmachainService implements K2ServiceInterface {
   Future<String> updateUser(String? username, String? phoneNumber) async {
     try {
       final String? phoneHash =
-          phoneNumber != null ? getPhoneNumberHash(phoneNumber) : null;
+          phoneNumber != null ? (phoneNumber) : null;
 
       final usernameOption =
           username == null ? const Option.none() : Option.some(username);
