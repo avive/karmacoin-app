@@ -1,4 +1,4 @@
-// Chain user info returned from various RPCs
+/// Chain user info returned from various RPCs such as GetUserInfoBy....()
 class KC2UserInfo {
   String accountId;
   String phoneNumberHash;
@@ -33,6 +33,7 @@ class KC2Event {
         data = event['event'].value.value;
 }
 
+/// A kc2 transaction
 abstract class KC2Tx {
   late String signer;
   late String pallet;
@@ -64,6 +65,7 @@ abstract class KC2Tx {
   });
 }
 
+/// New user kc2 tx
 class KC2NewUserTransactionV1 extends KC2Tx {
   String username;
   String phoneNumberHash;
@@ -87,6 +89,7 @@ class KC2NewUserTransactionV1 extends KC2Tx {
   });
 }
 
+/// Update user kc2 tx
 class KC2UpdateUserTxV1 extends KC2Tx {
   String? username;
   String? phoneNumberHash;
@@ -108,6 +111,7 @@ class KC2UpdateUserTxV1 extends KC2Tx {
   });
 }
 
+/// kc2 appreciation tx
 class KC2AppreciationTxV1 extends KC2Tx {
   String fromAddress;
 
@@ -169,6 +173,7 @@ class KC2TransferTxV1 extends KC2Tx {
   });
 }
 
+/// kc2 set admin tx
 class KC2SetAdminTxv1 extends KC2Tx {
   String adminAddress;
   int communityId;
@@ -190,6 +195,7 @@ class KC2SetAdminTxv1 extends KC2Tx {
   });
 }
 
+/// kc2 delete user tx
 class KC2DeleteUserTxv1 extends KC2Tx {
   String userAddress;
 

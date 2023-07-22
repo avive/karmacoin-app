@@ -25,12 +25,11 @@ abstract class K2ServiceInterface {
   // rpc methods
 
   // accountId - ss58 address
-  Future<Map<String, dynamic>?> getUserInfoByAccountId(String accountId);
+  Future<KC2UserInfo?> getUserInfoByAccountId(String accountId);
 
-  Future<Map<String, dynamic>?> getUserInfoByUsername(String username);
+  Future<KC2UserInfo?> getUserInfoByUsername(String username);
 
-  Future<Map<String, dynamic>?> getUserInfoByPhoneNumberHash(
-      String phoneNumberHash);
+  Future<KC2UserInfo?> getUserInfoByPhoneNumberHash(String phoneNumberHash);
 
   // transactions
 

@@ -90,22 +90,56 @@ class KarmachainService implements K2ServiceInterface {
   // RPC
 
   @override
-  Future<Map<String, dynamic>?> getUserInfoByAccountId(String accountId) async {
-    return await karmachain.send(
-        'identity_getUserInfoByAccountId', [accountId]).then((v) => v.result);
+  Future<KC2UserInfo?> getUserInfoByAccountId(String accountId) async {
+    try {
+      Map<String, dynamic>? data = await karmachain.send(
+          'identity_getUserInfoByAccountId', [accountId]).then((v) => v.result);
+
+      if (data != null) {
+        return KC2UserInfo.fromChainData(data);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      debugPrint('Failed to get user info by account id: $e');
+      return null;
+    }
   }
 
   @override
-  Future<Map<String, dynamic>?> getUserInfoByUsername(String username) async {
-    return await karmachain.send(
-        'identity_getUserInfoByUsername', [username]).then((v) => v.result);
+  Future<KC2UserInfo?> getUserInfoByUsername(String username) async {
+    try {
+      Map<String, dynamic>? data = await karmachain.send(
+          'identity_getUserInfoByUsername', [username]).then((v) => v.result);
+
+      if (data != null) {
+        return KC2UserInfo.fromChainData(data);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      debugPrint('Failed to get user info by user name: $e');
+      return null;
+    }
   }
 
   @override
-  Future<Map<String, dynamic>?> getUserInfoByPhoneNumberHash(
+  Future<KC2UserInfo?> getUserInfoByPhoneNumberHash(
       String phoneNumberHash) async {
-    return await karmachain.send('identity_getUserInfoByPhoneNumberHash',
-        [phoneNumberHash]).then((v) => v.result);
+    try {
+      Map<String, dynamic>? data = await karmachain.send(
+          'identity_getUserInfoByPhoneNumberHash',
+          [phoneNumberHash]).then((v) => v.result);
+
+      if (data != null) {
+        return KC2UserInfo.fromChainData(data);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      debugPrint('Failed to get user info by phone number hash: $e');
+      return null;
+    }
   }
 
   @override
@@ -643,12 +677,14 @@ class KarmachainService implements K2ServiceInterface {
       case 'Username':
         toUserName = accountIdentityValue;
         final result = await getUserInfoByUsername(accountIdentityValue);
-        toAccountId = result?['account_id'];
+        // todo: handle null result case
+        toAccountId = result!.accountId;
         break;
       default:
         toPhoneNumberHash = hex.encode(accountIdentityValue.cast<int>());
         final result = await getUserInfoByPhoneNumberHash(toPhoneNumberHash);
-        toAccountId = result?['account_id'];
+        // todo: handle null result case
+        toAccountId = result!.accountId;
         break;
     }
 

@@ -31,34 +31,26 @@ Future<void> startKC2Playground() async {
   }
 
   kc2Service.newUserCallback = (tx) async {
-    try {
-      debugPrint('>> new user tx');
+    debugPrint('>> new user tx');
 
-      // all 3 methods should return's katya's account data
-      Map<String, dynamic>? res =
-          await kc2Service.getUserInfoByAccountId(katya.accountId);
+    // all 3 methods should return's katya's account data
+    KC2UserInfo? userInfo =
+        await kc2Service.getUserInfoByAccountId(katya.accountId);
 
-      if (res == null) {
-        throw 'failed to get user by account id';
-      }
+    if (userInfo == null) {
+      throw 'failed to get user by account id';
+    }
 
-      KC2UserInfo userInfo = KC2UserInfo.fromChainData(res);
+    userInfo = await kc2Service.getUserInfoByPhoneNumberHash(
+        kc2Service.getPhoneNumberHash("972549805380"));
 
-      res = await kc2Service.getUserInfoByPhoneNumberHash(
-          kc2Service.getPhoneNumberHash("972549805380"));
+    if (userInfo == null) {
+      throw 'failed to get user by phone number';
+    }
 
-      if (res == null) {
-        throw 'failed to get user by phone number';
-      }
-      userInfo = KC2UserInfo.fromChainData(res);
-
-      res = await kc2Service.getUserInfoByUsername("Katya");
-      if (res == null) {
-        throw 'failed to get user by name';
-      }
-      userInfo = KC2UserInfo.fromChainData(res);
-    } catch (e) {
-      debugPrint('error getting user info: $e');
+    userInfo = await kc2Service.getUserInfoByUsername("Katya");
+    if (userInfo == null) {
+      throw 'failed to get user by name';
     }
     // get kayta from api via all ways here
 
