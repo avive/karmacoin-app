@@ -671,7 +671,6 @@ class KarmachainService implements K2ServiceInterface {
 
     // todo: tripple checks this - it comes from num
     // @Danylo Kyrieiev
-
     final BigInt amount = args['amount'];
     final int communityId = args['community_id'].value;
     final int charTraitId = args['char_trait_id'].value;
@@ -693,6 +692,8 @@ class KarmachainService implements K2ServiceInterface {
         if (res == null) {
           throw 'failed to get user id by username via api';
         }
+
+        // complete tx data fields from info
         toUserName = res.userName;
         toPhoneNumberHash = res.phoneNumberHash;
 
@@ -717,6 +718,8 @@ class KarmachainService implements K2ServiceInterface {
         if (res == null) {
           throw 'failed to get user id by phone hash via api';
         }
+
+        // complete missing field in tx with data from api
         toAccountId = res.accountId;
         toUserName = res.userName;
         break;
