@@ -395,6 +395,8 @@ class KarmachainService implements K2ServiceInterface {
     // debugPrint('Encoded extrinsic: $encodedHex');
     final result =
         await karmachain.send('author_submitExtrinsic', [encodedHex]);
+
+    // todo: what data is in the response?
     debugPrint('Submit extrinsic result: ${result.result.toString()}');
   }
 
@@ -661,10 +663,13 @@ class KarmachainService implements K2ServiceInterface {
       int blockIndex,
       Map<String, dynamic> rawData,
       List<KC2Event> txEvents) async {
+    debugPrint("Args: $args");
+
     final to = args['to'];
-    final amount = args['amount'];
-    final communityId = args['communityId'];
-    final charTraitId = args['charTraitId'];
+    // todo: tripple checks this - it comes from num
+    final BigInt amount = args['amount'];
+    final int communityId = args['community_id'].value;
+    final int charTraitId = args['char_trait_id'].value;
 
     final accountIdentityType = to.key;
     final accountIdentityValue = to.value;
