@@ -183,7 +183,7 @@ class KarmachainService implements K2ServiceInterface {
     try {
       final evidence = await karmachain.send('verifier_verify',
           [accountId, username, phoneNumber, 'dummy']).then((v) => v.result);
-      debugPrint('Verifier evidence - $evidence');
+      // debugPrint('Verifier evidence - $evidence');
 
       final phoneNumberHash = hasher.hashString(phoneNumber);
       final hexPhoneNumberHash = hex.encode(phoneNumberHash);
@@ -348,7 +348,7 @@ class KarmachainService implements K2ServiceInterface {
     } else {
       signature = keyring.sign(output.toBytes());
     }
-    debugPrint('Signature: ${hex.encode(signature)}');
+    // debugPrint('Signature: ${hex.encode(signature)}');
 
     // This is the format of the signature part of the transaction. If we want to
     // experiment with an unsigned transaction here, we can set this to None::<()> instead.
@@ -394,7 +394,7 @@ class KarmachainService implements K2ServiceInterface {
     // debugPrint('Encoded extrinsic: $encodedHex');
     final result =
         await karmachain.send('author_submitExtrinsic', [encodedHex]);
-    debugPrint('Submit extrinsic result: ${result.result.toString()}');
+    // debugPrint('Submit extrinsic result: ${result.result.toString()}');
 
     return result.result.toString();
   }
