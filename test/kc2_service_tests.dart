@@ -40,6 +40,7 @@ void main() {
           debugPrint('Local user katya public address: ${katya.accountId}');
 
           final completer = Completer<bool>();
+          String apprciationTxHash = "";
 
           kc2Service.newUserCallback = (tx) async {
             debugPrint('>> Katya new user callback called');
@@ -53,8 +54,14 @@ void main() {
             kc2Service.setKeyring(punch.keyring);
 
             kc2Service.appreciationCallback = (tx) async {
+              if (tx.hash != apprciationTxHash) {
+                debugPrint('unexecpted tx hash: ${tx.hash} ');
+                completer.complete(false);
+                return;
+              }
+
               debugPrint('>> appreciation tx: $tx');
-              // expect(tx.failedReason, isNull);
+              expect(tx.failedReason, isNull);
               expect(tx.amount, BigInt.from(1000));
               expect(tx.charTraitId, 35);
               expect(tx.fromAddress, punch.accountId);
@@ -78,8 +85,7 @@ void main() {
                 return;
               }
 
-              // TODO: use hash
-              final hash = await kc2Service.sendAppreciation(
+              apprciationTxHash = await kc2Service.sendAppreciation(
                   kc2Service.getPhoneNumberHash("972549805380"),
                   BigInt.from(1000),
                   0,

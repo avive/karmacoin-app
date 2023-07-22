@@ -33,18 +33,22 @@ abstract class K2ServiceInterface {
 
   // transactions
 
-  // accountId - ss58 encoded user's public ed25519 key
-  // userName - unique username. Must not be empty
-  // phoneNumber - user's phone number. Including country code. Excluding leading +
+  /// Create a new on-chain user with provided data
+  /// accountId - ss58 encoded user's public ed25519 key
+  /// userName - unique username. Must not be empty
+  /// phoneNumber - user's phone number. Including country code. Excluding leading +
+  /// returns submitted transaction hash
   Future<String> newUser(String accountId, String username, String phoneNumber);
 
   Future<String> updateUser(String? username, String? phoneNumber);
 
-  // phoneNumberHash - canonical hex string of phone number hash using blake32.
-  // use getPhoneNumberHash() to get hash from a number
+  /// Send a new appreciation or transfer transaction (charTraitId == 0)
+  /// phoneNumberHash - canonical hex string of phone number hash using blake32. Use getPhoneNumberHash() to get hash from a number
+  /// Returns submitted transaction hash
   Future<String> sendAppreciation(
       String phoneNumberHash, BigInt amount, int communityId, int charTraitId);
 
+  /// Set a user to be a community admin. Only the community owner can call this method. Returns submitted transaction hash.
   Future<String> setAdmin(int communityId, String accountId);
 
   // events
