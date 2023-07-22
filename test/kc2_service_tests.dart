@@ -53,7 +53,7 @@ void main() {
             kc2Service.setKeyring(punch.keyring);
 
             kc2Service.appreciationCallback = (tx) async {
-              debugPrint('>> appreciation tx: $tx');
+              debugPrint('>> appreciation tx: ${tx.hash}');
               if (!completer.isCompleted) {
                 completer.complete(true);
               }
@@ -145,7 +145,6 @@ void main() {
           return;
         }
 
-        // @Danylo Kyrieiev - this test fails every time
         userInfo = await kc2Service.getUserInfoByUsername("Katya");
         if (userInfo == null) {
           debugPrint('Faied to get user info by nickname');

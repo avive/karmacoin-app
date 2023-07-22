@@ -178,7 +178,7 @@ class KarmachainService implements K2ServiceInterface {
   // Transactions
 
   @override
-  Future<void> newUser(
+  Future<String > newUser(
       String accountId, String username, String phoneNumber) async {
     try {
       final evidence = await karmachain.send('verifier_verify',
@@ -199,7 +199,7 @@ class KarmachainService implements K2ServiceInterface {
             'phone_number_hash': hex.decode(hexPhoneNumberHash),
           }));
 
-      await _signAndSendTransaction(call);
+      return await _signAndSendTransaction(call);
     } on PlatformException catch (e) {
       debugPrint('Failed to send signup tx: ${e.details}');
       rethrow;
@@ -207,7 +207,7 @@ class KarmachainService implements K2ServiceInterface {
   }
 
   @override
-  Future<void> updateUser(String? username, String? phoneNumber) async {
+  Future<String> updateUser(String? username, String? phoneNumber) async {
     try {
       final String? phoneHash =
           phoneNumber != null ? getPhoneNumberHash(phoneNumber) : null;
@@ -225,7 +225,7 @@ class KarmachainService implements K2ServiceInterface {
             'phone_number_hash': hexPhoneNumberHashOption,
           }));
 
-      await _signAndSendTransaction(call);
+      return await _signAndSendTransaction(call);
     } on PlatformException catch (e) {
       debugPrint('Failed to bootstrap karma: ${e.details}');
       rethrow;
@@ -233,7 +233,7 @@ class KarmachainService implements K2ServiceInterface {
   }
 
   @override
-  Future<void> sendAppreciation(String hexPhoneNumberHash, BigInt amount,
+  Future<String> sendAppreciation(String hexPhoneNumberHash, BigInt amount,
       int communityId, int charTraitId) async {
     try {
       final call = MapEntry(
@@ -245,7 +245,7 @@ class KarmachainService implements K2ServiceInterface {
             'char_trait_id': Option.some(charTraitId),
           }));
 
-      await _signAndSendTransaction(call);
+      return await _signAndSendTransaction(call);
     } on PlatformException catch (e) {
       debugPrint('Failed to bootstrap karma: ${e.details}');
       rethrow;
@@ -253,7 +253,7 @@ class KarmachainService implements K2ServiceInterface {
   }
 
   @override
-  Future<void> setAdmin(int communityId, String accountId) async {
+  Future<String> setAdmin(int communityId, String accountId) async {
     try {
       final call = MapEntry(
           'Appreciation',
@@ -263,7 +263,7 @@ class KarmachainService implements K2ServiceInterface {
                 MapEntry('AccountId', ss58.Address.decode(accountId).pubkey),
           }));
 
-      await _signAndSendTransaction(call);
+      return await _signAndSendTransaction(call);
     } on PlatformException catch (e) {
       debugPrint('Failed to bootstrap karma: ${e.details}');
       rethrow;
@@ -388,18 +388,16 @@ class KarmachainService implements K2ServiceInterface {
     return payloadHex.toString();
   }
 
-  Future<void> _signAndSendTransaction(MapEntry<String, dynamic> call) async {
+  Future<String> _signAndSendTransaction(MapEntry<String, dynamic> call) async {
     final signer = ss58.Codec(42).encode(keyring.getPublicKey());
     final encodedHex =
         await _signTransaction(signer, keyring.getPublicKey(), call);
     // debugPrint('Encoded extrinsic: $encodedHex');
     final result =
         await karmachain.send('author_submitExtrinsic', [encodedHex]);
-
-    // todo: what data is in the response?
-    // @Danylo Kyrieiev
-    // Is the result the extrinsic hash? if yes, we want to return it all the way back to the caller
     debugPrint('Submit extrinsic result: ${result.result.toString()}');
+
+    return result.result.toString();
   }
 
   /// Retrieves events for specific block by accessing `System` pallet storage
@@ -440,10 +438,11 @@ class KarmachainService implements K2ServiceInterface {
     final events = await _getEvents(blockHash);
     final block = await karmachain
         .send('chain_getBlock', [blockHash]).then((v) => v.result);
+    debugPrint('Block: ${block['block']}');
+
     final extrinsics = block['block']['extrinsics'].map((encodedExtrinsic) {
       final extrinsic = _decodeTransaction(Input.fromHex(encodedExtrinsic));
-      final extrinsicHash =
-          hex.encode(Hasher.twoxx128.hashString(encodedExtrinsic));
+      final extrinsicHash = '0x${hex.encode(Hasher.blake2b256.hashString(encodedExtrinsic))}';
 
       return MapEntry(extrinsicHash, extrinsic);
     }).toList();
@@ -488,7 +487,7 @@ class KarmachainService implements K2ServiceInterface {
     String blockNumber,
     int blockIndex,
   ) {
-    hash ??= hex.encode(ExtrinsicsCodec(chainInfo: chainInfo).encode(tx));
+    hash = '0x${hex.encode(Hasher.blake2b256.hash(ExtrinsicsCodec(chainInfo: chainInfo).encode(tx)))}';
 
     final String pallet = tx['calls'].key;
     final String method = tx['calls'].value.key;
