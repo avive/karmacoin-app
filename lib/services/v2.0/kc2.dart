@@ -460,8 +460,12 @@ class KarmachainService implements K2ServiceInterface {
           .where((event) => event.extrinsicIndex == transactionIndex)
           .toList();
 
-      _processTransaction(address, transaction, transactionEvents, timestamp,
-          hash, blockNumber, transactionIndex);
+      try {
+        _processTransaction(address, transaction, transactionEvents, timestamp,
+            hash, blockNumber, transactionIndex);
+      } catch (e) {
+        debugPrint('Failed to process transaction: $e');
+      }
     });
 
     return blockNumber;
@@ -676,15 +680,20 @@ class KarmachainService implements K2ServiceInterface {
         break;
       case 'Username':
         toUserName = accountIdentityValue;
-        final result = await getUserInfoByUsername(accountIdentityValue);
-        // todo: handle null result case
-        toAccountId = result!.accountId;
+        final res = await getUserInfoByUsername(accountIdentityValue);
+        if (res == null) {
+          throw 'failed to get user id by username via api';
+        }
+        toAccountId = res.accountId;
         break;
       default:
         toPhoneNumberHash = hex.encode(accountIdentityValue.cast<int>());
-        final result = await getUserInfoByPhoneNumberHash(toPhoneNumberHash);
+        final res = await getUserInfoByPhoneNumberHash(toPhoneNumberHash);
         // todo: handle null result case
-        toAccountId = result!.accountId;
+        if (res == null) {
+          throw 'failed to get user id by phone hash via api';
+        }
+        toAccountId = res.accountId;
         break;
     }
 
