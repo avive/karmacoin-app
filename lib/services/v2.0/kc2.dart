@@ -497,7 +497,7 @@ class KarmachainService implements K2ServiceInterface {
     final String? signer = _getTransactionSigner(tx);
 
     if (signer == null) {
-      debugPrint("skipping unsigned tx");
+      debugPrint("skipping unsigned tx $pallet/$method");
       return;
     }
 
