@@ -54,6 +54,18 @@ void main() {
 
             kc2Service.appreciationCallback = (tx) async {
               debugPrint('>> appreciation tx: $tx');
+              // expect(tx.failedReason, isNull);
+              expect(tx.amount, BigInt.from(1000));
+              expect(tx.charTraitId, 35);
+              expect(tx.fromAddress, punch.accountId);
+              expect(tx.toAddress, katya.accountId);
+              expect(tx.toPhoneNumberHash,
+                  kc2Service.getPhoneNumberHash("972549805380"));
+              expect(tx.toUsername, "Katya");
+              expect(tx.signer, punch.accountId);
+
+              // todo: test all other tx props here
+
               if (!completer.isCompleted) {
                 completer.complete(true);
               }
@@ -104,6 +116,72 @@ void main() {
     });
 
     test('Signup', () async {
+      debugPrint('Signup test');
+
+      K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
+
+      // Create a new identity for local user
+      IdentityInterface katya = Identity();
+
+      await katya.initNoStorage();
+
+      // Set katya as signer
+      kc2Service.setKeyring(katya.keyring);
+      debugPrint('Local user katya public address: ${katya.accountId}');
+
+      final completer = Completer<bool>();
+
+      kc2Service.newUserCallback = (tx) async {
+        debugPrint('>> new user callback called');
+        if (tx.failedReason != null) {
+          completer.complete(false);
+          return;
+        }
+
+        // all 3 methods should return's Katya's account data
+        KC2UserInfo? userInfo =
+            await kc2Service.getUserInfoByAccountId(katya.accountId);
+
+        if (userInfo == null) {
+          debugPrint('Faied to get user info by account id');
+          completer.complete(false);
+          return;
+        }
+
+        userInfo = await kc2Service.getUserInfoByPhoneNumberHash(
+            kc2Service.getPhoneNumberHash("972549805380"));
+
+        if (userInfo == null) {
+          debugPrint('Faied to get user info by phone number');
+          completer.complete(false);
+          return;
+        }
+
+        // @Danylo Kyrieiev - this test fails every time
+        userInfo = await kc2Service.getUserInfoByUsername("Katya");
+        if (userInfo == null) {
+          debugPrint('Faied to get user info by nickname');
+          completer.complete(false);
+          return;
+        }
+
+        completer.complete(true);
+      };
+
+      await kc2Service.connectToApi('ws://127.0.0.1:9944');
+
+      // subscribe to new account txs
+      kc2Service.subscribeToAccount(katya.accountId);
+
+      // signup katya
+      await kc2Service.newUser(katya.accountId, "Katya", "972549805380");
+
+      // wait for completer and verify test success
+      expect(await completer.future, equals(true));
+      expect(completer.isCompleted, isTrue);
+    });
+
+    test('Update user info', () async {
       debugPrint('Signup test');
 
       K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
