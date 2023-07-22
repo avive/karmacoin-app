@@ -178,7 +178,7 @@ class KarmachainService implements K2ServiceInterface {
   // Transactions
 
   @override
-  Future<String > newUser(
+  Future<String> newUser(
       String accountId, String username, String phoneNumber) async {
     try {
       final evidence = await karmachain.send('verifier_verify',
@@ -209,8 +209,7 @@ class KarmachainService implements K2ServiceInterface {
   @override
   Future<String> updateUser(String? username, String? phoneNumber) async {
     try {
-      final String? phoneHash =
-          phoneNumber != null ? (phoneNumber) : null;
+      final String? phoneHash = phoneNumber != null ? (phoneNumber) : null;
 
       final usernameOption =
           username == null ? const Option.none() : Option.some(username);
@@ -438,11 +437,12 @@ class KarmachainService implements K2ServiceInterface {
     final events = await _getEvents(blockHash);
     final block = await karmachain
         .send('chain_getBlock', [blockHash]).then((v) => v.result);
-    debugPrint('Block: ${block['block']}');
+    // debugPrint('Block: ${block['block']}');
 
     final extrinsics = block['block']['extrinsics'].map((encodedExtrinsic) {
       final extrinsic = _decodeTransaction(Input.fromHex(encodedExtrinsic));
-      final extrinsicHash = '0x${hex.encode(Hasher.blake2b256.hashString(encodedExtrinsic))}';
+      final extrinsicHash =
+          '0x${hex.encode(Hasher.blake2b256.hashString(encodedExtrinsic))}';
 
       return MapEntry(extrinsicHash, extrinsic);
     }).toList();
@@ -487,7 +487,8 @@ class KarmachainService implements K2ServiceInterface {
     String blockNumber,
     int blockIndex,
   ) {
-    hash = '0x${hex.encode(Hasher.blake2b256.hash(ExtrinsicsCodec(chainInfo: chainInfo).encode(tx)))}';
+    hash =
+        '0x${hex.encode(Hasher.blake2b256.hash(ExtrinsicsCodec(chainInfo: chainInfo).encode(tx)))}';
 
     final String pallet = tx['calls'].key;
     final String method = tx['calls'].value.key;
