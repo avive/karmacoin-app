@@ -6,6 +6,8 @@ abstract class IdentityInterface {
   /// identity and will be persisted to secure storage. Otherwise, identity is loaded from local store if exists. If not, a new one is created and persisted to local store
   Future<void> init({String? mnemonic});
 
+  Future<void> initNoStorage();
+
   /// get the identity's keyring
   KC2KeyRing get keyring;
 

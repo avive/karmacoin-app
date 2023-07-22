@@ -6,6 +6,14 @@ To learn more about KarmaCoin visit https://karmaco.in
 ## Supported Platforms
 Web, iOS, Android
 
+## Testing
+
+To run the tests via terminal use the flutter test command.
+
+```bash
+flutter test test/[test_name].dart
+```
+
 ## Scripts
 
 ### Create native splash screen

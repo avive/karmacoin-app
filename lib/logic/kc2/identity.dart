@@ -33,7 +33,7 @@ class Identity implements IdentityInterface {
     } else {
       _keyring = KC2KeyRing();
       // persist the mnemonic so it can be loaded on next app session
-      // await _persistMnemonic();
+      await _persistMnemonic();
       debugPrint('created new menonic: ${keyring.mnemonic}, and persisted');
     }
   }
@@ -60,5 +60,10 @@ class Identity implements IdentityInterface {
   @override
   Uint8List sign(Uint8List message) {
     return _keyring.sign(message);
+  }
+
+  @override
+  Future<void> initNoStorage() async {
+    _keyring = KC2KeyRing();
   }
 }

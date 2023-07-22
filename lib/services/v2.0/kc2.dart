@@ -779,7 +779,6 @@ class KarmachainService implements K2ServiceInterface {
       Map<String, dynamic> rawData,
       List<KC2Event> txEvents) {
     final toAddress = ss58.Codec(42).encode(args['dest'].value.cast<int>());
-
     if (signer != address && toAddress == address) {
       return;
     }
