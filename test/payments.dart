@@ -162,7 +162,8 @@ void main() {
           String katyaNewUserTxHash = "";
           String punchNewUserTxHash = "";
 
-          // remove appreciation callback
+          // remove appreciation callback which is getting called right now in case of
+          // appreciation sent with charTrait == 0
           kc2Service.appreciationCallback = null;
 
           kc2Service.newUserCallback = (tx) async {
@@ -183,6 +184,7 @@ void main() {
             kc2Service.setKeyring(punch.keyring);
 
             kc2Service.transferCallback = (tx) async {
+              // @Danylo Kyrieiev  - this is never called in case of client sending appreciation w chartTraitId == 0
               debugPrint('>> transfer callback called');
               if (tx.hash != transferTxHash) {
                 debugPrint(
@@ -223,7 +225,9 @@ void main() {
                 return;
               }
 
-              // transfer is just an appreciation w 0 charTraitId
+              // Transfer is just an appreciation w 0 charTraitId
+              // @Danylo Kyrieiev - this seems to not be processed as balances/transfer tx by the node
+              // client gets called back with appreciation
               transferTxHash = await kc2Service.sendAppreciation(
                   kc2Service.getPhoneNumberHash(katyaPhoneNumber),
                   BigInt.from(1000),
