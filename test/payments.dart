@@ -162,6 +162,9 @@ void main() {
           String katyaNewUserTxHash = "";
           String punchNewUserTxHash = "";
 
+          // remove appreciation callback
+          kc2Service.appreciationCallback = null;
+
           kc2Service.newUserCallback = (tx) async {
             debugPrint('>> Katya new user callback called');
             if (tx.failedReason != null) {
@@ -180,6 +183,7 @@ void main() {
             kc2Service.setKeyring(punch.keyring);
 
             kc2Service.transferCallback = (tx) async {
+              debugPrint('>> transfer callback called');
               if (tx.hash != transferTxHash) {
                 debugPrint(
                     'unexecpted tx hash: ${tx.hash}. Expected: $transferTxHash');
