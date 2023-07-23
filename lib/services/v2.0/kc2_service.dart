@@ -27,7 +27,7 @@ abstract class K2ServiceInterface {
   /// accountId - ss58 address
   Future<KC2UserInfo?> getUserInfoByAccountId(String accountId);
 
-  Future<KC2UserInfo?> getUserInfoByUsername(String username);
+  Future<KC2UserInfo?> getUserInfoByUserName(String username);
 
   // Use getPhoneNumberHash of an international number w/o leading +
   Future<KC2UserInfo?> getUserInfoByPhoneNumberHash(String phoneNumberHash);

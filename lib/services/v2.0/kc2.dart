@@ -98,7 +98,7 @@ class KarmachainService implements K2ServiceInterface {
   }
 
   @override
-  Future<KC2UserInfo?> getUserInfoByUsername(String username) async {
+  Future<KC2UserInfo?> getUserInfoByUserName(String username) async {
     try {
       Map<String, dynamic>? data = await karmachain.send(
           'identity_getUserInfoByUsername', [username]).then((v) => v.result);
@@ -728,7 +728,7 @@ class KarmachainService implements K2ServiceInterface {
         toUserName = accountIdentityValue;
 
         // call api to get missing fields
-        final res = await getUserInfoByUsername(accountIdentityValue);
+        final res = await getUserInfoByUserName(accountIdentityValue);
         if (res == null) {
           throw 'failed to get user id by username via api';
         }

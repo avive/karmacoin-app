@@ -48,7 +48,7 @@ Future<void> startKC2Playground() async {
       throw 'failed to get user by phone number';
     }
 
-    userInfo = await kc2Service.getUserInfoByUsername("Katya");
+    userInfo = await kc2Service.getUserInfoByUserName("Katya");
     if (userInfo == null) {
       throw 'failed to get user by name';
     }

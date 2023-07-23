@@ -83,7 +83,7 @@ void main() {
           expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
           expect(userInfo.userName, katyaUserName);
 
-          userInfo = await kc2Service.getUserInfoByUsername(katyaUserName);
+          userInfo = await kc2Service.getUserInfoByUserName(katyaUserName);
           if (userInfo == null) {
             debugPrint('Faied to get user info by nickname');
             completer.complete(false);
@@ -182,7 +182,7 @@ void main() {
           expect(userInfo.phoneNumberHash, '0x$newPhoneNumberHash');
           expect(userInfo.userName, katyaUserName);
 
-          userInfo = await kc2Service.getUserInfoByUsername(katyaUserName);
+          userInfo = await kc2Service.getUserInfoByUserName(katyaUserName);
           if (userInfo == null) {
             debugPrint('Faied to get user info by nickname');
             completer.complete(false);
@@ -314,7 +314,7 @@ void main() {
           expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
           expect(userInfo.userName, katyaNewUserName);
 
-          userInfo = await kc2Service.getUserInfoByUsername(katyaNewUserName);
+          userInfo = await kc2Service.getUserInfoByUserName(katyaNewUserName);
           if (userInfo == null) {
             debugPrint('Faied to get user info by updated user name');
             completer.complete(false);
