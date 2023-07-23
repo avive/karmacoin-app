@@ -72,20 +72,6 @@ class KarmachainService implements K2ServiceInterface {
         'UnsignedPayload': '(Call, Extra, Additional)',
         'Extrinsic': '(MultiAddress, MultiSignature, Extra)',
       });
-
-      /*
-      if (createTestAccounts) {
-        final mnemonic = keyring.generateMnemonic();
-        keyring.setKeypairFromMnemonic(mnemonic);
-        debugPrint('Generated mnemonic: $mnemonic');
-
-        final accountId = ss58.Codec(42).encode(keyring.getPublicKey());
-        await newUser(accountId, 'Test', '0123456789');
-
-        final userInfo = await getUserInfoByAccountId(
-            '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY');
-        debugPrint('$userInfo');
-      }*/
     } on PlatformException catch (e) {
       debugPrint('Failed to connect to api: ${e.details}');
       rethrow;
@@ -155,16 +141,21 @@ class KarmachainService implements K2ServiceInterface {
         'transactions_getTransactions', [accountId]).then((v) => v.result);
 
     txs?.forEach((transaction) async {
-      final bytes = transaction['signed_transaction']['transaction_body'];
-      final transactionBody =
-          _decodeTransaction(Input.fromBytes(bytes.cast<int>()));
-      final timestamp = transaction['timestamp'];
-      final blockNumber = transaction['block_number'];
-      final transactionIndex = transaction['transaction_index'];
-      final events = await _getTransactionEvents(blockNumber, transactionIndex);
-
-      _processTransaction(accountId, transactionBody, events,
-          BigInt.from(timestamp), null, blockNumber, transactionIndex);
+      try {
+        final blockNumber = transaction['block_number'];
+        final transactionIndex = transaction['transaction_index'];
+        final bytes = transaction['signed_transaction']['transaction_body'];
+        final transactionBody =
+            _decodeTransaction(Input.fromBytes(bytes.cast<int>()));
+        final timestamp = transaction['timestamp'];
+        final events =
+            await _getTransactionEvents(blockNumber, transactionIndex);
+        _processTransaction(accountId, transactionBody, events,
+            BigInt.from(timestamp), null, blockNumber, transactionIndex);
+      } catch (e) {
+        debugPrint('failed tp procxess tx due to $e');
+        // don't throw so we can process valid txs even when one is bad
+      }
     });
 
     debugPrint('Account transactions: $txs');
@@ -216,6 +207,12 @@ class KarmachainService implements K2ServiceInterface {
   }
 
   /// Update user's phone number or user name
+  /// username - new user name. If null, user name will not be updated
+  /// phoneNumber - new phone number. If null, phone number will not be updated
+  /// One of username and phoneNumber must not be null and should be differeent
+  /// than current onchain value
+  ///
+  /// Impplementation will attempt to obtain verifier evidence regarding the association between the accountId, and the new userName or the new phoneNumber
   @override
   Future<String> updateUser(String? username, String? phoneNumber) async {
     try {
@@ -306,7 +303,9 @@ class KarmachainService implements K2ServiceInterface {
     return hex.encode(phoneNumberHash);
   }
 
+  //
   ////// private implementation methods below
+  //
 
   Future<String> _signTransaction(
       String signer, List<int> pk, MapEntry<String, dynamic> call) async {
@@ -410,11 +409,17 @@ class KarmachainService implements K2ServiceInterface {
     final encodedHex =
         await _signTransaction(signer, keyring.getPublicKey(), call);
     // debugPrint('Encoded extrinsic: $encodedHex');
-    final result =
-        await karmachain.send('author_submitExtrinsic', [encodedHex]);
-    // debugPrint('Submit extrinsic result: ${result.result.toString()}');
 
-    return result.result.toString();
+    try {
+      final result =
+          await karmachain.send('author_submitExtrinsic', [encodedHex]);
+      // debugPrint('Submit extrinsic result: ${result.result.toString()}');
+
+      return result.result.toString();
+    } catch (e) {
+      debugPrint('Failed to submit transaction: $e');
+      rethrow;
+    }
   }
 
   /// Retrieves events for specific block by accessing `System` pallet storage
@@ -814,6 +819,7 @@ class KarmachainService implements K2ServiceInterface {
     }*/
   }*/
 
+  /// Process a coin transfer tx
   void _processTransferTransaction(
       String hash,
       BigInt timeStamp,

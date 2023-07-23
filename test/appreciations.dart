@@ -75,6 +75,8 @@ void main() {
             }
 
             debugPrint('>> appreciation tx: $tx');
+
+            // @Danylo  - why is it not null?
             // expect(tx.failedReason, isNull);
             expect(tx.amount, BigInt.from(1000));
             expect(tx.charTraitId, 35);
@@ -84,8 +86,6 @@ void main() {
                 kc2Service.getPhoneNumberHash(katyaPhoneNumber));
             expect(tx.toUsername, katyaUserName);
             expect(tx.signer, punch.accountId);
-
-            // todo: test all other tx props here
 
             if (!completer.isCompleted) {
               completer.complete(true);
