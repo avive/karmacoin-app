@@ -684,7 +684,7 @@ class KarmachainService implements K2ServiceInterface {
     String? toUserName;
     String? toPhoneNumberHash;
 
-    // get toAccountId
+    // Complete missing fields in tx data via the api based on incomplete data
     switch (accountIdentityType) {
       case 'AccountId':
         toAccountId = ss58.Codec(42).encode(accountIdentityValue.cast<int>());

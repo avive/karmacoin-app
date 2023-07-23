@@ -17,12 +17,12 @@ void main() {
   GetIt.I.registerLazySingleton<K2ServiceInterface>(() => KarmachainService());
 
   group(
-    'payment tests',
+    'payments',
     () {
       test(
-        'Payment',
+        ' - basic payment test',
         () async {
-          debugPrint('Payment test');
+          debugPrint('basic payment test');
 
           K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 

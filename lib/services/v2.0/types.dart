@@ -96,6 +96,7 @@ class KC2UpdateUserTxV1 extends KC2Tx {
 
   KC2UpdateUserTxV1({
     required this.username,
+    // note that this is currently null from chain if user name was updated
     required this.phoneNumberHash,
     required super.transactionEvents,
     required super.args,
