@@ -21,30 +21,35 @@ class KarmachainService implements K2ServiceInterface {
   late KC2KeyRing keyring;
   Blake2bHasher hasher = const Blake2bHasher(64);
 
+  /// Connected chain info
   @override
   late ChainInfo chainInfo;
 
+  /// Callback when a new user transaction is processed for local user
   @override
   NewUserCallback? newUserCallback;
 
+  /// An appreciation to or from local user
   @override
   AppreciationCallback? appreciationCallback;
 
+  /// A transfer to or from local user
   @override
   TransferCallback? transferCallback;
 
+  /// Local user's account data update
   @override
   UpdateUserCallback? updateUserCallback;
 
-  // Set a local user's identity keyring for purpose of signing txs
+  /// Set a local user's identity keyring for purpose of signing txs
   @override
   void setKeyring(KC2KeyRing keyring) {
     this.keyring = keyring;
   }
 
-  // Connect to a karmachain api service. e.g
-  // Local running node - "ws://127.0.0.1:9944"
-  // Testnet - "wss://testnet.karmaco.in/testnet/ws"
+  /// Connect to a karmachain api service. e.g
+  /// Local running node - "ws://127.0.0.1:9944"
+  /// Testnet - "wss://testnet.karmaco.in/testnet/ws"
   @override
   Future<void> connectToApi(String wsUrl) async {
     try {
@@ -142,12 +147,14 @@ class KarmachainService implements K2ServiceInterface {
     }
   }
 
+  /// Get all on-chain txs to or form an account
+  /// accountId - ss58 encoded address
   @override
   Future<void> getTransactions(String accountId) async {
-    final transactions = await karmachain.send(
+    final txs = await karmachain.send(
         'transactions_getTransactions', [accountId]).then((v) => v.result);
 
-    transactions?.forEach((transaction) async {
+    txs?.forEach((transaction) async {
       final bytes = transaction['signed_transaction']['transaction_body'];
       final transactionBody =
           _decodeTransaction(Input.fromBytes(bytes.cast<int>()));
@@ -160,7 +167,7 @@ class KarmachainService implements K2ServiceInterface {
           BigInt.from(timestamp), null, blockNumber, transactionIndex);
     });
 
-    debugPrint('Account transactions: $transactions');
+    debugPrint('Account transactions: $txs');
   }
 
   Future<List<KC2Event>> _getTransactionEvents(
@@ -177,6 +184,8 @@ class KarmachainService implements K2ServiceInterface {
 
   // Transactions
 
+  /// Signup  a new user with the provided data.
+  /// This method will attempt to obtain verifier evidence regarding the association between the accountId, userName and phoneNumber
   @override
   Future<String> newUser(
       String accountId, String username, String phoneNumber) async {
@@ -206,6 +215,7 @@ class KarmachainService implements K2ServiceInterface {
     }
   }
 
+  /// Update user's phone number or user name
   @override
   Future<String> updateUser(String? username, String? phoneNumber) async {
     try {
@@ -213,6 +223,9 @@ class KarmachainService implements K2ServiceInterface {
 
       final usernameOption =
           username == null ? const Option.none() : Option.some(username);
+
+      // @Danylo Kyrieiev - in case of a phone number update, a new verifier evidence regarding the association between the user's account and the new phone number should be obtained by the client and submitted in the transaction just like in NewUser. I don't see this is implemented yet.
+
       final hexPhoneNumberHashOption = phoneHash == null
           ? const Option.none()
           : Option.some(hex.decode(phoneHash));
@@ -231,6 +244,11 @@ class KarmachainService implements K2ServiceInterface {
     }
   }
 
+  /// @Danylo Kyrieiev - we need to support a simple transfer to an account id via the balances/payment tx and expose this to client. Can you please add this here?
+
+  /// todo: add support for sending a appreciation to a user name. To, implement, get the phone number hash from the chain for user name or id via the RPC api and send appreciation to it.
+
+  /// Send an apprecaition or a payment to a phone number hash
   @override
   Future<String> sendAppreciation(String hexPhoneNumberHash, BigInt amount,
       int communityId, int charTraitId) async {
@@ -433,10 +451,11 @@ class KarmachainService implements K2ServiceInterface {
 
     final blockHash = await karmachain
         .send('chain_getBlockHash', [blockNumber]).then((v) => v.result);
-    debugPrint('Retrieve current block hash: $blockHash');
+    debugPrint('Retrieve current block with hash: $blockHash');
     final events = await _getEvents(blockHash);
     final block = await karmachain
         .send('chain_getBlock', [blockHash]).then((v) => v.result);
+
     // debugPrint('Block: ${block['block']}');
 
     final extrinsics = block['block']['extrinsics'].map((encodedExtrinsic) {
@@ -467,7 +486,7 @@ class KarmachainService implements K2ServiceInterface {
         _processTransaction(address, transaction, transactionEvents, timestamp,
             hash, blockNumber, transactionIndex);
       } catch (e) {
-        debugPrint('Failed to process transaction: $e');
+        debugPrint('Failed tx processing: $e');
       }
     });
 
@@ -478,6 +497,7 @@ class KarmachainService implements K2ServiceInterface {
     return ExtrinsicsCodec(chainInfo: chainInfo).decode(input);
   }
 
+  /// Process a single kc2 tx
   void _processTransaction(
     String address,
     Map<String, dynamic> tx,
@@ -502,6 +522,9 @@ class KarmachainService implements K2ServiceInterface {
       debugPrint("skipping unsigned tx");
       return;
     }
+
+    // @Danylo Kyrieiev todo: we need the failed reason to be a concrete type
+    // so it can be properly handled in the app
 
     final failedReason = txEvents
         .where((event) => event.eventName == 'ExtrinsicFailed')
@@ -559,10 +582,10 @@ class KarmachainService implements K2ServiceInterface {
       return;
     }
 
-    debugPrint('Skipping tx of type: $pallet/$method');
+    debugPrint('Skipped tx $pallet/$method');
   }
 
-  /// Decode transaction signer address. Return `null` if transaction is `unsigned`
+  /// Returns tx's signer address. Return null if the transaction is unsigned.
   String? _getTransactionSigner(Map<String, dynamic> extrinsic) {
     final signature = extrinsic['signature'];
     if (signature == null) {
@@ -589,10 +612,6 @@ class KarmachainService implements K2ServiceInterface {
       MapEntry<String, Object?>? failedReason,
       Map<String, dynamic> rawData,
       List<KC2Event> txEvents) async {
-    if (newUserCallback == null) {
-      return;
-    }
-
     final username = args['username'];
     final phoneNumberHash = hex.encode(args['phone_number_hash'].cast<int>());
 
