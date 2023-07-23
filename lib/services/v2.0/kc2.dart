@@ -494,10 +494,12 @@ class KarmachainService implements K2ServiceInterface {
     final String method = tx['calls'].value.key;
     final args = tx['calls'].value.value;
 
+    debugPrint("Processing tx $pallet/$method. hash: $hash");
+
     final String? signer = _getTransactionSigner(tx);
 
     if (signer == null) {
-      debugPrint("skipping unsigned tx $pallet/$method");
+      debugPrint("skipping unsigned tx");
       return;
     }
 
@@ -665,7 +667,7 @@ class KarmachainService implements K2ServiceInterface {
       int blockIndex,
       Map<String, dynamic> rawData,
       List<KC2Event> txEvents) async {
-    debugPrint("Args: $args");
+    debugPrint("Appreciation tx args: $args");
 
     final to = args['to'];
 
@@ -810,6 +812,8 @@ class KarmachainService implements K2ServiceInterface {
     if (signer != address && toAddress == address) {
       return;
     }
+
+    debugPrint('Transfer tx: $args');
 
     final amount = args['value'];
 

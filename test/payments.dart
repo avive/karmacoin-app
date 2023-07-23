@@ -181,7 +181,8 @@ void main() {
 
             kc2Service.transferCallback = (tx) async {
               if (tx.hash != transferTxHash) {
-                debugPrint('unexecpted tx hash: ${tx.hash} ');
+                debugPrint(
+                    'unexecpted tx hash: ${tx.hash}. Expected: $transferTxHash');
                 completer.complete(false);
                 return;
               }
@@ -224,6 +225,7 @@ void main() {
                   BigInt.from(1000),
                   0,
                   0);
+              debugPrint('transferTxHash: $transferTxHash');
             };
 
             // signup punch
