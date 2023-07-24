@@ -243,6 +243,24 @@ class KarmachainService implements K2ServiceInterface {
 
   /// @Danylo Kyrieiev - we need to support a simple transfer to an account id via the balances/payment tx and expose this to client. Can you please add this here?
 
+  @override
+  Future<String> sendTransfer(String accountId, BigInt amount) async {
+    try {
+      final call = MapEntry(
+          'Balances',
+          MapEntry('transfer', {
+            'dest': MapEntry('Id', accountId),
+            'value': amount
+          })
+      );
+
+      return await _signAndSendTransaction(call);
+    } on PlatformException catch (e) {
+      debugPrint('Failed to bootstrap karma: ${e.details}');
+      rethrow;
+    }
+  }
+
   /// todo: add support for sending a appreciation to a user name. To, implement, get the phone number hash from the chain for user name or id via the RPC api and send appreciation to it.
 
   /// Send an apprecaition or a payment to a phone number hash
