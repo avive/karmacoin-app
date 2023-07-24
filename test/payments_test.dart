@@ -230,6 +230,7 @@ void main() {
 
               // Transfer
               try {
+                // send 999 coins to katya
                 transferTxHash = await kc2Service.sendTransfer(
                   katya.accountId,
                   BigInt.from(999),

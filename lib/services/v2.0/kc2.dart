@@ -226,17 +226,28 @@ class KarmachainService implements K2ServiceInterface {
       if (phoneNumber != null) {
         final userInfo = await getUserInfoByAccountId(keyring.getAccountId());
 
-        final evidence = await karmachain.send('verifier_verify',
-            [userInfo!.accountId, userInfo.userName, phoneNumber, 'dummy']).then((v) => v.result);
+        final evidence = await karmachain.send('verifier_verify', [
+          userInfo!.accountId,
+          userInfo.userName,
+          phoneNumber,
+          'dummy'
+        ]).then((v) => v.result);
 
-        verifierPublicKey = ss58.Codec(42).decode(evidence['verifier_account_id']);
+        verifierPublicKey =
+            ss58.Codec(42).decode(evidence['verifier_account_id']);
         verifierSignature = hex.decode(evidence['signature']);
       }
 
-      final verifierPublicKeyOption = verifierPublicKey == null ? const Option.none() : Option.some(verifierPublicKey);
-      final verifierSignatureOption = verifierSignature == null ? const Option.none() : Option.some(verifierSignature);
-      final usernameOption = username == null ? const Option.none() : Option.some(username);
-      final Uint8List? phoneNumberHash = phoneNumber != null ? hasher.hashString(phoneNumber) : null;
+      final verifierPublicKeyOption = verifierPublicKey == null
+          ? const Option.none()
+          : Option.some(verifierPublicKey);
+      final verifierSignatureOption = verifierSignature == null
+          ? const Option.none()
+          : Option.some(verifierSignature);
+      final usernameOption =
+          username == null ? const Option.none() : Option.some(username);
+      final Uint8List? phoneNumberHash =
+          phoneNumber != null ? hasher.hashString(phoneNumber) : null;
       final phoneNumberHashOption = phoneNumberHash == null
           ? const Option.none()
           : Option.some(phoneNumberHash);
@@ -252,7 +263,7 @@ class KarmachainService implements K2ServiceInterface {
 
       return await _signAndSendTransaction(call);
     } on PlatformException catch (e) {
-      debugPrint('Failed to bootstrap karma: ${e.details}');
+      debugPrint('Failed to update user: ${e.details}');
       rethrow;
     }
   }
@@ -267,7 +278,7 @@ class KarmachainService implements K2ServiceInterface {
 
       return await _signAndSendTransaction(call);
     } on PlatformException catch (e) {
-      debugPrint('Failed to bootstrap karma: ${e.details}');
+      debugPrint('Failed to send transfer: ${e.details}');
       rethrow;
     }
   }
@@ -290,7 +301,7 @@ class KarmachainService implements K2ServiceInterface {
 
       return await _signAndSendTransaction(call);
     } on PlatformException catch (e) {
-      debugPrint('Failed to bootstrap karma: ${e.details}');
+      debugPrint('Failed to send appreciation: ${e.details}');
       rethrow;
     }
   }
@@ -308,7 +319,7 @@ class KarmachainService implements K2ServiceInterface {
 
       return await _signAndSendTransaction(call);
     } on PlatformException catch (e) {
-      debugPrint('Failed to bootstrap karma: ${e.details}');
+      debugPrint('Failed to set admin: ${e.details}');
       rethrow;
     }
   }
