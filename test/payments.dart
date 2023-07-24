@@ -68,6 +68,9 @@ void main() {
             kc2Service.subscribeToAccount(punch.accountId);
             kc2Service.setKeyring(punch.keyring);
 
+            // Define empty appreciation callback
+            kc2Service.appreciationCallback = (tx) async {};
+
             kc2Service.transferCallback = (tx) async {
               // @Danylo Kyrieiev  - this is never called in case of client sending appreciation w chartTraitId == 0
               debugPrint('>> transfer callback called');
@@ -111,8 +114,6 @@ void main() {
               }
 
               // Transfer is just an appreciation w 0 charTraitId
-              // @Danylo Kyrieiev - this seems to not be processed as balances/transfer tx by the node
-              // client gets called back with appreciation
               transferTxHash = await kc2Service.sendAppreciation(
                   kc2Service.getPhoneNumberHash(katyaPhoneNumber),
                   BigInt.from(1000),

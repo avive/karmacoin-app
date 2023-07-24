@@ -756,6 +756,26 @@ class KarmachainService implements K2ServiceInterface {
       return;
     }
 
+    if (charTraitId == 0 || charTraitId == null) {
+      final transferTx = KC2TransferTxV1(
+          fromAddress: signer,
+          toAddress: toAccountId,
+          amount: amount,
+          transactionEvents: txEvents,
+          args: args,
+          pallet: pallet,
+          method: method,
+          failedReason: failedReason,
+          timestamp: timeStamp,
+          hash: hash,
+          blockNumber:blockNumber,
+          blockIndex: blockIndex,
+          rawData: rawData,
+          signer: signer
+      );
+      await transferCallback!(transferTx);
+    }
+
     final appreciationTx = KC2AppreciationTxV1(
       fromAddress: signer,
       toAddress: toAccountId,
