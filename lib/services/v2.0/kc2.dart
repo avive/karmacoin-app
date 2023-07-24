@@ -153,7 +153,7 @@ class KarmachainService implements K2ServiceInterface {
         _processTransaction(accountId, transactionBody, events,
             BigInt.from(timestamp), null, blockNumber, transactionIndex);
       } catch (e) {
-        debugPrint('failed tp procxess tx due to $e');
+        debugPrint('failed to process tx due to $e');
         // don't throw so we can process valid txs even when one is bad
       }
     });
@@ -209,10 +209,10 @@ class KarmachainService implements K2ServiceInterface {
   /// Update user's phone number or user name
   /// username - new user name. If null, user name will not be updated
   /// phoneNumber - new phone number. If null, phone number will not be updated
-  /// One of username and phoneNumber must not be null and should be differeent
-  /// than current onchain value
+  /// One of username and phoneNumber must not be null and should be different
+  /// than current on-chain value
   ///
-  /// Impplementation will attempt to obtain verifier evidence regarding the association between the accountId, and the new userName or the new phoneNumber
+  /// Implementation will attempt to obtain verifier evidence regarding the association between the accountId, and the new userName or the new phoneNumber
   @override
   Future<String> updateUser(String? username, String? phoneNumber) async {
     try {
@@ -241,11 +241,27 @@ class KarmachainService implements K2ServiceInterface {
     }
   }
 
-  /// @Danylo Kyrieiev - we need to support a simple transfer to an account id via the balances/payment tx and expose this to client. Can you please add this here?
+  @override
+  Future<String> sendTransfer(String accountId, BigInt amount) async {
+    try {
+      final call = MapEntry(
+          'Balances',
+          MapEntry('transfer', {
+            'dest': MapEntry('Id', accountId),
+            'value': amount
+          })
+      );
+
+      return await _signAndSendTransaction(call);
+    } on PlatformException catch (e) {
+      debugPrint('Failed to bootstrap karma: ${e.details}');
+      rethrow;
+    }
+  }
 
   /// todo: add support for sending a appreciation to a user name. To, implement, get the phone number hash from the chain for user name or id via the RPC api and send appreciation to it. No need to appreciate by accountId.
 
-  /// Send an apprecaition or a payment to a phone number hash
+  /// Send an appreciation or a payment to a phone number hash
   @override
   Future<String> sendAppreciation(String hexPhoneNumberHash, BigInt amount,
       int communityId, int charTraitId) async {

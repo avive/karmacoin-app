@@ -43,6 +43,8 @@ abstract class K2ServiceInterface {
 
   Future<String> updateUser(String? username, String? phoneNumber);
 
+  Future<String> sendTransfer(String accountId, BigInt amount);
+
   /// Send a new appreciation or transfer transaction (charTraitId == 0)
   /// phoneNumberHash - canonical hex string of phone number hash using blake32.
   /// Use getPhoneNumberHash() to get hash of a number
