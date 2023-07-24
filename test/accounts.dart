@@ -46,7 +46,7 @@ void main() {
           }
 
           if (tx.hash != txHash) {
-            debugPrint('unexecpted tx hash: ${tx.hash} ');
+            debugPrint('unexpected tx hash: ${tx.hash} ');
             completer.complete(false);
             return;
           }
@@ -61,7 +61,7 @@ void main() {
               await kc2Service.getUserInfoByAccountId(katya.accountId);
 
           if (userInfo == null) {
-            debugPrint('Faied to get user info by account id');
+            debugPrint('Failed to get user info by account id');
             completer.complete(false);
             return;
           }
@@ -74,7 +74,7 @@ void main() {
               await kc2Service.getUserInfoByPhoneNumberHash(phoneNumberHash);
 
           if (userInfo == null) {
-            debugPrint('Faied to get user info by phone number');
+            debugPrint('Failed to get user info by phone number');
             completer.complete(false);
             return;
           }
@@ -85,7 +85,7 @@ void main() {
 
           userInfo = await kc2Service.getUserInfoByUserName(katyaUserName);
           if (userInfo == null) {
-            debugPrint('Faied to get user info by nickname');
+            debugPrint('Failed to get user info by nickname');
             completer.complete(false);
             return;
           }
@@ -159,7 +159,7 @@ void main() {
               await kc2Service.getUserInfoByAccountId(katya.accountId);
 
           if (userInfo == null) {
-            debugPrint('Faied to get user info by account id');
+            debugPrint('Failed to get user info by account id');
             completer.complete(false);
             return;
           }
@@ -173,7 +173,7 @@ void main() {
               await kc2Service.getUserInfoByPhoneNumberHash(newPhoneNumberHash);
 
           if (userInfo == null) {
-            debugPrint('Faied to get user info by phone number');
+            debugPrint('Failed to get user info by phone number');
             completer.complete(false);
             return;
           }
@@ -184,7 +184,7 @@ void main() {
 
           userInfo = await kc2Service.getUserInfoByUserName(katyaUserName);
           if (userInfo == null) {
-            debugPrint('Faied to get user info by nickname');
+            debugPrint('Failed to get user info by nickname');
             completer.complete(false);
             return;
           }
@@ -204,7 +204,7 @@ void main() {
           }
 
           if (tx.hash != txHash) {
-            debugPrint('unexecpted tx hash: ${tx.hash} ');
+            debugPrint('unexpected tx hash: ${tx.hash} ');
             completer.complete(false);
             return;
           }
@@ -291,7 +291,7 @@ void main() {
               await kc2Service.getUserInfoByAccountId(katya.accountId);
 
           if (userInfo == null) {
-            debugPrint('Faied to get user info by account id');
+            debugPrint('Failed to get user info by account id');
             completer.complete(false);
             return;
           }
@@ -305,7 +305,7 @@ void main() {
               await kc2Service.getUserInfoByPhoneNumberHash(phoneNumberHash);
 
           if (userInfo == null) {
-            debugPrint('Faied to get user info by phone number');
+            debugPrint('Failed to get user info by phone number');
             completer.complete(false);
             return;
           }
@@ -316,7 +316,7 @@ void main() {
 
           userInfo = await kc2Service.getUserInfoByUserName(katyaNewUserName);
           if (userInfo == null) {
-            debugPrint('Faied to get user info by updated user name');
+            debugPrint('Failed to get user info by updated user name');
             completer.complete(false);
             return;
           }
@@ -336,7 +336,7 @@ void main() {
           }
 
           if (tx.hash != txHash) {
-            debugPrint('unexecpted tx hash: ${tx.hash} ');
+            debugPrint('unexpected tx hash: ${tx.hash} ');
             completer.complete(false);
             return;
           }
