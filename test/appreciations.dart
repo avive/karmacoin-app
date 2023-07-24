@@ -76,8 +76,7 @@ void main() {
 
             debugPrint('>> appreciation tx: $tx');
 
-            // @Danylo  - why is it not null?
-            // expect(tx.failedReason, isNull);
+            expect(tx.failedReason, isNull);
             expect(tx.amount, BigInt.from(1000));
             expect(tx.charTraitId, 35);
             expect(tx.fromAddress, punch.accountId);
