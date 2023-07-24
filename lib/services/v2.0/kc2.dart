@@ -273,8 +273,10 @@ class KarmachainService implements K2ServiceInterface {
     try {
       final call = MapEntry(
           'Balances',
-          MapEntry('transfer',
-              {'dest': MapEntry('Id', accountId), 'value': amount}));
+          MapEntry('transfer', {
+            'dest': MapEntry('Id', ss58.Address.decode(accountId).pubkey),
+            'value': amount
+          }));
 
       return await _signAndSendTransaction(call);
     } on PlatformException catch (e) {
