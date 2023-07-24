@@ -698,8 +698,8 @@ class KarmachainService implements K2ServiceInterface {
     // todo: tripple checks this - it comes from num
     // @Danylo Kyrieiev
     final BigInt amount = args['amount'];
-    final int communityId = args['community_id'].value;
-    final int charTraitId = args['char_trait_id'].value;
+    final int? communityId = args['community_id'].value;
+    final int? charTraitId = args['char_trait_id'].value;
 
     final accountIdentityType = to.key;
     final accountIdentityValue = to.value;

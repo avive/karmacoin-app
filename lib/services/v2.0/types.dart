@@ -126,8 +126,8 @@ class KC2AppreciationTxV1 extends KC2Tx {
   String? toUsername;
 
   BigInt amount;
-  int communityId;
-  int charTraitId;
+  int? communityId;
+  int? charTraitId;
 
   KC2AppreciationTxV1({
     required this.fromAddress,
