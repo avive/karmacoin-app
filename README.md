@@ -8,10 +8,8 @@ Web, iOS, Android
 
 ## Testing
 
-To run the tests via terminal use the flutter test command.
-
 ```bash
-flutter test test/[test_name].dart
+flutter test
 ```
 
 ## Scripts
