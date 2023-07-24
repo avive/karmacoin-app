@@ -41,7 +41,7 @@ void main() {
         debugPrint('Local user katya public address: ${katya.accountId}');
 
         final completer = Completer<bool>();
-        String apprciationTxHash = "";
+        String appreciationTxHash = "";
         String katyaNewUserTxHash = "";
         String punchNewUserTxHash = "";
 
@@ -53,7 +53,7 @@ void main() {
           }
 
           if (tx.hash != katyaNewUserTxHash) {
-            debugPrint('unexecpted tx hash: ${tx.hash} ');
+            debugPrint('unexpected tx hash: ${tx.hash} ');
             completer.complete(false);
             return;
           }
@@ -63,8 +63,8 @@ void main() {
           kc2Service.setKeyring(punch.keyring);
 
           kc2Service.appreciationCallback = (tx) async {
-            if (tx.hash != apprciationTxHash) {
-              debugPrint('unexecpted tx hash: ${tx.hash} ');
+            if (tx.hash != appreciationTxHash) {
+              debugPrint('unexpected tx hash: ${tx.hash} ');
               completer.complete(false);
               return;
             }
@@ -99,12 +99,12 @@ void main() {
             }
 
             if (tx.hash != punchNewUserTxHash) {
-              debugPrint('unexecpted tx hash: ${tx.hash} ');
+              debugPrint('unexpected tx hash: ${tx.hash} ');
               completer.complete(false);
               return;
             }
 
-            apprciationTxHash = await kc2Service.sendAppreciation(
+            appreciationTxHash = await kc2Service.sendAppreciation(
                 kc2Service.getPhoneNumberHash(katyaPhoneNumber),
                 BigInt.from(1000),
                 0,
