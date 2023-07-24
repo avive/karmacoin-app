@@ -36,7 +36,7 @@ class _AccountStoreKeys {
 
 /// Local karmaCoin account logic. We seperate between authentication and account. Authentication is handled by Firebase Auth.
 class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
-  final _secureStorage = const FlutterSecureStorage();
+  final secureStorage = const FlutterSecureStorage();
 
   // update user data from chain polling timer
   // ignore: unused_field
@@ -61,10 +61,10 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     //await clear();
 
     // load data from store
-    String? seedData = await _secureStorage.read(
+    String? seedData = await secureStorage.read(
         key: _AccountStoreKeys.seed, aOptions: _aOptions);
 
-    String? seedWordsData = await _secureStorage.read(
+    String? seedWordsData = await secureStorage.read(
         key: _AccountStoreKeys.seedSecurityWords, aOptions: _aOptions);
 
     if (seedData != null && seedWordsData != null) {
@@ -73,14 +73,14 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
       _setKeyPairFromSeed(seed);
       accountSecurityWords.value = seedWordsData;
 
-      var localModeData = await _secureStorage.read(
+      var localModeData = await secureStorage.read(
           key: _AccountStoreKeys.localMode, aOptions: _aOptions);
 
       if (localModeData != null) {
         localMode.value = localModeData.toLowerCase() == 'true';
       }
 
-      var displayKarmaMiningScreenData = await _secureStorage.read(
+      var displayKarmaMiningScreenData = await secureStorage.read(
           key: _AccountStoreKeys.displayKarmaMiningScreen, aOptions: _aOptions);
 
       if (displayKarmaMiningScreenData != null) {
@@ -88,7 +88,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
             displayKarmaMiningScreenData.toLowerCase() == 'true';
       }
 
-      String? karmaCoinUserData = await _secureStorage.read(
+      String? karmaCoinUserData = await secureStorage.read(
           key: _AccountStoreKeys.karmaCoinUser, aOptions: _aOptions);
 
       if (karmaCoinUserData != null) {
@@ -114,20 +114,20 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
       debugPrint('seed and security words not found in secure local store.');
     }
 
-    requestedUserName.value = await _secureStorage.read(
+    requestedUserName.value = await secureStorage.read(
         key: _AccountStoreKeys.requestedUserName, aOptions: _aOptions);
 
-    phoneNumber.value = await _secureStorage.read(
+    phoneNumber.value = await secureStorage.read(
         key: _AccountStoreKeys.phoneNumber, aOptions: _aOptions);
 
-    var isSignedUpData = await _secureStorage.read(
+    var isSignedUpData = await secureStorage.read(
         key: _AccountStoreKeys.userSignedUp, aOptions: _aOptions);
 
     if (isSignedUpData != null) {
       signedUpOnChain.value = isSignedUpData.toLowerCase() == 'true';
     }
 
-    String? verificationData = await _secureStorage.read(
+    String? verificationData = await secureStorage.read(
         key: _AccountStoreKeys.verificationData, aOptions: _aOptions);
     if (verificationData != null) {
       try {
@@ -139,7 +139,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     }
 
     // Read last known fcm token for device
-    String? token = await _secureStorage.read(
+    String? token = await secureStorage.read(
         key: _AccountStoreKeys.fcmTokenKey, aOptions: _aOptions);
     if (token != null) {
       fcmToken.value = token;
@@ -151,7 +151,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
 
   @override
   Future<void> setFCMPushNoteToken(String token) async {
-    await _secureStorage.write(
+    await secureStorage.write(
         key: _AccountStoreKeys.fcmTokenKey, value: token, aOptions: _aOptions);
 
     fcmToken.value = token;
@@ -326,12 +326,12 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     debugPrint('seed length:${seed.length} seed: ${seed.toHexString()}');
 
     // store seed and seed security words on store
-    await _secureStorage.write(
+    await secureStorage.write(
         key: _AccountStoreKeys.seed,
         value: base64.encode(seed),
         aOptions: _aOptions);
 
-    await _secureStorage.write(
+    await secureStorage.write(
         key: _AccountStoreKeys.seedSecurityWords,
         value: securityWords,
         aOptions: _aOptions);
@@ -361,7 +361,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
 
     String userData = karmaCoinUser.value!.userData.writeToBuffer().toBase64();
 
-    await _secureStorage.write(
+    await secureStorage.write(
         key: _AccountStoreKeys.karmaCoinUser,
         value: userData,
         aOptions: _aOptions);
@@ -371,7 +371,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
 
   /// Set local user's phone number
   Future<void> _setUserPhoneNumber(String phoneNumber) async {
-    await _secureStorage.write(
+    await secureStorage.write(
         key: _AccountStoreKeys.phoneNumber,
         value: phoneNumber,
         aOptions: _aOptions);
@@ -381,7 +381,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
   /// Set if the local user is gined up or not. User is signed-up when
   /// its new user transaction is on the chain.
   Future<void> _setSignedUp(bool signedUp) async {
-    await _secureStorage.write(
+    await secureStorage.write(
         key: _AccountStoreKeys.userSignedUp,
         value: signedUp.toString(),
         aOptions: _aOptions);
@@ -396,7 +396,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
 
   Future<void> _setLocalMode(bool mode) async {
     debugPrint('setting local mode to: $mode');
-    await _secureStorage.write(
+    await secureStorage.write(
         key: _AccountStoreKeys.localMode,
         value: mode.toString(),
         aOptions: _aOptions);
@@ -417,31 +417,31 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     // stop tracking txs for local user
     await txsBoss.setAccountId(null);
 
-    await _secureStorage.delete(
+    await secureStorage.delete(
         key: _AccountStoreKeys.seed, aOptions: _aOptions);
 
-    await _secureStorage.delete(
+    await secureStorage.delete(
         key: _AccountStoreKeys.displayKarmaMiningScreen, aOptions: _aOptions);
 
-    await _secureStorage.delete(
+    await secureStorage.delete(
         key: _AccountStoreKeys.seedSecurityWords, aOptions: _aOptions);
 
-    await _secureStorage.delete(
+    await secureStorage.delete(
         key: _AccountStoreKeys.karmaCoinUser, aOptions: _aOptions);
 
-    await _secureStorage.delete(
+    await secureStorage.delete(
         key: _AccountStoreKeys.phoneNumber, aOptions: _aOptions);
 
-    await _secureStorage.delete(
+    await secureStorage.delete(
         key: _AccountStoreKeys.requestedUserName, aOptions: _aOptions);
 
-    await _secureStorage.delete(
+    await secureStorage.delete(
         key: _AccountStoreKeys.localMode, aOptions: _aOptions);
 
-    await _secureStorage.delete(
+    await secureStorage.delete(
         key: _AccountStoreKeys.userSignedUp, aOptions: _aOptions);
 
-    await _secureStorage.delete(
+    await secureStorage.delete(
         key: _AccountStoreKeys.verificationData, aOptions: _aOptions);
 
     // clear all state from memory
@@ -512,7 +512,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
   @override
   Future<void> setRequestedUserName(String requestedUserName) async {
     debugPrint('setting local requested user name: $requestedUserName');
-    await _secureStorage.write(
+    await secureStorage.write(
         key: _AccountStoreKeys.requestedUserName,
         value: requestedUserName,
         aOptions: _aOptions);
@@ -521,7 +521,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
 
   @override
   Future<void> setDisplayedKarmaRewardsScreen(bool value) async {
-    await _secureStorage.write(
+    await secureStorage.write(
         key: _AccountStoreKeys.displayKarmaMiningScreen,
         value: value.toString(),
         aOptions: _aOptions);
@@ -616,7 +616,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
 
     // store this  response as last verifier response in secure storage
     // even if it reports a failure so we can deal with failure in ui
-    await _secureStorage.write(
+    await secureStorage.write(
         key: _AccountStoreKeys.verificationData,
         value: userVerificationData.writeToBuffer().toBase64(),
         aOptions: _aOptions);

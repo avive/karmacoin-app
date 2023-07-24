@@ -5,6 +5,7 @@ import 'package:karma_coin/logic/kc2/keyring.dart';
 
 const storeKey = "kc2menomonic";
 
+/// A kc2 persistent identity
 class Identity implements IdentityInterface {
   late KC2KeyRing _keyring;
 
@@ -20,7 +21,7 @@ class Identity implements IdentityInterface {
     if (mnemonic != null) {
       _keyring = KC2KeyRing(mnemonic: mnemonic);
       await _persistMnemonic();
-      debugPrint('created identity from provided mnemonic');
+      debugPrint('created identity from the provided mnemonic');
       return;
     }
 
@@ -29,12 +30,13 @@ class Identity implements IdentityInterface {
 
     if (storeMnemonic != null) {
       _keyring = KC2KeyRing(mnemonic: storeMnemonic);
-      debugPrint('loaded mnemonic ${keyring.mnemonic}ß from secure storage');
+      debugPrint('loaded mnemonic ${keyring.mnemonic} from secure store.');
     } else {
       _keyring = KC2KeyRing();
       // persist the mnemonic so it can be loaded on next app session
       await _persistMnemonic();
-      debugPrint('created new menonic: ${keyring.mnemonic}, and persisted');
+      debugPrint(
+          'created new menonic: ${keyring.mnemonic}, and persisted in store.');
     }
   }
 

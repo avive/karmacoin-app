@@ -87,14 +87,14 @@ class KarmachainService implements K2ServiceInterface {
           'identity_getUserInfoByAccountId', [accountId]).then((v) => v.result);
 
       if (data != null) {
-        return KC2UserInfo.fromChainData(data);
+        return KC2UserInfo.fromJson(data);
       } else {
         debugPrint('no user info found for $accountId');
         return null;
       }
     } catch (e) {
       debugPrint('error getting user info by accountId $accountId: $e');
-      return null;
+      rethrow;
     }
   }
 
@@ -105,14 +105,14 @@ class KarmachainService implements K2ServiceInterface {
           'identity_getUserInfoByUsername', [userName]).then((v) => v.result);
 
       if (data != null) {
-        return KC2UserInfo.fromChainData(data);
+        return KC2UserInfo.fromJson(data);
       } else {
         debugPrint('no user info found for $userName');
         return null;
       }
     } catch (e) {
       debugPrint('error getting user info by user name $userName: $e');
-      return null;
+      rethrow;
     }
   }
 
@@ -125,7 +125,7 @@ class KarmachainService implements K2ServiceInterface {
           [phoneNumberHash]).then((v) => v.result);
 
       if (data != null) {
-        return KC2UserInfo.fromChainData(data);
+        return KC2UserInfo.fromJson(data);
       } else {
         debugPrint('No user found for phone number hash $phoneNumberHash');
         return null;
@@ -133,7 +133,7 @@ class KarmachainService implements K2ServiceInterface {
     } catch (e) {
       debugPrint(
           'error getting user info by phone number hash $phoneNumberHash: $e');
-      return null;
+      rethrow;
     }
   }
 

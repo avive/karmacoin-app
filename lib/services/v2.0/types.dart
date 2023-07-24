@@ -1,3 +1,12 @@
+import 'dart:convert';
+
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+const localUserInfoStorageKey = 'kc2_local_user_info';
+const androidOptions = AndroidOptions(
+  encryptedSharedPreferences: true,
+);
+
 /// Chain user info returned from various RPCs such as GetUserInfoBy....()
 class KC2UserInfo {
   String accountId;
@@ -5,18 +14,54 @@ class KC2UserInfo {
   String userName;
   BigInt balance;
   int nonce;
-  int karmascore;
-  // todo: add char traits
-  // todo: add community memberships
+  int karmaScore;
+  //
+  // todo: support char traits
+  // todo: support community memberships
+  //
 
-  KC2UserInfo.fromChainData(Map<String, dynamic> u)
+  KC2UserInfo.fromJson(Map<String, dynamic> u)
       : accountId = u['account_id'],
         phoneNumberHash = u['phone_number_hash'],
         userName = u['user_name'],
         balance = BigInt.from(u['balance']),
         nonce = u['nonce'],
-        karmascore = u['karma_score'];
+        karmaScore = u['karma_score'];
+
+  Map<String, dynamic> toJson() => {
+        'account_id': accountId,
+        'phone_number_hash': phoneNumberHash,
+        'user_name': userName,
+        'balance': balance.toString(),
+        'nonce': nonce,
+        'karms_score': karmaScore,
+      };
+
+  Future<void> persistToSecureStorage(FlutterSecureStorage s) async {
+    String data = jsonEncode(this);
+    await s.write(
+        key: localUserInfoStorageKey, value: data, aOptions: androidOptions);
+  }
+
+  Future<void> deleteFromSecureStorage(FlutterSecureStorage s) async {
+    await s.delete(key: localUserInfoStorageKey, aOptions: androidOptions);
+  }
 }
+
+Future<KC2UserInfo?> loadUserInfoFromSecureStorage(
+    FlutterSecureStorage s) async {
+  String? data =
+      await s.read(key: localUserInfoStorageKey, aOptions: androidOptions);
+
+  if (data == null) {
+    return null;
+  }
+
+  Map<String, dynamic> map = jsonDecode(data);
+  return KC2UserInfo.fromJson(map);
+}
+
+///////////////////////////
 
 class KC2Event {
   String phase;
