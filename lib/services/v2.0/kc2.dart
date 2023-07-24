@@ -89,27 +89,29 @@ class KarmachainService implements K2ServiceInterface {
       if (data != null) {
         return KC2UserInfo.fromChainData(data);
       } else {
+        debugPrint('no user info found for $accountId');
         return null;
       }
     } catch (e) {
-      debugPrint('Failed to get user info by account id: $e');
+      debugPrint('error getting user info by accountId $accountId: $e');
       return null;
     }
   }
 
   @override
-  Future<KC2UserInfo?> getUserInfoByUserName(String username) async {
+  Future<KC2UserInfo?> getUserInfoByUserName(String userName) async {
     try {
       Map<String, dynamic>? data = await karmachain.send(
-          'identity_getUserInfoByUsername', [username]).then((v) => v.result);
+          'identity_getUserInfoByUsername', [userName]).then((v) => v.result);
 
       if (data != null) {
         return KC2UserInfo.fromChainData(data);
       } else {
+        debugPrint('no user info found for $userName');
         return null;
       }
     } catch (e) {
-      debugPrint('Failed to get user info by user name: $e');
+      debugPrint('error getting user info by user name $userName: $e');
       return null;
     }
   }
@@ -125,10 +127,12 @@ class KarmachainService implements K2ServiceInterface {
       if (data != null) {
         return KC2UserInfo.fromChainData(data);
       } else {
+        debugPrint('No user found for phone number hash $phoneNumberHash');
         return null;
       }
     } catch (e) {
-      debugPrint('Failed to get user info by phone number hash: $e');
+      debugPrint(
+          'error getting user info by phone number hash $phoneNumberHash: $e');
       return null;
     }
   }
@@ -153,7 +157,7 @@ class KarmachainService implements K2ServiceInterface {
         _processTransaction(accountId, transactionBody, events,
             BigInt.from(timestamp), null, blockNumber, transactionIndex);
       } catch (e) {
-        debugPrint('failed to process tx due to $e');
+        debugPrint('error processing tx: $e');
         // don't throw so we can process valid txs even when one is bad
       }
     });
@@ -246,11 +250,8 @@ class KarmachainService implements K2ServiceInterface {
     try {
       final call = MapEntry(
           'Balances',
-          MapEntry('transfer', {
-            'dest': MapEntry('Id', accountId),
-            'value': amount
-          })
-      );
+          MapEntry('transfer',
+              {'dest': MapEntry('Id', accountId), 'value': amount}));
 
       return await _signAndSendTransaction(call);
     } on PlatformException catch (e) {

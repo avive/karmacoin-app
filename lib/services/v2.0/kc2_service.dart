@@ -41,8 +41,10 @@ abstract class K2ServiceInterface {
   /// Returns submitted transaction hash
   Future<String> newUser(String accountId, String username, String phoneNumber);
 
+  /// Update user's user name or phone number
   Future<String> updateUser(String? username, String? phoneNumber);
 
+  /// Transfer coins from local account to an account
   Future<String> sendTransfer(String accountId, BigInt amount);
 
   /// Send a new appreciation or transfer transaction (charTraitId == 0)
