@@ -6,7 +6,7 @@ import 'package:karma_coin/logic/kc2/identity.dart';
 import 'package:karma_coin/logic/kc2/identity_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
-import 'package:karma_coin/services/v2.0/types.dart';
+import 'package:karma_coin/services/v2.0/user_info.dart';
 
 final random = Random.secure();
 String get randomPhoneNumber => (random.nextInt(900000) + 100000).toString();
@@ -69,6 +69,9 @@ void main() {
           expect(userInfo.accountId, katya.accountId);
           expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
           expect(userInfo.userName, katyaUserName);
+          expect(userInfo.traitScores.length, 1);
+          expect(userInfo.traitScores[0].traitId, 1);
+          expect(userInfo.traitScores[0].score, 1);
 
           userInfo =
               await kc2Service.getUserInfoByPhoneNumberHash(phoneNumberHash);

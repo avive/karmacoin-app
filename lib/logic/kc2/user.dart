@@ -5,7 +5,7 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/kc2/identity.dart';
 import 'package:karma_coin/logic/kc2/identity_interface.dart';
 import 'package:karma_coin/logic/kc2/user_interface.dart';
-import 'package:karma_coin/services/v2.0/types.dart';
+import 'package:karma_coin/services/v2.0/user_info.dart';
 
 class KC2User extends KC2UserInteface {
   // private members

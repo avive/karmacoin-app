@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/services/v2.0/types.dart';
+import 'package:karma_coin/services/v2.0/user_info.dart';
 
 /// User's kc2 signup status
 enum SignupStatus {
