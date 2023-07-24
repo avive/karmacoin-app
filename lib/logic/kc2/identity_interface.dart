@@ -24,4 +24,7 @@ abstract class IdentityInterface {
 
   /// sign a messsage with identity's private signing key
   Uint8List sign(Uint8List message);
+
+  /// Remove from the identity from local store
+  Future<void> removeFromStore();
 }

@@ -40,6 +40,13 @@ class Identity implements IdentityInterface {
     }
   }
 
+  /// remove the id from local store
+  @override
+  Future<void> removeFromStore() async {
+    await _secureStorage.delete(
+        key: storeKey, aOptions: _sercureStorageOptions);
+  }
+
   Future<void> _persistMnemonic() async {
     await _secureStorage.write(
         key: storeKey,
