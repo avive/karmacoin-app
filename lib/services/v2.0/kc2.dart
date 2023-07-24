@@ -243,7 +243,7 @@ class KarmachainService implements K2ServiceInterface {
 
   /// @Danylo Kyrieiev - we need to support a simple transfer to an account id via the balances/payment tx and expose this to client. Can you please add this here?
 
-  /// todo: add support for sending a appreciation to a user name. To, implement, get the phone number hash from the chain for user name or id via the RPC api and send appreciation to it.
+  /// todo: add support for sending a appreciation to a user name. To, implement, get the phone number hash from the chain for user name or id via the RPC api and send appreciation to it. No need to appreciate by accountId.
 
   /// Send an apprecaition or a payment to a phone number hash
   @override
@@ -768,11 +768,10 @@ class KarmachainService implements K2ServiceInterface {
           failedReason: failedReason,
           timestamp: timeStamp,
           hash: hash,
-          blockNumber:blockNumber,
+          blockNumber: blockNumber,
           blockIndex: blockIndex,
           rawData: rawData,
-          signer: signer
-      );
+          signer: signer);
       await transferCallback!(transferTx);
     }
 
