@@ -72,7 +72,6 @@ void main() {
             kc2Service.appreciationCallback = (tx) async {};
 
             kc2Service.transferCallback = (tx) async {
-              // @Danylo Kyrieiev  - this is never called in case of client sending appreciation w chartTraitId == 0
               debugPrint('>> transfer callback called');
               if (tx.hash != transferTxHash) {
                 debugPrint(
