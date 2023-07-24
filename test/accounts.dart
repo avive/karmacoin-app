@@ -151,7 +151,6 @@ void main() {
           }
 
           expect(tx.phoneNumberHash, newPhoneNumberHash);
-          expect(tx.username, katyaNewPhoneNumber);
           expect(tx.signer, katya.accountId);
 
           // all 3 methods should return's Katya's account data
@@ -209,11 +208,10 @@ void main() {
             return;
           }
 
-          // @Danylo Kyrieiev: this tx submission fails
           debugPrint('calling update user...');
           try {
             updateTexHash =
-                await kc2Service.updateUser(katyaUserName, katyaNewPhoneNumber);
+                await kc2Service.updateUser(null, newPhoneNumberHash);
           } catch (e) {
             debugPrint('Failed to update user: $e');
             completer.complete(false);
