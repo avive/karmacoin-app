@@ -211,7 +211,7 @@ void main() {
           debugPrint('calling update user...');
           try {
             updateTexHash =
-                await kc2Service.updateUser(null, newPhoneNumberHash);
+                await kc2Service.updateUser(null, katyaNewPhoneNumber);
           } catch (e) {
             debugPrint('Failed to update user: $e');
             completer.complete(false);

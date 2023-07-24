@@ -186,7 +186,6 @@ class KarmachainService implements K2ServiceInterface {
       // debugPrint('Verifier evidence - $evidence');
 
       final phoneNumberHash = hasher.hashString(phoneNumber);
-      final hexPhoneNumberHash = hex.encode(phoneNumberHash);
 
       final call = MapEntry(
           'Identity',
@@ -196,7 +195,7 @@ class KarmachainService implements K2ServiceInterface {
             'verifier_signature': hex.decode(evidence['signature']),
             'account_id': ss58.Address.decode(accountId).pubkey,
             'username': username,
-            'phone_number_hash': hex.decode(hexPhoneNumberHash),
+            'phone_number_hash': phoneNumberHash,
           }));
 
       return await _signAndSendTransaction(call);
@@ -216,22 +215,35 @@ class KarmachainService implements K2ServiceInterface {
   @override
   Future<String> updateUser(String? username, String? phoneNumber) async {
     try {
-      final String? phoneHash = phoneNumber != null ? (phoneNumber) : null;
+      Uint8List? verifierPublicKey;
+      List<int>? verifierSignature;
 
-      final usernameOption =
-          username == null ? const Option.none() : Option.some(username);
+      // Get evidence for phone number change
+      if (phoneNumber != null) {
+        final userInfo = await getUserInfoByAccountId(keyring.getAccountId());
 
-      // @Danylo Kyrieiev - in case of a phone number update, a new verifier evidence regarding the association between the user's account and the new phone number should be obtained by the client and submitted in the transaction just like in NewUser. I don't see this is implemented yet.
+        final evidence = await karmachain.send('verifier_verify',
+            [userInfo!.accountId, userInfo.userName, phoneNumber, 'dummy']).then((v) => v.result);
 
-      final hexPhoneNumberHashOption = phoneHash == null
+        verifierPublicKey = ss58.Codec(42).decode(evidence['verifier_account_id']);
+        verifierSignature = hex.decode(evidence['signature']);
+      }
+
+      final verifierPublicKeyOption = verifierPublicKey == null ? const Option.none() : Option.some(verifierPublicKey);
+      final verifierSignatureOption = verifierSignature == null ? const Option.none() : Option.some(verifierSignature);
+      final usernameOption = username == null ? const Option.none() : Option.some(username);
+      final Uint8List? phoneNumberHash = phoneNumber != null ? hasher.hashString(phoneNumber) : null;
+      final phoneNumberHashOption = phoneNumberHash == null
           ? const Option.none()
-          : Option.some(hex.decode(phoneHash));
+          : Option.some(phoneNumberHash);
 
       final call = MapEntry(
           'Identity',
           MapEntry('update_user', {
+            'verifier_public_key': verifierPublicKeyOption,
+            'verifier_signature': verifierSignatureOption,
             'username': usernameOption,
-            'phone_number_hash': hexPhoneNumberHashOption,
+            'phone_number_hash': phoneNumberHashOption,
           }));
 
       return await _signAndSendTransaction(call);
