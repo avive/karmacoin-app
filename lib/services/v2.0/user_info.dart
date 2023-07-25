@@ -63,7 +63,10 @@ class KC2UserInfo {
       : accountId = u['account_id'],
         phoneNumberHash = u['phone_number_hash'],
         userName = u['user_name'],
-        balance = BigInt.from(u['balance']),
+        // we assume value is a string or a num...
+        balance = u['balance'] is String
+            ? BigInt.parse(u['balance'])
+            : BigInt.from(u['balance']),
         nonce = u['nonce'],
         karmaScore = u['karma_score'],
         traitScores = (u['trait_scores'] as List<dynamic>)
