@@ -41,8 +41,8 @@ class KC2User extends KC2UserInteface {
   /// This userInfo becomes unusable after the call and should not be used anymore.
   @override
   Future<void> signout() async {
-    if (userInfo != null) {
-      await userInfo!.deleteFromSecureStorage(_secureStorage);
+    if (userInfo.value != null) {
+      await userInfo.value?.deleteFromSecureStorage(_secureStorage);
     }
 
     // unsubscribe from kc2 callbacks
@@ -88,13 +88,13 @@ class KC2User extends KC2UserInteface {
   @override
   Future<void> updateUserDataFromLocalStore() async {
     // load user info last obtained from chain from local store
-    userInfo = await loadUserInfoFromSecureStorage(_secureStorage);
+    userInfo.value = await loadUserInfoFromSecureStorage(_secureStorage);
 
     // check consistency between identity and userInfo and drop userInfo if needed
-    if (userInfo != null) {
-      if (userInfo!.accountId != _identity.accountId) {
+    if (userInfo.value != null) {
+      if (userInfo.value?.accountId != _identity.accountId) {
         debugPrint(">>> local user info account id mismatch - droppping it...");
-        await userInfo!.deleteFromSecureStorage(_secureStorage);
+        await userInfo.value?.deleteFromSecureStorage(_secureStorage);
       } else {
         // if we have previosuly saved userInfo then we are signed up in this session
         signupStatus.value = SignupStatus.signedUp;
@@ -114,9 +114,12 @@ class KC2User extends KC2UserInteface {
         signupStatus.value = SignupStatus.notSignedUp;
         return;
       }
+
+      // update observable value
+      userInfo.value = info;
+
       // persist latest user info and set signup to signedup
-      userInfo = info;
-      await userInfo!.persistToSecureStorage(_secureStorage);
+      await userInfo.value?.persistToSecureStorage(_secureStorage);
       signupStatus.value = SignupStatus.signedUp;
     } catch (e) {
       // api error - don't change signup status

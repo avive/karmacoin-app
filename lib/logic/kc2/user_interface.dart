@@ -20,7 +20,7 @@ abstract class KC2UserInteface {
   late IdentityInterface identity;
 
   /// Latest known userInfo obtained from the chain
-  KC2UserInfo? userInfo;
+  final ValueNotifier<KC2UserInfo?> userInfo = ValueNotifier(null);
 
   /// Initialize the user. Should be aclled on new app session after the kc2 service has been initialized and app has a connection to a kc2 api provider.
   Future<void> init();

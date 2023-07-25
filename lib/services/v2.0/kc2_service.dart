@@ -1,7 +1,10 @@
 import 'dart:async';
 
 import 'package:karma_coin/logic/kc2/keyring.dart';
-import 'package:karma_coin/services/v2.0/transactions.dart';
+import 'package:karma_coin/services/v2.0/txs/appreciation_tx.dart';
+import 'package:karma_coin/services/v2.0/txs/new_user_tx.dart';
+import 'package:karma_coin/services/v2.0/txs/transfer_tx.dart';
+import 'package:karma_coin/services/v2.0/txs/update_user_tx.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:substrate_metadata_fixed/models/models.dart';
 

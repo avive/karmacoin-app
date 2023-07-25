@@ -3,14 +3,11 @@ import 'dart:async';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/logic/kc2/identity.dart';
-import 'package:karma_coin/logic/kc2/identity_interface.dart';
 import 'package:karma_coin/logic/kc2/user.dart';
 import 'package:karma_coin/logic/kc2/user_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 final random = Random.secure();
 String get randomPhoneNumber => (random.nextInt(900000) + 100000).toString();
@@ -48,9 +45,12 @@ void main() {
         final completer = Completer<bool>();
 
         katya.signupStatus.addListener(() async {
-          debugPrint('signup status changed to: ${katya.signupStatus.value}');
           switch (katya.signupStatus.value) {
+            case SignupStatus.signingUp:
+              debugPrint('Signup status is signing up...');
+              break;
             case SignupStatus.signedUp:
+              debugPrint('Signup callback called');
               KC2UserInfo? userInfo = await kc2Service
                   .getUserInfoByAccountId(katya.identity.accountId);
 
