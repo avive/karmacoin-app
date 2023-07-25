@@ -255,6 +255,7 @@ void main() {
         final completer = Completer<bool>();
 
         BigInt balance;
+        String katyaAccountId;
 
         katya.signupStatus.addListener(() async {
           switch (katya.signupStatus.value) {
@@ -268,6 +269,8 @@ void main() {
               // this simulate install on new device and migration of user data between accounts
 
               balance = katya.userInfo.value!.balance;
+              katyaAccountId = katya.identity.accountId;
+
               await katya.signout();
               KC2UserInteface katya1 = KC2User();
               // set katya1 as local user - this should set kc2 keyring to katya1
@@ -292,8 +295,15 @@ void main() {
                     expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
                     expect(userInfo.userName, katyaUserName);
 
-                    // expected katya balance to be migrated to katya1
+                    // expected katya's balance to be migrated to katya1
+                    // and to not see signup reward for katya1...
                     expect(userInfo.balance, balance);
+
+                    KC2UserInfo? oldAccountInfo =
+                        await kc2Service.getUserInfoByAccountId(katyaAccountId);
+
+                    // we expect katya's account to be deleted from chain after migration
+                    expect(oldAccountInfo, isNull);
 
                     await katya1.signout();
                     completer.complete(true);
