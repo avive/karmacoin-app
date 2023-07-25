@@ -15,6 +15,8 @@ class KC2User extends KC2UserInteface {
   late final _secureStorage = const FlutterSecureStorage();
   late IdentityInterface _identity;
   late KC2TransactionBossInterface _txsBoss;
+  late String _signupTxHash;
+  late String _updateUserTxHash;
 
   @override
   ValueNotifier<List<KC2Tx>> get incomingAppreciations =>
@@ -54,17 +56,15 @@ class KC2User extends KC2UserInteface {
       _txsBoss.addAppreciation(tx);
     };
 
-    kc2Service.updateUserCallback = (tx) async {
-      // get up-to-date user info object from chain
-      await getUserDataFromChain();
-    };
+    kc2Service.newUserCallback = _signupUserCallback;
+    kc2Service.updateUserCallback = _updateUserCallback;
 
     // subscribe to account transactions
     _subscribeToAccountTimer =
         kc2Service.subscribeToAccount(_identity.accountId);
 
     // for testing purposes - change to only call this once per
-    // app session when user wants to view his appreciations/transfers...
+    // app session when user wants to view his appreciations/transfers for the first time...
     await fetchAppreciations();
   }
 
@@ -87,6 +87,7 @@ class KC2User extends KC2UserInteface {
     kc2Service.transferCallback = null;
     kc2Service.appreciationCallback = null;
     kc2Service.updateUserCallback = null;
+    kc2Service.newUserCallback = null;
 
     // unsubscribe from kc2 callbacks
     _subscribeToAccountTimer.cancel();
@@ -109,21 +110,8 @@ class KC2User extends KC2UserInteface {
       }
     });
 
-    kc2Service.newUserCallback = (tx) async {
-      if (tx.accountId != _identity.accountId) {
-        debugPrint('unexpected tx account id in signup tx: ${tx.accountId}');
-        return;
-      }
-
-      // update value and notify
-      signupStatus.value = SignupStatus.signedUp;
-
-      // get updated user info from chain
-      await getUserDataFromChain();
-    };
-
-    // todo: take user name and phone number from app state
-    await kc2Service.newUser(
+    // todo: take user name and phone number from ui via app state
+    _signupTxHash = await kc2Service.newUser(
         _identity.accountId, requestedUserName, requestedPhoneNumber);
   }
 
@@ -167,6 +155,76 @@ class KC2User extends KC2UserInteface {
     } catch (e) {
       // api error - don't change signup status
       debugPrint('failed to get userInfo from chain: $e');
+    }
+  }
+
+  @override
+  Future<void> updateUserInfo(
+      String? requestedUserName, String? requestedPhoneNumber) async {
+    _updateUserTxHash =
+        await kc2Service.updateUser(requestedUserName, requestedPhoneNumber);
+
+    debugPrint('Update user tx hash: $_updateUserTxHash');
+  }
+
+  @override
+  Future<void> deleteUser() async {
+    throw UnimplementedError();
+  }
+
+  Future<void> _signupUserCallback(KC2NewUserTransactionV1 tx) async {
+    if (tx.accountId != _identity.accountId) {
+      debugPrint('unexpected tx account id in signup tx: ${tx.accountId}');
+      return;
+    }
+
+    if (tx.hash != _signupTxHash) {
+      debugPrint('mismatch tx hash in signup tx: ${tx.hash}');
+      return;
+    }
+
+    // update value and notify
+    signupStatus.value = SignupStatus.signedUp;
+
+    // get updated user info from chain
+    await getUserDataFromChain();
+  }
+
+  Future<void> _updateUserCallback(KC2UpdateUserTxV1 tx) async {
+    if (tx.hash != _updateUserTxHash) {
+      debugPrint('mismatch tx hash in update user tx: ${tx.hash}');
+      return;
+    }
+
+    if (userInfo.value == null) {
+      debugPrint('No local user info to update from update user tx');
+      return;
+    }
+
+    // Clone needed here as we want to set a new observable value
+    KC2UserInfo u = KC2UserInfo.clone(userInfo.value!);
+    bool updated = false;
+
+    if (tx.phoneNumberHash != null &&
+        tx.phoneNumberHash != userInfo.value!.phoneNumberHash) {
+      // phone number changed
+      u.phoneNumberHash = tx.phoneNumberHash!;
+      updated = true;
+    }
+
+    if (tx.username != null && tx.username != userInfo.value!.userName) {
+      // username changed
+      u.userName = tx.username!;
+      updated = true;
+    }
+
+    if (updated) {
+      debugPrint('Updating user info from update user tx');
+      // persist latest user info
+      await u.persistToSecureStorage(_secureStorage);
+
+      // update observable value
+      userInfo.value = u;
     }
   }
 }

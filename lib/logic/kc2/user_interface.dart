@@ -41,6 +41,13 @@ abstract class KC2UserInteface {
   /// requestedPhoneNumber - user's requested phone number. Must be unique. International format. Excluding leading +.
   Future<void> signup(String requestedUserName, String requestedPhoneNumber);
 
+  /// Update user name and/or phone number - observable UserInfo will update when the tx is processed by the chain.
+  Future<void> updateUserInfo(
+      String? requestedUserName, String? requestedPhoneNumber);
+
+  /// Delete user from karmachain. This will delete all user's data from the chain and local store and will sign out the user. Don't use this object after calling this method.
+  Future<void> deleteUser();
+
   /// Update user info from local store
   Future<void> updateUserDataFromLocalStore();
 

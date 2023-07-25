@@ -35,6 +35,27 @@ class KC2UserInfo {
   int karmaScore;
   List<TraitScore> traitScores;
 
+  KC2UserInfo({
+    required this.accountId,
+    required this.phoneNumberHash,
+    required this.userName,
+    required this.balance,
+    required this.nonce,
+    required this.karmaScore,
+    required this.traitScores,
+  });
+
+  KC2UserInfo.clone(KC2UserInfo u)
+      : this(
+          accountId: u.accountId,
+          phoneNumberHash: u.phoneNumberHash,
+          userName: u.userName,
+          balance: u.balance,
+          nonce: u.nonce,
+          karmaScore: u.karmaScore,
+          traitScores: u.traitScores,
+        );
+
   // todo: support community memberships
   //
 
