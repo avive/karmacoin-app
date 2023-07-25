@@ -64,6 +64,9 @@ void main() {
               expect(userInfo.traitScores[0].traitId, 1);
               expect(userInfo.traitScores[0].score, 1);
 
+              // signup reward
+              expect(userInfo.balance, BigInt.from(10000000));
+
               await katya.signout();
               completer.complete(true);
               break;
@@ -266,7 +269,7 @@ void main() {
               debugPrint('Katya signup callback called');
 
               // signup user with same phone number but different id and same phone number again
-              // this simulate install on new device and migration of user data between accounts
+              // this simulates install on new device and migration of user data between accounts
 
               balance = katya.userInfo.value!.balance;
               katyaAccountId = katya.identity.accountId;
@@ -294,6 +297,10 @@ void main() {
                     expect(userInfo!.accountId, katya1.identity.accountId);
                     expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
                     expect(userInfo.userName, katyaUserName);
+
+                    // expected to see balance reflecting katya's signup-reward
+                    // and no additional reward on katyas1 signup
+                    expect(userInfo.balance, BigInt.from(10000000));
 
                     // expected katya's balance to be migrated to katya1
                     // and to not see signup reward for katya1...
