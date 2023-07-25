@@ -122,6 +122,9 @@ class KarmachainService implements K2ServiceInterface {
   Future<KC2UserInfo?> getUserInfoByPhoneNumberHash(
       String phoneNumberHash) async {
     try {
+      if (phoneNumberHash.startsWith('0x')) {
+        phoneNumberHash = phoneNumberHash.substring(2);
+      }
       Map<String, dynamic>? data = await karmachain.send(
           'identity_getUserInfoByPhoneNumberHash',
           [phoneNumberHash]).then((v) => v.result);
@@ -293,6 +296,9 @@ class KarmachainService implements K2ServiceInterface {
   @override
   Future<String> sendAppreciation(String hexPhoneNumberHash, BigInt amount,
       int communityId, int charTraitId) async {
+    if (hexPhoneNumberHash.startsWith('0x')) {
+      hexPhoneNumberHash = hexPhoneNumberHash.substring(2);
+    }
     try {
       final call = MapEntry(
           'Appreciation',
@@ -341,7 +347,7 @@ class KarmachainService implements K2ServiceInterface {
 
   // Utility
 
-  // Note that this is hex string without trailing 0x
+  // Returns hex string without a trailing 0x
   @override
   String getPhoneNumberHash(String phoneNumber) {
     final phoneNumberHash = hasher.hashString(phoneNumber);
