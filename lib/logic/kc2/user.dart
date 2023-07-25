@@ -84,6 +84,7 @@ class KC2User extends KC2UserInteface {
       await userInfo.value?.deleteFromSecureStorage(_secureStorage);
     }
 
+    // clear all callbacks
     kc2Service.transferCallback = null;
     kc2Service.appreciationCallback = null;
     kc2Service.updateUserCallback = null;
@@ -183,11 +184,11 @@ class KC2User extends KC2UserInteface {
       return;
     }
 
-    // update value and notify
-    signupStatus.value = SignupStatus.signedUp;
-
     // get updated user info from chain
     await getUserDataFromChain();
+
+    // update value and notify after user info was fetched from chain
+    signupStatus.value = SignupStatus.signedUp;
   }
 
   Future<void> _updateUserCallback(KC2UpdateUserTxV1 tx) async {

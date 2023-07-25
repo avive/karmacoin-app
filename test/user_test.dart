@@ -21,9 +21,9 @@ void main() {
 
   K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
-  group('user tests', () {
+  group('kc2 user tests', () {
     test(
-      'Signup user',
+      'Signup kc2 user',
       () async {
         // connect before creating a user
         await kc2Service.connectToApi('ws://127.0.0.1:9944');
@@ -90,7 +90,7 @@ void main() {
     );
 
     test(
-      'Update user name',
+      'Update kc2 user name',
       () async {
         // connect before creating a user
         await kc2Service.connectToApi('ws://127.0.0.1:9944');
@@ -162,7 +162,7 @@ void main() {
     );
 
     test(
-      'Update phone number',
+      'Update kc2 phone number',
       () async {
         // connect before creating a user
         await kc2Service.connectToApi('ws://127.0.0.1:9944');
@@ -227,6 +227,105 @@ void main() {
 
         // signup katya
         await katya.signup(katyaUserName, phoneNumber);
+
+        // wait for completer and verify test success
+        expect(await completer.future, equals(true));
+        expect(completer.isCompleted, isTrue);
+      },
+      timeout: const Timeout(Duration(seconds: 120)),
+    );
+
+    test(
+      'Migrate kc2 user',
+      () async {
+        // connect before creating a user
+        await kc2Service.connectToApi('ws://127.0.0.1:9944');
+
+        KC2UserInteface katya = KC2User();
+        await katya.init();
+
+        String katyaUserName =
+            "Katya${katya.identity.accountId.substring(0, 5)}";
+
+        String katyaPhoneNumber = randomPhoneNumber;
+
+        String phoneNumberHash =
+            kc2Service.getPhoneNumberHash(katyaPhoneNumber);
+
+        final completer = Completer<bool>();
+
+        BigInt balance;
+
+        katya.signupStatus.addListener(() async {
+          switch (katya.signupStatus.value) {
+            case SignupStatus.signingUp:
+              debugPrint('Katya is signing up...');
+              break;
+            case SignupStatus.signedUp:
+              debugPrint('Katya signup callback called');
+
+              // signup user with same phone number but different id and same phone number again
+              // this simulate install on new device and migration of user data between accounts
+
+              balance = katya.userInfo.value!.balance;
+              await katya.signout();
+              KC2UserInteface katya1 = KC2User();
+              // set katya1 as local user - this should set kc2 keyring to katya1
+              await katya1.init();
+
+              katya1.signupStatus.addListener(() async {
+                switch (katya.signupStatus.value) {
+                  case SignupStatus.signingUp:
+                    debugPrint('Katya1 is signing up...');
+                    break;
+                  case SignupStatus.signedUp:
+                    debugPrint('Katya1 Signup callback');
+
+                    // Get userInfo from chain for katya's phone number
+                    KC2UserInfo? userInfo = await kc2Service
+                        .getUserInfoByPhoneNumberHash(phoneNumberHash);
+
+                    expect(userInfo, isNotNull);
+
+                    // @Danylo Kyrieiev - following expect fails - api returns katya's accountId instead of katya1...
+                    expect(userInfo!.accountId, katya1.identity.accountId);
+                    expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
+                    expect(userInfo.userName, katyaUserName);
+
+                    // expected katya balance to be migrated to katya1
+                    expect(userInfo.balance, balance);
+
+                    await katya1.signout();
+                    completer.complete(true);
+                    break;
+                  case SignupStatus.notSignedUp:
+                    debugPrint('failed to signup katya1');
+                    await katya.signout();
+                    completer.complete(false);
+                    break;
+                  default:
+                    break;
+                }
+              });
+
+              debugPrint('katya1 accountId: ${katya1.identity.accountId}');
+              // signup katya1 with same user name and phone number as katya
+              await katya1.signup(katyaUserName, katyaPhoneNumber);
+              break;
+            case SignupStatus.notSignedUp:
+              debugPrint('failed to signup katya');
+              await katya.signout();
+              completer.complete(false);
+              break;
+            default:
+              break;
+          }
+        });
+
+        debugPrint('Signing up katya. AccountId: ${katya.identity.accountId}');
+
+        // signup katya
+        await katya.signup(katyaUserName, katyaPhoneNumber);
 
         // wait for completer and verify test success
         expect(await completer.future, equals(true));
