@@ -30,7 +30,8 @@ abstract class K2ServiceInterface {
 
   Future<KC2UserInfo?> getUserInfoByUserName(String username);
 
-  // Use getPhoneNumberHash of an international number w/o leading +
+  // Use getPhoneNumberHash of an international number w/o leading + and without 0x hex prefix.
+  // just a hex string of the number
   Future<KC2UserInfo?> getUserInfoByPhoneNumberHash(String phoneNumberHash);
 
   // transactions

@@ -52,7 +52,7 @@ void main() {
           }
 
           expect(tx.accountId, katya.accountId);
-          expect(tx.phoneNumberHash, phoneNumberHash);
+          expect(tx.phoneNumberHash, '0x$phoneNumberHash');
           expect(tx.username, katyaUserName);
           expect(tx.signer, katya.accountId);
 
@@ -153,7 +153,7 @@ void main() {
             return;
           }
 
-          expect(tx.phoneNumberHash, newPhoneNumberHash);
+          expect(tx.phoneNumberHash, '0x$newPhoneNumberHash');
           expect(tx.signer, katya.accountId);
 
           // all 3 methods should return's Katya's account data

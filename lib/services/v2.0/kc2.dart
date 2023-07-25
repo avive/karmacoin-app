@@ -341,6 +341,7 @@ class KarmachainService implements K2ServiceInterface {
 
   // Utility
 
+  // Note that this is hex string without trailing 0x
   @override
   String getPhoneNumberHash(String phoneNumber) {
     final phoneNumberHash = hasher.hashString(phoneNumber);
@@ -662,7 +663,8 @@ class KarmachainService implements K2ServiceInterface {
       Map<String, dynamic> rawData,
       List<KC2Event> txEvents) async {
     final username = args['username'];
-    final phoneNumberHash = hex.encode(args['phone_number_hash'].cast<int>());
+    final phoneNumberHash =
+        '0x${hex.encode(args['phone_number_hash'].cast<int>())}';
 
     final newUserTx = KC2NewUserTransactionV1(
       accountId: accountId,
@@ -701,7 +703,7 @@ class KarmachainService implements K2ServiceInterface {
     final phoneNumberHashOption = args['phone_number_hash'].value;
     final phoneNumberHash = phoneNumberHashOption == null
         ? null
-        : hex.encode(phoneNumberHashOption.cast<int>());
+        : '0x${hex.encode(phoneNumberHashOption.cast<int>())}';
 
     final updateUserTx = KC2UpdateUserTxV1(
       username: username,
@@ -778,7 +780,7 @@ class KarmachainService implements K2ServiceInterface {
         toPhoneNumberHash = res.phoneNumberHash;
         break;
       default:
-        toPhoneNumberHash = hex.encode(accountIdentityValue.cast<int>());
+        toPhoneNumberHash = '0x${hex.encode(accountIdentityValue.cast<int>())}';
 
         // call api to get missing fields
         final res = await getUserInfoByPhoneNumberHash(toPhoneNumberHash);
