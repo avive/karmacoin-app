@@ -19,7 +19,7 @@ void main() {
 
   group('signup tests', () {
     test(
-      'Signup new user',
+      'Signup new user tx',
       () async {
         K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 

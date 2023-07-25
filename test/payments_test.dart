@@ -20,7 +20,7 @@ void main() {
     'payments',
     () {
       test(
-        ' - basic payment test',
+        'Basic payment test',
         () async {
           K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
@@ -140,7 +140,7 @@ void main() {
         timeout: const Timeout(Duration(seconds: 120)),
       );
       test(
-        ' - basic transfer test',
+        'Basic transfer test',
         () async {
           K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 

@@ -18,7 +18,7 @@ void main() {
 
   group('appreciations tests', () {
     test(
-      ' - basic appreciation',
+      'Basic appreciation',
       () async {
         debugPrint('Appreciation test');
 

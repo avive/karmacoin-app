@@ -1,6 +1,6 @@
 import 'dart:async';
-
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/logic/kc2/identity_interface.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
 /// User's kc2 signup status
@@ -16,7 +16,10 @@ abstract class KC2UserInteface {
   final ValueNotifier<SignupStatus> signupStatus =
       ValueNotifier(SignupStatus.unknown);
 
-  // Latest known userInfo obtained from the chain
+  /// User's identity
+  late IdentityInterface identity;
+
+  /// Latest known userInfo obtained from the chain
   KC2UserInfo? userInfo;
 
   /// Initialize the user. Should be aclled on new app session after the kc2 service has been initialized and app has a connection to a kc2 api provider.
@@ -27,7 +30,9 @@ abstract class KC2UserInteface {
   Future<void> signout();
 
   /// Signup user to kc2. SignupStatus will update based on the signup process.
-  Future<void> signup();
+  /// requestedUserName - user's requested username. Must be unique.
+  /// requestedPhoneNumber - user's requested phone number. Must be unique. International format. Excluding leading +.
+  Future<void> signup(String requestedUserName, String requestedPhoneNumber);
 
   /// Update user info from local store
   Future<void> updateUserDataFromLocalStore();

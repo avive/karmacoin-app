@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/kc2/identity.dart';
@@ -9,9 +8,12 @@ import 'package:karma_coin/services/v2.0/user_info.dart';
 
 class KC2User extends KC2UserInteface {
   // private members
-  late IdentityInterface _identity;
   late Timer _subscribeToAccountTimer;
   late final _secureStorage = const FlutterSecureStorage();
+  late IdentityInterface _identity;
+
+  @override
+  IdentityInterface get identity => _identity;
 
   /// Initialize the user. Should be aclled on new app session after the kc2 service has been initialized and app has a connection to a kc2 api provider.
   @override
@@ -27,7 +29,7 @@ class KC2User extends KC2UserInteface {
     // load user info from local store
     await updateUserDataFromLocalStore();
 
-    // get fresh user info from chain
+    // get fresh user info from chain and signup the user if it exists on chain
     await getUserDataFromChain();
 
     // subscribe to account transactions
@@ -50,9 +52,10 @@ class KC2User extends KC2UserInteface {
     await _identity.removeFromStore();
   }
 
-  /// Signup user to kc2
+  /// Signup user to kc2 chain
   @override
-  Future<void> signup() async {
+  Future<void> signup(
+      String requestedUserName, String requestedPhoneNumber) async {
     signupStatus.value = SignupStatus.signingUp;
 
     // set failure callback for 18 secs
@@ -77,7 +80,8 @@ class KC2User extends KC2UserInteface {
     };
 
     // todo: take user name and phone number from app state
-    await kc2Service.newUser(_identity.accountId, "Punch", "972549805381");
+    await kc2Service.newUser(
+        _identity.accountId, requestedUserName, requestedPhoneNumber);
   }
 
   /// Update user info from local store
@@ -110,7 +114,7 @@ class KC2User extends KC2UserInteface {
         signupStatus.value = SignupStatus.notSignedUp;
         return;
       }
-
+      // persist latest user info and set signup to signedup
       userInfo = info;
       await userInfo!.persistToSecureStorage(_secureStorage);
       signupStatus.value = SignupStatus.signedUp;
