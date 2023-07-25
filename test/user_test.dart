@@ -32,8 +32,6 @@ void main() {
         KC2UserInteface katya = KC2User();
         await katya.init();
 
-        // await katya.signout();
-
         String katyaUserName =
             "Katya${katya.identity.accountId.substring(0, 5)}";
 

@@ -1,5 +1,13 @@
 import 'package:karma_coin/services/v2.0/event.dart';
 
+// export all tx types
+export 'package:karma_coin/services/v2.0/txs/appreciation_tx.dart';
+export 'package:karma_coin/services/v2.0/txs/new_user_tx.dart';
+export 'package:karma_coin/services/v2.0/txs/set_admin_tx.dart';
+export 'package:karma_coin/services/v2.0/txs/update_user_tx.dart';
+export 'package:karma_coin/services/v2.0/txs/delete_user_tx.dart';
+export 'package:karma_coin/services/v2.0/txs/transfer_tx.dart';
+
 /// A kc2 transaction
 abstract class KC2Tx {
   late String signer;

@@ -3,7 +3,10 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/kc2/identity.dart';
 import 'package:karma_coin/logic/kc2/identity_interface.dart';
+import 'package:karma_coin/logic/kc2/txs_boss2.dart';
+import 'package:karma_coin/logic/kc2/txs_boss2_interface.dart';
 import 'package:karma_coin/logic/kc2/user_interface.dart';
+import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
 class KC2User extends KC2UserInteface {
@@ -11,6 +14,15 @@ class KC2User extends KC2UserInteface {
   late Timer _subscribeToAccountTimer;
   late final _secureStorage = const FlutterSecureStorage();
   late IdentityInterface _identity;
+  late KC2TransactionBossInterface _txsBoss;
+
+  @override
+  ValueNotifier<List<KC2Tx>> get incomingAppreciations =>
+      _txsBoss.incomingAppreciations;
+
+  @override
+  ValueNotifier<List<KC2Tx>> get outgoingAppreciations =>
+      _txsBoss.outgoingAppreciations;
 
   @override
   IdentityInterface get identity => _identity;
@@ -26,24 +38,55 @@ class KC2User extends KC2UserInteface {
     // Set the user's as the local signer
     kc2Service.setKeyring(_identity.keyring);
 
+    _txsBoss = KC2TransactionBoss(_identity.accountId);
+
     // load user info from local store
     await updateUserDataFromLocalStore();
 
     // get fresh user info from chain and signup the user if it exists on chain
     await getUserDataFromChain();
 
+    kc2Service.transferCallback = (tx) async {
+      _txsBoss.addTransferTx(tx);
+    };
+
+    kc2Service.appreciationCallback = (tx) async {
+      _txsBoss.addAppreciation(tx);
+    };
+
+    kc2Service.updateUserCallback = (tx) async {
+      // get up-to-date user info object from chain
+      await getUserDataFromChain();
+    };
+
     // subscribe to account transactions
     _subscribeToAccountTimer =
         kc2Service.subscribeToAccount(_identity.accountId);
+
+    // for testing purposes - change to only call this once per
+    // app session when user wants to view his appreciations/transfers...
+    await fetchAppreciations();
+  }
+
+  /// Fetch all account related appreciations and payment txs - incoming and outgoing
+  /// Client should call this before user wants to view his txs as this is an expensive slow operation.
+  /// This only needs to happen once per app session as new txs should be streamed to the client via the tx callbacks.
+  @override
+  Future<void> fetchAppreciations() async {
+    await kc2Service.getTransactions(_identity.accountId);
   }
 
   /// Signout and delete ALL locally stored data.
-  /// This userInfo becomes unusable after the call and should not be used anymore.
+  /// This KC2User object becomes unusable after the call and should not be used anymore.
   @override
   Future<void> signout() async {
     if (userInfo.value != null) {
       await userInfo.value?.deleteFromSecureStorage(_secureStorage);
     }
+
+    kc2Service.transferCallback = null;
+    kc2Service.appreciationCallback = null;
+    kc2Service.updateUserCallback = null;
 
     // unsubscribe from kc2 callbacks
     _subscribeToAccountTimer.cancel();
