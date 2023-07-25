@@ -210,7 +210,7 @@ void main() {
 
               debugPrint('Updating phone number...');
 
-              await katya.updateUserInfo(null, phoneNumberHash1);
+              await katya.updateUserInfo(null, phoneNumber1);
 
               break;
             case SignupStatus.notSignedUp:
