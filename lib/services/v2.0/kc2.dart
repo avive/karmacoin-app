@@ -275,6 +275,18 @@ class KarmachainService implements K2ServiceInterface {
   }
 
   @override
+  Future<String> deleteUser() async {
+    try {
+      const call = MapEntry('Identity', MapEntry('delete_user', <String, dynamic>{}));
+
+      return await _signAndSendTransaction(call);
+    } on PlatformException catch (e) {
+      debugPrint('Failed to delete user: ${e.details}');
+      rethrow;
+    }
+  }
+
+  @override
   Future<String> sendTransfer(String accountId, BigInt amount) async {
     try {
       final call = MapEntry(
