@@ -20,6 +20,7 @@ class KC2TransactionBoss extends KC2TransactionBossInterface {
       outgoingAppreciations.value = txs;
     } else {
       debugPrint('Ignoring apprecation: $tx');
+      throw 'this should not happen as to or from must be to local user';
     }
   }
 
@@ -36,6 +37,7 @@ class KC2TransactionBoss extends KC2TransactionBossInterface {
       outgoingAppreciations.value = txs;
     } else {
       debugPrint('Ignoring transfer: $tx');
+      throw 'this should not happen as to or from must be to local user';
     }
   }
 }

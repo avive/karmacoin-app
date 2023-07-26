@@ -18,7 +18,7 @@ abstract class KC2Tx {
 
   late BigInt timestamp;
   late String hash;
-  late String blockNumber;
+  late BigInt blockNumber;
   late int blockIndex;
 
   late List<KC2Event> transactionEvents;
