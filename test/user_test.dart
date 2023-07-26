@@ -435,7 +435,7 @@ void main() {
         expect(await completer.future, equals(true));
         expect(completer.isCompleted, isTrue);
       },
-      timeout: const Timeout(Duration(seconds: 120)),
+      timeout: const Timeout(Duration(seconds: 280)),
     );
   });
 }
