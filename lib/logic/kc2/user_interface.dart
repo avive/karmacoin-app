@@ -24,10 +24,10 @@ abstract class KC2UserInteface {
   final ValueNotifier<KC2UserInfo?> userInfo = ValueNotifier(null);
 
   /// All incoming txs to the user's account
-  late final ValueNotifier<List<KC2Tx>> incomingAppreciations;
+  late final ValueNotifier<Map<String, KC2Tx>> incomingAppreciations;
 
   /// All outgoing txs from the user's account
-  late final ValueNotifier<List<KC2Tx>> outgoingAppreciations;
+  late final ValueNotifier<Map<String, KC2Tx>> outgoingAppreciations;
 
   /// Initialize the user. Should be aclled on new app session after the kc2 service has been initialized and app has a connection to a kc2 api provider.
   Future<void> init();

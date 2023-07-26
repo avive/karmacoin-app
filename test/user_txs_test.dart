@@ -96,8 +96,6 @@ void main() {
 
                     debugPrint('waiting for 14 secs and checking txs...');
                     Future.delayed(const Duration(seconds: 14), () async {
-                      // @Danylo Kyrieiev - now that the failing tx is processed - incoming is 2 for punch !?
-                      // please investigate
                       expect(punch.incomingAppreciations.value.length, 1);
                       expect(punch.outgoingAppreciations.value.length, 2);
 

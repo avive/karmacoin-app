@@ -19,11 +19,11 @@ class KC2User extends KC2UserInteface {
   late String _updateUserTxHash;
 
   @override
-  ValueNotifier<List<KC2Tx>> get incomingAppreciations =>
+  ValueNotifier<Map<String, KC2Tx>> get incomingAppreciations =>
       _txsBoss.incomingAppreciations;
 
   @override
-  ValueNotifier<List<KC2Tx>> get outgoingAppreciations =>
+  ValueNotifier<Map<String, KC2Tx>> get outgoingAppreciations =>
       _txsBoss.outgoingAppreciations;
 
   @override
