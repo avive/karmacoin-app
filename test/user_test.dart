@@ -411,10 +411,13 @@ void main() {
               txHash = await kc2Service.sendAppreciation(
                   punchPhoneNumberHash, BigInt.from(1234), 0, 64);
 
-              // maybee a delay here is needed?
-
-              // signup punch when tx is in the pool
-              await punch.signup(punchUserName, punchPhoneNumber);
+              debugPrint('waiting 14 seconds...');
+              // give enough time for reward to be issued
+              await Future.delayed(const Duration(seconds: 14), () async {
+                // signup punch when tx is in the pool
+                debugPrint('Signing up punch...');
+                await punch.signup(punchUserName, punchPhoneNumber);
+              });
               break;
             case SignupStatus.notSignedUp:
               debugPrint('failed to signup katya');
@@ -435,7 +438,7 @@ void main() {
         expect(await completer.future, equals(true));
         expect(completer.isCompleted, isTrue);
       },
-      timeout: const Timeout(Duration(seconds: 120)),
+      timeout: const Timeout(Duration(seconds: 280)),
     );
   });
 }
