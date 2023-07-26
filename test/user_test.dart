@@ -373,6 +373,11 @@ void main() {
             case SignupStatus.signedUp:
               debugPrint('Katya signup callback called');
 
+              // Send appreciation from katya to punch before punch signed up
+              // so it goes to the pool
+              txHash = await kc2Service.sendAppreciation(
+                  punchPhoneNumberHash, BigInt.from(1234), 0, 64);
+
               await katya.signout();
               KC2UserInteface punch = KC2User();
               await punch.init();
@@ -390,8 +395,8 @@ void main() {
                         await kc2Service.getUserInfoByAccountId(katyaAccountId);
 
                     // check balance and referral trait and score here
-                    expect(katyaInfo!.balance, BigInt.from(20000000));
-                    expect(katyaInfo.karmaScore, 2);
+                    expect(katyaInfo!.balance, BigInt.from(20000000 - 1234));
+                    expect(katyaInfo.karmaScore, 3);
 
                     await punch.signout();
                     completer.complete(true);
@@ -406,15 +411,10 @@ void main() {
                 }
               });
 
-              // Send appreciation from katya to punch before punch signed up
-              // so it goes to the pool
-              txHash = await kc2Service.sendAppreciation(
-                  punchPhoneNumberHash, BigInt.from(1234), 0, 64);
-
               // maybee a delay here is needed?
 
               // signup punch when tx is in the pool
-              await punch.signup(punchUserName, punchPhoneNumber);
+             await punch.signup(punchUserName, punchPhoneNumber);
               break;
             case SignupStatus.notSignedUp:
               debugPrint('failed to signup katya');
