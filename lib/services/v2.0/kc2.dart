@@ -162,7 +162,7 @@ class KarmachainService implements K2ServiceInterface {
         _processTransaction(accountId, transactionBody, events,
             BigInt.from(timestamp), null, blockNumber, transactionIndex);
       } catch (e) {
-        debugPrint('error processing tx: $e');
+        debugPrint('error processing tx: $transaction $e');
         // don't throw so we can process valid txs even when one is bad
       }
     });

@@ -58,4 +58,7 @@ abstract class KC2UserInteface {
   /// Client should call this before user wants to view his txs as this is an expensive slow operation.
   /// This only needs to happen once per app session as new txs should be streamed to the client via the tx callbacks.
   Future<void> fetchAppreciations();
+
+  // Get score for a char trait id
+  int getScore(int traitId);
 }

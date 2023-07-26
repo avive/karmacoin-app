@@ -45,6 +45,16 @@ class KC2UserInfo {
     required this.traitScores,
   });
 
+  /// Returns the score for a provided traitId
+  int getScore(int traitId) {
+    for (TraitScore s in traitScores) {
+      if (s.traitId == traitId) {
+        return s.score;
+      }
+    }
+    return 0;
+  }
+
   KC2UserInfo.clone(KC2UserInfo u)
       : this(
           accountId: u.accountId,

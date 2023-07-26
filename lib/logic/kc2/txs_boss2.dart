@@ -10,11 +10,11 @@ class KC2TransactionBoss extends KC2TransactionBossInterface {
   @override
   void addAppreciation(KC2AppreciationTxV1 tx) {
     // we need to replace the observeable list for clients to get notified
-    if (tx.fromAddress == accountId) {
+    if (tx.toAddress == accountId) {
       List<KC2Tx> txs = incomingAppreciations.value.toList();
       txs.add(tx);
       incomingAppreciations.value = txs;
-    } else if (tx.toAddress == accountId) {
+    } else if (tx.fromAddress == accountId) {
       List<KC2Tx> txs = outgoingAppreciations.value.toList();
       txs.add(tx);
       outgoingAppreciations.value = txs;
@@ -26,11 +26,11 @@ class KC2TransactionBoss extends KC2TransactionBossInterface {
   @override
   void addTransferTx(KC2TransferTxV1 tx) {
     // we need to replace the observeable list for clients to get notified
-    if (tx.fromAddress == accountId) {
+    if (tx.toAddress == accountId) {
       List<KC2Tx> txs = incomingAppreciations.value.toList();
       txs.add(tx);
       incomingAppreciations.value = txs;
-    } else if (tx.toAddress == accountId) {
+    } else if (tx.fromAddress == accountId) {
       List<KC2Tx> txs = outgoingAppreciations.value.toList();
       txs.add(tx);
       outgoingAppreciations.value = txs;

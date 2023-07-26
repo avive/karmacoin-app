@@ -363,7 +363,6 @@ void main() {
         final completer = Completer<bool>();
 
         String katyaAccountId = katya.identity.accountId;
-        String txHash;
 
         katya.signupStatus.addListener(() async {
           switch (katya.signupStatus.value) {
@@ -375,7 +374,7 @@ void main() {
 
               // Send appreciation from katya to punch before punch signed up
               // so it goes to the pool
-              txHash = await kc2Service.sendAppreciation(
+              await kc2Service.sendAppreciation(
                   punchPhoneNumberHash, BigInt.from(1234), 0, 64);
 
               await katya.signout();
@@ -390,12 +389,16 @@ void main() {
                   case SignupStatus.signedUp:
                     debugPrint('Punch signed up');
 
+                    // expected 1 in trait from katya's appreciation
+                    expect(punch.getScore(64), 1);
+
                     // Get userInfo from chain for katya's phone number
                     KC2UserInfo? katyaInfo =
                         await kc2Service.getUserInfoByAccountId(katyaAccountId);
 
                     // check balance and referral trait and score here
                     expect(katyaInfo!.balance, BigInt.from(20000000 - 1234));
+                    // scorfe = signup + app sent/received (spender) + (ambassador) referral trait
                     expect(katyaInfo.karmaScore, 3);
 
                     await punch.signout();
@@ -411,10 +414,8 @@ void main() {
                 }
               });
 
-              // maybee a delay here is needed?
-
               // signup punch when tx is in the pool
-             await punch.signup(punchUserName, punchPhoneNumber);
+              await punch.signup(punchUserName, punchPhoneNumber);
               break;
             case SignupStatus.notSignedUp:
               debugPrint('failed to signup katya');

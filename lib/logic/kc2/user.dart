@@ -50,10 +50,16 @@ class KC2User extends KC2UserInteface {
 
     kc2Service.transferCallback = (tx) async {
       _txsBoss.addTransferTx(tx);
+      // update user balance, etc...
+      // todo: this will cause update on every tx to/from user's account. Optimize to only call per block for possible multiple txs in a block.
+      await getUserDataFromChain();
     };
 
     kc2Service.appreciationCallback = (tx) async {
       _txsBoss.addAppreciation(tx);
+      // update user balance, etc..
+      // todo: this will cause update on every tx to/from user's account. Optimize to only call per block for possible multiple txs in a block.
+      await getUserDataFromChain();
     };
 
     kc2Service.newUserCallback = _signupUserCallback;
@@ -65,7 +71,7 @@ class KC2User extends KC2UserInteface {
 
     // for testing purposes - change to only call this once per
     // app session when user wants to view his appreciations/transfers for the first time...
-    await fetchAppreciations();
+    // await fetchAppreciations();
   }
 
   /// Fetch all account related appreciations and payment txs - incoming and outgoing
@@ -166,6 +172,11 @@ class KC2User extends KC2UserInteface {
         await kc2Service.updateUser(requestedUserName, requestedPhoneNumber);
 
     debugPrint('Update user tx hash: $_updateUserTxHash');
+  }
+
+  @override
+  int getScore(int traitId) {
+    return userInfo.value?.getScore(traitId) ?? 0;
   }
 
   @override
