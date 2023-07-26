@@ -57,7 +57,7 @@ void main() {
             }
 
             if (tx.hash != katyaNewUserTxHash) {
-              debugPrint('unexecpted tx hash: ${tx.hash} ');
+              debugPrint('unexpected tx hash: ${tx.hash} ');
               completer.complete(false);
               return;
             }
@@ -73,7 +73,7 @@ void main() {
               debugPrint('>> transfer callback called');
               if (tx.hash != transferTxHash) {
                 debugPrint(
-                    'unexecpted tx hash: ${tx.hash}. Expected: $transferTxHash');
+                    'unexpected tx hash: ${tx.hash}. Expected: $transferTxHash');
                 completer.complete(false);
                 return;
               }
@@ -105,7 +105,7 @@ void main() {
               }
 
               if (tx.hash != punchNewUserTxHash) {
-                debugPrint('unexecpted tx hash: ${tx.hash} ');
+                debugPrint('unexpected tx hash: ${tx.hash} ');
                 completer.complete(false);
                 return;
               }
@@ -176,7 +176,7 @@ void main() {
             }
 
             if (tx.hash != katyaNewUserTxHash) {
-              debugPrint('unexecpted tx hash: ${tx.hash} ');
+              debugPrint('unexpected tx hash: ${tx.hash} ');
               completer.complete(false);
               return;
             }
@@ -192,7 +192,7 @@ void main() {
               debugPrint('>> transfer callback called');
               if (tx.hash != transferTxHash) {
                 debugPrint(
-                    'unexecpted tx hash: ${tx.hash}. Expected: $transferTxHash');
+                    'unexpected tx hash: ${tx.hash}. Expected: $transferTxHash');
                 completer.complete(false);
                 return;
               }
@@ -224,7 +224,7 @@ void main() {
               }
 
               if (tx.hash != punchNewUserTxHash) {
-                debugPrint('unexecpted tx hash: ${tx.hash} ');
+                debugPrint('unexpected tx hash: ${tx.hash} ');
                 completer.complete(false);
                 return;
               }
