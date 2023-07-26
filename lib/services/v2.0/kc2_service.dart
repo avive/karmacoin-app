@@ -46,6 +46,9 @@ abstract class K2ServiceInterface {
   /// Update user's user name or phone number
   Future<String> updateUser(String? username, String? phoneNumber);
 
+  /// Update user's user name or phone number
+  Future<String> deleteUser();
+
   /// Transfer coins from local account to an account
   Future<String> sendTransfer(String accountId, BigInt amount);
 
