@@ -76,6 +76,10 @@ void main() {
 
                     // expected 1 in trait from katya's appreciation
                     expect(punch.getScore(64), 1);
+                    expect(punch.userInfo.value?.balance,
+                        BigInt.from(10000000 + 1234));
+
+                    expect(punch.userInfo.value?.karmaScore, 2);
 
                     // get all account txs from chain
                     await punch.fetchAppreciations();
@@ -85,15 +89,23 @@ void main() {
                     expect(punch.outgoingAppreciations.value.length, 0);
 
                     await kc2Service.sendAppreciation(
-                        katyaPhoneNumberHash, BigInt.from(5000000), 0, 24);
+                        katyaPhoneNumberHash, BigInt.from(54321), 0, 24);
 
                     await kc2Service.sendTransfer(
-                        katyaAccountId, BigInt.from(3000000));
+                        katyaAccountId, BigInt.from(12345));
 
-                    debugPrint('wait for 14 seconds and check txs...');
+                    debugPrint('waiting for 14 secs and checking txs...');
                     Future.delayed(const Duration(seconds: 14), () async {
                       expect(punch.incomingAppreciations.value.length, 1);
                       expect(punch.outgoingAppreciations.value.length, 2);
+
+                      // check karma score and balance
+                      // @Danylo Kyrieiev - I think that punch is getting karma reward - need to fix this once we fix that issue - change 20KC to 10KC below...
+                      expect(punch.userInfo.value?.balance,
+                          BigInt.from(20000000 + 1234 - 12345 - 54321));
+
+                      expect(punch.userInfo.value?.karmaScore, 4);
+
                       await punch.signout();
                       completer.complete(true);
                     });
