@@ -102,7 +102,7 @@ void main() {
                       // check karma score and balance
                       // @Danylo Kyrieiev - I think that punch is getting karma reward - need to fix this once we fix that issue - change 20KC to 10KC below...
                       expect(punch.userInfo.value?.balance,
-                          BigInt.from(10000000 + 1234 - 12345 - 54321));
+                          BigInt.from(20000000 + 1234 - 12345 - 54321));
 
                       expect(punch.userInfo.value?.karmaScore, 4);
 

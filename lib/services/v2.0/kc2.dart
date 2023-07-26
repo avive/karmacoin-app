@@ -151,6 +151,7 @@ class KarmachainService implements K2ServiceInterface {
 
     txs?.forEach((transaction) async {
       try {
+        // todo: verify status is 'OnChain'
         final BigInt blockNumber = BigInt.from(transaction['block_number']);
         final int transactionIndex = transaction['transaction_index'];
         final bytes = transaction['signed_transaction']['transaction_body'];
@@ -176,14 +177,21 @@ class KarmachainService implements K2ServiceInterface {
 
   Future<List<KC2Event>> _getTransactionEvents(
       BigInt blockNumber, int transactionIndex) async {
-    final blockHash = await karmachain
-        .send('chain_getBlockHash', [blockNumber]).then((v) => v.result);
-    final events = await _getEvents(blockHash);
-    final transactionEvents = events
-        .where((event) => event.extrinsicIndex == transactionIndex)
-        .toList();
+    try {
+      final String blockNumberString = '0x${blockNumber.toRadixString(16)}';
 
-    return transactionEvents;
+      final blockHash = await karmachain.send(
+          'chain_getBlockHash', [blockNumberString]).then((v) => v.result);
+      final events = await _getEvents(blockHash);
+      final transactionEvents = events
+          .where((event) => event.extrinsicIndex == transactionIndex)
+          .toList();
+
+      return transactionEvents;
+    } catch (e) {
+      debugPrint('error getting tx events: $e');
+      rethrow;
+    }
   }
 
   // Transactions
@@ -280,7 +288,8 @@ class KarmachainService implements K2ServiceInterface {
   @override
   Future<String> deleteUser() async {
     try {
-      const call = MapEntry('Identity', MapEntry('delete_user', <String, dynamic>{}));
+      const call =
+          MapEntry('Identity', MapEntry('delete_user', <String, dynamic>{}));
 
       return await _signAndSendTransaction(call);
     } on PlatformException catch (e) {
