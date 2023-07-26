@@ -780,7 +780,8 @@ class KarmachainService implements K2ServiceInterface {
         // call api to get missing fields
         final res = await getUserInfoByUserName(accountIdentityValue);
         if (res == null) {
-          throw 'failed to get user id by username via api';
+          debugPrint('failed to get user id by username via api');
+          return;
         }
         toAccountId = res.accountId;
         toPhoneNumberHash = res.phoneNumberHash;
@@ -792,7 +793,8 @@ class KarmachainService implements K2ServiceInterface {
         final res = await getUserInfoByPhoneNumberHash(toPhoneNumberHash);
         // todo: handle null result case
         if (res == null) {
-          throw 'failed to get user id by phone hash via api';
+          debugPrint('failed to get user id by phone hash via api');
+          return;
         }
 
         // complete missing field in tx with data from api
