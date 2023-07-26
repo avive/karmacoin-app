@@ -146,6 +146,7 @@ class KarmachainService implements K2ServiceInterface {
   /// accountId - ss58 encoded address
   @override
   Future<void> getTransactions(String accountId) async {
+    debugPrint('Getting all txs for account: $accountId');
     final txs = await karmachain.send(
         'transactions_getTransactions', [accountId]).then((v) => v.result);
 
@@ -160,19 +161,16 @@ class KarmachainService implements K2ServiceInterface {
         final int timestamp = transaction['timestamp'];
         final List<KC2Event> events =
             await _getTransactionEvents(blockNumber, transactionIndex);
-
-        debugPrint('>>> about to process tx...');
-
         _processTransaction(accountId, transactionBody, events,
             BigInt.from(timestamp), null, blockNumber, transactionIndex);
       } catch (e) {
-        // @Danylo Kyrieiev - getting type 'int' is not a subtype of type 'String' error on some txs...
         debugPrint('error processing tx: $transaction $e');
         // don't throw so we can process valid txs even when one is bad
       }
     });
 
-    debugPrint('Account transactions: $txs');
+    debugPrint('Processed ${txs.length} txs for account: $accountId}');
+    // debugPrint('Account transactions: $txs');
   }
 
   Future<List<KC2Event>> _getTransactionEvents(
