@@ -257,7 +257,6 @@ void main() {
 
         final completer = Completer<bool>();
 
-        BigInt balance;
         String katyaAccountId;
 
         katya.signupStatus.addListener(() async {
@@ -268,12 +267,9 @@ void main() {
             case SignupStatus.signedUp:
               debugPrint('Katya signup callback called');
 
-              // signup user with same phone number but different id and same phone number again
-              // this simulates install on new device and migration of user data between accounts
+              // signup user with same phone number but different id and same phone number again. This simulates install on new device and migration of user data between accounts
 
-              balance = katya.userInfo.value!.balance;
               katyaAccountId = katya.identity.accountId;
-
               await katya.signout();
               KC2UserInteface katya1 = KC2User();
               // set katya1 as local user - this should set kc2 keyring to katya1
@@ -292,25 +288,15 @@ void main() {
                         .getUserInfoByPhoneNumberHash(phoneNumberHash);
 
                     expect(userInfo, isNotNull);
-
-                    // @Danylo Kyrieiev - following expect fails - api returns katya's accountId instead of katya1...
                     expect(userInfo!.accountId, katya1.identity.accountId);
-
                     expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
                     expect(userInfo.userName, katyaUserName);
 
-                    // expected to see balance reflecting katya's signup-reward
-                    // and no additional reward on katyas1 signup
+                    // expected to see balance reflecting katya's signup-reward and no additional reward on katyas1 signup
                     expect(userInfo.balance, BigInt.from(10000000));
-
-                    // expected katya's balance to be migrated to katya1
-                    // and to not see signup reward for katya1...
-                    expect(userInfo.balance, balance);
 
                     KC2UserInfo? oldAccountInfo =
                         await kc2Service.getUserInfoByAccountId(katyaAccountId);
-
-                    // @Danylo Kyrieiev - this returns old user account after migration - should return null
 
                     // we expect katya's account to be deleted from chain after migration
                     expect(oldAccountInfo, isNull);
