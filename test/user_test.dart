@@ -21,9 +21,9 @@ void main() {
 
   K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
-  group('kc2 user tests', () {
+  group('kc2 users tests', () {
     test(
-      'Signup kc2 user',
+      'Signup user',
       () async {
         // connect before creating a user
         await kc2Service.connectToApi('ws://127.0.0.1:9944');
@@ -93,7 +93,7 @@ void main() {
     );
 
     test(
-      'Update kc2 user name',
+      'Update user name',
       () async {
         // connect before creating a user
         await kc2Service.connectToApi('ws://127.0.0.1:9944');
@@ -165,7 +165,7 @@ void main() {
     );
 
     test(
-      'Update kc2 phone number',
+      'Update phone number',
       () async {
         // connect before creating a user
         await kc2Service.connectToApi('ws://127.0.0.1:9944');
@@ -239,7 +239,7 @@ void main() {
     );
 
     test(
-      'Migrate kc2 user',
+      'Migrate user',
       () async {
         // connect before creating a user
         await kc2Service.connectToApi('ws://127.0.0.1:9944');
@@ -317,6 +317,104 @@ void main() {
               debugPrint('katya1 accountId: ${katya1.identity.accountId}');
               // signup katya1 with same user name and phone number as katya
               await katya1.signup(katyaUserName, katyaPhoneNumber);
+              break;
+            case SignupStatus.notSignedUp:
+              debugPrint('failed to signup katya');
+              await katya.signout();
+              completer.complete(false);
+              break;
+            default:
+              break;
+          }
+        });
+
+        debugPrint('Signing up katya. AccountId: ${katya.identity.accountId}');
+
+        // signup katya
+        await katya.signup(katyaUserName, katyaPhoneNumber);
+
+        // wait for completer and verify test success
+        expect(await completer.future, equals(true));
+        expect(completer.isCompleted, isTrue);
+      },
+      timeout: const Timeout(Duration(seconds: 120)),
+    );
+
+    test(
+      'Referral reward',
+      () async {
+        // connect before creating a user
+        await kc2Service.connectToApi('ws://127.0.0.1:9944');
+
+        KC2UserInteface katya = KC2User();
+        await katya.init();
+
+        String katyaUserName =
+            "Katya${katya.identity.accountId.substring(0, 5)}";
+
+        String punchUserName =
+            "Punch${katya.identity.accountId.substring(5, 10)}";
+
+        String katyaPhoneNumber = randomPhoneNumber;
+        String punchPhoneNumber = randomPhoneNumber;
+        String punchPhoneNumberHash =
+            kc2Service.getPhoneNumberHash(punchPhoneNumber);
+
+        final completer = Completer<bool>();
+
+        String katyaAccountId = katya.identity.accountId;
+        String txHash;
+
+        katya.signupStatus.addListener(() async {
+          switch (katya.signupStatus.value) {
+            case SignupStatus.signingUp:
+              debugPrint('Katya is signing up...');
+              break;
+            case SignupStatus.signedUp:
+              debugPrint('Katya signup callback called');
+
+              await katya.signout();
+              KC2UserInteface punch = KC2User();
+              await punch.init();
+
+              punch.signupStatus.addListener(() async {
+                switch (punch.signupStatus.value) {
+                  case SignupStatus.signingUp:
+                    debugPrint('Punch is signing up...');
+                    break;
+                  case SignupStatus.signedUp:
+                    debugPrint('Punch signed up');
+
+                    // Get userInfo from chain for katya's phone number
+                    KC2UserInfo? katyaInfo =
+                        await kc2Service.getUserInfoByAccountId(katyaAccountId);
+
+                    // check balance and referral trait and score here
+                    expect(katyaInfo!.balance, BigInt.from(20000000));
+                    expect(katyaInfo.karmaScore, 2);
+
+                    await punch.signout();
+                    completer.complete(true);
+                    break;
+                  case SignupStatus.notSignedUp:
+                    debugPrint('failed to signup katya1');
+                    await katya.signout();
+                    completer.complete(false);
+                    break;
+                  default:
+                    break;
+                }
+              });
+
+              // Send appreciation from katya to punch before punch signed up
+              // so it goes to the pool
+              txHash = await kc2Service.sendAppreciation(
+                  punchPhoneNumberHash, BigInt.from(1234), 0, 64);
+
+              // maybee a delay here is needed?
+
+              // signup punch when tx is in the pool
+              await punch.signup(punchUserName, punchPhoneNumber);
               break;
             case SignupStatus.notSignedUp:
               debugPrint('failed to signup katya');

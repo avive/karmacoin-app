@@ -292,18 +292,19 @@ class KarmachainService implements K2ServiceInterface {
 
   /// todo: add support for sending a appreciation to a user name. To, implement, get the phone number hash from the chain for user name or id via the RPC api and send appreciation to it. No need to appreciate by accountId.
 
-  /// Send an appreciation or a payment to a phone number hash
+  /// Send an appreciation or a payment to a phone number hash.
+  /// phoneNumberHash - canonical hex string of phone number hash using blake32. Can be with or without 0x prefix
   @override
-  Future<String> sendAppreciation(String hexPhoneNumberHash, BigInt amount,
+  Future<String> sendAppreciation(String phoneNumberHash, BigInt amount,
       int communityId, int charTraitId) async {
-    if (hexPhoneNumberHash.startsWith('0x')) {
-      hexPhoneNumberHash = hexPhoneNumberHash.substring(2);
+    if (phoneNumberHash.startsWith('0x')) {
+      phoneNumberHash = phoneNumberHash.substring(2);
     }
     try {
       final call = MapEntry(
           'Appreciation',
           MapEntry('appreciation', {
-            'to': MapEntry('PhoneNumberHash', hex.decode(hexPhoneNumberHash)),
+            'to': MapEntry('PhoneNumberHash', hex.decode(phoneNumberHash)),
             'amount': amount,
             'community_id': Option.some(communityId),
             'char_trait_id': Option.some(charTraitId),
