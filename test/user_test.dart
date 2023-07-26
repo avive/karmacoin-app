@@ -280,7 +280,7 @@ void main() {
               await katya1.init();
 
               katya1.signupStatus.addListener(() async {
-                switch (katya.signupStatus.value) {
+                switch (katya1.signupStatus.value) {
                   case SignupStatus.signingUp:
                     debugPrint('Katya1 is signing up...');
                     break;
@@ -293,7 +293,6 @@ void main() {
 
                     expect(userInfo, isNotNull);
 
-                    // @Danylo Kyrieiev - following expect fails - api returns katya's accountId instead of katya1...
                     expect(userInfo!.accountId, katya1.identity.accountId);
 
                     expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
@@ -309,8 +308,6 @@ void main() {
 
                     KC2UserInfo? oldAccountInfo =
                         await kc2Service.getUserInfoByAccountId(katyaAccountId);
-
-                    // @Danylo Kyrieiev - this returns old user account after migration - should return null
 
                     // we expect katya's account to be deleted from chain after migration
                     expect(oldAccountInfo, isNull);
