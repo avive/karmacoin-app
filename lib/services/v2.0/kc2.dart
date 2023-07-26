@@ -162,6 +162,7 @@ class KarmachainService implements K2ServiceInterface {
         _processTransaction(accountId, transactionBody, events,
             BigInt.from(timestamp), null, blockNumber, transactionIndex);
       } catch (e) {
+        // @Danylo Kyrieiev - getting type 'int' is not a subtype of type 'String' error on some txs...
         debugPrint('error processing tx: $transaction $e');
         // don't throw so we can process valid txs even when one is bad
       }
