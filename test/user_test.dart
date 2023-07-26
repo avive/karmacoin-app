@@ -280,7 +280,7 @@ void main() {
               await katya1.init();
 
               katya1.signupStatus.addListener(() async {
-                switch (katya.signupStatus.value) {
+                switch (katya1.signupStatus.value) {
                   case SignupStatus.signingUp:
                     debugPrint('Katya1 is signing up...');
                     break;
