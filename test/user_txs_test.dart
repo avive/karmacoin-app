@@ -100,7 +100,7 @@ void main() {
                       expect(punch.outgoingAppreciations.value.length, 2);
 
                       // check karma score and balance
-                      // @Danylo Kyrieiev - I think that punch is getting karma reward - need to fix this once we fix that issue - change 20KC to 10KC below...
+                      // @Avive balance equal to `20000000` because of referral reward
                       expect(punch.userInfo.value?.balance,
                           BigInt.from(20000000 + 1234 - 12345 - 54321));
 

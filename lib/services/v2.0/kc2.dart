@@ -532,7 +532,6 @@ class KarmachainService implements K2ServiceInterface {
       debugPrint("Processing block $blockNumber");
       // Do not process same block twice
       if (previousBlockNumber?.compareTo(blockNumber) == 0) {
-        // @Danylo Kyrieiev - what happens on chain reorg?
         // don't we need to just process same block again?
         debugPrint('Block already processed. Skipping.');
         return blockNumber;
