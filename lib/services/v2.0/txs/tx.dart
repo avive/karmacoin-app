@@ -1,4 +1,5 @@
 import 'package:karma_coin/services/v2.0/event.dart';
+import 'package:karma_coin/services/v2.0/error.dart';
 
 // export all tx types
 export 'package:karma_coin/services/v2.0/txs/appreciation_tx.dart';
@@ -13,8 +14,7 @@ abstract class KC2Tx {
   late String signer;
   late String pallet;
   late String method;
-  late MapEntry<String, Object?>?
-      failedReason; // is this a string or other type?
+  late ChainError? failedReason;
 
   late BigInt timestamp;
   late String hash;
