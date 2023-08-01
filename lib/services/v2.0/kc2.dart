@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:collection/collection.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/kc2/keyring.dart';
+import 'package:karma_coin/services/v2.0/error.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
 import 'package:karma_coin/services/v2.0/event.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
@@ -16,12 +17,16 @@ import 'package:substrate_metadata_fixed/models/models.dart';
 import 'package:substrate_metadata_fixed/substrate_metadata.dart';
 import 'package:convert/convert.dart';
 import 'package:substrate_metadata_fixed/types/metadata_types.dart';
+import 'package:substrate_metadata_fixed/utils/utils.dart';
 
 class KarmachainService implements K2ServiceInterface {
   late polkadart.Provider karmachain;
   late polkadart.StateApi api;
   late KC2KeyRing keyring;
   Blake2bHasher hasher = const Blake2bHasher(64);
+
+  /// Decoded chain metadata
+  late DecodedMetadata decodedMetadata;
 
   /// Connected chain info
   @override
@@ -62,8 +67,8 @@ class KarmachainService implements K2ServiceInterface {
       debugPrint('Api initialized');
 
       final metadata = await karmachain.send('state_getMetadata', []);
-      final DecodedMetadata decodedMetadata =
-          MetadataDecoder.instance.decode(metadata.result.toString());
+
+      decodedMetadata = MetadataDecoder.instance.decode(metadata.result.toString());
       chainInfo = ChainInfo.fromMetadata(decodedMetadata);
       debugPrint('Fetched chainInfo: ${chainInfo.version}');
 
@@ -616,15 +621,12 @@ class KarmachainService implements K2ServiceInterface {
         return;
       }
 
-      // @Danylo Kyrieiev todo: we need the failed reason to be a concrete type
-      // so it can be properly handled in the app
-
-      final failedReason = txEvents
+      final failedEventData = txEvents
           .where((event) => event.eventName == 'ExtrinsicFailed')
           .firstOrNull
-          ?.data['dispatch_error'];
+          ?.data;
 
-      // debugPrint('$pallet $method $args $signer $failedReason');
+      final failedReason = _processFailedEventData(failedEventData);
 
       if (newUserCallback != null &&
           pallet == 'Identity' &&
@@ -751,7 +753,7 @@ class KarmachainService implements K2ServiceInterface {
       BigInt blockNumber,
       Map<String, dynamic> args,
       int blockIndex,
-      MapEntry<String, Object?>? failedReason,
+      ChainError? failedReason,
       Map<String, dynamic> rawData,
       List<KC2Event> txEvents) async {
     try {
@@ -789,7 +791,7 @@ class KarmachainService implements K2ServiceInterface {
       String address,
       String signer,
       Map<String, dynamic> args,
-      MapEntry<String, Object?>? failedReason,
+      ChainError? failedReason,
       String method,
       String pallet,
       BigInt blockNumber,
@@ -832,7 +834,7 @@ class KarmachainService implements K2ServiceInterface {
       String address,
       String signer,
       Map<String, dynamic> args,
-      MapEntry<String, Object?>? failedReason,
+      ChainError? failedReason,
       String method,
       String pallet,
       BigInt blockNumber,
@@ -999,7 +1001,7 @@ class KarmachainService implements K2ServiceInterface {
       String address,
       String signer,
       Map<String, dynamic> args,
-      MapEntry<String, Object?>? failedReason,
+      ChainError? failedReason,
       String method,
       String pallet,
       BigInt blockNumber,
@@ -1038,5 +1040,26 @@ class KarmachainService implements K2ServiceInterface {
       debugPrint('error processing transfer tx: $e');
       rethrow;
     }
+  }
+
+  ChainError? _processFailedEventData(Map<String, dynamic>? failedReason) {
+    if (failedReason == null) {
+      return null;
+    }
+
+    final moduleIndex = failedReason['dispatch_error']?.value['index'];
+    final errorIndex = failedReason['dispatch_error']?.value['error'][0];
+    debugPrint('Process error module $moduleIndex error $errorIndex');
+
+    final codecTypeId = decodedMetadata.metadata['pallets'][moduleIndex]['errors'].value['type'];
+    debugPrint('Codec type id: $codecTypeId');
+
+    final codecSchema = decodedMetadata.metadata['lookup']['types'].firstWhere((e) => e['id'] == codecTypeId);
+    debugPrint('Codec schema: $codecSchema');
+
+    final errorMetadata = codecSchema['type']['def'].value['variants'][errorIndex];
+    debugPrint('Error metadata: $errorMetadata');
+
+    return ChainError.fromSubstrateMetadata(errorMetadata);
   }
 }
