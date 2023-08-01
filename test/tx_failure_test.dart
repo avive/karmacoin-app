@@ -20,7 +20,7 @@ void main() {
   group('failure tests', () {
     test(
       'Update user phone number failure',
-          () async {
+      () async {
         K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
         // Create a new identity for local user
@@ -70,8 +70,7 @@ void main() {
 
           debugPrint('calling update user...');
           try {
-            updateTexHash =
-            await kc2Service.updateUser(null, katyaPhoneNumber);
+            updateTexHash = await kc2Service.updateUser(null, katyaPhoneNumber);
           } catch (e) {
             debugPrint('Failed to update user: $e');
             completer.complete(false);
@@ -99,6 +98,116 @@ void main() {
       timeout: const Timeout(
         Duration(seconds: 120),
       ),
+    );
+
+    test(
+      'Appreciation insufficient funds',
+      () async {
+        debugPrint('Appreciation insufficient funds');
+
+        K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
+
+        // Create a new identity for local user
+        IdentityInterface katya = Identity();
+        IdentityInterface punch = Identity();
+
+        await katya.initNoStorage();
+        await punch.initNoStorage();
+
+        String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
+        String katyaPhoneNumber = randomPhoneNumber;
+        String punchUserName = "Punch${punch.accountId.substring(0, 5)}";
+        String punchPhoneNumber = randomPhoneNumber;
+
+        // Set katya as signer
+        kc2Service.setKeyring(katya.keyring);
+        debugPrint('Local user katya public address: ${katya.accountId}');
+
+        final completer = Completer<bool>();
+        String appreciationTxHash = "";
+        String katyaNewUserTxHash = "";
+        String punchNewUserTxHash = "";
+
+        kc2Service.newUserCallback = (tx) async {
+          debugPrint('>> Katya new user callback called');
+          if (tx.failedReason != null) {
+            completer.complete(false);
+            return;
+          }
+
+          if (tx.hash != katyaNewUserTxHash) {
+            debugPrint('unexpected tx hash: ${tx.hash} ');
+            completer.complete(false);
+            return;
+          }
+
+          KC2UserInfo? katyaInfo =
+              await kc2Service.getUserInfoByUserName(katyaUserName);
+
+          BigInt txAmount = katyaInfo!.balance + BigInt.one;
+
+          // switch local user to punch
+          kc2Service.subscribeToAccount(punch.accountId);
+          kc2Service.setKeyring(punch.keyring);
+
+          kc2Service.appreciationCallback = (tx) async {
+            if (tx.hash != appreciationTxHash) {
+              debugPrint('unexpected tx hash: ${tx.hash} ');
+              completer.complete(false);
+              return;
+            }
+
+            if (tx.failedReason == null) {
+              completer.complete(false);
+              return;
+            }
+
+            debugPrint('>> appreciation tx: $tx');
+
+            if (!completer.isCompleted) {
+              completer.complete(true);
+            }
+          };
+
+          kc2Service.newUserCallback = (tx) async {
+            debugPrint('>> Punch new user callback called');
+            if (tx.failedReason != null) {
+              completer.complete(false);
+              return;
+            }
+
+            if (tx.hash != punchNewUserTxHash) {
+              debugPrint('unexpected tx hash: ${tx.hash} ');
+              completer.complete(false);
+              return;
+            }
+
+            // send appreciation w/o sufficient funds
+            appreciationTxHash = await kc2Service.sendAppreciation(
+                kc2Service.getPhoneNumberHash(katyaPhoneNumber),
+                txAmount,
+                0,
+                35);
+          };
+
+          // signup punch
+          punchNewUserTxHash = await kc2Service.newUser(
+              punch.accountId, punchUserName, punchPhoneNumber);
+        };
+
+        await kc2Service.connectToApi('ws://127.0.0.1:9944');
+
+        // subscribe to new account txs
+        kc2Service.subscribeToAccount(katya.accountId);
+
+        katyaNewUserTxHash = await kc2Service.newUser(
+            katya.accountId, katyaUserName, katyaPhoneNumber);
+
+        // wait for completer and verify test success
+        expect(await completer.future, equals(true));
+        expect(completer.isCompleted, isTrue);
+      },
+      timeout: const Timeout(Duration(seconds: 120)),
     );
   });
 }

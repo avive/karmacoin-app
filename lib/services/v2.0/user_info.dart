@@ -55,6 +55,7 @@ class KC2UserInfo {
     return 0;
   }
 
+  /// Copy constructor
   KC2UserInfo.clone(KC2UserInfo u)
       : this(
           accountId: u.accountId,
@@ -66,8 +67,7 @@ class KC2UserInfo {
           traitScores: u.traitScores,
         );
 
-  // todo: support community memberships
-  //
+  // todo: add support for community memberships
 
   KC2UserInfo.fromJson(Map<String, dynamic> u)
       : accountId = u['account_id'],

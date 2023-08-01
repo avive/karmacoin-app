@@ -6,6 +6,7 @@ import 'package:karma_coin/logic/kc2/identity_interface.dart';
 import 'package:karma_coin/logic/kc2/txs_boss2.dart';
 import 'package:karma_coin/logic/kc2/txs_boss2_interface.dart';
 import 'package:karma_coin/logic/kc2/user_interface.dart';
+import 'package:karma_coin/services/v2.0/kc2_service.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
@@ -68,18 +69,18 @@ class KC2User extends KC2UserInteface {
     // subscribe to account transactions
     _subscribeToAccountTimer =
         kc2Service.subscribeToAccount(_identity.accountId);
-
-    // for testing purposes - change to only call this once per
-    // app session when user wants to view his appreciations/transfers for the first time...
-    // await fetchAppreciations();
   }
 
   /// Fetch all account related appreciations and payment txs - incoming and outgoing
   /// Client should call this before user wants to view his txs as this is an expensive slow operation.
   /// This only needs to happen once per app session as new txs should be streamed to the client via the tx callbacks.
   @override
-  Future<void> fetchAppreciations() async {
-    await kc2Service.getTransactions(_identity.accountId);
+  Future<FetchAppreciationsStatus> fetchAppreciations() async {
+    fetchAppreciationStatus.value = FetchAppreciationsStatus.fetching;
+    fetchAppreciationStatus.value =
+        await kc2Service.getTransactions(_identity.accountId);
+
+    return fetchAppreciationStatus.value;
   }
 
   /// Signout and delete ALL locally stored data.

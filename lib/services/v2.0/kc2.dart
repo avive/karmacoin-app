@@ -17,7 +17,6 @@ import 'package:substrate_metadata_fixed/models/models.dart';
 import 'package:substrate_metadata_fixed/substrate_metadata.dart';
 import 'package:convert/convert.dart';
 import 'package:substrate_metadata_fixed/types/metadata_types.dart';
-import 'package:substrate_metadata_fixed/utils/utils.dart';
 
 class KarmachainService implements K2ServiceInterface {
   late polkadart.Provider karmachain;
@@ -68,7 +67,8 @@ class KarmachainService implements K2ServiceInterface {
 
       final metadata = await karmachain.send('state_getMetadata', []);
 
-      decodedMetadata = MetadataDecoder.instance.decode(metadata.result.toString());
+      decodedMetadata =
+          MetadataDecoder.instance.decode(metadata.result.toString());
       chainInfo = ChainInfo.fromMetadata(decodedMetadata);
       debugPrint('Fetched chainInfo: ${chainInfo.version}');
 
@@ -150,7 +150,7 @@ class KarmachainService implements K2ServiceInterface {
   /// Get all on-chain txs to or form an account
   /// accountId - ss58 encoded address
   @override
-  Future<void> getTransactions(String accountId) async {
+  Future<FetchAppreciationsStatus> getTransactions(String accountId) async {
     debugPrint('Getting all txs for account: $accountId');
     final txs = await karmachain.send(
         'transactions_getTransactions', [accountId]).then((v) => v.result);
@@ -171,11 +171,15 @@ class KarmachainService implements K2ServiceInterface {
       } catch (e) {
         debugPrint('error processing tx: $transaction $e');
         // don't throw so we can process valid txs even when one is bad
+
+        return FetchAppreciationsStatus.error;
       }
     });
 
     debugPrint('Processed ${txs.length} txs for account: $accountId}');
     // debugPrint('Account transactions: $txs');
+
+    return FetchAppreciationsStatus.fetched;
   }
 
   Future<List<KC2Event>> _getTransactionEvents(
@@ -532,15 +536,19 @@ class KarmachainService implements K2ServiceInterface {
     try {
       final header =
           await karmachain.send('chain_getHeader', []).then((v) => v.result);
+
       //debugPrint('Retrieve chain head: $header');
+
       final BigInt blockNumber = BigInt.parse(header['number']);
-      debugPrint("Processing block $blockNumber");
+
       // Do not process same block twice
       if (previousBlockNumber?.compareTo(blockNumber) == 0) {
         // don't we need to just process same block again?
-        debugPrint('Block already processed. Skipping.');
+        debugPrint('Block $blockNumber already processed. Skipping.');
         return blockNumber;
       }
+
+      debugPrint("Processing block $blockNumber");
 
       final blockHash = await karmachain
           .send('chain_getBlockHash', [header['number']]).then((v) => v.result);
@@ -1051,13 +1059,16 @@ class KarmachainService implements K2ServiceInterface {
     final errorIndex = failedReason['dispatch_error']?.value['error'][0];
     debugPrint('Process error module $moduleIndex error $errorIndex');
 
-    final codecTypeId = decodedMetadata.metadata['pallets'][moduleIndex]['errors'].value['type'];
+    final codecTypeId = decodedMetadata
+        .metadata['pallets'][moduleIndex]['errors'].value['type'];
     debugPrint('Codec type id: $codecTypeId');
 
-    final codecSchema = decodedMetadata.metadata['lookup']['types'].firstWhere((e) => e['id'] == codecTypeId);
+    final codecSchema = decodedMetadata.metadata['lookup']['types']
+        .firstWhere((e) => e['id'] == codecTypeId);
     debugPrint('Codec schema: $codecSchema');
 
-    final errorMetadata = codecSchema['type']['def'].value['variants'][errorIndex];
+    final errorMetadata =
+        codecSchema['type']['def'].value['variants'][errorIndex];
     debugPrint('Error metadata: $errorMetadata');
 
     return ChainError.fromSubstrateMetadata(errorMetadata);

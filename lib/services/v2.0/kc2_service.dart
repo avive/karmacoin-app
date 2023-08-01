@@ -11,6 +11,8 @@ typedef UpdateUserCallback = Future<void> Function(KC2UpdateUserTxV1 tx);
 typedef AppreciationCallback = Future<void> Function(KC2AppreciationTxV1 tx);
 typedef TransferCallback = Future<void> Function(KC2TransferTxV1 tx);
 
+enum FetchAppreciationsStatus { idle, fetching, fetched, error }
+
 abstract class K2ServiceInterface {
   /// Available after connectToApi() called and completed without an error
   ChainInfo get chainInfo;
@@ -72,7 +74,7 @@ abstract class K2ServiceInterface {
   /// Get all transactions from chain to, or from an account
   /// Transactions will be sent to registered event handlers based on their type
   /// accountId - ss58 encoded address
-  Future<void> getTransactions(String accountId);
+  Future<FetchAppreciationsStatus> getTransactions(String accountId);
 
   // helpers
 

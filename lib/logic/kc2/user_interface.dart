@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/kc2/identity_interface.dart';
+import 'package:karma_coin/services/v2.0/kc2_service.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
@@ -16,6 +17,10 @@ abstract class KC2UserInteface {
   /// Observeable signup status
   final ValueNotifier<SignupStatus> signupStatus =
       ValueNotifier(SignupStatus.unknown);
+
+  /// Observeable txs fetching status
+  final ValueNotifier<FetchAppreciationsStatus> fetchAppreciationStatus =
+      ValueNotifier(FetchAppreciationsStatus.idle);
 
   /// User's identity
   late IdentityInterface identity;
@@ -57,7 +62,7 @@ abstract class KC2UserInteface {
   /// Fetch all account related appreciations and payment txs - incoming and outgoing
   /// Client should call this before user wants to view his txs as this is an expensive slow operation.
   /// This only needs to happen once per app session as new txs should be streamed to the client via the tx callbacks.
-  Future<void> fetchAppreciations();
+  Future<FetchAppreciationsStatus> fetchAppreciations();
 
   // Get score for a char trait id
   int getScore(int traitId);
