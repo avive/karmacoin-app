@@ -1055,6 +1055,12 @@ class KarmachainService implements K2ServiceInterface {
       return null;
     }
 
+    // Default substrate error decoded in other way by polkadart
+    if (failedReason['dispatch_error']?.value.runtimeType == String) {
+      // No way to provide additional description
+      return ChainError(failedReason['dispatch_error']?.value, null);
+    }
+
     final moduleIndex = failedReason['dispatch_error']?.value['index'];
     final errorIndex = failedReason['dispatch_error']?.value['error'][0];
     debugPrint('Process error module $moduleIndex error $errorIndex');
@@ -1068,7 +1074,7 @@ class KarmachainService implements K2ServiceInterface {
     debugPrint('Codec schema: $codecSchema');
 
     final errorMetadata =
-        codecSchema['type']['def'].value['variants'][errorIndex];
+    codecSchema['type']['def'].value['variants'][errorIndex];
     debugPrint('Error metadata: $errorMetadata');
 
     return ChainError.fromSubstrateMetadata(errorMetadata);
