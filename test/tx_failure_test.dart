@@ -103,8 +103,6 @@ void main() {
     test(
       'Appreciation insufficient funds',
       () async {
-        debugPrint('Appreciation insufficient funds');
-
         K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
         // Create a new identity for local user
