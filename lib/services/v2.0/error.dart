@@ -1,6 +1,8 @@
 class ChainError {
   String name;
-  String description;
+  String? description;
+
+  ChainError(this.name, this.description);
 
   ChainError.fromSubstrateMetadata(Map<String, dynamic> errorMetadata)
       : name = errorMetadata['name'],
