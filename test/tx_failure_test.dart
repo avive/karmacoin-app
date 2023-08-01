@@ -141,11 +141,6 @@ void main() {
             return;
           }
 
-          KC2UserInfo? katyaInfo =
-              await kc2Service.getUserInfoByUserName(katyaUserName);
-
-          BigInt txAmount = katyaInfo!.balance + BigInt.one;
-
           // switch local user to punch
           kc2Service.subscribeToAccount(punch.accountId);
           kc2Service.setKeyring(punch.keyring);
@@ -158,6 +153,7 @@ void main() {
             }
 
             if (tx.failedReason == null) {
+              debugPrint('unexpected tx success');
               completer.complete(false);
               return;
             }
@@ -182,7 +178,12 @@ void main() {
               return;
             }
 
-            // send appreciation w/o sufficient funds
+            KC2UserInfo? info =
+                await kc2Service.getUserInfoByUserName(punchUserName);
+
+            BigInt txAmount = info!.balance + BigInt.one;
+
+            // send appreciation w/o sufficient funds from punch to katya
             appreciationTxHash = await kc2Service.sendAppreciation(
                 kc2Service.getPhoneNumberHash(katyaPhoneNumber),
                 txAmount,
