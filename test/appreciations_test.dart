@@ -160,6 +160,8 @@ void main() {
         String katyaNewUserTxHash = "";
         String punchNewUserTxHash = "";
 
+        final BigInt karmaRewardsAmount = BigInt.from(10000000);
+
         int txsCount = 0;
 
         kc2Service.newUserCallback = (tx) async {
@@ -205,7 +207,7 @@ void main() {
               Future.delayed(const Duration(seconds: 6 * 12), () async {
                 KC2UserInfo? info =
                     await kc2Service.getUserInfoByUserName(punchUserName);
-                if (info!.balance == balance + BigInt.from(10000000)) {
+                if (info!.balance == balance + karmaRewardsAmount) {
                   completer.complete(true);
                 } else {
                   completer.complete(false);

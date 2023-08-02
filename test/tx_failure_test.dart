@@ -179,7 +179,8 @@ void main() {
             KC2UserInfo? info =
                 await kc2Service.getUserInfoByUserName(punchUserName);
 
-            BigInt txAmount = info!.balance + BigInt.one;
+            // amount greater than balance + existential deposit
+            BigInt txAmount = info!.balance;
 
             // send appreciation w/o sufficient funds from punch to katya
             appreciationTxHash = await kc2Service.sendAppreciation(

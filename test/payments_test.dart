@@ -21,7 +21,7 @@ void main() {
     'payments',
     () {
       test(
-        'Basic payment test',
+        'Payment via appreciation api',
         () async {
           K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
@@ -141,7 +141,7 @@ void main() {
         timeout: const Timeout(Duration(seconds: 120)),
       );
       test(
-        'Basic transfer test',
+        'Coin transfer',
         () async {
           K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
@@ -266,7 +266,7 @@ void main() {
       );
 
       test(
-        'Basic transfer no funds test',
+        'Insufficient funds',
         () async {
           K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
@@ -350,7 +350,8 @@ void main() {
               KC2UserInfo? info =
                   await kc2Service.getUserInfoByUserName(punchUserName);
 
-              BigInt txAmount = info!.balance + BigInt.one;
+              // amount greater than balance - existential deposit
+              BigInt txAmount = info!.balance;
 
               // Transfer
               try {
