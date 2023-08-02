@@ -227,7 +227,7 @@ void main() {
               return;
             }
 
-            // send 2 apprecaitions from punch to katya
+            // send 2 appreciations from punch to katya
 
             appreciation1TxHash = await kc2Service.sendAppreciation(
                 kc2Service.getPhoneNumberHash(katyaPhoneNumber),
