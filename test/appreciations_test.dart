@@ -180,7 +180,7 @@ void main() {
           kc2Service.setKeyring(punch.keyring);
 
           kc2Service.appreciationCallback = (tx) async {
-            if (tx.hash != appreciation1TxHash ||
+            if (tx.hash != appreciation1TxHash &&
                 tx.hash != appreciation2TxHash) {
               debugPrint('unexpected tx hash: ${tx.hash} ');
               completer.complete(false);
@@ -199,13 +199,13 @@ void main() {
                   await kc2Service.getUserInfoByUserName(punchUserName);
 
               // punch balance after sending 2 appreciations
-              BigInt balance = info!.balance + BigInt.one;
+              BigInt balance = info!.balance;
 
               debugPrint('waiting for 5 blocks for karma reward...');
               Future.delayed(const Duration(seconds: 6 * 12), () async {
                 KC2UserInfo? info =
                     await kc2Service.getUserInfoByUserName(punchUserName);
-                if (info!.balance == balance + BigInt.from(1000000)) {
+                if (info!.balance == balance + BigInt.from(10000000)) {
                   completer.complete(true);
                 } else {
                   completer.complete(false);
