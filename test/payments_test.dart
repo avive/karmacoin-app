@@ -21,7 +21,7 @@ void main() {
     'payments',
     () {
       test(
-        'Payment via appreciation api',
+        'Transfer via appreciation api',
         () async {
           K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
