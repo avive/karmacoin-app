@@ -43,8 +43,9 @@ void main() {
 
           final completer = Completer<bool>();
           String transferTxHash = "";
-          String katyaNewUserTxHash = "";
-          String punchNewUserTxHash = "";
+          String? katyaNewUserTxHash;
+          String? punchNewUserTxHash;
+          String? err;
 
           // remove appreciation callback which is getting called right now in case of
           // appreciation sent with charTrait == 0
@@ -122,8 +123,11 @@ void main() {
             };
 
             // signup punch
-            punchNewUserTxHash = await kc2Service.newUser(
+            (punchNewUserTxHash, err) = await kc2Service.newUser(
                 punch.accountId, punchUserName, punchPhoneNumber);
+
+            expect(punchNewUserTxHash, isNotNull);
+            expect(err, isNull);
           };
 
           await kc2Service.connectToApi('ws://127.0.0.1:9944');
@@ -131,8 +135,10 @@ void main() {
           // subscribe to new account txs
           kc2Service.subscribeToAccount(katya.accountId);
 
-          katyaNewUserTxHash = await kc2Service.newUser(
+          (katyaNewUserTxHash, err) = await kc2Service.newUser(
               katya.accountId, katyaUserName, katyaPhoneNumber);
+
+          expect(katyaNewUserTxHash, isNotNull);
 
           // wait for completer and verify test success
           expect(await completer.future, equals(true));
@@ -141,7 +147,7 @@ void main() {
         timeout: const Timeout(Duration(seconds: 120)),
       );
       test(
-        'Coin transfer',
+        'Basic coin transfer',
         () async {
           K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
@@ -163,8 +169,9 @@ void main() {
 
           final completer = Completer<bool>();
           String transferTxHash = "";
-          String katyaNewUserTxHash = "";
-          String punchNewUserTxHash = "";
+          String? katyaNewUserTxHash;
+          String? punchNewUserTxHash;
+          String? err;
 
           // remove appreciation callback which is getting called right now in case of appreciation sent with charTrait == 0
           kc2Service.appreciationCallback = null;
@@ -246,8 +253,11 @@ void main() {
             };
 
             // signup punch
-            punchNewUserTxHash = await kc2Service.newUser(
+            (punchNewUserTxHash, err) = await kc2Service.newUser(
                 punch.accountId, punchUserName, punchPhoneNumber);
+
+            expect(punchNewUserTxHash, isNotNull);
+            expect(err, isNull);
           };
 
           await kc2Service.connectToApi('ws://127.0.0.1:9944');
@@ -255,7 +265,7 @@ void main() {
           // subscribe to new account txs
           kc2Service.subscribeToAccount(katya.accountId);
 
-          katyaNewUserTxHash = await kc2Service.newUser(
+          (katyaNewUserTxHash, err) = await kc2Service.newUser(
               katya.accountId, katyaUserName, katyaPhoneNumber);
 
           // wait for completer and verify test success
@@ -288,8 +298,9 @@ void main() {
 
           final completer = Completer<bool>();
           String transferTxHash = "";
-          String katyaNewUserTxHash = "";
-          String punchNewUserTxHash = "";
+          String? katyaNewUserTxHash;
+          String? punchNewUserTxHash;
+          String? err;
 
           // remove appreciation callback which is getting called right now in case of appreciation sent with charTrait == 0
           kc2Service.appreciationCallback = null;
@@ -350,8 +361,8 @@ void main() {
               KC2UserInfo? info =
                   await kc2Service.getUserInfoByUserName(punchUserName);
 
-              // amount greater than balance - existential deposit
-              BigInt txAmount = info!.balance;
+              // amount greater than balance
+              BigInt txAmount = info!.balance + BigInt.one;
 
               // Transfer
               try {
@@ -369,8 +380,11 @@ void main() {
             };
 
             // signup punch
-            punchNewUserTxHash = await kc2Service.newUser(
+            (punchNewUserTxHash, err) = await kc2Service.newUser(
                 punch.accountId, punchUserName, punchPhoneNumber);
+
+            expect(punchNewUserTxHash, isNotNull);
+            expect(err, isNull);
           };
 
           await kc2Service.connectToApi('ws://127.0.0.1:9944');
@@ -378,8 +392,11 @@ void main() {
           // subscribe to new account txs
           kc2Service.subscribeToAccount(katya.accountId);
 
-          katyaNewUserTxHash = await kc2Service.newUser(
+          (katyaNewUserTxHash, err) = await kc2Service.newUser(
               katya.accountId, katyaUserName, katyaPhoneNumber);
+
+          expect(katyaNewUserTxHash, isNotNull);
+          expect(err, isNull);
 
           // wait for completer and verify test success
           expect(await completer.future, equals(true));

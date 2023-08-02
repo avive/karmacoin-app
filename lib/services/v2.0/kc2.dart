@@ -213,12 +213,20 @@ class KarmachainService implements K2ServiceInterface {
   /// Signup  a new user with the provided data.
   /// This method will attempt to obtain verifier evidence regarding the association between the accountId, userName and phoneNumber
   @override
-  Future<String> newUser(
+  Future<(String?, String?)> newUser(
       String accountId, String username, String phoneNumber) async {
     try {
       final evidence = await karmachain.send('verifier_verify',
           [accountId, username, phoneNumber, 'dummy']).then((v) => v.result);
       // debugPrint('Verifier evidence - $evidence');
+
+      if (evidence == null) {
+        return (null, "NoVerifierEvidence");
+      }
+
+      if (evidence["verification_result"] != "Verified") {
+        return (null, evidence["verification_result"] as String);
+      }
 
       final phoneNumberHash = hasher.hashString(phoneNumber);
 
@@ -233,10 +241,10 @@ class KarmachainService implements K2ServiceInterface {
             'phone_number_hash': phoneNumberHash,
           }));
 
-      return await _signAndSendTransaction(call);
+      return (await _signAndSendTransaction(call), null);
     } on PlatformException catch (e) {
       debugPrint('Failed to send signup tx: ${e.details}');
-      rethrow;
+      return (null, "FailedToSendTx");
     }
   }
 
@@ -248,7 +256,8 @@ class KarmachainService implements K2ServiceInterface {
   ///
   /// Implementation will attempt to obtain verifier evidence regarding the association between the accountId, and the new userName or the new phoneNumber
   @override
-  Future<String> updateUser(String? username, String? phoneNumber) async {
+  Future<(String?, String?)> updateUser(
+      String? username, String? phoneNumber) async {
     try {
       Uint8List? verifierPublicKey;
       List<int>? verifierSignature;
@@ -263,6 +272,14 @@ class KarmachainService implements K2ServiceInterface {
           phoneNumber,
           'dummy'
         ]).then((v) => v.result);
+
+        if (evidence == null) {
+          return (null, "NoVerifierEvidence");
+        }
+
+        if (evidence["verification_result"] != "Verified") {
+          return (null, evidence["verification_result"] as String);
+        }
 
         verifierPublicKey =
             ss58.Codec(42).decode(evidence['verifier_account_id']);
@@ -292,10 +309,10 @@ class KarmachainService implements K2ServiceInterface {
             'phone_number_hash': phoneNumberHashOption,
           }));
 
-      return await _signAndSendTransaction(call);
+      return (await _signAndSendTransaction(call), null);
     } on PlatformException catch (e) {
       debugPrint('Failed to update user: ${e.details}');
-      rethrow;
+      return (null, "FailedToSendTx");
     }
   }
 
@@ -1081,7 +1098,7 @@ class KarmachainService implements K2ServiceInterface {
     debugPrint('Codec schema: $codecSchema');
 
     final errorMetadata =
-    codecSchema['type']['def'].value['variants'][errorIndex];
+        codecSchema['type']['def'].value['variants'][errorIndex];
     debugPrint('Error metadata: $errorMetadata');
 
     return ChainError.fromSubstrateMetadata(errorMetadata);

@@ -47,10 +47,11 @@ abstract class K2ServiceInterface {
   /// userName - unique username. Must not be empty
   /// phoneNumber - user's phone number. Including country code. Excluding leading +
   /// Returns submitted transaction hash
-  Future<String> newUser(String accountId, String username, String phoneNumber);
+  Future<(String?, String?)> newUser(
+      String accountId, String username, String phoneNumber);
 
   /// Update user's user name or phone number
-  Future<String> updateUser(String? username, String? phoneNumber);
+  Future<(String?, String?)> updateUser(String? username, String? phoneNumber);
 
   /// Update user's user name or phone number
   Future<String> deleteUser();

@@ -43,8 +43,9 @@ void main() {
 
         final completer = Completer<bool>();
         String appreciationTxHash = "";
-        String katyaNewUserTxHash = "";
-        String punchNewUserTxHash = "";
+        String? katyaNewUserTxHash;
+        String? punchNewUserTxHash;
+        String? err;
 
         kc2Service.newUserCallback = (tx) async {
           debugPrint('>> Katya new user callback called');
@@ -113,8 +114,11 @@ void main() {
           };
 
           // signup punch
-          punchNewUserTxHash = await kc2Service.newUser(
+          (punchNewUserTxHash, err) = await kc2Service.newUser(
               punch.accountId, punchUserName, punchPhoneNumber);
+
+          expect(punchNewUserTxHash, isNotNull);
+          expect(err, isNull);
         };
 
         await kc2Service.connectToApi('ws://127.0.0.1:9944');
@@ -122,8 +126,11 @@ void main() {
         // subscribe to new account txs
         kc2Service.subscribeToAccount(katya.accountId);
 
-        katyaNewUserTxHash = await kc2Service.newUser(
+        (katyaNewUserTxHash, err) = await kc2Service.newUser(
             katya.accountId, katyaUserName, katyaPhoneNumber);
+
+        expect(katyaNewUserTxHash, isNotNull);
+        expect(err, isNull);
 
         // wait for completer and verify test success
         expect(await completer.future, equals(true));
@@ -157,8 +164,9 @@ void main() {
         String appreciation1TxHash = "";
         String appreciation2TxHash = "";
 
-        String katyaNewUserTxHash = "";
-        String punchNewUserTxHash = "";
+        String? katyaNewUserTxHash;
+        String? punchNewUserTxHash;
+        String? err;
 
         final BigInt karmaRewardsAmount = BigInt.from(10000000);
 
@@ -245,8 +253,11 @@ void main() {
           };
 
           // signup punch
-          punchNewUserTxHash = await kc2Service.newUser(
+          (punchNewUserTxHash, err) = await kc2Service.newUser(
               punch.accountId, punchUserName, punchPhoneNumber);
+
+          expect(punchNewUserTxHash, isNotNull);
+          expect(err, isNull);
         };
 
         await kc2Service.connectToApi('ws://127.0.0.1:9944');
@@ -254,8 +265,11 @@ void main() {
         // subscribe to new account txs
         kc2Service.subscribeToAccount(katya.accountId);
 
-        katyaNewUserTxHash = await kc2Service.newUser(
+        (katyaNewUserTxHash, err) = await kc2Service.newUser(
             katya.accountId, katyaUserName, katyaPhoneNumber);
+
+        expect(karmaRewardsAmount, isNotNull);
+        expect(err, isNull);
 
         // wait for completer and verify test success
         expect(await completer.future, equals(true));

@@ -19,7 +19,7 @@ void main() {
 
   group('failure tests', () {
     test(
-      'Update user phone number failure',
+      'Update user with same phone number',
       () async {
         K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
@@ -35,8 +35,9 @@ void main() {
         debugPrint('Local user katya public address: ${katya.accountId}');
 
         final completer = Completer<bool>();
-        String txHash = "";
-        String updateTexHash = "";
+        String? txHash;
+        String? updateTexHash;
+        String? err;
 
         kc2Service.updateUserCallback = (tx) async {
           debugPrint('>> update user update 1 called');
@@ -68,13 +69,12 @@ void main() {
             return;
           }
 
-          debugPrint('calling update user...');
-          try {
-            updateTexHash = await kc2Service.updateUser(null, katyaPhoneNumber);
-          } catch (e) {
-            debugPrint('Failed to update user: $e');
-            completer.complete(false);
-          }
+          debugPrint('calling update user with same phone number...');
+          (updateTexHash, err) =
+              await kc2Service.updateUser(null, katyaPhoneNumber);
+
+          expect(updateTexHash, isNotNull);
+          expect(err, isNull);
         };
 
         await kc2Service.connectToApi('ws://127.0.0.1:9944');
@@ -83,13 +83,12 @@ void main() {
         kc2Service.subscribeToAccount(katya.accountId);
 
         // signup katya
-        try {
-          txHash = await kc2Service.newUser(
-              katya.accountId, katyaUserName, katyaPhoneNumber);
-        } catch (e) {
-          debugPrint('Failed to signup katya: $e');
-          completer.complete(false);
-        }
+
+        (txHash, err) = await kc2Service.newUser(
+            katya.accountId, katyaUserName, katyaPhoneNumber);
+
+        expect(txHash, isNotNull);
+        expect(err, isNull);
 
         // wait for completer and verify test success
         expect(await completer.future, equals(true));
@@ -123,8 +122,9 @@ void main() {
 
         final completer = Completer<bool>();
         String appreciationTxHash = "";
-        String katyaNewUserTxHash = "";
-        String punchNewUserTxHash = "";
+        String? katyaNewUserTxHash;
+        String? punchNewUserTxHash;
+        String? err;
 
         kc2Service.newUserCallback = (tx) async {
           debugPrint('>> Katya new user callback called');
@@ -179,8 +179,8 @@ void main() {
             KC2UserInfo? info =
                 await kc2Service.getUserInfoByUserName(punchUserName);
 
-            // amount greater than balance + existential deposit
-            BigInt txAmount = info!.balance;
+            // amount greater than balance
+            BigInt txAmount = info!.balance + BigInt.one;
 
             // send appreciation w/o sufficient funds from punch to katya
             appreciationTxHash = await kc2Service.sendAppreciation(
@@ -191,8 +191,11 @@ void main() {
           };
 
           // signup punch
-          punchNewUserTxHash = await kc2Service.newUser(
+          (punchNewUserTxHash, err) = await kc2Service.newUser(
               punch.accountId, punchUserName, punchPhoneNumber);
+
+          expect(punchNewUserTxHash, isNotNull);
+          expect(err, isNull);
         };
 
         await kc2Service.connectToApi('ws://127.0.0.1:9944');
@@ -200,8 +203,11 @@ void main() {
         // subscribe to new account txs
         kc2Service.subscribeToAccount(katya.accountId);
 
-        katyaNewUserTxHash = await kc2Service.newUser(
+        (katyaNewUserTxHash, err) = await kc2Service.newUser(
             katya.accountId, katyaUserName, katyaPhoneNumber);
+
+        expect(katyaNewUserTxHash, isNotNull);
+        expect(err, isNull);
 
         // wait for completer and verify test success
         expect(await completer.future, equals(true));

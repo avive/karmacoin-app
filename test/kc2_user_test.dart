@@ -21,7 +21,9 @@ void main() {
 
   K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
-  group('kc2 users tests', () {
+  /// Tests using K2CUser
+
+  group('KC2User tests', () {
     test(
       'Signup user',
       () async {
@@ -195,8 +197,7 @@ void main() {
 
               katya.userInfo.addListener(() async {
                 if (katya.userInfo.value?.phoneNumberHash == phoneNumberHash) {
-                  // skip this - this callback is due to fetching of user info from chain on
-                  // signup
+                  // skip this - this callback is due to fetching of user info from chain on signup
                   return;
                 }
 
@@ -516,7 +517,8 @@ void main() {
                       expect(katya1Info.phoneNumberHash, '0x$phoneNumberHash');
                       expect(katya1Info.userName, katyaUserName);
 
-                      // this should be 1 - existential deposit soon
+                      // @Danylo Kyrieiev  this should be 1 - existential deposit
+                      // as soon as your change is merged
                       expect(katya1Info.balance, BigInt.zero);
                       await katya1.signout();
                       completer.complete(true);

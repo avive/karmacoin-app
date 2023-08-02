@@ -16,8 +16,8 @@ class KC2User extends KC2UserInteface {
   late final _secureStorage = const FlutterSecureStorage();
   late IdentityInterface _identity;
   late KC2TransactionBossInterface _txsBoss;
-  late String _signupTxHash;
-  late String _updateUserTxHash;
+  late String? _signupTxHash;
+  late String? _updateUserTxHash;
 
   @override
   ValueNotifier<Map<String, KC2Tx>> get incomingAppreciations =>
@@ -104,23 +104,60 @@ class KC2User extends KC2UserInteface {
     await _identity.removeFromStore();
   }
 
-  /// Signup user to kc2 chain
+  /// Signup user to kc2 chain. Returns optional error. Updates signupStatus and signupFailureReson.
   @override
   Future<void> signup(
       String requestedUserName, String requestedPhoneNumber) async {
     signupStatus.value = SignupStatus.signingUp;
+    signupFailureReson = SignupFailureReason.unknown;
 
     // set failure callback for 18 secs
     Future.delayed(const Duration(seconds: 18), () async {
       if (signupStatus.value == SignupStatus.signingUp) {
         // timed out waiting for new user transaction
         signupStatus.value = SignupStatus.notSignedUp;
+        signupFailureReson = SignupFailureReason.connectionTimeOut;
       }
     });
 
     // todo: take user name and phone number from ui via app state
-    _signupTxHash = await kc2Service.newUser(
+    String? err;
+    String? txHash;
+    (txHash, err) = await kc2Service.newUser(
         _identity.accountId, requestedUserName, requestedPhoneNumber);
+
+    if (err != null) {
+      signupStatus.value = SignupStatus.notSignedUp;
+      switch (err) {
+        case "UserNameTaken":
+          signupFailureReson = SignupFailureReason.usernameTaken;
+          break;
+        case "FailedToSendTx":
+          signupFailureReson = SignupFailureReason.serverError;
+          break;
+        case "InvalidSignature":
+          signupFailureReson = SignupFailureReason.invalidSignature;
+          break;
+        case "Unverified":
+          signupFailureReson = SignupFailureReason.serverError;
+          break;
+        case "MissingData":
+          signupFailureReson = SignupFailureReason.invalidData;
+          break;
+        case "AccountMismatch":
+          signupFailureReson = SignupFailureReason.accountMismatch;
+          break;
+        default:
+          debugPrint("deal with it");
+          signupFailureReson = SignupFailureReason.invalidData;
+          break;
+      }
+      return;
+    }
+
+    if (txHash != null) {
+      _signupTxHash = txHash;
+    }
   }
 
   /// Update user info from local store
@@ -169,10 +206,55 @@ class KC2User extends KC2UserInteface {
   @override
   Future<void> updateUserInfo(
       String? requestedUserName, String? requestedPhoneNumber) async {
-    _updateUserTxHash =
+    String? err;
+    String? txHash;
+
+    updateResult.value = UpdateResult.updating;
+
+    // set failure callback for 18 secs
+    Future.delayed(const Duration(seconds: 18), () async {
+      if (updateResult.value == UpdateResult.updating) {
+        // timed out waiting for update transaction
+        updateResult.value == UpdateResult.connectionTimeOut;
+      }
+    });
+
+    (txHash, err) =
         await kc2Service.updateUser(requestedUserName, requestedPhoneNumber);
 
-    debugPrint('Update user tx hash: $_updateUserTxHash');
+    if (err != null) {
+      signupStatus.value = SignupStatus.notSignedUp;
+      switch (err) {
+        case "UserNameTaken":
+          updateResult.value = UpdateResult.usernameTaken;
+          break;
+        case "FailedToSendTx":
+          updateResult.value = UpdateResult.serverError;
+          break;
+        case "InvalidSignature":
+          updateResult.value = UpdateResult.invalidSignature;
+          break;
+        case "Unverified":
+          updateResult.value = UpdateResult.serverError;
+          break;
+        case "MissingData":
+          updateResult.value = UpdateResult.invalidData;
+          break;
+        case "AccountMismatch":
+          updateResult.value = UpdateResult.accountMismatch;
+          break;
+        default:
+          debugPrint(">>> deal with it");
+          updateResult.value = UpdateResult.invalidData;
+          break;
+      }
+      return;
+    }
+
+    if (txHash != null) {
+      _updateUserTxHash = txHash;
+      debugPrint('Update user tx hash: $_updateUserTxHash');
+    }
   }
 
   @override
@@ -196,11 +278,19 @@ class KC2User extends KC2UserInteface {
       return;
     }
 
+    if (tx.failedReason != null) {
+      debugPrint('failed to signup user: ${tx.failedReason}');
+      signupFailureReson = SignupFailureReason.invalidData;
+      signupStatus.value = SignupStatus.notSignedUp;
+      return;
+    }
+
     // get updated user info from chain
     await getUserDataFromChain();
 
     // update value and notify after user info was fetched from chain
     signupStatus.value = SignupStatus.signedUp;
+    signupFailureReson = SignupFailureReason.unknown;
   }
 
   Future<void> _updateUserCallback(KC2UpdateUserTxV1 tx) async {
@@ -211,6 +301,12 @@ class KC2User extends KC2UserInteface {
 
     if (userInfo.value == null) {
       debugPrint('No local user info to update from update user tx');
+      return;
+    }
+
+    if (tx.failedReason != null) {
+      debugPrint('failed to update user: ${tx.failedReason}');
+      updateResult.value = UpdateResult.invalidData;
       return;
     }
 
@@ -239,5 +335,7 @@ class KC2User extends KC2UserInteface {
       // update observable value
       userInfo.value = u;
     }
+
+    updateResult.value = UpdateResult.updated;
   }
 }

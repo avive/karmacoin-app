@@ -13,10 +13,39 @@ enum SignupStatus {
   signedUp,
 }
 
+enum SignupFailureReason {
+  unknown,
+  invalidSignature,
+  usernameTaken,
+  invalidData,
+  serverError,
+  connectionTimeOut,
+  accountMismatch;
+}
+
+enum UpdateResult {
+  unknown,
+  updating,
+  updated,
+  usernameTaken,
+  invalidData,
+  invalidSignature,
+  serverError,
+  accountMismatch,
+  connectionTimeOut;
+}
+
 abstract class KC2UserInteface {
   /// Observeable signup status
   final ValueNotifier<SignupStatus> signupStatus =
       ValueNotifier(SignupStatus.unknown);
+
+  /// Observeable update status
+  final ValueNotifier<UpdateResult> updateResult =
+      ValueNotifier(UpdateResult.unknown);
+
+  /// Observeable signup status
+  SignupFailureReason signupFailureReson = SignupFailureReason.unknown;
 
   /// Observeable txs fetching status
   final ValueNotifier<FetchAppreciationsStatus> fetchAppreciationStatus =
