@@ -40,11 +40,11 @@ abstract class KC2UserInteface {
   final ValueNotifier<SignupStatus> signupStatus =
       ValueNotifier(SignupStatus.unknown);
 
-  /// Observeable update status
+  /// Observeable update account status
   final ValueNotifier<UpdateResult> updateResult =
       ValueNotifier(UpdateResult.unknown);
 
-  /// Observeable signup status
+  /// Last known signup failure reason
   SignupFailureReason signupFailureReson = SignupFailureReason.unknown;
 
   /// Observeable txs fetching status

@@ -399,7 +399,7 @@ void main() {
 
                     // check balance and referral trait and score here
                     expect(katyaInfo!.balance, BigInt.from(20000000 - 1234));
-                    // scor`e = signup + app sent/received (spender) + (ambassador) referral trait
+                    // score = signup + app sent/received (spender) + (ambassador) referral trait
                     expect(katyaInfo.karmaScore, 3);
 
                     await punch.signout();

@@ -255,6 +255,7 @@ class KarmachainService implements K2ServiceInterface {
   /// than current on-chain value
   ///
   /// Implementation will attempt to obtain verifier evidence regarding the association between the accountId, and the new userName or the new phoneNumber
+  /// Returns txHash or an error string
   @override
   Future<(String?, String?)> updateUser(
       String? username, String? phoneNumber) async {

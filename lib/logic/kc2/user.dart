@@ -147,6 +147,8 @@ class KC2User extends KC2UserInteface {
         case "AccountMismatch":
           signupFailureReson = SignupFailureReason.accountMismatch;
           break;
+        case "NoVerifierEvidence":
+          signupFailureReson = SignupFailureReason.serverError;
         default:
           debugPrint("deal with it");
           signupFailureReson = SignupFailureReason.invalidData;
@@ -223,7 +225,6 @@ class KC2User extends KC2UserInteface {
         await kc2Service.updateUser(requestedUserName, requestedPhoneNumber);
 
     if (err != null) {
-      signupStatus.value = SignupStatus.notSignedUp;
       switch (err) {
         case "UserNameTaken":
           updateResult.value = UpdateResult.usernameTaken;
@@ -243,6 +244,8 @@ class KC2User extends KC2UserInteface {
         case "AccountMismatch":
           updateResult.value = UpdateResult.accountMismatch;
           break;
+        case "NoVerifierEvidence":
+          signupFailureReson = SignupFailureReason.serverError;
         default:
           debugPrint(">>> deal with it");
           updateResult.value = UpdateResult.invalidData;
@@ -252,6 +255,7 @@ class KC2User extends KC2UserInteface {
     }
 
     if (txHash != null) {
+      // update will come on callback for this tx
       _updateUserTxHash = txHash;
       debugPrint('Update user tx hash: $_updateUserTxHash');
     }
@@ -307,6 +311,7 @@ class KC2User extends KC2UserInteface {
     if (tx.failedReason != null) {
       debugPrint('failed to update user: ${tx.failedReason}');
       updateResult.value = UpdateResult.invalidData;
+      // todo: go deeper into reason and update result
       return;
     }
 
