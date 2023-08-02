@@ -25,6 +25,10 @@ abstract class K2ServiceInterface {
   /// Testnet - "wss://testnet.karmaco.in/testnet/ws"
   Future<void> connectToApi(String wsUrl);
 
+  //
+
+  BigInt getExistentialDeposit();
+
   // rpc methods
 
   /// accountId - ss58 address

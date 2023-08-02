@@ -85,6 +85,13 @@ class KarmachainService implements K2ServiceInterface {
     }
   }
 
+  //
+
+  @override
+  BigInt getExistentialDeposit() {
+    return chainInfo.constants['Balances']!['ExistentialDeposit']!.value;
+  }
+
   // RPC
 
   @override
