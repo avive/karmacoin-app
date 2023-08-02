@@ -11,7 +11,7 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/signed_transaction.dart' as est;
 
 /// Transaction generator is responsible for creating and submitting transactions to the Karmachain. it is designed to be mixed-into account_logic
-abstract class TrnasactionGenerator {
+mixin TrnasactionGenerator {
   /// Submit an appreciation / payment txs to Karmachain
   Future<SubmitTransactionResponse> submitPaymentTransacationImpl(
       PaymentTransactionData data,

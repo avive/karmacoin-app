@@ -6,6 +6,12 @@ To learn more about KarmaCoin visit https://karmaco.in
 ## Supported Platforms
 Web, iOS, Android
 
+## Testing
+
+```bash
+flutter test
+```
+
 ## Scripts
 
 ### Create native splash screen
