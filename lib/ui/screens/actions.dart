@@ -5,7 +5,6 @@ import 'package:karma_coin/ui/widgets/communities_list.dart';
 import 'package:karma_coin/ui/widgets/delete_account_tile.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:badges/badges.dart' as badges;
-import 'package:random_avatar/random_avatar.dart';
 
 const _privacyUrl = 'https://karmaco.in/docs/privacy';
 const _supportUrl = 'https://karmaco.in/docs/support';
@@ -120,10 +119,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
           ),
           CupertinoListTile.notched(
             title: const Text('Public Profile'),
-            leading: RandomAvatar(
-                accountLogic.karmaCoinUser.value!.userName.value,
-                height: 28,
-                width: 28),
+            leading: const Icon(CupertinoIcons.bookmark, size: 28),
             trailing: const CupertinoListTileChevron(),
             onTap: () {
               String userName =
