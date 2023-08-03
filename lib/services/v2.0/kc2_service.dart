@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:karma_coin/logic/kc2/keyring.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
@@ -14,8 +13,11 @@ typedef TransferCallback = Future<void> Function(KC2TransferTxV1 tx);
 enum FetchAppreciationsStatus { idle, fetching, fetched, error }
 
 abstract class K2ServiceInterface {
-  /// Available after connectToApi() called and completed without an error
+  /// Available after connectToApi called and completed without an error
   ChainInfo get chainInfo;
+
+  /// Get the chain's existential deposit amount
+  BigInt get existentialDeposit;
 
   /// Set an identity's keyring - call with local user's identity keyring on new app session
   void setKeyring(KC2KeyRing keyring);
@@ -25,11 +27,8 @@ abstract class K2ServiceInterface {
   /// Testnet - "wss://testnet.karmaco.in/testnet/ws"
   Future<void> connectToApi(String wsUrl);
 
-  //
-
-  BigInt getExistentialDeposit();
-
   // rpc methods
+  //
 
   /// accountId - ss58 address
   Future<KC2UserInfo?> getUserInfoByAccountId(String accountId);
@@ -88,6 +87,7 @@ abstract class K2ServiceInterface {
 
   // available client txs callbacks
   //
+
   NewUserCallback? newUserCallback;
   UpdateUserCallback? updateUserCallback;
   AppreciationCallback? appreciationCallback;

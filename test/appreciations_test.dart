@@ -211,7 +211,7 @@ void main() {
               // punch balance after sending 2 appreciations
               BigInt balance = info!.balance;
 
-              debugPrint('waiting for 5 blocks for karma reward...');
+              debugPrint('>> waiting for 5 blocks for karma reward...');
               Future.delayed(const Duration(seconds: 6 * 12), () async {
                 KC2UserInfo? info =
                     await kc2Service.getUserInfoByUserName(punchUserName);
@@ -275,7 +275,7 @@ void main() {
         expect(await completer.future, equals(true));
         expect(completer.isCompleted, isTrue);
       },
-      timeout: const Timeout(Duration(seconds: 120)),
+      timeout: const Timeout(Duration(seconds: 300)),
     );
   });
 }

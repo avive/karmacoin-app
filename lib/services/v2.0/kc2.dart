@@ -31,6 +31,10 @@ class KarmachainService implements K2ServiceInterface {
   @override
   late ChainInfo chainInfo;
 
+  @override
+  BigInt get existentialDeposit =>
+      chainInfo.constants['Balances']!['ExistentialDeposit']!.value;
+
   /// Callback when a new user transaction is processed for local user
   @override
   NewUserCallback? newUserCallback;
@@ -86,11 +90,6 @@ class KarmachainService implements K2ServiceInterface {
   }
 
   //
-
-  @override
-  BigInt getExistentialDeposit() {
-    return chainInfo.constants['Balances']!['ExistentialDeposit']!.value;
-  }
 
   // RPC
 
@@ -573,7 +572,8 @@ class KarmachainService implements K2ServiceInterface {
         return blockNumber;
       }
 
-      debugPrint("Processing block $blockNumber");
+      debugPrint(
+          'Processing block $blockNumber. Previous block: $previousBlockNumber');
 
       final blockHash = await karmachain
           .send('chain_getBlockHash', [header['number']]).then((v) => v.result);

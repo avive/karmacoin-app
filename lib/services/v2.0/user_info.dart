@@ -6,6 +6,7 @@ const androidOptions = AndroidOptions(
   encryptedSharedPreferences: true,
 );
 
+/// A user's trait score type
 class TraitScore {
   int traitId;
   int score;
@@ -25,7 +26,7 @@ class TraitScore {
       };
 }
 
-/// Chain user info returned from various RPCs such as GetUserInfoBy....()
+/// Chain user info returned from various RPCs such as GetUserInfoByXXX()
 class KC2UserInfo {
   String accountId;
   String phoneNumberHash;

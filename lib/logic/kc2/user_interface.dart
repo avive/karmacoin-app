@@ -40,7 +40,7 @@ abstract class KC2UserInteface {
   final ValueNotifier<SignupStatus> signupStatus =
       ValueNotifier(SignupStatus.unknown);
 
-  /// Observeable update account status
+  /// Observeable account update status
   final ValueNotifier<UpdateResult> updateResult =
       ValueNotifier(UpdateResult.unknown);
 
@@ -54,7 +54,7 @@ abstract class KC2UserInteface {
   /// User's identity
   late IdentityInterface identity;
 
-  /// Latest known userInfo obtained from the chain
+  /// Observeable latest known userInfo obtained from the chain
   final ValueNotifier<KC2UserInfo?> userInfo = ValueNotifier(null);
 
   /// All incoming txs to the user's account
@@ -75,11 +75,11 @@ abstract class KC2UserInteface {
   /// requestedPhoneNumber - user's requested phone number. Must be unique. International format. Excluding leading +.
   Future<void> signup(String requestedUserName, String requestedPhoneNumber);
 
-  /// Update user name and/or phone number - observable UserInfo will update when the tx is processed by the chain.
+  /// Update user name and/or phone number - register on observables iserInfo and updateResult for flow control.
   Future<void> updateUserInfo(
       String? requestedUserName, String? requestedPhoneNumber);
 
-  /// Delete user from karmachain. This will delete all user's data from the chain and local store and will sign out the user. Don't use this object after calling this method.
+  /// Delete user from karmachain. This will delete all user's data from the chain and local store and will sign out the user. Don't use this user object after calling this method.
   Future<void> deleteUser();
 
   /// Update user info from local store
