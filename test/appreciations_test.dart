@@ -37,6 +37,8 @@ void main() {
         String punchUserName = "Punch${punch.accountId.substring(0, 5)}";
         String punchPhoneNumber = randomPhoneNumber;
 
+        Timer? accountBlocksTimer;
+
         // Set katya as signer
         kc2Service.setKeyring(katya.keyring);
         debugPrint('Local user katya public address: ${katya.accountId}');
@@ -61,6 +63,7 @@ void main() {
           }
 
           // switch local user to punch
+          accountBlocksTimer?.cancel();
           kc2Service.subscribeToAccount(punch.accountId);
           kc2Service.setKeyring(punch.keyring);
 
@@ -124,7 +127,7 @@ void main() {
         await kc2Service.connectToApi('ws://127.0.0.1:9944');
 
         // subscribe to new account txs
-        kc2Service.subscribeToAccount(katya.accountId);
+        accountBlocksTimer = kc2Service.subscribeToAccount(katya.accountId);
 
         (katyaNewUserTxHash, err) = await kc2Service.newUser(
             katya.accountId, katyaUserName, katyaPhoneNumber);
@@ -156,6 +159,8 @@ void main() {
         String punchUserName = "Punch${punch.accountId.substring(0, 5)}";
         String punchPhoneNumber = randomPhoneNumber;
 
+        Timer? accountBlocksTimer;
+
         // Set katya as signer
         kc2Service.setKeyring(katya.keyring);
         debugPrint('Local user katya public address: ${katya.accountId}');
@@ -186,6 +191,7 @@ void main() {
           }
 
           // switch local user to punch
+          accountBlocksTimer?.cancel();
           kc2Service.subscribeToAccount(punch.accountId);
           kc2Service.setKeyring(punch.keyring);
 
@@ -263,7 +269,7 @@ void main() {
         await kc2Service.connectToApi('ws://127.0.0.1:9944');
 
         // subscribe to new account txs
-        kc2Service.subscribeToAccount(katya.accountId);
+        accountBlocksTimer = kc2Service.subscribeToAccount(katya.accountId);
 
         (katyaNewUserTxHash, err) = await kc2Service.newUser(
             katya.accountId, katyaUserName, katyaPhoneNumber);

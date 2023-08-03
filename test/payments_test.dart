@@ -37,6 +37,8 @@ void main() {
           String punchUserName = "Punch${punch.accountId.substring(0, 5)}";
           String punchPhoneNumber = randomPhoneNumber;
 
+          Timer? blocksProcessingTimer;
+
           // Set katya as signer
           kc2Service.setKeyring(katya.keyring);
           debugPrint('Local user katya public address: ${katya.accountId}');
@@ -65,6 +67,7 @@ void main() {
             }
 
             // switch local user to punch
+            blocksProcessingTimer?.cancel();
             kc2Service.subscribeToAccount(punch.accountId);
             kc2Service.setKeyring(punch.keyring);
 
@@ -133,7 +136,8 @@ void main() {
           await kc2Service.connectToApi('ws://127.0.0.1:9944');
 
           // subscribe to new account txs
-          kc2Service.subscribeToAccount(katya.accountId);
+          blocksProcessingTimer =
+              kc2Service.subscribeToAccount(katya.accountId);
 
           (katyaNewUserTxHash, err) = await kc2Service.newUser(
               katya.accountId, katyaUserName, katyaPhoneNumber);
@@ -167,6 +171,8 @@ void main() {
           kc2Service.setKeyring(katya.keyring);
           debugPrint('Local user katya public address: ${katya.accountId}');
 
+          Timer? blockProcessingTimer;
+
           final completer = Completer<bool>();
           String transferTxHash = "";
           String? katyaNewUserTxHash;
@@ -190,6 +196,7 @@ void main() {
             }
 
             // switch local user to punch
+            blockProcessingTimer?.cancel();
             kc2Service.subscribeToAccount(punch.accountId);
             kc2Service.setKeyring(punch.keyring);
 
@@ -263,7 +270,7 @@ void main() {
           await kc2Service.connectToApi('ws://127.0.0.1:9944');
 
           // subscribe to new account txs
-          kc2Service.subscribeToAccount(katya.accountId);
+          blockProcessingTimer = kc2Service.subscribeToAccount(katya.accountId);
 
           (katyaNewUserTxHash, err) = await kc2Service.newUser(
               katya.accountId, katyaUserName, katyaPhoneNumber);
@@ -274,7 +281,6 @@ void main() {
         },
         timeout: const Timeout(Duration(seconds: 120)),
       );
-
       test(
         'Insufficient funds',
         () async {
@@ -291,6 +297,8 @@ void main() {
           String katyaPhoneNumber = randomPhoneNumber;
           String punchUserName = "Punch${punch.accountId.substring(0, 5)}";
           String punchPhoneNumber = randomPhoneNumber;
+
+          Timer? blockProcessingTimer;
 
           // Set katya as signer
           kc2Service.setKeyring(katya.keyring);
@@ -319,6 +327,7 @@ void main() {
             }
 
             // switch local user to punch
+            blockProcessingTimer?.cancel();
             kc2Service.subscribeToAccount(punch.accountId);
             kc2Service.setKeyring(punch.keyring);
 
@@ -390,7 +399,7 @@ void main() {
           await kc2Service.connectToApi('ws://127.0.0.1:9944');
 
           // subscribe to new account txs
-          kc2Service.subscribeToAccount(katya.accountId);
+          blockProcessingTimer = kc2Service.subscribeToAccount(katya.accountId);
 
           (katyaNewUserTxHash, err) = await kc2Service.newUser(
               katya.accountId, katyaUserName, katyaPhoneNumber);

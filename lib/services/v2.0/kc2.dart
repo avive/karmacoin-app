@@ -396,9 +396,14 @@ class KarmachainService implements K2ServiceInterface {
   /// Subscribe to account transactions and events
   @override
   Timer subscribeToAccount(String address) {
-    BigInt? blockNumber;
+    BigInt blockNumber = BigInt.zero;
     return Timer.periodic(const Duration(seconds: 12), (Timer t) async {
-      blockNumber = await _processBlock(address, blockNumber);
+      try {
+        blockNumber = await _processBlock(address, blockNumber);
+        debugPrint('>>> set prev block to $blockNumber');
+      } catch (e) {
+        debugPrint('Failed to process block: $e');
+      }
     });
   }
 
@@ -556,7 +561,7 @@ class KarmachainService implements K2ServiceInterface {
   }
 
   Future<BigInt> _processBlock(
-      String address, BigInt? previousBlockNumber) async {
+      String address, BigInt previousBlockNumber) async {
     try {
       final header =
           await karmachain.send('chain_getHeader', []).then((v) => v.result);
@@ -566,14 +571,14 @@ class KarmachainService implements K2ServiceInterface {
       final BigInt blockNumber = BigInt.parse(header['number']);
 
       // Do not process same block twice
-      if (previousBlockNumber?.compareTo(blockNumber) == 0) {
+      if (previousBlockNumber.compareTo(blockNumber) == 0) {
         // don't we need to just process same block again?
-        debugPrint('Block $blockNumber already processed. Skipping.');
+        debugPrint('>> block $blockNumber already processed. Skipping...');
         return blockNumber;
       }
 
       debugPrint(
-          'Processing block $blockNumber. Previous block: $previousBlockNumber');
+          'Processing block $blockNumber. Prev block: $previousBlockNumber');
 
       final blockHash = await karmachain
           .send('chain_getBlockHash', [header['number']]).then((v) => v.result);
