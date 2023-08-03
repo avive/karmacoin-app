@@ -400,7 +400,7 @@ class KarmachainService implements K2ServiceInterface {
     return Timer.periodic(const Duration(seconds: 12), (Timer t) async {
       try {
         blockNumber = await _processBlock(address, blockNumber);
-        debugPrint('>>> set prev block to $blockNumber');
+        // debugPrint('>>> set prev block to $blockNumber');
       } catch (e) {
         debugPrint('Failed to process block: $e');
       }

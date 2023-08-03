@@ -14,7 +14,7 @@ class KC2User extends KC2UserInteface {
   // private members
   late Timer _subscribeToAccountTimer;
   late final _secureStorage = const FlutterSecureStorage();
-  late IdentityInterface _identity;
+  final IdentityInterface _identity = Identity();
   late KC2TransactionBossInterface _txsBoss;
   late String? _signupTxHash;
   late String? _updateUserTxHash;
@@ -30,13 +30,15 @@ class KC2User extends KC2UserInteface {
   @override
   IdentityInterface get identity => _identity;
 
-  /// Initialize the user. Should be aclled on new app session after the kc2 service has been initialized and app has a connection to a kc2 api provider.
   @override
-  Future<void> init() async {
-    _identity = Identity();
+  Future<bool> get hasLocalIdentity => _identity.existsInLocalStore;
 
-    // Init user's identity. This will load the identity from store if it exists. Otherwise, it will create a new one and persist it to store.
-    await _identity.init();
+  /// Initialize the user. Should be aclled on new app session after the kc2 service has been initialized and app has a connection to a kc2 api provider.
+  /// Optionally provide mnenmoic to resotre this user from provided one.
+  @override
+  Future<void> init({String? mnemonic}) async {
+    // Init user's identity. This will use provided mnemonic if exists. Otherwise, it will load the identity from store if it was prev stored on this device. Otherwise, it will create a new one with a new mnemonic and persist it to store.
+    await _identity.init(mnemonic: mnemonic);
 
     // Set the user's as the local signer
     kc2Service.setKeyring(_identity.keyring);
@@ -83,7 +85,7 @@ class KC2User extends KC2UserInteface {
     return fetchAppreciationStatus.value;
   }
 
-  /// Signout and delete ALL locally stored data.
+  /// Signout the user from the app. Mnemonic is still in local store.
   /// This KC2User object becomes unusable after the call and should not be used anymore.
   @override
   Future<void> signout() async {
@@ -91,14 +93,14 @@ class KC2User extends KC2UserInteface {
       await userInfo.value?.deleteFromSecureStorage(_secureStorage);
     }
 
+    // unsubscribe from kc2 callbacks
+    _subscribeToAccountTimer.cancel();
+
     // clear all callbacks
     kc2Service.transferCallback = null;
     kc2Service.appreciationCallback = null;
     kc2Service.updateUserCallback = null;
     kc2Service.newUserCallback = null;
-
-    // unsubscribe from kc2 callbacks
-    _subscribeToAccountTimer.cancel();
 
     // remove the id from local store
     await _identity.removeFromStore();
@@ -110,6 +112,18 @@ class KC2User extends KC2UserInteface {
       String requestedUserName, String requestedPhoneNumber) async {
     signupStatus.value = SignupStatus.signingUp;
     signupFailureReson = SignupFailureReason.unknown;
+
+    // trimm validate data, remove leading + from phone number if exists
+    if (requestedPhoneNumber.startsWith('+')) {
+      requestedPhoneNumber = requestedPhoneNumber.substring(1);
+    }
+    requestedPhoneNumber = requestedPhoneNumber.trim();
+    requestedUserName = requestedUserName.trim();
+    if (requestedUserName.isEmpty || requestedPhoneNumber.isEmpty) {
+      signupStatus.value = SignupStatus.notSignedUp;
+      signupFailureReson = SignupFailureReason.invalidData;
+      return;
+    }
 
     // set failure callback for 18 secs
     Future.delayed(const Duration(seconds: 18), () async {

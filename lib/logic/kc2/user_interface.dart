@@ -35,6 +35,16 @@ enum UpdateResult {
   connectionTimeOut;
 }
 
+/// Usage patterns:
+/// 1. Create a new KC2UserInteface object
+/// 2. Check hasLocalIdentity to see if user has a local identity persisted on this device.
+/// 3. Check previouslySignedUp to see if user previously signed up to the chain on this device.
+/// If hasLocalIdentity and previouslySignedUp are both true, user is signed-up on this device.
+/// If hasLocalIdentity is false then this is first run on this device. Call init() to initialize the user with a new random mnemonic and identity.
+/// After phone auth is complete call init() and signup() to signup the user to karmachain or to migrate old account to new one.
+/// To restore user from user-entered mnenmonic call init(mnenomic) with the user provided mnemonic.
+/// After init is called. If userInfo.value is null then user not found on chain with the local accountId and should be signed up. If it is not null then user is already signed up with the local accountId.
+
 abstract class KC2UserInteface {
   /// Observeable signup status
   final ValueNotifier<SignupStatus> signupStatus =
@@ -54,7 +64,7 @@ abstract class KC2UserInteface {
   /// User's identity
   late IdentityInterface identity;
 
-  /// Observeable latest known userInfo obtained from the chain
+  /// Observeable latest known KC2UserInfo obtained from the chain
   final ValueNotifier<KC2UserInfo?> userInfo = ValueNotifier(null);
 
   /// All incoming txs to the user's account
@@ -63,14 +73,20 @@ abstract class KC2UserInteface {
   /// All outgoing txs from the user's account
   late final ValueNotifier<Map<String, KC2Tx>> outgoingAppreciations;
 
-  /// Initialize the user. Should be aclled on new app session after the kc2 service has been initialized and app has a connection to a kc2 api provider.
-  Future<void> init();
+  /// Returns true iff user previously signedup to the chain on this device
+  bool get previouslySignedUp => userInfo.value != null;
 
-  /// Signout and delete ALL locally stored data.
-  /// This userInfo becomes unusable after the call and should not be used anymore.
+  /// Returns true iff user has a local identity persisted previosuly on this device
+  Future<bool> get hasLocalIdentity;
+
+  /// Initialize the local user. Should be aclled on new app session after the kc2 service has been initialized and app has a connection to a kc2 api provider.
+  Future<void> init({String? mnemonic});
+
+  /// Signout on this device and delete local data including mnemonic.
+  /// This KC2UserInteface becomes unusable after the call and should not be used anymore.
   Future<void> signout();
 
-  /// Signup user to kc2. SignupStatus will update based on the signup process.
+  /// Signup user to kc2. SignupStatus will update based on the signup process progress.
   /// requestedUserName - user's requested username. Must be unique.
   /// requestedPhoneNumber - user's requested phone number. Must be unique. International format. Excluding leading +.
   Future<void> signup(String requestedUserName, String requestedPhoneNumber);
