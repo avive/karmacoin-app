@@ -147,6 +147,36 @@ class KarmachainService implements K2ServiceInterface {
     }
   }
 
+  @override
+  Future<List<KC2UserInfo>> getCommunityMembers(int communityId, {int? fromIndex, int? limit}) async {
+    try {
+      List<dynamic> data = await karmachain.send(
+          'community_getAllUsers',
+          [communityId, fromIndex, limit]
+      ).then((v) => v.result);
+
+      return data.map((e) => KC2UserInfo.fromJson(e)).toList();
+    } catch (e) {
+      debugPrint('error getting community members $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<Contact>> getContacts(String prefix, {int? communityId, int? fromIndex, int? limit}) async {
+    try {
+      List<dynamic> data = await karmachain.send(
+        'community_getContacts',
+        [prefix, communityId, fromIndex, limit]
+      ).then((v) => v.result);
+
+      return data.map((e) => Contact.fromJson(e)).toList();
+    } catch (e) {
+      debugPrint('error getting contacts $e');
+      rethrow;
+    }
+  }
+
   /// Get all on-chain txs to or form an account
   /// accountId - ss58 encoded address
   @override

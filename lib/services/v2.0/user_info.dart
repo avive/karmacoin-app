@@ -145,7 +145,7 @@ class Contact {
   List<TraitScore> traitScores;
 
   Contact.fromJson(Map<String, dynamic> c)
-    : userName = c['username'],
+    : userName = c['user_name'],
       accountId = c['account_id'],
       phoneNumberHash = c['phone_number_hash'],
       communityMembership = (c['community_membership'] as List<dynamic>)
