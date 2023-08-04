@@ -157,7 +157,7 @@ class KarmachainService implements K2ServiceInterface {
 
       return data.map((e) => KC2UserInfo.fromJson(e)).toList();
     } catch (e) {
-      debugPrint('error getting community members $e');
+      debugPrint('error getting community members: $e');
       rethrow;
     }
   }
@@ -172,7 +172,7 @@ class KarmachainService implements K2ServiceInterface {
 
       return data.map((e) => Contact.fromJson(e)).toList();
     } catch (e) {
-      debugPrint('error getting contacts $e');
+      debugPrint('error getting contacts: $e');
       rethrow;
     }
   }
