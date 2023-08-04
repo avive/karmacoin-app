@@ -33,8 +33,7 @@ class KC2User extends KC2UserInteface {
   @override
   Future<bool> get hasLocalIdentity => _identity.existsInLocalStore;
 
-  /// Initialize the user. Should be aclled on new app session after the kc2 service has been initialized and app has a connection to a kc2 api provider.
-  /// Optionally provide mnenmoic to resotre this user from provided one.
+  /// Initialize the user. Should be aclled on new app session after the kc2 service has been initialized and app has a connection to a kc2 api provider. Optionally provide mnenmoic to resotre this user from provided one.
   @override
   Future<void> init({String? mnemonic}) async {
     // Init user's identity. This will use provided mnemonic if exists. Otherwise, it will load the identity from store if it was prev stored on this device. Otherwise, it will create a new one with a new mnemonic and persist it to store.

@@ -1,9 +1,11 @@
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/logic/kc2/app.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/ui/screens/about.dart';
 import 'package:karma_coin/ui/screens/backup_account.dart';
 import 'package:karma_coin/ui/screens/community_home.dart';
 import 'package:karma_coin/ui/screens/karmachain.dart';
+import 'package:karma_coin/ui/screens/kc2/welcome.dart';
 import 'package:karma_coin/ui/screens/profile.dart';
 import 'package:karma_coin/ui/screens/restore_account.dart';
 import 'package:karma_coin/ui/screens/restore_account_intro.dart';
@@ -14,7 +16,6 @@ import 'package:karma_coin/ui/screens/sms_code_input.dart';
 import 'package:karma_coin/ui/screens/payment_tx_details.dart';
 import 'package:karma_coin/ui/screens/user_details.dart';
 import 'package:karma_coin/ui/screens/home.dart';
-import 'package:karma_coin/ui/screens/welcome.dart';
 import 'package:karma_coin/ui/screens/user_name.dart';
 import 'package:karma_coin/ui/widgets/send.dart';
 
@@ -152,6 +153,13 @@ void pushNamedAndRemoveUntil(String path) {
 }
 
 String _getInitialLocation() {
+  if (kc2User.previouslySignedUp) {
+    debugPrint('Previously signed up - go to home..');
+    return ScreenPaths.home;
+  } else {
+    return ScreenPaths.welcome;
+  }
+  /*
   if (accountLogic.karmaCoinUser.value != null &&
       (accountLogic.signedUpOnChain.value || accountLogic.localMode.value)) {
     debugPrint('Signup or local mode - go to user home..');
@@ -159,7 +167,7 @@ String _getInitialLocation() {
   } else {
     debugPrint('Show welcome screen..');
     return ScreenPaths.welcome;
-  }
+  }*/
 }
 
 /// The route configuration
@@ -229,7 +237,7 @@ final GoRouter appRouter = GoRouter(
         name: ScreenNames.welcome,
         path: ScreenPaths.welcome,
         builder: (BuildContext context, GoRouterState state) {
-          return const WelcomeScreen(title: 'KARMA COIN');
+          return const KC2WelcomeScreen(title: 'KARMA COIN');
         }),
     GoRoute(
         name: ScreenNames.actions,

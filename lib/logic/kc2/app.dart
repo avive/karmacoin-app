@@ -7,47 +7,33 @@ import 'package:get_it/get_it.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/logic/auth.dart';
+import 'package:karma_coin/logic/auth_interface.dart';
 import 'package:karma_coin/logic/config.dart';
 import 'package:karma_coin/common/platform_info.dart';
-import 'package:karma_coin/logic/account_setup_controller.dart';
+import 'package:karma_coin/logic/kc2/user.dart';
+import 'package:karma_coin/logic/kc2/user_interface.dart';
 import 'package:karma_coin/logic/txs_boss.dart';
 import 'package:karma_coin/logic/txs_boss_interface.dart';
 import 'package:karma_coin/logic/user_name_availability.dart';
 import 'package:karma_coin/logic/verifier.dart';
 import 'package:karma_coin/services/v2.0/kc2.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
-import 'account_logic.dart';
-import 'account_interface.dart';
-import 'api.dart';
-import 'auth_interface.dart';
 
 /// Add syntax sugar for quickly accessing the main "logic" controllers in the app
-AppLogic get appLogic => GetIt.I.get<AppLogic>();
-
-Api get api => GetIt.I.get<Api>();
-
+KC2AppLogic get appLogic => GetIt.I.get<KC2AppLogic>();
 Verifier get verifier => GetIt.I.get<Verifier>();
-
 ConfigLogic get settingsLogic => GetIt.I.get<ConfigLogic>();
-
 AuthLogicInterface get authLogic => GetIt.I.get<AuthLogicInterface>();
-
-AccountLogicInterface get accountLogic => GetIt.I.get<AccountLogicInterface>();
-
 UserNameAvailabilityLogic get userNameAvailabilityLogic =>
     GetIt.I.get<UserNameAvailabilityLogic>();
-
-AccountSetupController get accountSetupController =>
-    GetIt.I.get<AccountSetupController>();
-
 TransactionsBossInterface get txsBoss =>
     GetIt.I.get<TransactionsBossInterface>();
-
 AppState get appState => GetIt.I.get<AppState>();
 
 K2ServiceInterface get kc2Service => GetIt.I.get<K2ServiceInterface>();
+KC2UserInteface get kc2User => GetIt.I.get<KC2UserInteface>();
 
-mixin AppLogicInterface {
+mixin KC2AppLogicInterface {
   /// Indicates to the rest of the app that bootstrap has not completed.
   /// The router will use this to prevent redirects while bootstrapping.
   bool isBootstrapComplete = false;
@@ -57,7 +43,7 @@ mixin AppLogicInterface {
   Future<void> bootstrap();
 }
 
-class AppLogic with AppLogicInterface {
+class KC2AppLogic with KC2AppLogicInterface {
   @override
   bool get isLandscapeEnabled =>
       PlatformInfo.isDesktopOrWeb || deviceSize.shortestSide > 500;
@@ -76,15 +62,12 @@ class AppLogic with AppLogicInterface {
   static void registerSingletons() {
     // Top level app controller
     GetIt.I.registerLazySingleton<Verifier>(() => Verifier());
-    GetIt.I.registerLazySingleton<Api>(() => Api());
-    GetIt.I.registerLazySingleton<AppLogic>(() => AppLogic());
+    GetIt.I.registerLazySingleton<KC2AppLogic>(() => KC2AppLogic());
     GetIt.I.registerLazySingleton<ConfigLogic>(() => ConfigLogic());
     GetIt.I.registerLazySingleton<AuthLogicInterface>(() => AuthLogic());
-    GetIt.I.registerLazySingleton<AccountLogicInterface>(() => AccountLogic());
+    GetIt.I.registerLazySingleton<KC2UserInteface>(() => KC2User());
     GetIt.I.registerLazySingleton<UserNameAvailabilityLogic>(
         () => UserNameAvailabilityLogic());
-    GetIt.I.registerLazySingleton<AccountSetupController>(
-        () => AccountSetupController());
     GetIt.I.registerLazySingleton<TransactionsBossInterface>(
         () => TransactionsBoss());
     GetIt.I.registerLazySingleton<AppState>(() => AppState());
@@ -100,14 +83,6 @@ class AppLogic with AppLogicInterface {
     // Set the initial supported orientations
     setDeviceOrientation(supportedOrientations);
 
-    if (!kIsWeb) {
-      // this is only for native clients. Web uses browser certs
-      ByteData data =
-          await PlatformAssetBundle().load('assets/ca/lets-encrypt-r3.pem');
-      SecurityContext.defaultContext
-          .setTrustedCertificatesBytes(data.buffer.asUint8List());
-    }
-
     // Set preferred refresh rate to the max possible (the OS may ignore this)
     if (!kIsWeb && PlatformInfo.isAndroid) {
       await FlutterDisplayMode.setHighRefreshRate();
@@ -116,9 +91,6 @@ class AppLogic with AppLogicInterface {
     // Load app settings
     await settingsLogic.init();
 
-    // Init the account logic
-    await accountLogic.init();
-
     // Int the auth logic
     await authLogic.init();
 
@@ -126,16 +98,35 @@ class AppLogic with AppLogicInterface {
       debugPrint('user is Firebase authenticated on app startup');
     }
 
-    if (accountLogic.signedUpOnChain.value == true) {
-      debugPrint("user has signed up (new user tx on chain)");
+    if (await kc2User.hasLocalIdentity) {
+      debugPrint('kc2 local identity found on app startup');
+      if (kc2User.previouslySignedUp) {
+        debugPrint(
+            'kc2 previously signed up on this device - get latest user info..');
+
+        // init the user using its local identity
+        await kc2User.init();
+      } else {
+        debugPrint('kc2 not previously signed up on this device');
+      }
+    } else {
+      debugPrint('kc2 local identity not found on app startup');
     }
 
     WidgetsFlutterBinding.ensureInitialized();
 
+    if (!kIsWeb) {
+      // this is only for native clients. Web uses browser certs
+      ByteData data =
+          await PlatformAssetBundle().load('assets/ca/lets-encrypt-r3.pem');
+      SecurityContext.defaultContext
+          .setTrustedCertificatesBytes(data.buffer.asUint8List());
+    }
+
     // Flag bootStrap as complete
     isBootstrapComplete = true;
 
-    debugPrint('bootstrap done');
+    debugPrint('bootstrap completed');
   }
 
   @override
