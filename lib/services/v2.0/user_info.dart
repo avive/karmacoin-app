@@ -109,7 +109,7 @@ class KC2UserInfo {
         'user_name': userName,
         'balance': balance.toString(),
         'nonce': nonce,
-        'karms_score': karmaScore,
+        'karma_score': karmaScore,
         'trait_scores': traitScores.map((e) => e.toJson()).toList(),
       };
 
