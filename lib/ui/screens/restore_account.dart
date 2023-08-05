@@ -57,7 +57,7 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
     );
 
     // fill the form with current accont restore words so no typing needed
-    if (settingsLogic.devMode &&
+    if (configLogic.devMode &&
         accountLogic.accountSecurityWords.value != null) {
       backupWords = accountLogic.accountSecurityWords.value!.split(' ');
     }

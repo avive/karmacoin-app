@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 const localUserInfoStorageKey = 'kc2_local_user_info';
@@ -78,7 +79,7 @@ class KC2UserInfo {
         balance = u['balance'] is String
             ? BigInt.parse(u['balance'])
             : BigInt.from(u['balance']),
-        nonce = u['nonce'],
+        nonce = u['nonce'] is String ? int.parse(u['nonce']) : u['nonce'],
         karmaScore = u['karma_score'],
         traitScores = (u['trait_scores'] as List<dynamic>)
             .map((e) => TraitScore.fromJson(e))
@@ -95,9 +96,13 @@ class KC2UserInfo {
       };
 
   Future<void> persistToSecureStorage(FlutterSecureStorage s) async {
-    String data = jsonEncode(this);
-    await s.write(
-        key: localUserInfoStorageKey, value: data, aOptions: androidOptions);
+    try {
+      String data = jsonEncode(this);
+      await s.write(
+          key: localUserInfoStorageKey, value: data, aOptions: androidOptions);
+    } catch (e) {
+      debugPrint('>>>> Error persisting userInfo to secure storage: $e');
+    }
   }
 
   Future<void> deleteFromSecureStorage(FlutterSecureStorage s) async {
@@ -115,5 +120,10 @@ Future<KC2UserInfo?> loadUserInfoFromSecureStorage(
   }
 
   Map<String, dynamic> map = jsonDecode(data);
-  return KC2UserInfo.fromJson(map);
+  try {
+    return KC2UserInfo.fromJson(map);
+  } catch (e) {
+    debugPrint('>>>> Error loading user info from secure storage: $e');
+    return null;
+  }
 }

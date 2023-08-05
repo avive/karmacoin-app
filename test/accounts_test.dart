@@ -100,7 +100,7 @@ void main() {
           completer.complete(true);
         };
 
-        await kc2Service.connectToApi('ws://127.0.0.1:9944');
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         // subscribe to new account txs
         kc2Service.subscribeToAccount(katya.accountId);
@@ -225,7 +225,7 @@ void main() {
           expect(err, isNull);
         };
 
-        await kc2Service.connectToApi('ws://127.0.0.1:9944');
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         // subscribe to new account txs
         kc2Service.subscribeToAccount(katya.accountId);
@@ -354,7 +354,7 @@ void main() {
           expect(err, isNull);
         };
 
-        await kc2Service.connectToApi('ws://127.0.0.1:9944');
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         // subscribe to new account txs
         kc2Service.subscribeToAccount(katya.accountId);
@@ -430,7 +430,7 @@ void main() {
           completer.complete(true);
         };
 
-        await kc2Service.connectToApi('ws://127.0.0.1:9944');
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         // subscribe to new account txs
         kc2Service.subscribeToAccount(katya.accountId);

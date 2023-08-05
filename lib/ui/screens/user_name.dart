@@ -22,7 +22,7 @@ class SetUserNameScreen extends StatefulWidget {
 }
 
 class _SetUserNameScreenState extends State<SetUserNameScreen> {
-  String deafaultName = settingsLogic.devMode ? "avive" : "";
+  String deafaultName = configLogic.devMode ? "avive" : "";
   late final _textController = TextEditingController(text: deafaultName);
   bool isSubmitInProgress = false;
 
@@ -139,7 +139,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
 
   Future<void> _submitName(BuildContext context) async {
     if (!mounted) return;
-    if (_textController.text.isEmpty) {
+    if (_textController.text.trim().isEmpty) {
       StatusAlert.show(
         context,
         duration: const Duration(seconds: 2),
@@ -175,13 +175,15 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
         isSubmitInProgress = true;
       });
 
+      appState.requestedUserName = _textController.text;
+
       // store the user's reuqested name in account logic
-      await accountLogic.setRequestedUserName(_textController.text);
+      // await accountLogic.setRequestedUserName(_textController.text);
 
       switch (widget.operation) {
         case Operation.signUp:
-          debugPrint('*** starting signup flow...');
-          await accountSetupController.signUpUser();
+          debugPrint('*** Navigating to signup progress screen');
+          pushNamedAndRemoveUntil(ScreenPaths.signupProgress);
           break;
         case Operation.updateUserName:
           debugPrint('starting update user name flow...');

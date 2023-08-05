@@ -19,13 +19,19 @@ import 'package:convert/convert.dart';
 import 'package:substrate_metadata_fixed/types/metadata_types.dart';
 
 class KarmachainService implements K2ServiceInterface {
-  late polkadart.Provider karmachain;
+  late polkadart.Provider kc2ApiProvider;
+  // optional verifier provider differenet that karmnachain api provider
+  late polkadart.Provider? verifierProvider;
   late polkadart.StateApi api;
   late KC2KeyRing keyring;
   Blake2bHasher hasher = const Blake2bHasher(64);
+  bool _connectedToApi = false;
 
   /// Decoded chain metadata
   late DecodedMetadata decodedMetadata;
+
+  @override
+  bool get connectedToApi => _connectedToApi;
 
   /// Connected chain info
   @override
@@ -60,16 +66,23 @@ class KarmachainService implements K2ServiceInterface {
   /// Connect to a karmachain api service. e.g
   /// Local running node - "ws://127.0.0.1:9944"
   /// Testnet - "wss://testnet.karmaco.in/testnet/ws"
+  /// Optionally provide a verifier provider url, to allow connecting to api providers which are not verifiers (not yet supported)
   @override
-  Future<void> connectToApi(String wsUrl) async {
+  Future<void> connectToApi(
+      {required String apiWsUrl, String? verifierWsUrl}) async {
     try {
-      karmachain = polkadart.Provider(Uri.parse(wsUrl));
-      debugPrint('Connected to karmachain');
+      if (verifierWsUrl != null) {
+        throw 'Custom verifier provider not supported yet';
+      }
+      verifierProvider = null;
 
-      api = polkadart.StateApi(karmachain);
-      debugPrint('Api initialized');
+      debugPrint('Connecting to kc2 api...');
+      kc2ApiProvider = polkadart.Provider(Uri.parse(apiWsUrl));
+      api = polkadart.StateApi(kc2ApiProvider);
+      final metadata = await kc2ApiProvider.send('state_getMetadata', []);
 
-      final metadata = await karmachain.send('state_getMetadata', []);
+      // todo: if verifierWsUrl != null then connect to verifier, otherwise we assume
+      // that the api provider is also a verifier
 
       decodedMetadata =
           MetadataDecoder.instance.decode(metadata.result.toString());
@@ -83,20 +96,21 @@ class KarmachainService implements K2ServiceInterface {
         'UnsignedPayload': '(Call, Extra, Additional)',
         'Extrinsic': '(MultiAddress, MultiSignature, Extra)',
       });
+      _connectedToApi = true;
+      debugPrint('Connected to api: $apiWsUrl');
     } on PlatformException catch (e) {
-      debugPrint('Failed to connect to api: ${e.details}');
+      debugPrint('Failed to connect to kc2 api: $e');
+      _connectedToApi = false;
       rethrow;
     }
   }
-
-  //
 
   // RPC
 
   @override
   Future<KC2UserInfo?> getUserInfoByAccountId(String accountId) async {
     try {
-      Map<String, dynamic>? data = await karmachain.send(
+      Map<String, dynamic>? data = await kc2ApiProvider.send(
           'identity_getUserInfoByAccountId', [accountId]).then((v) => v.result);
 
       if (data != null) {
@@ -114,7 +128,7 @@ class KarmachainService implements K2ServiceInterface {
   @override
   Future<KC2UserInfo?> getUserInfoByUserName(String userName) async {
     try {
-      Map<String, dynamic>? data = await karmachain.send(
+      Map<String, dynamic>? data = await kc2ApiProvider.send(
           'identity_getUserInfoByUsername', [userName]).then((v) => v.result);
 
       if (data != null) {
@@ -136,7 +150,7 @@ class KarmachainService implements K2ServiceInterface {
       if (phoneNumberHash.startsWith('0x')) {
         phoneNumberHash = phoneNumberHash.substring(2);
       }
-      Map<String, dynamic>? data = await karmachain.send(
+      Map<String, dynamic>? data = await kc2ApiProvider.send(
           'identity_getUserInfoByPhoneNumberHash',
           [phoneNumberHash]).then((v) => v.result);
 
@@ -158,7 +172,7 @@ class KarmachainService implements K2ServiceInterface {
   @override
   Future<FetchAppreciationsStatus> getTransactions(String accountId) async {
     debugPrint('Getting all txs for account: $accountId');
-    final txs = await karmachain.send(
+    final txs = await kc2ApiProvider.send(
         'transactions_getTransactions', [accountId]).then((v) => v.result);
 
     txs?.forEach((transaction) async {
@@ -193,7 +207,7 @@ class KarmachainService implements K2ServiceInterface {
     try {
       final String blockNumberString = '0x${blockNumber.toRadixString(16)}';
 
-      final blockHash = await karmachain.send(
+      final blockHash = await kc2ApiProvider.send(
           'chain_getBlockHash', [blockNumberString]).then((v) => v.result);
       final events = await _getEvents(blockHash);
       final transactionEvents = events
@@ -215,7 +229,12 @@ class KarmachainService implements K2ServiceInterface {
   Future<(String?, String?)> newUser(
       String accountId, String username, String phoneNumber) async {
     try {
-      final evidence = await karmachain.send('verifier_verify',
+      //
+      // todo: use configure verifier which might be different provider
+      // than the provider used by the api. right now we assume provider
+      // is a verifier
+      //
+      final evidence = await kc2ApiProvider.send('verifier_verify',
           [accountId, username, phoneNumber, 'dummy']).then((v) => v.result);
       // debugPrint('Verifier evidence - $evidence');
 
@@ -266,7 +285,7 @@ class KarmachainService implements K2ServiceInterface {
       if (phoneNumber != null) {
         final userInfo = await getUserInfoByAccountId(keyring.getAccountId());
 
-        final evidence = await karmachain.send('verifier_verify', [
+        final evidence = await kc2ApiProvider.send('verifier_verify', [
           userInfo!.accountId,
           userInfo.userName,
           phoneNumber,
@@ -423,11 +442,11 @@ class KarmachainService implements K2ServiceInterface {
   Future<String> _signTransaction(
       String signer, List<int> pk, MapEntry<String, dynamic> call) async {
     const extrinsicFormatVersion = 4;
-    final nonce = await karmachain
+    final nonce = await kc2ApiProvider
         .send('system_accountNextIndex', [signer]).then((v) => v.result);
     final runtimeVersion = await api.getRuntimeVersion();
     // Removing '0x' prefix
-    final genesisHash = await karmachain
+    final genesisHash = await kc2ApiProvider
         .send('chain_getBlockHash', [0])
         .then((v) => v.result.toString().substring(2))
         .then((v) => hex.decode(v));
@@ -525,7 +544,7 @@ class KarmachainService implements K2ServiceInterface {
 
     try {
       final result =
-          await karmachain.send('author_submitExtrinsic', [encodedHex]);
+          await kc2ApiProvider.send('author_submitExtrinsic', [encodedHex]);
       // debugPrint('Submit extrinsic result: ${result.result.toString()}');
 
       return result.result.toString();
@@ -563,8 +582,8 @@ class KarmachainService implements K2ServiceInterface {
   Future<BigInt> _processBlock(
       String address, BigInt previousBlockNumber) async {
     try {
-      final header =
-          await karmachain.send('chain_getHeader', []).then((v) => v.result);
+      final header = await kc2ApiProvider
+          .send('chain_getHeader', []).then((v) => v.result);
 
       //debugPrint('Retrieve chain head: $header');
 
@@ -580,11 +599,11 @@ class KarmachainService implements K2ServiceInterface {
       debugPrint(
           'Processing block $blockNumber. Prev block: $previousBlockNumber');
 
-      final blockHash = await karmachain
+      final blockHash = await kc2ApiProvider
           .send('chain_getBlockHash', [header['number']]).then((v) => v.result);
       debugPrint('Retrieve current block with hash: $blockHash');
       final events = await _getEvents(blockHash);
-      final block = await karmachain
+      final block = await kc2ApiProvider
           .send('chain_getBlock', [blockHash]).then((v) => v.result);
 
       // debugPrint('Block: ${block['block']}');

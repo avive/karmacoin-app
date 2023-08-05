@@ -14,6 +14,10 @@ enum Destination { accountAddress, phoneNumber }
 
 // misc runtime state such as kc amount input. Includes lifted up state from widgets
 class AppState {
+  // holders
+  String? verifiedPhoneNumber;
+  String? requestedUserName;
+
   /// user amount entry value in kcents for current appreciation
   /// we default amount to 1 Karma Coin
   final ValueNotifier<Int64> kCentsAmount = ValueNotifier(Int64(1000));

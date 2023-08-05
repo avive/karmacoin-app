@@ -61,7 +61,7 @@ abstract class KC2UserInteface {
   final ValueNotifier<FetchAppreciationsStatus> fetchAppreciationStatus =
       ValueNotifier(FetchAppreciationsStatus.idle);
 
-  /// User's identity
+  /// User's identity - public key, private key, accountId, mnemonic
   late IdentityInterface identity;
 
   /// Observeable latest known KC2UserInfo obtained from the chain
@@ -91,6 +91,9 @@ abstract class KC2UserInteface {
   /// requestedPhoneNumber - user's requested phone number. Must be unique. International format. Excluding leading +.
   Future<void> signup(String requestedUserName, String requestedPhoneNumber);
 
+  /// returns true if (account id, phone number, user name) exists on chain
+  Future<bool> isAccountOnchain(String userName, String phoneNumber);
+
   /// Update user name and/or phone number - register on observables iserInfo and updateResult for flow control.
   Future<void> updateUserInfo(
       String? requestedUserName, String? requestedPhoneNumber);
@@ -111,4 +114,24 @@ abstract class KC2UserInteface {
 
   // Get score for a char trait id
   int getScore(int traitId);
+
+  /// Get a string error message for a signup failure reason
+  String getErrorMessageFor(SignupFailureReason reason) {
+    switch (reason) {
+      case SignupFailureReason.usernameTaken:
+        return 'Username was just taken. Please go back and choose a new user name.';
+      case SignupFailureReason.serverError:
+        return 'Server error. Please try again in a bit.';
+      case SignupFailureReason.invalidSignature:
+        return 'Invalid signature. Please try again.';
+      case SignupFailureReason.invalidData:
+        return 'Invalid data. Please try again.';
+      case SignupFailureReason.accountMismatch:
+        return 'Account mismatch. Please try again.';
+      case SignupFailureReason.connectionTimeOut:
+        return 'Connection timed out. Please try again.';
+      default:
+        return 'Signup error. Please try again.';
+    }
+  }
 }

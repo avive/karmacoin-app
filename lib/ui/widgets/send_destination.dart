@@ -28,7 +28,7 @@ class _SendDestinationState extends State<SendDestination> {
 
     // some defaults for dev mode to reduce typing in interactive testing...
 
-    if (!settingsLogic.devMode) {
+    if (!configLogic.devMode) {
       _accountAddressTextController = TextEditingController(
           text:
               "0xdf35d76f13a7d2b3ca949909737f211e1927132e210f676e8738fe1ba9dcfbb3");

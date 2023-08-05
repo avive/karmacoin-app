@@ -10,11 +10,16 @@ class KC2KeyRing {
   late String _mnemonic;
 
   /// Create a new keyring with provided mnemonic.
-  /// If mnemonic is not provided then a new one is generated and used.
+  /// If mnemonic is not provided then a new random one is generated and used.
   KC2KeyRing({String? mnemonic}) {
-    if (mnemonic == null) {
+    if (mnemonic != null) {
+      // debugPrint('Using provided $mnemonic to create keyring.');
+      _mnemonic = mnemonic;
+    } else {
       _mnemonic = bip39.generateMnemonic();
+      // debugPrint('Generated new mnemonic $_mnemonic for keyring');
     }
+
     Uint8List seed = bip39.mnemonicToSeed(_mnemonic).sublist(0, 32);
     _privateKey = ed.newKeyFromSeed(seed);
   }

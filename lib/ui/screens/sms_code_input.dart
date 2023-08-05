@@ -67,22 +67,11 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
       }
     }
 
-    // Attempt auto sign-in in case there's already an account on chain for the local accountId with this phone number
-    if (await accountLogic.attemptAutoSignIn()) {
-      setState(() {
-        submitInProgress = false;
-      });
-
-      Future.delayed(Duration.zero, () {
-        debugPrint(
-            'Auto signin - user already signed in with local accountId and verified phone number');
-        pushNamedAndRemoveUntil(ScreenPaths.home);
-      });
-    } else {
-      Future.delayed(Duration.zero, () {
-        pushNamedAndRemoveUntil(ScreenPaths.newUserName);
-      });
-    }
+    // todo: check if user is already registered with this phone number,
+    // existing userName and accountId and if yes, skip and go to user home...
+    Future.delayed(Duration.zero, () {
+      pushNamedAndRemoveUntil(ScreenPaths.newUserName);
+    });
   }
 
   Widget _getIndicator(BuildContext context) {

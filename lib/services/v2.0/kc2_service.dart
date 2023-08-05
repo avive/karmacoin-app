@@ -25,7 +25,11 @@ abstract class K2ServiceInterface {
   /// Connect to a karmachain api service. e.g
   /// Local running node - "ws://127.0.0.1:9944"
   /// Testnet - "wss://testnet.karmaco.in/testnet/ws"
-  Future<void> connectToApi(String wsUrl);
+  /// Optionally provide a verifier provider url, to allow connecting to api providers which are not
+  /// verifiers (not yet supported)
+  Future<void> connectToApi({required String apiWsUrl, String? verifierWsUrl});
+
+  bool get connectedToApi;
 
   // rpc methods
   //

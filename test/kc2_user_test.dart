@@ -28,7 +28,7 @@ void main() {
       'Signup user',
       () async {
         // connect before creating a user
-        await kc2Service.connectToApi('ws://127.0.0.1:9944');
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         KC2UserInteface katya = KC2User();
         await katya.init();
@@ -98,7 +98,7 @@ void main() {
       'Update user name',
       () async {
         // connect before creating a user
-        await kc2Service.connectToApi('ws://127.0.0.1:9944');
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         KC2UserInteface katya = KC2User();
         await katya.init();
@@ -170,7 +170,7 @@ void main() {
       'Update phone number',
       () async {
         // connect before creating a user
-        await kc2Service.connectToApi('ws://127.0.0.1:9944');
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         KC2UserInteface katya = KC2User();
         await katya.init();
@@ -243,7 +243,7 @@ void main() {
       'Migrate user',
       () async {
         // connect before creating a user
-        await kc2Service.connectToApi('ws://127.0.0.1:9944');
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         KC2UserInteface katya = KC2User();
         await katya.init();
@@ -345,7 +345,7 @@ void main() {
       'Referral reward',
       () async {
         // connect before creating a user
-        await kc2Service.connectToApi('ws://127.0.0.1:9944');
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         KC2UserInteface katya = KC2User();
         await katya.init();
@@ -444,7 +444,7 @@ void main() {
       'Delete user',
       () async {
         // connect before creating a user
-        await kc2Service.connectToApi('ws://127.0.0.1:9944');
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         KC2UserInteface katya = KC2User();
         await katya.init();

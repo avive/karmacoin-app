@@ -223,8 +223,8 @@ class _SendWidgetState extends State<SendWidget> {
   void initState() {
     super.initState();
 
-    String defaultNumber = settingsLogic.devMode ? "549805380" : "";
-    IsoCode code = settingsLogic.devMode ? IsoCode.IL : IsoCode.US;
+    String defaultNumber = configLogic.devMode ? "549805380" : "";
+    IsoCode code = configLogic.devMode ? IsoCode.IL : IsoCode.US;
 
     phoneController =
         PhoneController(PhoneNumber(isoCode: code, nsn: defaultNumber));

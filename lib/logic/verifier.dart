@@ -8,13 +8,12 @@ class Verifier {
 
   Verifier() {
     debugPrint(
-        'Verifier config: ${settingsLogic.verifierHostName.value}:${settingsLogic.verifierHostPort.value}');
+        'Verifier config: ${configLogic.verifierHostName.value}:${configLogic.verifierHostPort.value}');
 
     final clientChannel = GrpcOrGrpcWebClientChannel.toSingleEndpoint(
-      host: settingsLogic.verifierHostName.value,
-      port: settingsLogic.verifierHostPort.value,
-      transportSecure: settingsLogic.verifierSecureConnection.value,
-      
+      host: configLogic.verifierHostName.value,
+      port: configLogic.verifierHostPort.value,
+      transportSecure: configLogic.verifierSecureConnection.value,
     );
 
     verifierServiceClient = VerifierServiceClient(clientChannel);

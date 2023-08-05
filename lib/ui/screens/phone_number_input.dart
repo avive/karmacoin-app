@@ -46,8 +46,8 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
     super.initState();
     isSigninIn = false;
 
-    String defaultNuber = settingsLogic.devMode ? "549805381" : "";
-    IsoCode code = settingsLogic.devMode ? IsoCode.IL : IsoCode.US;
+    String defaultNuber = configLogic.devMode ? "549805381" : "";
+    IsoCode code = configLogic.devMode ? IsoCode.IL : IsoCode.US;
 
     phoneController =
         PhoneController(PhoneNumber(isoCode: code, nsn: defaultNuber));
@@ -177,7 +177,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
           return;
         }
 
-        accountLogic.phoneNumber.value = number;
+        appState.verifiedPhoneNumber = number;
 
         setState(() {
           isSigninIn = false;
@@ -230,7 +230,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
         // store verficationId in app state
         debugPrint('verification code id: $verificationId');
         appState.phoneAuthVerificationCodeId = verificationId;
-        accountLogic.phoneNumber.value = number;
+        appState.verifiedPhoneNumber = number;
 
         setState(() {
           isSigninIn = false;
@@ -243,7 +243,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
       codeAutoRetrievalTimeout: (String verificationId) {
         // andorid auto resolution timed out - show auth code screen
         appState.phoneAuthVerificationCodeId = verificationId;
-        accountLogic.phoneNumber.value = number;
+        appState.verifiedPhoneNumber = number;
 
         if (mounted) {
           setState(() {
@@ -345,8 +345,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                         ),
                         CupertinoButton(
                           onPressed: () async {
-                            await openUrl(
-                                settingsLogic.learnYoutubePlaylistUrl);
+                            await openUrl(configLogic.learnYoutubePlaylistUrl);
                           },
                           child: Text(
                             'Learn more',

@@ -89,7 +89,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
                 title: const Text('Learn More'),
                 leading: const Icon(CupertinoIcons.question_circle, size: 28),
                 onTap: () async {
-                  await openUrl(settingsLogic.learnYoutubePlaylistUrl);
+                  await openUrl(configLogic.learnYoutubePlaylistUrl);
                 }),
           ]),
       CupertinoListSection.insetGrouped(

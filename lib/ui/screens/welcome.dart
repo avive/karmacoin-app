@@ -103,7 +103,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
     res.add(CupertinoButton(
       onPressed: () async {
-        await openUrl(settingsLogic.learnYoutubePlaylistUrl);
+        await openUrl(configLogic.learnYoutubePlaylistUrl);
       },
       child: const Text('Learn More'),
     ));

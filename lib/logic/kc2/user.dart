@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/kc2/identity.dart';
@@ -36,6 +37,7 @@ class KC2User extends KC2UserInteface {
   /// Initialize the user. Should be aclled on new app session after the kc2 service has been initialized and app has a connection to a kc2 api provider. Optionally provide mnenmoic to resotre this user from provided one.
   @override
   Future<void> init({String? mnemonic}) async {
+    debugPrint("Initializing local user data...");
     // Init user's identity. This will use provided mnemonic if exists. Otherwise, it will load the identity from store if it was prev stored on this device. Otherwise, it will create a new one with a new mnemonic and persist it to store.
     await _identity.init(mnemonic: mnemonic);
 
@@ -70,6 +72,58 @@ class KC2User extends KC2UserInteface {
     // subscribe to account transactions
     _subscribeToAccountTimer =
         kc2Service.subscribeToAccount(_identity.accountId);
+
+    // register on firebase auth state changes
+    debugPrint('*** Registering on firebase auth state changes for user...');
+    try {
+      FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+        if (user != null) {
+          debugPrint(
+              '*** got a user from firebase auth. ${user.phoneNumber}, accountId: ${user.displayName}');
+          // set the current firebase user accountId
+          await _onNewFirebaseUserAuthenticated(user);
+        } else {
+          debugPrint('no user from firebase auth');
+        }
+      });
+    } catch (e) {
+      debugPrint(
+          'Firebase auth not initialized. This is expected in tests: $e');
+    }
+  }
+
+  /// Store kc2 accountId on firebase for the user using the displayName hack
+  Future<void> _onNewFirebaseUserAuthenticated(User user) async {
+    if (user.displayName != null && user.displayName!.isNotEmpty) {
+      if (user.displayName! == identity.accountId) {
+        debugPrint('*** firebase user displayName(accountId) is up-to-date...');
+        return;
+      }
+    }
+
+    debugPrint(
+        '**** Storing lastest accountId ${identity.accountId} firebase auth db...');
+    try {
+      // store the account id on firebase
+      await user.updateDisplayName(identity.accountId);
+    } catch (e) {
+      debugPrint('Error updating firebase user display name field: $e');
+      return;
+    }
+
+    try {
+      // store user email address if it was provided by the user
+      final emailAddress = appState.userProvidedEmailAddress;
+      if (emailAddress.isNotEmpty && emailAddress != user.email) {
+        await user.updateEmail(emailAddress);
+        debugPrint('Stored user user provided email address on firebase.');
+      }
+    } catch (e) {
+      debugPrint('Error updating firebase user\'s email address: $e');
+    }
+
+    debugPrint(
+        '*** User accountId: ${identity.accountId} stored on firebase auth db.');
   }
 
   /// Fetch all account related appreciations and payment txs - incoming and outgoing
@@ -103,6 +157,13 @@ class KC2User extends KC2UserInteface {
 
     // remove the id from local store
     await _identity.removeFromStore();
+  }
+
+  /// returns true if (account id, phone number, user name) exists on chain
+  @override
+  Future<bool> isAccountOnchain(String userName, String phoneNumber) async {
+    // todo: implement me
+    return false;
   }
 
   /// Signup user to kc2 chain. Returns optional error. Updates signupStatus and signupFailureReson.
@@ -202,6 +263,7 @@ class KC2User extends KC2UserInteface {
 
       if (info == null) {
         // user is not on chain
+        debugPrint('Local user not on chain');
         signupStatus.value = SignupStatus.notSignedUp;
         return;
       }
@@ -214,7 +276,7 @@ class KC2User extends KC2UserInteface {
       signupStatus.value = SignupStatus.signedUp;
     } catch (e) {
       // api error - don't change signup status
-      debugPrint('failed to get userInfo from chain: $e');
+      debugPrint('failed to get userInfo from chain via api: $e');
     }
   }
 

@@ -25,7 +25,7 @@ void main() {
       'Get transactions',
       () async {
         // connect before creating a user
-        await kc2Service.connectToApi('ws://127.0.0.1:9944');
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         KC2UserInteface katya = KC2User();
         await katya.init();

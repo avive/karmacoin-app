@@ -25,7 +25,7 @@ Future<void> startKC2Playground() async {
   try {
     // Local running node - "ws://127.0.0.1:9944"
     // Testnet - "wss://testnet.karmaco.in/testnet/ws"
-    await kc2Service.connectToApi('ws://127.0.0.1:9944');
+    await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
   } catch (e) {
     debugPrint('error connecting to kc2 api: $e');
   }

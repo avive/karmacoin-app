@@ -19,7 +19,6 @@ import 'package:karma_coin/data/verify_number_request.dart' as data;
 import 'package:karma_coin/data/user_verification_data.dart' as vnr;
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:karma_coin/data/signed_transaction.dart' as dst;
-import 'account_setup_controller.dart';
 
 class _AccountStoreKeys {
   static String seed = 'seed'; // keypair seed
@@ -457,7 +456,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     fcmToken.value = null;
 
     // reset account setup state
-    accountSetupController.setStatus(AccountSetupStatus.readyToSignup);
+    // accountSetupController.setStatus(AccountSetupStatus.readyToSignup);
   }
 
   /// Set the account id for a firebase user and store the user's phone number

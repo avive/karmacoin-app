@@ -8,14 +8,13 @@ class Api {
 
   Api() {
     debugPrint(
-        'Api config: ${settingsLogic.apiHostName.value}:${settingsLogic.apiHostPort.value}');
+        'Api config: ${configLogic.apiHostName.value}:${configLogic.apiHostPort.value}');
 
     final clientChannel = GrpcOrGrpcWebClientChannel.toSingleEndpoint(
-      host: settingsLogic.apiHostName.value,
-      port: settingsLogic.apiHostPort.value,
-      transportSecure: settingsLogic.apiSecureConnection.value,
+      host: configLogic.apiHostName.value,
+      port: configLogic.apiHostPort.value,
+      transportSecure: false,
     );
-
 
     apiServiceClient = ApiServiceClient(clientChannel);
   }

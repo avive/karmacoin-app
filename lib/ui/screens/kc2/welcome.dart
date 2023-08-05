@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/services/api/api.pb.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/ui/widgets/animated_background.dart';
 import 'package:karma_coin/ui/widgets/animated_wave.dart';
@@ -43,11 +42,7 @@ class _KC2WelcomeScreenState extends State<KC2WelcomeScreen> {
         return;
       }
 
-      try {
-        await api.apiServiceClient.getGenesisData(GetGenesisDataRequest());
-        // todo: update genesis data
-      } catch (e) {
-        debugPrint('Can\'t get genesis data from api: $e');
+      if (!kc2Service.connectedToApi) {
         if (context.mounted) {
           StatusAlert.show(context,
               duration: const Duration(seconds: 4),
@@ -103,7 +98,7 @@ class _KC2WelcomeScreenState extends State<KC2WelcomeScreen> {
 
     res.add(CupertinoButton(
       onPressed: () async {
-        await openUrl(settingsLogic.learnYoutubePlaylistUrl);
+        await openUrl(configLogic.learnYoutubePlaylistUrl);
       },
       child: const Text('Learn More'),
     ));

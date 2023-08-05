@@ -14,10 +14,10 @@ import 'package:karma_coin/data/kc_user.dart';
 /// App config logic
 class ConfigLogic {
   /// Set to true to work against localhost servers. Otherwise production servers are used
-  final bool apiLocalMode = false;
+  final bool apiLocalMode = true;
 
   // dev mode has some text field input shortcuts to save time in dev
-  final bool devMode = false;
+  final bool devMode = true;
 
   // check internet connections and show error messages
   final bool enableInternetConnectionChecking = false;
@@ -25,7 +25,7 @@ class ConfigLogic {
   late final currentLocale = ValueNotifier<String?>(null);
   late final apiHostName = ValueNotifier<String>('127.0.0.1');
   late final apiHostPort = ValueNotifier<int>(9080);
-  late final apiSecureConnection = ValueNotifier<bool>(false);
+  late final apiProtocol = ValueNotifier<String>('ws');
   late final verifierHostName = ValueNotifier<String>('127.0.0.1');
   late final verifierHostPort = ValueNotifier<int>(9080);
   late final verifierSecureConnection = ValueNotifier<bool>(false);
@@ -38,7 +38,6 @@ class ConfigLogic {
   late final learnYoutubePlaylistUrl =
       'https://www.youtube.com/playlist?list=PLF4zx8ioKJTszWMz1MKiHwStfMCdxh8MP';
 
-
   late final firebaseWebPushPubKey =
       "BPCf2pl7oLrgSWJJjEXzKfTIe4atfDay5-Aw9u0Ge8IgtfozLq1jkYPfJ0ccEY9D9cdqoAgxcbx4rGEhQC5nMN4";
 
@@ -47,7 +46,7 @@ class ConfigLogic {
 
   Future<void> init() async {
     if (apiLocalMode) {
-      debugPrint("Wroking against local servers");
+      debugPrint("Wroking against local kc2 api provider");
       if (await PlatformInfo.isRunningOnAndroidEmulator()) {
         debugPrint('Running in Android emulator');
         // on android emulator, use the host machine ip address
@@ -57,20 +56,28 @@ class ConfigLogic {
         apiHostName.value = '127.0.0.1';
         verifierHostName.value = '127.0.0.1';
       }
-      apiHostPort.value = 9080;
-      verifierHostPort.value = 9080;
-      apiSecureConnection.value = false;
+
+      apiHostPort.value = 9944;
+      verifierHostPort.value = 9944;
+      apiProtocol.value = 'ws';
+
       verifierSecureConnection.value = false;
     } else {
-      debugPrint('Working against production servers');
-      apiHostName.value = 'api.karmaco.in';
-      apiHostPort.value = 443;
-      apiSecureConnection.value = true;
+      debugPrint('Working against kc2 testnet api provider');
+      apiHostName.value = 'testnet.karmaco.in/testnet/ws';
+      apiHostPort.value = 80;
+      apiProtocol.value = 'wss';
+      //
+      // verifier info
       verifierHostName.value = 'api.karmaco.in';
       verifierHostPort.value = 443;
       verifierSecureConnection.value = true;
     }
   }
+
+  /// Returns connection url for kc2 api
+  String get kc2ApiUrl =>
+      '${apiProtocol.value}://${apiHostName.value}:${apiHostPort.value}';
 
   // push notificaiton handling
   ////////////////////
@@ -197,7 +204,7 @@ class ConfigLogic {
         }
       } else if (kIsWeb) {
         final fcmToken = await FirebaseMessaging.instance
-            .getToken(vapidKey: settingsLogic.firebaseWebPushPubKey);
+            .getToken(vapidKey: configLogic.firebaseWebPushPubKey);
         debugPrint('Got FCM Token: $fcmToken');
         if (fcmToken != null) {
           await _processPushNoteToken(fcmToken);

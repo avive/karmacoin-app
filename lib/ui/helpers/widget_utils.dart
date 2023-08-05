@@ -26,7 +26,7 @@ CupertinoSliverNavigationBar kcNavBar(context, String title) {
     trailing: adjustNavigationBarButtonPosition(
         CupertinoButton(
           onPressed: () async {
-            await openUrl(settingsLogic.learnYoutubePlaylistUrl);
+            await openUrl(configLogic.learnYoutubePlaylistUrl);
           },
           child: const Icon(CupertinoIcons.question_circle, size: 24),
         ),
@@ -43,7 +43,7 @@ CupertinoSliverNavigationBar kcNavBarWidget(context, Widget titleWidget) {
     trailing: adjustNavigationBarButtonPosition(
         CupertinoButton(
           onPressed: () async {
-            await openUrl(settingsLogic.learnYoutubePlaylistUrl);
+            await openUrl(configLogic.learnYoutubePlaylistUrl);
           },
           child: const Icon(CupertinoIcons.question_circle, size: 24),
         ),
