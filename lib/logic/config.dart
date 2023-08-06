@@ -1,11 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/common/platform_info.dart';
-import 'package:karma_coin/data/kc_user.dart';
 
 // todo: add settings interface
 
@@ -21,6 +20,13 @@ class ConfigLogic {
 
   // check internet connections and show error messages
   final bool enableInternetConnectionChecking = false;
+
+  final secureStorage = const FlutterSecureStorage();
+  static const _aOptions = AndroidOptions(
+    encryptedSharedPreferences: true,
+  );
+
+  final String _pushTokenKey = "pushTokenKey";
 
   late final currentLocale = ValueNotifier<String?>(null);
   late final apiHostName = ValueNotifier<String>('127.0.0.1');
@@ -43,6 +49,17 @@ class ConfigLogic {
 
   // requested user name entered by the user. For the canonical user-name, check AccountLogic
   late final requestedUserName = ValueNotifier<String>('');
+
+// Set received FCM push note token
+  Future<void> _setFCMPushNoteToken(String token) async {
+    await secureStorage.write(
+        key: _pushTokenKey, value: token, aOptions: _aOptions);
+
+    fcmToken.value = token;
+  }
+
+  // Get known FCM push note token
+  final ValueNotifier<String?> fcmToken = ValueNotifier<String?>(null);
 
   Future<void> init() async {
     if (apiLocalMode) {
@@ -72,6 +89,13 @@ class ConfigLogic {
       verifierHostName.value = 'api.karmaco.in';
       verifierHostPort.value = 443;
       verifierSecureConnection.value = true;
+    }
+
+    // Read last known fcm token for device
+    String? token =
+        await secureStorage.read(key: _pushTokenKey, aOptions: _aOptions);
+    if (token != null) {
+      fcmToken.value = token;
     }
   }
 
@@ -123,8 +147,7 @@ class ConfigLogic {
       return;
     }
 
-    KarmaCoinUser? karmaUser = accountLogic.karmaCoinUser.value;
-    if (karmaUser == null) {
+    if (!kc2User.previouslySignedUp) {
       debugPrint('No local karma coin user. Cannot send token to server.');
       return;
     }
@@ -132,6 +155,12 @@ class ConfigLogic {
     final fireStore = FirebaseFirestore.instance;
     String userId = firebaseAuth.currentUser!.uid;
     debugPrint('Firebase auth user id: $userId');
+
+    if (kc2User.identity.phoneNumber == null) {
+      debugPrint('No phone number. Cannot send token to server.');
+      return;
+    }
+
     final data = <String, String>{
       'token': token,
       'timeStamp': DateTime.now().millisecondsSinceEpoch.toString(),
@@ -143,9 +172,9 @@ class ConfigLogic {
 
         await fireStore.collection('users').doc(userId).set({
           'tokens': [data],
-          'accountId': karmaUser.userData.accountId.data.toBase64(),
-          'phoneNumber': karmaUser.userData.mobileNumber.number,
-          'userName': karmaUser.userData.userName,
+          'accountId': kc2User.identity.accountId,
+          'phoneNumber': kc2User.identity.phoneNumber,
+          'userName': kc2User.userInfo.value!.userName,
         });
 
         debugPrint("Stored token in firestore");
@@ -177,7 +206,7 @@ class ConfigLogic {
     });
 
     // store locally in account logic
-    await accountLogic.setFCMPushNoteToken(token);
+    await _setFCMPushNoteToken(token);
   }
 
   /// Register for push notes - may show dialog box to allow notifications
@@ -218,6 +247,9 @@ class ConfigLogic {
   /// Handle a received push note
   void _handleMessage(RemoteMessage message) {
     debugPrint('Got push notification: $message');
+
+    // todo: get all transactions and show appreciations screen
+    /*
     Future.delayed(Duration.zero, () async {
       await FirebaseAnalytics.instance.logEvent(name: "push_note_received");
 
@@ -230,6 +262,6 @@ class ConfigLogic {
           }
         }
       }
-    });
+    });*/
   }
 }

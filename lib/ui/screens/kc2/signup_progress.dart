@@ -31,6 +31,12 @@ class _SignupProgressScreeenState extends State<SignupProgressScreeen> {
         .addPostFrameCallback((_) => _postFrameCallback(context));
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    kc2User.signupStatus.removeListener(_onSignupStatusChanged);
+  }
+
   void _postFrameCallback(BuildContext context) {
     Future.delayed(Duration.zero, () async {
       bool isConnected = await PlatformInfo.isConnected();
@@ -63,27 +69,7 @@ class _SignupProgressScreeenState extends State<SignupProgressScreeen> {
       }
 
       // todo: regsiter callbacks and start signup
-      kc2User.signupStatus.addListener(() async {
-        switch (kc2User.signupStatus.value) {
-          case SignupStatus.signingUp:
-            debugPrint('Signup status is signing up...');
-            appState.signedUpInCurentSession.value = true;
-            await FirebaseAnalytics.instance.logEvent(name: "sign_up");
-            debugPrint('*** going to user home...');
-            pushNamedAndRemoveUntil(ScreenPaths.home);
-            // todo: navigate to home
-            break;
-          case SignupStatus.notSignedUp:
-            // enable trying again
-            setState(() {
-              isSubmitInProgress = false;
-            });
-            break;
-          default:
-            // we don't care here - ui shows state
-            break;
-        }
-      });
+      kc2User.signupStatus.addListener(_onSignupStatusChanged);
 
       debugPrint('Signing up user...');
 
@@ -91,6 +77,30 @@ class _SignupProgressScreeenState extends State<SignupProgressScreeen> {
       await kc2User.signup(
           appState.requestedUserName!, appState.verifiedPhoneNumber!);
     });
+  }
+
+  void _onSignupStatusChanged() async {
+    switch (kc2User.signupStatus.value) {
+      case SignupStatus.signedUp:
+        debugPrint('Signup status is signed up...');
+        appState.signedUpInCurentSession.value = true;
+        await FirebaseAnalytics.instance.logEvent(name: "sign_up");
+        debugPrint('*** going to user home...');
+        pushNamedAndRemoveUntil(ScreenPaths.home);
+        // todo: navigate to home
+        break;
+      case SignupStatus.notSignedUp:
+        // enable trying again
+        if (context.mounted) {
+          setState(() {
+            isSubmitInProgress = false;
+          });
+        }
+        break;
+      default:
+        // we don't care here - ui shows state
+        break;
+    }
   }
 
   @override

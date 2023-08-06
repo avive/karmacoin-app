@@ -1,7 +1,7 @@
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/personality_traits.dart';
-import 'package:karma_coin/services/api/types.pb.dart';
+import 'package:karma_coin/services/v2.0/user_info.dart';
 
 class TraitsScoresWheel extends StatefulWidget {
   @required
@@ -22,10 +22,14 @@ class _TraitsScoresWheelState extends State<TraitsScoresWheel> {
 
   @override
   build(BuildContext context) {
-    return ValueListenableBuilder<Map<int, List<TraitScore>>>(
-        valueListenable: accountLogic.karmaCoinUser.value!.traitScores,
+    return ValueListenableBuilder<KC2UserInfo?>(
+        valueListenable: kc2User.userInfo,
         builder: (context, value, child) {
-          List<TraitScore> scores = value[widget.communityId] ?? [];
+          if (value == null) {
+            return Container();
+          }
+
+          List<TraitScore> scores = kc2User.userInfo.value?.traitScores[widget.communityId] ?? [];
           return Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [

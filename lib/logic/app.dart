@@ -135,6 +135,9 @@ class KC2AppLogic with KC2AppLogicInterface {
     // In case of account restore - get rid of this user and init a new one from mnemonic.
     await kc2User.init();
 
+    // setup push notes (but don't wait on it per docs)
+    configLogic.setupPushNotifications();
+
     // Flag bootStrap as complete
     isBootstrapComplete = true;
     debugPrint('bootstrap completed');

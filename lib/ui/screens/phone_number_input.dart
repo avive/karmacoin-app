@@ -178,6 +178,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
         }
 
         appState.verifiedPhoneNumber = number;
+        await kc2User.identity.setPhoneNumber(number);
 
         setState(() {
           isSigninIn = false;

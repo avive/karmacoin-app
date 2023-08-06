@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:karma_coin/common_libs.dart';
@@ -60,7 +59,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   }
 
   void _postFrameCallback(BuildContext context) {
-    debugPrint("UserHomeScreen._postFrameCallback");
+    debugPrint("UserHomeScreen");
 
     // handle appreciate after signup
     if (appState.appreciateAfterSignup.value =

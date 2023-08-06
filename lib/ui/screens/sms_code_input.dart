@@ -66,6 +66,8 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
         return;
       }
     }
+    // save verified user namuber
+    await kc2User.identity.setPhoneNumber(appState.verifiedPhoneNumber);
 
     // todo: check if user is already registered with this phone number,
     // existing userName and accountId and if yes, skip and go to user home...

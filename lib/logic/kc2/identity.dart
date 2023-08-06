@@ -3,7 +3,9 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/kc2/identity_interface.dart';
 import 'package:karma_coin/logic/kc2/keyring.dart';
 
-const _storeKey = "kc2menomonic";
+const _mnemonicStoreKey = "kc2menomonic";
+const _phoneNumberStoreKey = "kc2phonenumber";
+
 const _secureStorage = FlutterSecureStorage();
 const _sercureStorageOptions = AndroidOptions(
   encryptedSharedPreferences: true,
@@ -12,11 +14,12 @@ const _sercureStorageOptions = AndroidOptions(
 /// A kc2 persistent identity
 class Identity implements IdentityInterface {
   late KC2KeyRing _keyring;
+  late String? _phoneNumber;
 
   /// Check if the identity exists in local store
   @override
   Future<bool> get existsInLocalStore =>
-      _secureStorage.containsKey(key: _storeKey);
+      _secureStorage.containsKey(key: _mnemonicStoreKey);
 
   /// Initialize the identity. If mnenomic is provided, it will be used to create the
   /// identity and will be persisted to secure storage. Otherwise, identity is loaded from local store if exists. If not, a new one is created and persisted to local store
@@ -24,13 +27,16 @@ class Identity implements IdentityInterface {
   Future<void> init({String? mnemonic}) async {
     if (mnemonic != null) {
       _keyring = KC2KeyRing(mnemonic: mnemonic);
-      await _persistMnemonic();
+      await _persistToStore();
       debugPrint('created identity from the provided mnemonic');
       return;
     }
 
+    _phoneNumber = await _secureStorage.read(
+        key: _phoneNumberStoreKey, aOptions: _sercureStorageOptions);
+
     String? storeMnemonic = await _secureStorage.read(
-        key: _storeKey, aOptions: _sercureStorageOptions);
+        key: _mnemonicStoreKey, aOptions: _sercureStorageOptions);
 
     if (storeMnemonic != null) {
       _keyring = KC2KeyRing(mnemonic: storeMnemonic);
@@ -38,9 +44,23 @@ class Identity implements IdentityInterface {
     } else {
       _keyring = KC2KeyRing();
       // persist the mnemonic so it can be loaded on next app session
-      await _persistMnemonic();
+      await _persistToStore();
       debugPrint(
           'created new menonic: ${keyring.mnemonic}, and persisted in secure store.');
+    }
+  }
+
+  @override
+  String? get phoneNumber => _phoneNumber;
+
+  @override
+  Future<void> setPhoneNumber(String? phoneNumber) async {
+    _phoneNumber = phoneNumber;
+    if (phoneNumber == null) {
+      await _secureStorage.delete(
+          key: _phoneNumberStoreKey, aOptions: _sercureStorageOptions);
+    } else {
+      await _persistToStore();
     }
   }
 
@@ -48,14 +68,24 @@ class Identity implements IdentityInterface {
   @override
   Future<void> removeFromStore() async {
     await _secureStorage.delete(
-        key: _storeKey, aOptions: _sercureStorageOptions);
+        key: _mnemonicStoreKey, aOptions: _sercureStorageOptions);
+
+    await _secureStorage.delete(
+        key: _phoneNumberStoreKey, aOptions: _sercureStorageOptions);
   }
 
-  Future<void> _persistMnemonic() async {
+  Future<void> _persistToStore() async {
     await _secureStorage.write(
-        key: _storeKey,
+        key: _mnemonicStoreKey,
         value: _keyring.mnemonic,
         aOptions: _sercureStorageOptions);
+
+    if (_phoneNumber != null) {
+      await _secureStorage.write(
+          key: _phoneNumberStoreKey,
+          value: _phoneNumber!,
+          aOptions: _sercureStorageOptions);
+    }
   }
 
   @override

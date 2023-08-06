@@ -22,6 +22,11 @@ abstract class IdentityInterface {
   /// Gets the user's public ss58 address
   String get accountId;
 
+  /// Available after signup on device
+  String? get phoneNumber;
+
+  Future<void> setPhoneNumber(String? phoneNumber);
+
   /// Gets the identity's public signing ed key
   List<int> get publicKey;
 
