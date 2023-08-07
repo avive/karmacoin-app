@@ -164,7 +164,6 @@ String _getInitialLocation() {
 
 /// The route configuration
 final GoRouter appRouter = GoRouter(
-  refreshListenable: accountSetupController,
   redirect: (context, state) {
     return null;
   },

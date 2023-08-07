@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/services/api/verifier.pbgrpc.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:status_alert/status_alert.dart';
@@ -147,36 +148,22 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
 
     await accountLogic.setUserPhoneNumber(number);
 
-    // send whatsapp verification code to user and go to code screen
-
-    var header =
-        'ACf9f5f915138e4051e94e4708003994dc:e31519797e18e87d5cadf096fc039681';
-    var encodedHeader = utf8.encode(header);
-    var base64Str = base64.encode(encodedHeader);
-    var url = Uri.parse(
-        'https://verify.twilio.com/v2/Services/VAe920b27955f092c16ee499043dfc7aea/Verifications');
+    // send whatsapp verification code to user and go to code screen if
+    // it was sent successfully
 
     try {
-      Response response = await http.post(url,
-          headers: {'Authorization': 'Basic $base64Str'},
-          body: {'To': number, 'Channel': 'whatsapp'});
+      SendVerificationCodeResponse resp = await verifier.verifierServiceClient
+          .sendVerificationCode(
+              SendVerificationCodeRequest(mobileNumber: number));
+
+      appState.twilloVerificationSid = resp.sessionId;
 
       setState(() {
         isSigninIn = false;
       });
 
-      if (response.statusCode == 201) {
-        // store sid and verification url in app state for use later
-        var data = jsonDecode(response.body);
-        appState.twilloVerificationSid = data['sid'];
-
-        debugPrint(
-            'Twilio sid: ${appState.twilloVerificationSid} navigate to verification screen...');
-        if (context.mounted) {
-          context.push(ScreenPaths.verify);
-        }
-      } else {
-        throw 'unexpected respons code: ${response.statusCode}, ${response.reasonPhrase}';
+      if (context.mounted) {
+        context.push(ScreenPaths.verify);
       }
     } catch (e) {
       debugPrint('error: $e');

@@ -143,19 +143,6 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
     );
   }
 
-  /*
-  readyToSignup,
-  validatorError,
-  submittingTransaction,
-  transactionSubmitted, // from this moment we use local user and txs until newuser tx is confirmed
-  transactionError,
-  userNameTaken, // rare but possible and needed to be handled
-  signingUp,
-  signedUp, // signup tx confirmed on chain
-  accountAlreadyExists, // there's already an on-chain account for that accountId
-  missingData,
-  */
-
   // todo: add signup status widget with status of signup
   Widget _getSignupStatusRow(BuildContext context) {
     if (!mounted) return Container();

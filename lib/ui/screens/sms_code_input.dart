@@ -36,65 +36,11 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
 
     pinController.clear();
     context.push(ScreenPaths.newUserName);
+
     /*
     setState(() {
       submitInProgress = true;
-    });
-
-    // Verify code using Twillo
-    try {
-      appState.twilloVerificationCode = currCode;
-
-      var header =
-          'ACf9f5f915138e4051e94e4708003994dc:cf041f3fb153ce8a47251b58d372790f';
-      var encodedHeader = utf8.encode(header);
-      var base64Str = base64.encode(encodedHeader);
-      var url = Uri.parse(
-          'https://verify.twilio.com/v2/Services/VAe920b27955f092c16ee499043dfc7aea/VerificationCheck');
-
-      Response response = await http.post(url,
-          headers: {'Authorization': 'Basic $base64Str'},
-          body: {'To': accountLogic.phoneNumber.value, 'Code': currCode});
-
-      if (response.statusCode == 200) {
-        var data = jsonDecode(response.body);
-        debugPrint('data: $data');
-        if (data["status"] == "approved" &&
-            data["sid"] == appState.twilloVerificationSid) {
-          debugPrint('verified');
-
-          // todo: call web service to create account and get back account id
-          setState(() {
-            submitInProgress = false;
-          });
-
-          Future.delayed(Duration.zero, () {
-            debugPrint('verification complete');
-            pushNamedAndRemoveUntil(ScreenPaths.newUserName);
-          });
-        } else {
-          throw 'error verifying code';
-        }
-      }
-    } catch (e) {
-      debugPrint('error verifying code: $e');
-      setState(() {
-        submitInProgress = false;
-      });
-
-      pinController.clear();
-      pinputFocusNode.requestFocus();
-
-      StatusAlert.show(
-        context,
-        duration: const Duration(seconds: 2),
-        title: 'Verificaiton Error',
-        subtitle: 'Invalid code provided. Please try again.',
-        configuration:
-            const IconConfiguration(icon: CupertinoIcons.stop_circle),
-        maxWidth: statusAlertWidth,
-      );
-    }*/
+    });*/
   }
 
   Widget _getIndicator(BuildContext context) {
