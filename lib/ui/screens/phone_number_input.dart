@@ -1,5 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
@@ -8,6 +9,7 @@ import 'package:status_alert/status_alert.dart';
 import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart'
     as contact_picker;
 import 'package:email_validator/email_validator.dart';
+import 'package:http/http.dart' as http;
 
 const _privacyUrl = 'https://karmaco.in/docs/privacy';
 
@@ -79,7 +81,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
         context,
         duration: const Duration(seconds: 2),
         title: 'Oopps',
-        subtitle: 'Please enter your mobile phone number.',
+        subtitle: 'Please enter your WhatsApp phone number.',
         configuration:
             const IconConfiguration(icon: CupertinoIcons.stop_circle),
         maxWidth: statusAlertWidth,
@@ -137,122 +139,61 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
     String number =
         '+${phoneController.value!.countryCode}${phoneController.value!.nsn}';
     debugPrint(
-        'Phone number canonical string: $number. Calling feirebase api...');
+        'Phone number canonical string: $number. Calling verificaiton api...');
 
     setState(() {
       isSigninIn = true;
     });
 
-    // override verification on emulator
-    if (PlatformInfo.isAndroid) {
-      if (await PlatformInfo.isRunningOnAndroidEmulator()) {
-        FirebaseAuth.instance.setSettings(
-            appVerificationDisabledForTesting: true, forceRecaptchaFlow: true);
-      } /*else {
-        FirebaseAuth.instance.setSettings(forceRecaptchaFlow: true);
-      }*/
-    }
+    accountLogic.phoneNumber.value = number;
 
-    await FirebaseAuth.instance.verifyPhoneNumber(
-      phoneNumber: number,
-      verificationCompleted: (PhoneAuthCredential credential) async {
-        debugPrint('android auto verification callback');
-        try {
-          await FirebaseAuth.instance.signInWithCredential(credential);
-        } catch (e) {
-          debugPrint('error: $e');
-          StatusAlert.show(
-            context,
-            duration: const Duration(seconds: 2),
-            title: 'Oopps',
-            subtitle: 'The phone number you entered is invalid.',
-            configuration:
-                const IconConfiguration(icon: CupertinoIcons.stop_circle),
-            maxWidth: statusAlertWidth,
-          );
+    // send whatsapp verification code to user and go to code screen
 
-          setState(() {
-            isSigninIn = false;
-          });
-          return;
-        }
+    var header =
+        'ACf9f5f915138e4051e94e4708003994dc:cf041f3fb153ce8a47251b58d372790f';
+    var encodedHeader = utf8.encode(header);
+    var base64Str = base64.encode(encodedHeader);
+    var url = Uri.parse(
+        'https://verify.twilio.com/v2/Services/VAe920b27955f092c16ee499043dfc7aea/Verifications');
 
-        accountLogic.phoneNumber.value = number;
+    try {
+      Response response = await http.post(url,
+          headers: {'Authorization': 'Basic $base64Str'},
+          body: {'To': number, 'Channel': 'whatsapp'});
 
-        setState(() {
-          isSigninIn = false;
-        });
+      setState(() {
+        isSigninIn = false;
+      });
 
-        Future.delayed(Duration.zero, () {
-          debugPrint('navigate to user name...');
-          context.push(ScreenPaths.newUserName);
-        });
-      },
-      verificationFailed: (FirebaseAuthException e) async {
-        debugPrint('firebase auth exception: $e');
-        if (e.code == 'invalid-phone-number') {
-          if (context.mounted) {
-            StatusAlert.show(
-              context,
-              duration: const Duration(seconds: 2),
-              title: 'Oopps',
-              subtitle: 'The phone number you entered is invalid.',
-              configuration:
-                  const IconConfiguration(icon: CupertinoIcons.stop_circle),
-              maxWidth: statusAlertWidth,
-            );
-          }
-          setState(() {
-            isSigninIn = false;
-          });
-          return;
-        }
+      if (response.statusCode == 201) {
+        // store sid and verification url in app state for use later
+        var data = jsonDecode(response.body);
+        appState.twilloVerificationSid = data['sid'];
 
-        // todo: check for more codes to give better error messages to users....
+        debugPrint(
+            'Twilio sid: ${appState.twilloVerificationSid} navigate to verification screen...');
         if (context.mounted) {
-          StatusAlert.show(
-            context,
-            duration: const Duration(seconds: 2),
-            title: 'Signup Error',
-            subtitle: '${e.message} - ${e.code}',
-            configuration:
-                const IconConfiguration(icon: CupertinoIcons.stop_circle),
-            maxWidth: statusAlertWidth,
-          );
-        }
-
-        setState(() {
-          isSigninIn = false;
-        });
-        return;
-      },
-      codeSent: (String verificationId, int? resendToken) async {
-        // store verficationId in app state
-        debugPrint('verification code id: $verificationId');
-        appState.phoneAuthVerificationCodeId = verificationId;
-        accountLogic.phoneNumber.value = number;
-
-        setState(() {
-          isSigninIn = false;
-        });
-
-        Future.delayed(Duration.zero, () {
-          context.push(ScreenPaths.verify);
-        });
-      },
-      codeAutoRetrievalTimeout: (String verificationId) {
-        // andorid auto resolution timed out - show auth code screen
-        appState.phoneAuthVerificationCodeId = verificationId;
-        accountLogic.phoneNumber.value = number;
-
-        if (mounted) {
-          setState(() {
-            isSigninIn = false;
-          });
           context.push(ScreenPaths.verify);
         }
-      },
-    );
+      } else {
+        throw 'unexpected respons code: ${response.statusCode}';
+      }
+    } catch (e) {
+      debugPrint('error: $e');
+      if (context.mounted) {
+        StatusAlert.show(context,
+            duration: const Duration(seconds: 4),
+            title: 'Server error',
+            subtitle: 'Please try again later.',
+            configuration: const IconConfiguration(
+                icon: CupertinoIcons.exclamationmark_triangle),
+            dismissOnBackgroundTap: true,
+            maxWidth: statusAlertWidth);
+      }
+      setState(() {
+        isSigninIn = false;
+      });
+    }
   }
 
   @override
@@ -276,7 +217,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Text('Sign up with your phone number',
+                        Text('Sign up with your WhatsApp number',
                             style: CupertinoTheme.of(context)
                                 .textTheme
                                 .navTitleTextStyle),
@@ -298,12 +239,13 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                               ]),
                               decoration: InputDecoration(
                                 label: withLabel
-                                    ? const Text('Your phone number')
+                                    ? const Text('Your WhatsApp phone number')
                                     : null,
                                 border: outlineBorder
                                     ? const OutlineInputBorder()
                                     : const UnderlineInputBorder(),
-                                hintText: withLabel ? '' : 'Your mobile number',
+                                hintText:
+                                    withLabel ? '' : 'Your WhatsApp number',
                               ),
                             ),
                           ),

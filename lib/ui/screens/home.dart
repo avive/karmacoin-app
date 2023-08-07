@@ -92,7 +92,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         }
       }
       // register for push notes but don't wait on it - may show dialog
-      settingsLogic.registerPushNotifications();
+      // disabled in this release migrating to Twillio
+      // settingsLogic.registerPushNotifications();
     });
   }
 

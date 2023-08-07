@@ -29,6 +29,9 @@ class AppState {
   final ValueNotifier<TxSubmissionStatus> txSubmissionStatus =
       ValueNotifier(TxSubmissionStatus.idle);
 
+  String twilloVerificationSid = '';
+  String twilloVerificationCode = '';
+
   //// Error message for ui feedback. todo: implement me
   final ValueNotifier<String> txSubmissionError = ValueNotifier('');
 

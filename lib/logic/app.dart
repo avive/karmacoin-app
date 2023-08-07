@@ -10,13 +10,10 @@ import 'package:karma_coin/logic/auth.dart';
 import 'package:karma_coin/logic/config.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/logic/account_setup_controller.dart';
-import 'package:karma_coin/logic/kc2/playground.dart';
 import 'package:karma_coin/logic/txs_boss.dart';
 import 'package:karma_coin/logic/txs_boss_interface.dart';
 import 'package:karma_coin/logic/user_name_availability.dart';
 import 'package:karma_coin/logic/verifier.dart';
-import 'package:karma_coin/services/v2.0/kc2.dart';
-import 'package:karma_coin/services/v2.0/kc2_service.dart';
 import 'account_logic.dart';
 import 'account_interface.dart';
 import 'api.dart';
@@ -45,8 +42,6 @@ TransactionsBossInterface get txsBoss =>
     GetIt.I.get<TransactionsBossInterface>();
 
 AppState get appState => GetIt.I.get<AppState>();
-
-K2ServiceInterface get kc2Service => GetIt.I.get<K2ServiceInterface>();
 
 mixin AppLogicInterface {
   /// Indicates to the rest of the app that bootstrap has not completed.
@@ -89,8 +84,7 @@ class AppLogic with AppLogicInterface {
     GetIt.I.registerLazySingleton<TransactionsBossInterface>(
         () => TransactionsBoss());
     GetIt.I.registerLazySingleton<AppState>(() => AppState());
-    GetIt.I
-        .registerLazySingleton<K2ServiceInterface>(() => KarmachainService());
+    
   }
 
   /// Initialize the app and singleton services
@@ -132,9 +126,6 @@ class AppLogic with AppLogicInterface {
       SecurityContext.defaultContext
           .setTrustedCertificatesBytes(data.buffer.asUint8List());
     }
-
-    // Play around with kc2
-    await startKC2Playground();
 
     // Flag bootStrap as complete
     isBootstrapComplete = true;

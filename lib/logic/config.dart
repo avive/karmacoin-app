@@ -17,7 +17,7 @@ class ConfigLogic {
   final bool apiLocalMode = false;
 
   // dev mode has some text field input shortcuts to save time in dev
-  final bool devMode = false;
+  final bool devMode = true;
 
   // check internet connections and show error messages
   final bool enableInternetConnectionChecking = false;
@@ -37,7 +37,6 @@ class ConfigLogic {
 
   late final learnYoutubePlaylistUrl =
       'https://www.youtube.com/playlist?list=PLF4zx8ioKJTszWMz1MKiHwStfMCdxh8MP';
-
 
   late final firebaseWebPushPubKey =
       "BPCf2pl7oLrgSWJJjEXzKfTIe4atfDay5-Aw9u0Ge8IgtfozLq1jkYPfJ0ccEY9D9cdqoAgxcbx4rGEhQC5nMN4";

@@ -567,7 +567,9 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     debugPrint('verify phone number...');
 
     data.VerifyNumberRequest requestData = data.VerifyNumberRequest(
-      verifier_types.VerifyNumberRequest(
+      verifier_types.VerifyNumberRequestDataEx(
+        verificationCode: appState.twilloVerificationCode,
+        verificationSid: appState.twilloVerificationSid,
         mobileNumber: MobileNumber(number: phoneNumber.value!),
         accountId: AccountId(data: _getAccountId()),
         requestedUserName: requestedUserName.value,
@@ -583,8 +585,8 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
 
     try {
       debugPrint('calling verifier.verifyNumber()...');
-      VerifyNumberResponse response =
-          await verifier.verifierServiceClient.verifyNumber(requestData.request
+      VerifyNumberResponse response = await verifier.verifierServiceClient
+          .verifyNumberEx(requestData.request
               /*,
             options: CallOptions(
               compression: const GzipCodec(),

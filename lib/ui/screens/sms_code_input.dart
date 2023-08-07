@@ -1,9 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:pinput/pinput.dart';
-import 'package:status_alert/status_alert.dart';
 
 class SmsCodeInputScreen extends StatefulWidget {
   const SmsCodeInputScreen({super.key});
@@ -33,56 +31,70 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
   }
 
   Future<void> _submitCode(BuildContext context, String currCode) async {
-    // Sign the user in (or link) with the credential
+    // store for later
+    appState.twilloVerificationCode = currCode;
+
+    pinController.clear();
+    context.push(ScreenPaths.newUserName);
+    /*
+    setState(() {
+      submitInProgress = true;
+    });
+
+    // Verify code using Twillo
     try {
-      // Create a PhoneAuthCredential with the code
-      PhoneAuthCredential credential = PhoneAuthProvider.credential(
-          verificationId: appState.phoneAuthVerificationCodeId,
-          smsCode: currCode);
+      appState.twilloVerificationCode = currCode;
 
-      setState(() {
-        submitInProgress = true;
-      });
+      var header =
+          'ACf9f5f915138e4051e94e4708003994dc:cf041f3fb153ce8a47251b58d372790f';
+      var encodedHeader = utf8.encode(header);
+      var base64Str = base64.encode(encodedHeader);
+      var url = Uri.parse(
+          'https://verify.twilio.com/v2/Services/VAe920b27955f092c16ee499043dfc7aea/VerificationCheck');
 
-      await FirebaseAuth.instance.signInWithCredential(credential);
-    } catch (e) {
-      if (mounted) {
-        StatusAlert.show(
-          context,
-          duration: const Duration(seconds: 2),
-          title: 'Verificaiton Error',
-          subtitle: 'Invalid code provided. Please try again.',
-          configuration: const IconConfiguration(icon: CupertinoIcons.bookmark),
-          maxWidth: statusAlertWidth,
-        );
+      Response response = await http.post(url,
+          headers: {'Authorization': 'Basic $base64Str'},
+          body: {'To': accountLogic.phoneNumber.value, 'Code': currCode});
 
-        pinController.clear();
-        pinputFocusNode.requestFocus();
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        debugPrint('data: $data');
+        if (data["status"] == "approved" &&
+            data["sid"] == appState.twilloVerificationSid) {
+          debugPrint('verified');
 
-        setState(() {
-          submitInProgress = false;
-        });
+          // todo: call web service to create account and get back account id
+          setState(() {
+            submitInProgress = false;
+          });
 
-        return;
+          Future.delayed(Duration.zero, () {
+            debugPrint('verification complete');
+            pushNamedAndRemoveUntil(ScreenPaths.newUserName);
+          });
+        } else {
+          throw 'error verifying code';
+        }
       }
-    }
-
-    // Attempt auto sign-in in case there's already an account on chain for the local accountId with this phone number
-    if (await accountLogic.attemptAutoSignIn()) {
+    } catch (e) {
+      debugPrint('error verifying code: $e');
       setState(() {
         submitInProgress = false;
       });
 
-      Future.delayed(Duration.zero, () {
-        debugPrint(
-            'Auto signin - user already signed in with local accountId and verified phone number');
-        pushNamedAndRemoveUntil(ScreenPaths.home);
-      });
-    } else {
-      Future.delayed(Duration.zero, () {
-        pushNamedAndRemoveUntil(ScreenPaths.newUserName);
-      });
-    }
+      pinController.clear();
+      pinputFocusNode.requestFocus();
+
+      StatusAlert.show(
+        context,
+        duration: const Duration(seconds: 2),
+        title: 'Verificaiton Error',
+        subtitle: 'Invalid code provided. Please try again.',
+        configuration:
+            const IconConfiguration(icon: CupertinoIcons.stop_circle),
+        maxWidth: statusAlertWidth,
+      );
+    }*/
   }
 
   Widget _getIndicator(BuildContext context) {
@@ -119,7 +131,7 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
                     child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Text('Enter the verification code sent to your phone',
+                          Text('Enter the code sent to your WhatsApp',
                               textAlign: TextAlign.center,
                               style: CupertinoTheme.of(context)
                                   .textTheme

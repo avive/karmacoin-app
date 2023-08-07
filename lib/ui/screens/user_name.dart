@@ -1,5 +1,6 @@
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/logic/account_setup_controller.dart';
 import 'package:karma_coin/logic/user_name_availability.dart';
 import 'package:karma_coin/services/api/api.pb.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
@@ -91,6 +92,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
                               },
                         child: submitButtonText,
                       ),
+                      _getIndicatorArea(context),
                     ]),
               ),
             ),
@@ -98,6 +100,21 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
         ),
       ),
     );
+  }
+
+  Widget _getIndicatorArea(BuildContext context) {
+    if (isSubmitInProgress) {
+      return Column(children: [
+        const SizedBox(height: 14),
+        _getSignupStatus(context),
+        const SizedBox(height: 14),
+        const CupertinoActivityIndicator(
+          radius: 20,
+        )
+      ]);
+    } else {
+      return Container();
+    }
   }
 
   Widget _getAvailabilityStatus(BuildContext context) {
@@ -135,6 +152,49 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
         },
       ),
     );
+  }
+
+  /*
+  readyToSignup,
+  validatorError,
+  submittingTransaction,
+  transactionSubmitted, // from this moment we use local user and txs until newuser tx is confirmed
+  transactionError,
+  userNameTaken, // rare but possible and needed to be handled
+  signingUp,
+  signedUp, // signup tx confirmed on chain
+  accountAlreadyExists, // there's already an on-chain account for that accountId
+  missingData,
+  */
+
+  // todo: add signup status widget with status of signup
+  Widget _getSignupStatus(BuildContext context) {
+    if (!mounted) return Container();
+    return ValueListenableBuilder<AccountSetupStatus>(
+        valueListenable: accountSetupController.status,
+        builder: (context, value, child) {
+          String text = 'Signun up...';
+          switch (value) {
+            case AccountSetupStatus.signingUp:
+              text = 'Signing up...';
+              break;
+            case AccountSetupStatus.signedUp:
+              text = 'Signed up!';
+              break;
+            case AccountSetupStatus.accountAlreadyExists:
+              text = 'Account already exists';
+              break;
+            case AccountSetupStatus.missingData:
+              text = 'Missing data';
+              break;
+            default:
+              text = 'Unknown status';
+              break;
+          }
+
+          return Text(text,
+              style: CupertinoTheme.of(context).textTheme.textStyle);
+        });
   }
 
   Future<void> _submitName(BuildContext context) async {
@@ -266,33 +326,37 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
     return Title(
       color: CupertinoColors.black, // This is required
       title: 'Karma Coin - User Name',
-      child: CupertinoTextField(
-        prefix: const Icon(
-          CupertinoIcons.person_solid,
-          color: CupertinoColors.lightBackgroundGray,
-          size: 28,
-        ),
-        autofocus: true,
-        autocorrect: false,
-        clearButtonMode: OverlayVisibilityMode.editing,
-        placeholder: 'Requested user name',
-        style: CupertinoTheme.of(context).textTheme.textStyle,
-        textAlign: TextAlign.center,
-        padding: const EdgeInsets.all(16.0),
-        decoration: const BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              width: 0,
-              // todo: from theme
-              color: CupertinoColors.inactiveGray,
+      child: Column(
+        children: [
+          CupertinoTextField(
+            prefix: const Icon(
+              CupertinoIcons.person_solid,
+              color: CupertinoColors.lightBackgroundGray,
+              size: 28,
             ),
+            autofocus: true,
+            autocorrect: false,
+            clearButtonMode: OverlayVisibilityMode.editing,
+            placeholder: 'Requested user name',
+            style: CupertinoTheme.of(context).textTheme.textStyle,
+            textAlign: TextAlign.center,
+            padding: const EdgeInsets.all(16.0),
+            decoration: const BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  width: 0,
+                  // todo: from theme
+                  color: CupertinoColors.inactiveGray,
+                ),
+              ),
+            ),
+            onChanged: (value) async {
+              // check availability on text change
+              await userNameAvailabilityLogic.check(value);
+            },
+            controller: _textController,
           ),
-        ),
-        onChanged: (value) async {
-          // check availability on text change
-          await userNameAvailabilityLogic.check(value);
-        },
-        controller: _textController,
+        ],
       ),
     );
   }
