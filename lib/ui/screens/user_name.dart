@@ -92,7 +92,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
                               },
                         child: submitButtonText,
                       ),
-                      _getIndicatorArea(context),
+                      _getSignupStatusRow(context),
                     ]),
               ),
             ),
@@ -102,27 +102,16 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
     );
   }
 
-  Widget _getIndicatorArea(BuildContext context) {
-    if (isSubmitInProgress) {
-      return Column(children: [
-        const SizedBox(height: 14),
-        _getSignupStatus(context),
-        const SizedBox(height: 14),
-        const CupertinoActivityIndicator(
-          radius: 20,
-        )
-      ]);
-    } else {
-      return Container();
-    }
-  }
-
   Widget _getAvailabilityStatus(BuildContext context) {
     if (!mounted) return Container();
     return ChangeNotifierProvider.value(
       value: userNameAvailabilityLogic,
       child: Consumer<UserNameAvailabilityLogic>(
         builder: (context, state, child) {
+          if (isSubmitInProgress) {
+            return Container();
+          }
+
           switch (state.status) {
             case UserNameAvailabilityStatus.unknown:
               return Container();
@@ -168,15 +157,27 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
   */
 
   // todo: add signup status widget with status of signup
-  Widget _getSignupStatus(BuildContext context) {
+  Widget _getSignupStatusRow(BuildContext context) {
     if (!mounted) return Container();
+
     return ValueListenableBuilder<AccountSetupStatus>(
         valueListenable: accountSetupController.status,
         builder: (context, value, child) {
-          String text = 'Signun up...';
+          bool showIndicator = false;
+          String text = '';
+          debugPrint(">>> status: $value");
           switch (value) {
             case AccountSetupStatus.signingUp:
               text = 'Signing up...';
+              showIndicator = true;
+              break;
+            case AccountSetupStatus.transactionSubmitted:
+              text = 'Transaction submitted';
+              showIndicator = true;
+              break;
+            case AccountSetupStatus.submittingTransaction:
+              text = 'Submitting transaction';
+              showIndicator = true;
               break;
             case AccountSetupStatus.signedUp:
               text = 'Signed up!';
@@ -188,12 +189,25 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
               text = 'Missing data';
               break;
             default:
-              text = 'Unknown status';
+              text = '';
               break;
           }
 
-          return Text(text,
-              style: CupertinoTheme.of(context).textTheme.textStyle);
+          List<Widget> children = [];
+          if (text != '') {
+            children.add(const SizedBox(height: 14));
+            children.add(Text(text,
+                style: CupertinoTheme.of(context).textTheme.textStyle));
+          }
+
+          if (showIndicator) {
+            children.add(const SizedBox(height: 14));
+            children.add(const CupertinoActivityIndicator(
+              radius: 20,
+            ));
+          }
+
+          return Column(children: children);
         });
   }
 
@@ -226,84 +240,9 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
       return;
     }
 
-    // check once again for availbility...
-    // await userNameAvailabilityLogic.check(_textController.text);
-
-    if (userNameAvailabilityLogic.status ==
+    /*
+    if (userNameAvailabilityLogic.status !=
         UserNameAvailabilityStatus.available) {
-      setState(() {
-        isSubmitInProgress = true;
-      });
-
-      // store the user's reuqested name in account logic
-      await accountLogic.setRequestedUserName(_textController.text);
-
-      switch (widget.operation) {
-        case Operation.signUp:
-          debugPrint('*** starting signup flow...');
-          await accountSetupController.signUpUser();
-          break;
-        case Operation.updateUserName:
-          debugPrint('starting update user name flow...');
-          try {
-            SubmitTransactionResponse resp = await accountLogic
-                .submitUpdateUserNameTransacation(_textController.text);
-
-            switch (resp.submitTransactionResult) {
-              case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
-                if (context.mounted) {
-                  StatusAlert.show(
-                    context,
-                    duration: const Duration(seconds: 2),
-                    title: 'Name updated',
-                    configuration:
-                        const IconConfiguration(icon: CupertinoIcons.wand_rays),
-                    maxWidth: statusAlertWidth,
-                  );
-                  setState(() {
-                    isSubmitInProgress = false;
-                  });
-                  context.pop();
-                }
-                debugPrint(
-                    'Update user name transaction submitted and accepted');
-                break;
-              case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
-                if (context.mounted) {
-                  StatusAlert.show(
-                    context,
-                    duration: const Duration(seconds: 2),
-                    title: 'Server Error',
-                    subtitle: 'Operation failed. Try again later.',
-                    configuration: const IconConfiguration(
-                        icon: CupertinoIcons.exclamationmark_triangle),
-                    maxWidth: statusAlertWidth,
-                  );
-                  setState(() {
-                    isSubmitInProgress = false;
-                  });
-                }
-                break;
-            }
-          } catch (e) {
-            if (context.mounted) {
-              StatusAlert.show(
-                context,
-                duration: const Duration(seconds: 2),
-                title: 'Oops',
-                subtitle: 'Operation failed. Try again later.',
-                configuration: const IconConfiguration(
-                    icon: CupertinoIcons.exclamationmark_triangle),
-                maxWidth: statusAlertWidth,
-              );
-              setState(() {
-                isSubmitInProgress = false;
-              });
-            }
-          }
-          break;
-      }
-    } else {
       debugPrint('Name not available - show warning');
       if (context.mounted) {
         StatusAlert.show(
@@ -318,7 +257,79 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
         setState(() {
           isSubmitInProgress = false;
         });
-      }
+        return;
+      }*/
+
+    setState(() {
+      isSubmitInProgress = true;
+    });
+
+    // store the user's reuqested name in account logic
+    await accountLogic.setRequestedUserName(_textController.text);
+
+    switch (widget.operation) {
+      case Operation.signUp:
+        debugPrint('*** starting signup flow...');
+        await accountSetupController.signUpUser();
+        break;
+      case Operation.updateUserName:
+        debugPrint('starting update user name flow...');
+        try {
+          SubmitTransactionResponse resp = await accountLogic
+              .submitUpdateUserNameTransacation(_textController.text);
+
+          switch (resp.submitTransactionResult) {
+            case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
+              if (context.mounted) {
+                StatusAlert.show(
+                  context,
+                  duration: const Duration(seconds: 2),
+                  title: 'Name updated',
+                  configuration:
+                      const IconConfiguration(icon: CupertinoIcons.wand_rays),
+                  maxWidth: statusAlertWidth,
+                );
+                setState(() {
+                  isSubmitInProgress = false;
+                });
+                context.pop();
+              }
+              debugPrint('Update user name transaction submitted and accepted');
+              break;
+            case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
+              if (context.mounted) {
+                StatusAlert.show(
+                  context,
+                  duration: const Duration(seconds: 2),
+                  title: 'Server Error',
+                  subtitle: 'Operation failed. Try again later.',
+                  configuration: const IconConfiguration(
+                      icon: CupertinoIcons.exclamationmark_triangle),
+                  maxWidth: statusAlertWidth,
+                );
+                setState(() {
+                  isSubmitInProgress = false;
+                });
+              }
+              break;
+          }
+        } catch (e) {
+          if (context.mounted) {
+            StatusAlert.show(
+              context,
+              duration: const Duration(seconds: 2),
+              title: 'Oops',
+              subtitle: 'Operation failed. Try again later.',
+              configuration: const IconConfiguration(
+                  icon: CupertinoIcons.exclamationmark_triangle),
+              maxWidth: statusAlertWidth,
+            );
+            setState(() {
+              isSubmitInProgress = false;
+            });
+          }
+        }
+        break;
     }
   }
 

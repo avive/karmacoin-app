@@ -43,12 +43,9 @@ class AccountSetupController extends ChangeNotifier {
 
   // First step in signup process
   Future<void> _getValidatorEvidence() async {
-    notifyListeners();
+    setStatus(AccountSetupStatus.readyToSignup);
 
-    if (!accountLogic.validateDataForNewKarmCoinUser()) {
-      setStatus(AccountSetupStatus.missingData);
-      return;
-    }
+    notifyListeners();
 
     if (accountLogic.karmaCoinUser.value == null) {
       // Create a new local karma coin user and store it in local store
@@ -56,8 +53,6 @@ class AccountSetupController extends ChangeNotifier {
       // so user can start sending transactions before his signup tx is confirmed
       await accountLogic.createNewKarmaCoinUser();
     }
-
-    setStatus(AccountSetupStatus.readyToSignup);
 
     if (!accountLogic.validateDataForPhoneVerification()) {
       setStatus(AccountSetupStatus.missingData);

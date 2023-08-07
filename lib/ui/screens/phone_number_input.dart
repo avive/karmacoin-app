@@ -145,12 +145,12 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
       isSigninIn = true;
     });
 
-    accountLogic.phoneNumber.value = number;
+    await accountLogic.setUserPhoneNumber(number);
 
     // send whatsapp verification code to user and go to code screen
 
     var header =
-        'ACf9f5f915138e4051e94e4708003994dc:cf041f3fb153ce8a47251b58d372790f';
+        'ACf9f5f915138e4051e94e4708003994dc:e31519797e18e87d5cadf096fc039681';
     var encodedHeader = utf8.encode(header);
     var base64Str = base64.encode(encodedHeader);
     var url = Uri.parse(
@@ -176,7 +176,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
           context.push(ScreenPaths.verify);
         }
       } else {
-        throw 'unexpected respons code: ${response.statusCode}';
+        throw 'unexpected respons code: ${response.statusCode}, ${response.reasonPhrase}';
       }
     } catch (e) {
       debugPrint('error: $e');

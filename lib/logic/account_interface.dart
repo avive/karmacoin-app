@@ -52,6 +52,8 @@ abstract class AccountLogicInterface {
   /// Verify user's phone number and account id
   Future<void> verifyPhoneNumber();
 
+  Future<void> setUserPhoneNumber(String phoneNumber);
+
   /// Set keypaird from seed words
   Future<void> setKeypairFromWords(String securityWords);
 
