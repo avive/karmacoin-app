@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/api/verifier.pbgrpc.dart';
@@ -10,7 +8,6 @@ import 'package:status_alert/status_alert.dart';
 import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart'
     as contact_picker;
 import 'package:email_validator/email_validator.dart';
-import 'package:http/http.dart' as http;
 
 const _privacyUrl = 'https://karmaco.in/docs/privacy';
 
