@@ -1,9 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:pinput/pinput.dart';
-import 'package:status_alert/status_alert.dart';
 
 class SmsCodeInputScreen extends StatefulWidget {
   const SmsCodeInputScreen({super.key});
@@ -33,47 +31,10 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
   }
 
   Future<void> _submitCode(BuildContext context, String currCode) async {
-    // Sign the user in (or link) with the credential
-    try {
-      // Create a PhoneAuthCredential with the code
-      PhoneAuthCredential credential = PhoneAuthProvider.credential(
-          verificationId: appState.phoneAuthVerificationCodeId,
-          smsCode: currCode);
-
-      setState(() {
-        submitInProgress = true;
-      });
-
-      await FirebaseAuth.instance.signInWithCredential(credential);
-    } catch (e) {
-      if (mounted) {
-        StatusAlert.show(
-          context,
-          duration: const Duration(seconds: 2),
-          title: 'Verificaiton Error',
-          subtitle: 'Invalid code provided. Please try again.',
-          configuration: const IconConfiguration(icon: CupertinoIcons.bookmark),
-          maxWidth: statusAlertWidth,
-        );
-
-        pinController.clear();
-        pinputFocusNode.requestFocus();
-
-        setState(() {
-          submitInProgress = false;
-        });
-
-        return;
-      }
-    }
-    // save verified user namuber
-    await kc2User.identity.setPhoneNumber(appState.verifiedPhoneNumber);
-
-    // todo: check if user is already registered with this phone number,
-    // existing userName and accountId and if yes, skip and go to user home...
-    Future.delayed(Duration.zero, () {
-      pushNamedAndRemoveUntil(ScreenPaths.newUserName);
-    });
+    // store for later
+    appState.twilloVerificationCode = currCode;
+    pinController.clear();
+    context.push(ScreenPaths.newUserName);
   }
 
   Widget _getIndicator(BuildContext context) {
@@ -110,7 +71,7 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
                     child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Text('Enter the verification code sent to your phone',
+                          Text('Enter the code sent to your WhatsApp',
                               textAlign: TextAlign.center,
                               style: CupertinoTheme.of(context)
                                   .textTheme

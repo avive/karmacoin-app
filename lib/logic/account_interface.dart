@@ -52,6 +52,8 @@ abstract class AccountLogicInterface {
   /// Verify user's phone number and account id
   Future<void> verifyPhoneNumber();
 
+  Future<void> setUserPhoneNumber(String phoneNumber);
+
   /// Set keypaird from seed words
   Future<void> setKeypairFromWords(String securityWords);
 
@@ -84,6 +86,7 @@ abstract class AccountLogicInterface {
   bool validateDataForNewKarmCoinUser();
   bool validateDataForPhoneVerification();
   bool validateDataForNewUserTransaction();
+  bool numberVerified();
 
   // Set received FCM push note token
   Future<void> setFCMPushNoteToken(String token);

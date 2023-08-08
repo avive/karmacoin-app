@@ -5,25 +5,26 @@ import '../common_libs.dart';
 
 enum AccountSetupStatus {
   readyToSignup,
-  validating,
   validatorError,
   submittingTransaction,
   transactionSubmitted, // from this moment we use local user and txs until newuser tx is confirmed
   transactionError,
   userNameTaken, // rare but possible and needed to be handled
+  signingUp,
   signedUp, // signup tx confirmed on chain
   accountAlreadyExists, // there's already an on-chain account for that accountId
   missingData,
+  incorrectVerificationCode,
 }
 
 /// Drives the sign-up interactive process in an app session once user provided all
 /// requred data. It uses data from accountLogic to drive the state of the sign-up process.
 class AccountSetupController extends ChangeNotifier {
-  AccountSetupStatus _status = AccountSetupStatus.readyToSignup;
+  ValueNotifier<AccountSetupStatus> status =
+      ValueNotifier(AccountSetupStatus.readyToSignup);
 
-  AccountSetupStatus get status => _status;
   void setStatus(AccountSetupStatus value) {
-    _status = value;
+    status.value = value;
     notifyListeners();
   }
 
@@ -37,26 +38,22 @@ class AccountSetupController extends ChangeNotifier {
   /// Start the signup process using local data in accountManager and a Karmacoin API service provider
   /// This has the side effect of setting the local karma coin user
   Future<void> signUpUser() async {
-    setStatus(AccountSetupStatus.readyToSignup);
+    setStatus(AccountSetupStatus.signingUp);
     await _getValidatorEvidence();
   }
 
   // First step in signup process
   Future<void> _getValidatorEvidence() async {
-    setStatus(AccountSetupStatus.validating);
+    setStatus(AccountSetupStatus.readyToSignup);
+
     notifyListeners();
 
-    if (!accountLogic.validateDataForNewKarmCoinUser()) {
-      setStatus(AccountSetupStatus.missingData);
-      return;
+    if (accountLogic.karmaCoinUser.value == null) {
+      // Create a new local karma coin user and store it in local store
+      // we use this local user until we get the on-chain user
+      // so user can start sending transactions before his signup tx is confirmed
+      await accountLogic.createNewKarmaCoinUser();
     }
-
-    // Create a new local karma coin user and store it in local store
-    // we use this local user until we get the on-chain user
-    // so user can start sending transactions before his signup tx is confirmed
-    await accountLogic.createNewKarmaCoinUser();
-
-    setStatus(AccountSetupStatus.readyToSignup);
 
     if (!accountLogic.validateDataForPhoneVerification()) {
       setStatus(AccountSetupStatus.missingData);
@@ -68,6 +65,11 @@ class AccountSetupController extends ChangeNotifier {
     } catch (e) {
       debugPrint('verification exception: $e');
       setStatus(AccountSetupStatus.validatorError);
+      return;
+    }
+
+    if (!accountLogic.numberVerified()) {
+      setStatus(AccountSetupStatus.incorrectVerificationCode);
       return;
     }
 
@@ -88,7 +90,7 @@ class AccountSetupController extends ChangeNotifier {
         case ExecutionResult.EXECUTION_RESULT_EXECUTED:
           // no need to check the tx event - if the signup was executed then the user is on-chain
 
-          if (_status != AccountSetupStatus.signedUp) {
+          if (status.value != AccountSetupStatus.signedUp) {
             setStatus(AccountSetupStatus.signedUp);
             appState.signedUpInCurentSession.value = true;
             await FirebaseAnalytics.instance.logEvent(name: "sign_up");

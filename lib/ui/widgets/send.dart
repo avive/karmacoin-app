@@ -226,6 +226,17 @@ class _SendWidgetState extends State<SendWidget> {
     String defaultNumber = configLogic.devMode ? "549805380" : "";
     IsoCode code = configLogic.devMode ? IsoCode.IL : IsoCode.US;
 
+    // set default country code from user's mobile number's country code
+
+    try {
+      PhoneNumber userNumber = PhoneNumber.parse(
+          accountLogic.karmaCoinUser.value!.mobileNumber.value.number);
+
+      code = userNumber.isoCode;
+    } catch (e) {
+      debugPrint('error parsing user mobile number: $e');
+    }
+
     phoneController =
         PhoneController(PhoneNumber(isoCode: code, nsn: defaultNumber));
   }

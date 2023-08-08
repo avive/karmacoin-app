@@ -31,6 +31,9 @@ void main() async {
 
   await appLogic.bootstrap();
 
+  // setup push notes (but don't wait on it per docs)
+  // settingsLogic.setupPushNotifications();
+
   runApp(KarmaCoinApp());
   FlutterNativeSplash.remove();
 }

@@ -1,7 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/services/api/verifier.pbgrpc.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:status_alert/status_alert.dart';
@@ -25,7 +25,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
   TextEditingController emailController = TextEditingController();
   late PhoneNumberInputValidator validator;
   bool outlineBorder = false;
-  bool mobileOnly = true;
+  bool mobileOnly = false;
   bool shouldFormat = true;
   bool isCountryChipPersistent = false;
   bool withLabel = false;
@@ -46,12 +46,22 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
     super.initState();
     isSigninIn = false;
 
-    String defaultNuber = configLogic.devMode ? "549805381" : "";
+    String defaultNumber = configLogic.devMode ? "549805381" : "";
     IsoCode code = configLogic.devMode ? IsoCode.IL : IsoCode.US;
 
+    try {
+      // ignore: deprecated_member_use
+      String? countryCode = WidgetsBinding.instance.window.locale.countryCode;
+      if (countryCode != null) {
+        code = IsoCode.fromJson(countryCode.toUpperCase());
+      }
+    } catch (e) {
+      debugPrint('failed to get country code from locale: $e');
+    }
+
     phoneController =
-        PhoneController(PhoneNumber(isoCode: code, nsn: defaultNuber));
-    validator = PhoneValidator.validMobile();
+        PhoneController(PhoneNumber(isoCode: code, nsn: defaultNumber));
+    validator = PhoneValidator.valid();
 
     if (PlatformInfo.isMobile) {
       // contact picker only available in native mobile iOs or Android
@@ -71,15 +81,14 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
       isSigninIn = true;
     });
 
-    bool isValid =
-        phoneController.value?.isValid(type: PhoneNumberType.mobile) ?? false;
+    bool isValid = phoneController.value?.isValid() ?? false;
 
     if (!isValid) {
       StatusAlert.show(
         context,
         duration: const Duration(seconds: 2),
         title: 'Oopps',
-        subtitle: 'Please enter your mobile phone number.',
+        subtitle: 'Please enter your WhatsApp phone number.',
         configuration:
             const IconConfiguration(icon: CupertinoIcons.stop_circle),
         maxWidth: statusAlertWidth,
@@ -137,123 +146,47 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
     String number =
         '+${phoneController.value!.countryCode}${phoneController.value!.nsn}';
     debugPrint(
-        'Phone number canonical string: $number. Calling feirebase api...');
+        'Phone number canonical string: $number. Calling verificaiton api...');
 
     setState(() {
       isSigninIn = true;
     });
 
-    // override verification on emulator
-    if (PlatformInfo.isAndroid) {
-      if (await PlatformInfo.isRunningOnAndroidEmulator()) {
-        FirebaseAuth.instance.setSettings(
-            appVerificationDisabledForTesting: true, forceRecaptchaFlow: true);
-      } /*else {
-        FirebaseAuth.instance.setSettings(forceRecaptchaFlow: true);
-      }*/
+    await accountLogic.setUserPhoneNumber(number);
+
+    // send whatsapp verification code to user and go to code screen if
+    // it was sent successfully
+
+    try {
+      SendVerificationCodeResponse resp = await verifier.verifierServiceClient
+          .sendVerificationCode(
+              SendVerificationCodeRequest(mobileNumber: number));
+
+      appState.twilloVerificationSid = resp.sessionId;
+
+      setState(() {
+        isSigninIn = false;
+      });
+
+      if (context.mounted) {
+        context.push(ScreenPaths.verify);
+      }
+    } catch (e) {
+      debugPrint('error: $e');
+      if (context.mounted) {
+        StatusAlert.show(context,
+            duration: const Duration(seconds: 4),
+            title: 'Server error',
+            subtitle: 'Please try again later.',
+            configuration: const IconConfiguration(
+                icon: CupertinoIcons.exclamationmark_triangle),
+            dismissOnBackgroundTap: true,
+            maxWidth: statusAlertWidth);
+      }
+      setState(() {
+        isSigninIn = false;
+      });
     }
-
-    await FirebaseAuth.instance.verifyPhoneNumber(
-      phoneNumber: number,
-      verificationCompleted: (PhoneAuthCredential credential) async {
-        debugPrint('android auto verification callback');
-        try {
-          await FirebaseAuth.instance.signInWithCredential(credential);
-        } catch (e) {
-          debugPrint('error: $e');
-          StatusAlert.show(
-            context,
-            duration: const Duration(seconds: 2),
-            title: 'Oopps',
-            subtitle: 'The phone number you entered is invalid.',
-            configuration:
-                const IconConfiguration(icon: CupertinoIcons.stop_circle),
-            maxWidth: statusAlertWidth,
-          );
-
-          setState(() {
-            isSigninIn = false;
-          });
-          return;
-        }
-
-        appState.verifiedPhoneNumber = number;
-        await kc2User.identity.setPhoneNumber(number);
-
-        setState(() {
-          isSigninIn = false;
-        });
-
-        Future.delayed(Duration.zero, () {
-          debugPrint('navigate to user name...');
-          context.push(ScreenPaths.newUserName);
-        });
-      },
-      verificationFailed: (FirebaseAuthException e) async {
-        debugPrint('firebase auth exception: $e');
-        if (e.code == 'invalid-phone-number') {
-          if (context.mounted) {
-            StatusAlert.show(
-              context,
-              duration: const Duration(seconds: 2),
-              title: 'Oopps',
-              subtitle: 'The phone number you entered is invalid.',
-              configuration:
-                  const IconConfiguration(icon: CupertinoIcons.stop_circle),
-              maxWidth: statusAlertWidth,
-            );
-          }
-          setState(() {
-            isSigninIn = false;
-          });
-          return;
-        }
-
-        // todo: check for more codes to give better error messages to users....
-        if (context.mounted) {
-          StatusAlert.show(
-            context,
-            duration: const Duration(seconds: 2),
-            title: 'Signup Error',
-            subtitle: '${e.message} - ${e.code}',
-            configuration:
-                const IconConfiguration(icon: CupertinoIcons.stop_circle),
-            maxWidth: statusAlertWidth,
-          );
-        }
-
-        setState(() {
-          isSigninIn = false;
-        });
-        return;
-      },
-      codeSent: (String verificationId, int? resendToken) async {
-        // store verficationId in app state
-        debugPrint('verification code id: $verificationId');
-        appState.phoneAuthVerificationCodeId = verificationId;
-        appState.verifiedPhoneNumber = number;
-
-        setState(() {
-          isSigninIn = false;
-        });
-
-        Future.delayed(Duration.zero, () {
-          context.push(ScreenPaths.verify);
-        });
-      },
-      codeAutoRetrievalTimeout: (String verificationId) {
-        // andorid auto resolution timed out - show auth code screen
-        appState.phoneAuthVerificationCodeId = verificationId;
-        appState.verifiedPhoneNumber = number;
-
-        if (mounted) {
-          setState(() {
-            isSigninIn = false;
-          });
-          context.push(ScreenPaths.verify);
-        }
-      },
-    );
   }
 
   @override
@@ -277,7 +210,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Text('Sign up with your phone number',
+                        Text('Sign up with your WhatsApp number',
                             style: CupertinoTheme.of(context)
                                 .textTheme
                                 .navTitleTextStyle),
@@ -299,12 +232,13 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                               ]),
                               decoration: InputDecoration(
                                 label: withLabel
-                                    ? const Text('Your phone number')
+                                    ? const Text('Your WhatsApp phone number')
                                     : null,
                                 border: outlineBorder
                                     ? const OutlineInputBorder()
                                     : const UnderlineInputBorder(),
-                                hintText: withLabel ? '' : 'Your mobile number',
+                                hintText:
+                                    withLabel ? '' : 'Your WhatsApp number',
                               ),
                             ),
                           ),

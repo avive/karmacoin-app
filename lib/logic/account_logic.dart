@@ -369,7 +369,8 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
   }
 
   /// Set local user's phone number
-  Future<void> _setUserPhoneNumber(String phoneNumber) async {
+  @override
+  Future<void> setUserPhoneNumber(String phoneNumber) async {
     await secureStorage.write(
         key: _AccountStoreKeys.phoneNumber,
         value: phoneNumber,
@@ -478,7 +479,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     debugPrint(
         'Storing user phone number we got from firebase to secure local store... ${user.phoneNumber}');
 
-    await _setUserPhoneNumber(user.phoneNumber!);
+    await setUserPhoneNumber(user.phoneNumber!);
 
     debugPrint('Storing accountId $accountIdBase64 firebase...');
     try {
@@ -531,8 +532,13 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
   /// Create a new karma coin user from account data
   @override
   Future<void> createNewKarmaCoinUser() async {
-    // todo: if we alrteady had anohter karma coin user then we should unregsiter from the transactionsBoss on transactions for this user
+    // todo: if we alr5eady had anohter karma coin user then we should unregsiter from the transactionsBoss on transactions for this user
     debugPrint('Creating new karmacoin user...');
+
+    if (keyPair.value == null) {
+      debugPrint('No local keypair exists - generating new one...');
+      await _generateNewKeyPair();
+    }
 
     // all new users get this on signup - we simulate it in clients until
     // we get it from the user's on-chain account
@@ -566,7 +572,9 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     debugPrint('verify phone number...');
 
     data.VerifyNumberRequest requestData = data.VerifyNumberRequest(
-      verifier_types.VerifyNumberRequest(
+      verifier_types.VerifyNumberRequestDataEx(
+        verificationCode: appState.twilloVerificationCode,
+        verificationSid: appState.twilloVerificationSid,
         mobileNumber: MobileNumber(number: phoneNumber.value!),
         accountId: AccountId(data: _getAccountId()),
         requestedUserName: requestedUserName.value,
@@ -582,14 +590,11 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
 
     try {
       debugPrint('calling verifier.verifyNumber()...');
-      VerifyNumberResponse response =
-          await verifier.verifierServiceClient.verifyNumber(requestData.request
-              /*,
-            options: CallOptions(
-              compression: const GzipCodec(),
-              timeout: const Duration(seconds: 30),
-            ),*/
-              );
+      VerifyNumberResponse response = await verifier.verifierServiceClient
+          .verifyNumberEx(requestData.request);
+
+      debugPrint(
+          'Verification result: ${response.userVerificationData.verificationResult}');
 
       userVerificationData = response.userVerificationData;
     } catch (e) {
@@ -630,6 +635,13 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     debugPrint(
         'validating local data for phone verification... ${karmaCoinUser.value}');
     return karmaCoinUser.value != null;
+  }
+
+  @override
+  bool numberVerified() {
+    return _userVerificationData?.verificationResult != null &&
+        _userVerificationData!.verificationResult ==
+            VerificationResult.VERIFICATION_RESULT_VERIFIED;
   }
 
   @override
