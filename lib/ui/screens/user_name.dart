@@ -1,6 +1,5 @@
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/logic/account_setup_controller.dart';
 import 'package:karma_coin/logic/user_name_availability.dart';
 import 'package:karma_coin/services/api/api.pb.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
@@ -145,8 +144,9 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
 
   // todo: add signup status widget with status of signup
   Widget _getSignupStatusRow(BuildContext context) {
-    if (!mounted) return Container();
+    return Container();
 
+    /*
     return ValueListenableBuilder<AccountSetupStatus>(
         valueListenable: accountSetupController.status,
         builder: (context, value, child) {
@@ -199,7 +199,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
           }
 
           return Column(children: children);
-        });
+        });*/
   }
 
   Future<void> _submitName(BuildContext context) async {
@@ -330,7 +330,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
     switch (widget.operation) {
       case Operation.signUp:
         debugPrint('*** starting signup flow...');
-        await accountSetupController.signUpUser();
+        // await accountSetupController.signUpUser();
         break;
       case Operation.updateUserName:
         debugPrint('starting update user name flow...');
