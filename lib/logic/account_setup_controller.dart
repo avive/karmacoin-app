@@ -1,7 +1,7 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:karma_coin/services/api/api.pbgrpc.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
-import '../common_libs.dart';
+import 'package:karma_coin/common_libs.dart';
 
 enum AccountSetupStatus {
   readyToSignup,
