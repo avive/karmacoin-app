@@ -48,9 +48,9 @@ class KC2UserInfo {
   });
 
   /// Returns the score for a provided traitId
-  int getScore(int traitId) {
+  int getScore(int communityId, int traitId) {
     for (TraitScore s in traitScores) {
-      if (s.traitId == traitId) {
+      if (s.communityId == communityId && s.traitId == traitId) {
         return s.score;
       }
     }

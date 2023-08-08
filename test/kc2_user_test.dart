@@ -391,7 +391,7 @@ void main() {
                     debugPrint('Punch signed up');
 
                     // expected 1 in trait from katya's appreciation
-                    expect(punch.getScore(64), 1);
+                    expect(punch.getScore(0, 64), 1);
 
                     // Get userInfo from chain for katya's phone number
                     KC2UserInfo? katyaInfo =

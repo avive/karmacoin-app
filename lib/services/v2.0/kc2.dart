@@ -899,7 +899,7 @@ class KarmachainService implements K2ServiceInterface {
       Map<String, dynamic> rawData,
       List<KC2Event> txEvents) async {
     try {
-      debugPrint("Appreciation tx args: $args");
+      // debugPrint("Appreciation tx args: $args");
 
       final to = args['to'];
 

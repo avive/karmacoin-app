@@ -46,6 +46,10 @@ enum UpdateResult {
 /// After init is called. If userInfo.value is null then user not found on chain with the local accountId and should be signed up. If it is not null then user is already signed up with the local accountId.
 
 abstract class KC2UserInteface {
+  /// Trait scores - index by community id
+  final ValueNotifier<Map<int, List<TraitScore>>> traitScores =
+      ValueNotifier<Map<int, List<TraitScore>>>({0: []});
+
   /// Observeable signup status
   final ValueNotifier<SignupStatus> signupStatus =
       ValueNotifier(SignupStatus.unknown);
@@ -113,7 +117,7 @@ abstract class KC2UserInteface {
   Future<FetchAppreciationsStatus> fetchAppreciations();
 
   // Get score for a char trait id
-  int getScore(int traitId);
+  int getScore(int communityId, int traitId);
 
   /// Get a string error message for a signup failure reason
   String getErrorMessageFor(SignupFailureReason reason) {
