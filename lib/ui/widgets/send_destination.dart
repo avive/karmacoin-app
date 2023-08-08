@@ -169,6 +169,8 @@ class _SendDestinationState extends State<SendDestination> {
   PhoneNumberInputValidator? _getValidator() {
     List<PhoneNumberInputValidator> validators = [];
     validators.add(PhoneValidator.validMobile());
+    validators.add(PhoneValidator.validFixedLine());
+
     return validators.isNotEmpty ? PhoneValidator.compose(validators) : null;
   }
 }

@@ -38,7 +38,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   late PhoneController phoneController;
   late final TraitsPickerWidget traitsPicker;
   bool outlineBorder = false;
-  bool mobileOnly = true;
+  bool mobileOnly = false;
   bool shouldFormat = true;
   bool isCountryChipPersistent = false;
   bool withLabel = true;
@@ -61,6 +61,16 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
 
     String defaultNumber = settingsLogic.devMode ? "549805380" : "";
     IsoCode code = settingsLogic.devMode ? IsoCode.IL : IsoCode.US;
+
+    // set default country code from user's mobile number's country code
+    try {
+      PhoneNumber userNumber = PhoneNumber.parse(
+          accountLogic.karmaCoinUser.value!.mobileNumber.value.number);
+
+      code = userNumber.isoCode;
+    } catch (e) {
+      debugPrint('error parsing user mobile number: $e');
+    }
 
     if (widget.communityId == 0) {
       traitsPicker =

@@ -101,10 +101,10 @@ packages:
     dependency: transitive
     description:
       name: circle_flags
-      sha256: "87102c61b777dcae56d29c6f1d2b2126d98dd09dd904618ccc04a0943ac95924"
+      sha256: cac0fe72ad731cae5984e30be536814d7df37eeb7efc388ba76fdb84dab47ac4
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.4"
+    version: "3.0.1"
   clock:
     dependency: transitive
     description:
@@ -233,14 +233,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.10"
-  dart_countries:
-    dependency: transitive
-    description:
-      name: dart_countries
-      sha256: c42fc90c38d57c857960b793c45d9cf2ba227f5eeb43c69d25d9ea47a9d44553
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.3"
   desktop_window:
     dependency: "direct main"
     description:
@@ -922,26 +914,18 @@ packages:
     dependency: "direct main"
     description:
       name: phone_form_field
-      sha256: cf36bf7c444ca179d480115a47480d1c8b019abbaba1a63fe35e185bfd48e872
+      sha256: "0e02d5548b73b51c47ee3e68b6fc0752cfb6f2f59c1ff9b531dcead0083ccd74"
       url: "https://pub.dev"
     source: hosted
-    version: "7.1.0"
-  phone_number_metadata:
-    dependency: transitive
-    description:
-      name: phone_number_metadata
-      sha256: "33df62bd25d8aa3fe245e928047f803a2c3af21a911965ff17c3b53f5824e6c7"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.0.5"
+    version: "8.1.0"
   phone_numbers_parser:
     dependency: "direct main"
     description:
       name: phone_numbers_parser
-      sha256: a3659911edc70e13da02a4d4374e4600b0862f8a56b94ba6a9d67afa9aba830d
+      sha256: "3b809c0190e7d1272a831f12a67ae5b329ef889d3a9e6da7a59fe86a471576e5"
       url: "https://pub.dev"
     source: hosted
-    version: "7.0.2"
+    version: "8.0.0"
   pinput:
     dependency: "direct main"
     description:

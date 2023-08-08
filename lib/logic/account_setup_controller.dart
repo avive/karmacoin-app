@@ -14,6 +14,7 @@ enum AccountSetupStatus {
   signedUp, // signup tx confirmed on chain
   accountAlreadyExists, // there's already an on-chain account for that accountId
   missingData,
+  incorrectVerificationCode,
 }
 
 /// Drives the sign-up interactive process in an app session once user provided all
@@ -64,6 +65,11 @@ class AccountSetupController extends ChangeNotifier {
     } catch (e) {
       debugPrint('verification exception: $e');
       setStatus(AccountSetupStatus.validatorError);
+      return;
+    }
+
+    if (!accountLogic.numberVerified()) {
+      setStatus(AccountSetupStatus.incorrectVerificationCode);
       return;
     }
 

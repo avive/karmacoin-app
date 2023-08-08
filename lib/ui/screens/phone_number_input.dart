@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/api/verifier.pbgrpc.dart';
@@ -25,7 +26,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
   TextEditingController emailController = TextEditingController();
   late PhoneNumberInputValidator validator;
   bool outlineBorder = false;
-  bool mobileOnly = true;
+  bool mobileOnly = false;
   bool shouldFormat = true;
   bool isCountryChipPersistent = false;
   bool withLabel = false;
@@ -46,12 +47,21 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
     super.initState();
     isSigninIn = false;
 
-    String defaultNuber = settingsLogic.devMode ? "549805381" : "";
+    String defaultNumber = settingsLogic.devMode ? "549805381" : "";
     IsoCode code = settingsLogic.devMode ? IsoCode.IL : IsoCode.US;
 
+    try {
+      String? countryCode = WidgetsBinding.instance.window.locale.countryCode;
+      if (countryCode != null) {
+        code = IsoCode.fromJson(countryCode.toUpperCase());
+      }
+    } catch (e) {
+      debugPrint('failed to get country code from locale: $e');
+    }
+
     phoneController =
-        PhoneController(PhoneNumber(isoCode: code, nsn: defaultNuber));
-    validator = PhoneValidator.validMobile();
+        PhoneController(PhoneNumber(isoCode: code, nsn: defaultNumber));
+    validator = PhoneValidator.valid();
 
     if (PlatformInfo.isMobile) {
       // contact picker only available in native mobile iOs or Android
@@ -71,8 +81,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
       isSigninIn = true;
     });
 
-    bool isValid =
-        phoneController.value?.isValid(type: PhoneNumberType.mobile) ?? false;
+    bool isValid = phoneController.value?.isValid() ?? false;
 
     if (!isValid) {
       StatusAlert.show(

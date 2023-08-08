@@ -158,6 +158,10 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
               text = 'Signing up...';
               showIndicator = true;
               break;
+            case AccountSetupStatus.incorrectVerificationCode:
+              text =
+                  'Incorrect verification code. Please go back and enter the correct code.';
+              break;
             case AccountSetupStatus.transactionSubmitted:
               text = 'Transaction submitted';
               showIndicator = true;

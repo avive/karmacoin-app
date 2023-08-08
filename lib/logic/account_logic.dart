@@ -592,13 +592,10 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     try {
       debugPrint('calling verifier.verifyNumber()...');
       VerifyNumberResponse response = await verifier.verifierServiceClient
-          .verifyNumberEx(requestData.request
-              /*,
-            options: CallOptions(
-              compression: const GzipCodec(),
-              timeout: const Duration(seconds: 30),
-            ),*/
-              );
+          .verifyNumberEx(requestData.request);
+
+      debugPrint(
+          'Verification result: ${response.userVerificationData.verificationResult}');
 
       userVerificationData = response.userVerificationData;
     } catch (e) {
@@ -639,6 +636,13 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
     debugPrint(
         'validating local data for phone verification... ${karmaCoinUser.value}');
     return karmaCoinUser.value != null;
+  }
+
+  @override
+  bool numberVerified() {
+    return _userVerificationData?.verificationResult != null &&
+        _userVerificationData!.verificationResult ==
+            VerificationResult.VERIFICATION_RESULT_VERIFIED;
   }
 
   @override
