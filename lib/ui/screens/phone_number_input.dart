@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/api/verifier.pbgrpc.dart';
@@ -51,6 +50,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
     IsoCode code = settingsLogic.devMode ? IsoCode.IL : IsoCode.US;
 
     try {
+      // ignore: deprecated_member_use
       String? countryCode = WidgetsBinding.instance.window.locale.countryCode;
       if (countryCode != null) {
         code = IsoCode.fromJson(countryCode.toUpperCase());
