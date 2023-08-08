@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/services/api/verifier.pbgrpc.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:status_alert/status_alert.dart';
@@ -152,11 +151,15 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
       isSigninIn = true;
     });
 
-    await accountLogic.setUserPhoneNumber(number);
+    appState.verifiedPhoneNumber = number;
+    // await accountLogic.setUserPhoneNumber(number);
 
-    // send whatsapp verification code to user and go to code screen if
-    // it was sent successfully
+    // skip whatsapp verificaion and go straight to user name
+    if (context.mounted) {
+      context.push(ScreenPaths.newUserName);
+    }
 
+    /*
     try {
       SendVerificationCodeResponse resp = await verifier.verifierServiceClient
           .sendVerificationCode(
@@ -186,7 +189,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
       setState(() {
         isSigninIn = false;
       });
-    }
+    }*/
   }
 
   @override

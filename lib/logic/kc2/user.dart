@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/kc2/identity.dart';
@@ -87,6 +86,7 @@ class KC2User extends KC2UserInteface {
         kc2Service.subscribeToAccount(_identity.accountId);
 
     // register on firebase auth state changes
+    /*
     debugPrint('*** Registering on firebase auth state changes for user...');
     try {
       FirebaseAuth.instance.authStateChanges().listen((User? user) async {
@@ -102,10 +102,11 @@ class KC2User extends KC2UserInteface {
     } catch (e) {
       debugPrint(
           'Firebase auth not initialized. This is expected in tests: $e');
-    }
+    }*/
   }
 
   /// Store kc2 accountId on firebase for the user using the displayName hack
+  /*
   Future<void> _onNewFirebaseUserAuthenticated(User user) async {
     if (user.displayName != null && user.displayName!.isNotEmpty) {
       if (user.displayName! == identity.accountId) {
@@ -137,7 +138,7 @@ class KC2User extends KC2UserInteface {
 
     debugPrint(
         '*** User accountId: ${identity.accountId} stored on firebase auth db.');
-  }
+  }*/
 
   /// Fetch all account related appreciations and payment txs - incoming and outgoing
   /// Client should call this before user wants to view his txs as this is an expensive slow operation.

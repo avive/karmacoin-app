@@ -263,9 +263,12 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
     switch (widget.operation) {
       case Operation.signUp:
         debugPrint('*** Navigating to signup progress screen');
-        pushNamedAndRemoveUntil(ScreenPaths.signupProgress);
+        if (context.mounted) {
+          context.push(ScreenPaths.signupProgress);
+        }
         break;
       case Operation.updateUserName:
+        // note: this flow is not kc2 upgraded yet
         debugPrint('starting update user name flow...');
         try {
           SubmitTransactionResponse resp = await accountLogic
@@ -322,74 +325,6 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
             });
           }
         }
-    }
-
-    // store the user's reuqested name in account logic
-    await accountLogic.setRequestedUserName(_textController.text);
-
-    switch (widget.operation) {
-      case Operation.signUp:
-        debugPrint('*** starting signup flow...');
-        // await accountSetupController.signUpUser();
-        break;
-      case Operation.updateUserName:
-        debugPrint('starting update user name flow...');
-        try {
-          SubmitTransactionResponse resp = await accountLogic
-              .submitUpdateUserNameTransacation(_textController.text);
-
-          switch (resp.submitTransactionResult) {
-            case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
-              if (context.mounted) {
-                StatusAlert.show(
-                  context,
-                  duration: const Duration(seconds: 2),
-                  title: 'Name updated',
-                  configuration:
-                      const IconConfiguration(icon: CupertinoIcons.wand_rays),
-                  maxWidth: statusAlertWidth,
-                );
-                setState(() {
-                  isSubmitInProgress = false;
-                });
-                context.pop();
-              }
-              debugPrint('Update user name transaction submitted and accepted');
-              break;
-            case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
-              if (context.mounted) {
-                StatusAlert.show(
-                  context,
-                  duration: const Duration(seconds: 2),
-                  title: 'Server Error',
-                  subtitle: 'Operation failed. Try again later.',
-                  configuration: const IconConfiguration(
-                      icon: CupertinoIcons.exclamationmark_triangle),
-                  maxWidth: statusAlertWidth,
-                );
-                setState(() {
-                  isSubmitInProgress = false;
-                });
-              }
-              break;
-          }
-        } catch (e) {
-          if (context.mounted) {
-            StatusAlert.show(
-              context,
-              duration: const Duration(seconds: 2),
-              title: 'Oops',
-              subtitle: 'Operation failed. Try again later.',
-              configuration: const IconConfiguration(
-                  icon: CupertinoIcons.exclamationmark_triangle),
-              maxWidth: statusAlertWidth,
-            );
-            setState(() {
-              isSubmitInProgress = false;
-            });
-          }
-        }
-        break;
     }
   }
 

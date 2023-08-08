@@ -131,12 +131,11 @@ class KC2AppLogic with KC2AppLogicInterface {
       debugPrint('failed to connect to kc2 api: $e');
     }
 
-    // Initialize kc2 user eraly.
-    // In case of account restore - get rid of this user and init a new one from mnemonic.
+    // Initialize kc2 user eraly. In case of account restore - get rid of this user and init a new one from mnemonic.
     await kc2User.init();
 
     // setup push notes (but don't wait on it per docs)
-    configLogic.setupPushNotifications();
+    // configLogic.setupPushNotifications();
 
     // Flag bootStrap as complete
     isBootstrapComplete = true;
