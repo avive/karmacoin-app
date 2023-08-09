@@ -61,7 +61,7 @@ void main() {
 
               expect(userInfo.accountId, katya.identity.accountId);
               expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
-              expect(userInfo.userName, katyaUserName);
+              expect(userInfo.userName, katyaUserName.toLowerCase());
               expect(userInfo.traitScores.length, 1);
               expect(userInfo.traitScores[0].traitId, 1);
               expect(userInfo.traitScores[0].score, 1);
@@ -120,7 +120,7 @@ void main() {
               debugPrint('Signup callback called');
 
               katya.userInfo.addListener(() async {
-                if (katya.userInfo.value?.userName == katyaUserName) {
+                if (katya.userInfo.value?.userName == katyaUserName.toLowerCase()) {
                   // skip this - this callback is due to fetching of user info from chain on
                   // signup
                   return;
@@ -291,7 +291,7 @@ void main() {
                     expect(userInfo, isNotNull);
                     expect(userInfo!.accountId, katya1.identity.accountId);
                     expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
-                    expect(userInfo.userName, katyaUserName);
+                    expect(userInfo.userName, katyaUserName.toLowerCase());
 
                     // expected to see balance reflecting katya's signup-reward and no additional reward for katyas1 signup
                     expect(userInfo.balance, BigInt.from(10000000));
@@ -515,7 +515,7 @@ void main() {
                       expect(katya1Info, isNotNull);
                       expect(katya1Info!.accountId, katya1.identity.accountId);
                       expect(katya1Info.phoneNumberHash, '0x$phoneNumberHash');
-                      expect(katya1Info.userName, katyaUserName);
+                      expect(katya1Info.userName, katyaUserName.toLowerCase());
 
                       // @Danylo Kyrieiev  this should be 1 - existential deposit
                       // as soon as your change is merged

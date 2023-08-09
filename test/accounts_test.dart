@@ -53,7 +53,7 @@ void main() {
 
           expect(tx.accountId, katya.accountId);
           expect(tx.phoneNumberHash, '0x$phoneNumberHash');
-          expect(tx.username, katyaUserName);
+          expect(tx.username, katyaUserName.toLowerCase());
           expect(tx.signer, katya.accountId);
 
           // all 3 methods should return's Katya's account data
@@ -68,7 +68,7 @@ void main() {
 
           expect(userInfo.accountId, katya.accountId);
           expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
-          expect(userInfo.userName, katyaUserName);
+          expect(userInfo.userName, katyaUserName.toLowerCase());
           expect(userInfo.traitScores.length, 1);
           expect(userInfo.traitScores[0].traitId, 1);
           expect(userInfo.traitScores[0].score, 1);
@@ -84,7 +84,7 @@ void main() {
 
           expect(userInfo.accountId, katya.accountId);
           expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
-          expect(userInfo.userName, katyaUserName);
+          expect(userInfo.userName, katyaUserName.toLowerCase());
 
           userInfo = await kc2Service.getUserInfoByUserName(katyaUserName);
           if (userInfo == null) {
@@ -95,7 +95,7 @@ void main() {
 
           expect(userInfo.accountId, katya.accountId);
           expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
-          expect(userInfo.userName, katyaUserName);
+          expect(userInfo.userName, katyaUserName.toLowerCase());
 
           completer.complete(true);
         };
@@ -172,7 +172,7 @@ void main() {
 
           expect(userInfo.accountId, katya.accountId);
           expect(userInfo.phoneNumberHash, '0x$newPhoneNumberHash');
-          expect(userInfo.userName, katyaUserName);
+          expect(userInfo.userName, katyaUserName.toLowerCase());
 
           // get the user by updated phone number
           userInfo =
@@ -186,7 +186,7 @@ void main() {
 
           expect(userInfo.accountId, katya.accountId);
           expect(userInfo.phoneNumberHash, '0x$newPhoneNumberHash');
-          expect(userInfo.userName, katyaUserName);
+          expect(userInfo.userName, katyaUserName.toLowerCase());
 
           userInfo = await kc2Service.getUserInfoByUserName(katyaUserName);
           if (userInfo == null) {
@@ -197,7 +197,7 @@ void main() {
 
           expect(userInfo.accountId, katya.accountId);
           expect(userInfo.phoneNumberHash, '0x$newPhoneNumberHash');
-          expect(userInfo.userName, katyaUserName);
+          expect(userInfo.userName, katyaUserName.toLowerCase());
 
           completer.complete(true);
         };
