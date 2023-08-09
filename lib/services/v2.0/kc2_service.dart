@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:karma_coin/logic/kc2/keyring.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
+import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:substrate_metadata_fixed/models/models.dart';
 
@@ -42,6 +43,14 @@ abstract class K2ServiceInterface {
   // Use getPhoneNumberHash of an international number w/o leading +
   // Hex string may be 0x prefixed or not
   Future<KC2UserInfo?> getUserInfoByPhoneNumberHash(String phoneNumberHash);
+
+  /// Fetch list of community members with information
+  /// about each member account
+  Future<List<KC2UserInfo>> getCommunityMembers(int communityId, {int? fromIndex, int? limit});
+
+  /// Fetch list of users who's username starts with `prefix`
+  /// also can be filtered by `communityId`, `null` mean no filtering
+  Future<List<Contact>> getContacts(String prefix, {int? communityId, int? fromIndex, int? limit});
 
   // transactions
 
