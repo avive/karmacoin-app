@@ -17,6 +17,7 @@ class KC2UserInfo {
   int nonce;
   int karmaScore;
   List<TraitScore> traitScores;
+  List<CommunityMembership> communityMembership;
 
   KC2UserInfo({
     required this.accountId,
@@ -26,6 +27,7 @@ class KC2UserInfo {
     required this.nonce,
     required this.karmaScore,
     required this.traitScores,
+    required this.communityMembership,
   });
 
   /// Returns the score for a provided traitId
@@ -48,9 +50,8 @@ class KC2UserInfo {
           nonce: u.nonce,
           karmaScore: u.karmaScore,
           traitScores: u.traitScores,
+          communityMembership: u.communityMembership,
         );
-
-  // todo: add support for community memberships
 
   KC2UserInfo.fromJson(Map<String, dynamic> u)
       : accountId = u['account_id'],
@@ -64,6 +65,9 @@ class KC2UserInfo {
         karmaScore = u['karma_score'],
         traitScores = (u['trait_scores'] as List<dynamic>)
             .map((e) => TraitScore.fromJson(e))
+            .toList(),
+        communityMembership = (u['community_membership'] as List<dynamic>)
+            .map((e) => CommunityMembership.fromJson(e))
             .toList();
 
   Map<String, dynamic> toJson() => {
@@ -74,6 +78,7 @@ class KC2UserInfo {
         'nonce': nonce,
         'karms_score': karmaScore,
         'trait_scores': traitScores.map((e) => e.toJson()).toList(),
+        'community_membership': communityMembership.map((e) => e.toJson()).toList(),
       };
 
   Future<void> persistToSecureStorage(FlutterSecureStorage s) async {
