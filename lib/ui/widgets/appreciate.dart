@@ -4,6 +4,7 @@ import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/phone_number_formatter.dart';
 import 'package:karma_coin/services/api/types.pb.dart' as api_types;
+import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:flutter/material.dart';
@@ -61,15 +62,16 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
 
     String defaultNumber = configLogic.devMode ? "549805380" : "";
     IsoCode code = configLogic.devMode ? IsoCode.IL : IsoCode.US;
+    String? phoneNumber = kc2User.identity.phoneNumber;
 
     // set default country code from user's mobile number's country code
-    try {
-      PhoneNumber userNumber = PhoneNumber.parse(
-          accountLogic.karmaCoinUser.value!.mobileNumber.value.number);
-
-      code = userNumber.isoCode;
-    } catch (e) {
-      debugPrint('error parsing user mobile number: $e');
+    if (phoneNumber != null) {
+      try {
+        PhoneNumber userNumber = PhoneNumber.parse(phoneNumber);
+        code = userNumber.isoCode;
+      } catch (e) {
+        debugPrint('error parsing user mobile number: $e');
+      }
     }
 
     if (widget.communityId == 0) {
@@ -79,8 +81,9 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
       traitsPicker = TraitsPickerWidget(null,
           GenesisConfig.communityPersonalityTraits[widget.communityId]!, 6);
 
-      isUsercommunityAdmin = accountLogic.karmaCoinUser.value!
-          .isCommunityAdmin(widget.communityId);
+      // todo: fix this
+      // isUsercommunityAdmin = accountLogic.karmaCoinUser.value!
+      //   .isCommunityAdmin(widget.communityId);
     }
 
     selectorNavigator = const CountrySelectorNavigator.draggableBottomSheet();
@@ -89,9 +92,13 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
         PhoneController(PhoneNumber(isoCode: code, nsn: defaultNumber));
 
     // use phone number from state if available
-    if (appState.sendDestinationPhoneNumber.value.isNotEmpty) {
-      phoneController.value =
-          PhoneNumber.parse(appState.sendDestinationPhoneNumber.value);
+    // todo: figure out how to fix this - what to display when no phone number?
+    // for example: show user name? We can obtain dest inf from api
+    // by phone hash!
+
+    if (appState.sendDestinationPhoneNumberHash.value.isNotEmpty) {
+      //phoneController.value =
+      //    PhoneNumber.parse(appState.sendDestinationPhoneNumberHash.value);
     }
 
     if (PlatformInfo.isMobile) {
@@ -140,6 +147,23 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
           maxWidth: statusAlertWidth);
     }
 
+    if (kc2User.userInfo.value == null) {
+      if (context.mounted) {
+        StatusAlert.show(
+          context,
+          duration: const Duration(seconds: 2),
+          title: 'Ooops',
+          subtitle: 'Missing local user info.',
+          configuration:
+              const IconConfiguration(icon: CupertinoIcons.xmark_circle),
+          maxWidth: statusAlertWidth,
+        );
+      }
+      return false;
+    }
+
+    KC2UserInfo userInfo = kc2User.userInfo.value!;
+
     if (phoneController.value == null ||
         phoneController.value!.countryCode.isEmpty ||
         phoneController.value!.nsn.isEmpty) {
@@ -157,7 +181,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
       return false;
     }
 
-    if (appState.kCentsAmount.value == Int64.ZERO) {
+    if (appState.kCentsAmount.value == BigInt.zero) {
       if (context.mounted) {
         StatusAlert.show(
           context,
@@ -172,27 +196,10 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
       return false;
     }
 
-    KarmaCoinUser? user = accountLogic.karmaCoinUser.value;
-
-    if (user == null) {
-      if (context.mounted) {
-        StatusAlert.show(
-          context,
-          duration: const Duration(seconds: 2),
-          title: 'Oops...',
-          subtitle: 'Please login to your account.',
-          configuration: const IconConfiguration(
-              icon: CupertinoIcons.exclamationmark_triangle),
-          maxWidth: statusAlertWidth,
-        );
-      }
-      return false;
-    }
-
     String number =
         '+${phoneController.value!.countryCode}${phoneController.value!.nsn}';
 
-    if (user.mobileNumber.value.number == number) {
+    if (kc2User.identity.phoneNumber == number) {
       if (context.mounted) {
         StatusAlert.show(
           context,
@@ -207,9 +214,9 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
       return false;
     }
 
-    debugPrint('user balance: ${user.balance.value}');
+    debugPrint('user balance: ${userInfo.balance.toString()}');
 
-    if (user.balance.value < appState.kCentsAmount.value) {
+    if (userInfo.balance < appState.kCentsAmount.value) {
       if (context.mounted) {
         StatusAlert.show(
           context,
@@ -230,18 +237,18 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   Future<void> _sendAppreciation() async {
     // todo: validate data and show alerts if invalid
 
-    String number =
-        '+${phoneController.value!.countryCode}${phoneController.value!.nsn}';
+    String phoneNumber =
+        '${phoneController.value!.countryCode}${phoneController.value!.nsn}';
 
-    // store data in app state - will be handeled in user's home screen dispatcher....
+    String phoneNumbeRhash = kc2Service.getPhoneNumberHash(phoneNumber);
+
+    // store ugc data in app state - will be handeled in user's home screen dispatcher....
     appState.paymentTransactionData.value = PaymentTransactionData(
-        appState.kCentsAmount.value,
-        appState.kCentsFeeAmount.value,
-        appState.selectedPersonalityTrait.value,
-        widget.communityId,
-        number,
-        '',
-        '');
+      kCentsAmount: appState.kCentsAmount.value,
+      personalityTrait: appState.selectedPersonalityTrait.value,
+      communityId: widget.communityId,
+      destPhoneNumberHash: phoneNumbeRhash,
+    );
 
     debugPrint(
         'payment transaction data: ${appState.paymentTransactionData.value}');
@@ -393,7 +400,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                     feeType: FeeType.payment,
                     title: 'AMOUNT'))));
           },
-          child: ValueListenableBuilder<Int64>(
+          child: ValueListenableBuilder<BigInt>(
               valueListenable: appState.kCentsAmount,
               builder: (context, value, child) => Text(
                     KarmaCoinAmountFormatter.format(value),
@@ -417,7 +424,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                     feeType: FeeType.fee,
                     title: 'NETWORK FEE'))));
           },
-          child: ValueListenableBuilder<Int64>(
+          child: ValueListenableBuilder<BigInt>(
               valueListenable: appState.kCentsFeeAmount,
               builder: (context, value, child) => Text(
                     KarmaCoinAmountFormatter.format(value),
@@ -494,10 +501,11 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
         // only show contacts in a community
         int communityId = widget.communityId;
 
-        if (accountLogic.karmaCoinUser.value!.isCommunityAdmin(communityId)) {
-          // let admin see non-community members users
-          communityId = 0;
-        }
+        // todo: fix this
+        //if (accountLogic.karmaCoinUser.value!.isCommunityAdmin(communityId)) {
+        // let admin see non-community members users
+        // communityId = 0;
+        //}
 
         Navigator.of(context).push(CupertinoPageRoute(
             fullscreenDialog: true,

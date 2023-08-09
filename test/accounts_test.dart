@@ -69,9 +69,10 @@ void main() {
           expect(userInfo.accountId, katya.accountId);
           expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
           expect(userInfo.userName, katyaUserName);
-          expect(userInfo.traitScores.length, 1);
-          expect(userInfo.traitScores[0].traitId, 1);
-          expect(userInfo.traitScores[0].score, 1);
+
+          expect(userInfo.traitScores[0], isNotNull);
+          expect(userInfo.traitScores[0]!.length, 1);
+          expect(userInfo.getScore(0, 1), 1);
 
           userInfo =
               await kc2Service.getUserInfoByPhoneNumberHash(phoneNumberHash);

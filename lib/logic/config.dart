@@ -1,6 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:karma_coin/common_libs.dart';
@@ -27,6 +24,7 @@ class ConfigLogic {
   );
 
   final String _pushTokenKey = "pushTokenKey";
+  final String _karmaMiningScreenDisplayedKey = "karmaMiningScreenDisplayedKey";
 
   late final currentLocale = ValueNotifier<String?>(null);
   late final apiHostName = ValueNotifier<String>('127.0.0.1');
@@ -47,7 +45,7 @@ class ConfigLogic {
   late final firebaseWebPushPubKey =
       "BPCf2pl7oLrgSWJJjEXzKfTIe4atfDay5-Aw9u0Ge8IgtfozLq1jkYPfJ0ccEY9D9cdqoAgxcbx4rGEhQC5nMN4";
 
-  // requested user name entered by the user. For the canonical user-name, check AccountLogic
+  // requested user name entered by the user.
   late final requestedUserName = ValueNotifier<String>('');
 
 // Set received FCM push note token
@@ -60,6 +58,18 @@ class ConfigLogic {
 
   // Get known FCM push note token
   final ValueNotifier<String?> fcmToken = ValueNotifier<String?>(null);
+
+  /// set to true after karma mining screen is displayed once
+  final ValueNotifier<bool> karmaMiningScreenDisplayed = ValueNotifier(false);
+
+  Future<void> setDisplayedKarmaRewardsScreen(bool value) async {
+    await secureStorage.write(
+        key: _karmaMiningScreenDisplayedKey,
+        value: value.toString(),
+        aOptions: _aOptions);
+
+    karmaMiningScreenDisplayed.value = value;
+  }
 
   Future<void> init() async {
     if (apiLocalMode) {
@@ -97,6 +107,14 @@ class ConfigLogic {
     if (token != null) {
       fcmToken.value = token;
     }
+
+    var displayKarmaMiningScreenData = await secureStorage.read(
+        key: _karmaMiningScreenDisplayedKey, aOptions: _aOptions);
+
+    if (displayKarmaMiningScreenData != null) {
+      karmaMiningScreenDisplayed.value =
+          displayKarmaMiningScreenData.toLowerCase() == 'true';
+    }
   }
 
   /// Returns connection url for kc2 api
@@ -109,6 +127,7 @@ class ConfigLogic {
   /// Handle push token change
   /// Note: This callback is fired at each app startup and whenever a new
   /// token is generated.
+  /*
   Future<void> setupPushNotifications() async {
     debugPrint('Setting up push notes...');
     FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
@@ -249,7 +268,7 @@ class ConfigLogic {
     debugPrint('Got push notification: $message');
 
     // todo: get all transactions and show appreciations screen
-    /*
+
     Future.delayed(Duration.zero, () async {
       await FirebaseAnalytics.instance.logEvent(name: "push_note_received");
 
@@ -262,6 +281,6 @@ class ConfigLogic {
           }
         }
       }
-    });*/
-  }
+    });
+  }*/
 }

@@ -1,18 +1,13 @@
-import 'package:fixnum/fixnum.dart';
-import 'package:flutter/material.dart';
 import 'package:karma_coin/data/genesis_config.dart';
-import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/personality_traits.dart';
 import 'package:karma_coin/data/phone_number_formatter.dart';
 import 'package:karma_coin/data/user.dart';
-import 'package:karma_coin/services/api/api.pb.dart';
-import 'package:karma_coin/services/api/types.pb.dart';
+import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/ui/widgets/pill.dart';
 import 'package:random_avatar/random_avatar.dart';
 import 'package:status_alert/status_alert.dart';
-import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 
 // Karma coin users selector
 class KarmaCoinUserSelector extends StatefulWidget {
@@ -52,8 +47,6 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
 
         // debugPrint('got contacts: ${resp.contacts}');
 
-        KarmaCoinUser user = accountLogic.karmaCoinUser.value!;
-
         if (prefix != null &&
             prefix.isNotEmpty &&
             prefix[0].toLowerCase() == prefix[0]) {
@@ -73,8 +66,9 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
         resp.contacts.removeWhere((contact) =>
             contact.userName.trim().isEmpty ||
             contact.userName.endsWith('old account]') ||
-            contact.userName == user.userName.value ||
-            contact.mobileNumber.number == user.mobileNumber.value.number);
+            contact.userName == kc2User.userInfo.value?.userName ||
+            contact.mobileNumber.number ==
+                kc2User.userInfo.value?.phoneNumberHash);
 
         setState(() {
           apiOffline = false;
@@ -191,7 +185,8 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
   }
 
   void _setAdmin(Contact contact) {
-    // todo: move this to kc_user
+    // todo: move this to kc2
+    /*
     Future.delayed(Duration.zero, () async {
       try {
         KarmaCoinUser localUser = accountLogic.karmaCoinUser.value!;
@@ -236,7 +231,7 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
             maxWidth: statusAlertWidth);
         return;
       }
-    });
+    });*/
   }
 
   void _showContextMenu(BuildContext conext, int index) {

@@ -122,10 +122,8 @@ class _ActionsScreenState extends State<ActionsScreen> {
             leading: const Icon(CupertinoIcons.bookmark, size: 28),
             trailing: const CupertinoListTileChevron(),
             onTap: () {
-              String userName =
-                  accountLogic.karmaCoinUser.value!.userName.value;
               context.pushNamed(ScreenNames.profile,
-                  params: {'username': userName});
+                  params: {'username': kc2User.userInfo.value!.userName});
             },
           ),
           CupertinoListTile.notched(

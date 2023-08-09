@@ -26,7 +26,7 @@ class KarmaCoinUser {
   final ValueNotifier<Map<int, List<TraitScore>>> traitScores =
       ValueNotifier<Map<int, List<TraitScore>>>({0: []});
 
-  // Expose user name
+  // Expose community memberships
   final ValueNotifier<List<CommunityMembership>> communities =
       ValueNotifier<List<CommunityMembership>>([]);
 
@@ -95,21 +95,6 @@ class KarmaCoinUser {
       }
     }
 
-    // hack giraffes appreciations for demo purposes
-    /*
-    newScores[1] = [
-      TraitScore(traitId: 10, score: 5, communityId: 1),
-      TraitScore(traitId: 4, score: 1, communityId: 1),
-      TraitScore(traitId: 3, score: 1, communityId: 1),
-      TraitScore(traitId: 11, score: 2, communityId: 1),
-      TraitScore(traitId: 15, score: 1, communityId: 1),
-      TraitScore(traitId: 18, score: 3, communityId: 1),
-      TraitScore(traitId: 39, score: 1, communityId: 1),
-      TraitScore(traitId: 42, score: 1, communityId: 1),
-      TraitScore(traitId: 60, score: 4, communityId: 1)
-    ];
-    */
-
     traitScores.value = newScores;
 
     for (List<TraitScore> scores in newScores.values) {
@@ -117,9 +102,6 @@ class KarmaCoinUser {
         debugPrint('*** Trait score: $score in comm ${score.communityId}');
       }
     }
-
-    // hack karma score for giraffes for demo purposes
-    //user.communityMemberships[0].karmaScore = 15;
 
     userData.communityMemberships.clear();
     userData.communityMemberships.addAll(user.communityMemberships);
@@ -130,7 +112,7 @@ class KarmaCoinUser {
     }
 
     if (persist) {
-      await accountLogic.persistKarmaCoinUser();
+      // await accountLogic.persistKarmaCoinUser();
     }
   }
 
@@ -145,7 +127,7 @@ class KarmaCoinUser {
     balance.value = newBalance;
 
     // persist changes
-    await accountLogic.persistKarmaCoinUser();
+    // await accountLogic.persistKarmaCoinUser();
   }
 
   /// Update nonce in an observable way
@@ -154,7 +136,7 @@ class KarmaCoinUser {
     this.nonce.value = nonce;
 
     // persist changes
-    await accountLogic.persistKarmaCoinUser();
+    // await accountLogic.persistKarmaCoinUser();
   }
 
   @override

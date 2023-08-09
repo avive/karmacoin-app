@@ -229,7 +229,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
         if (user.mobileNumber.number == phoneNumber.value!) {
           debugPrint('auto signing user');
           // set requested name to current user name
-          await accountLogic.setRequestedUserName(user.userName);
+          await setRequestedUserName(user.userName);
 
           // user is already signed up - update local data
           await createNewKarmaCoinUser();
@@ -715,7 +715,7 @@ class AccountLogic extends AccountLogicInterface with TrnasactionGenerator {
         karmaCoinUser.value!, keyPair.value!);
 
     // clear local data
-    await accountLogic.clear();
+    await clear();
     await authLogic.signOut();
 
     debugPrint("Delete response: ${resp.submitTransactionResult}");

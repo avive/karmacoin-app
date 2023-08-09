@@ -40,7 +40,7 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
         GetBlockchainDataResponse statsResponse = await api.apiServiceClient
             .getBlockchainData(GetBlockchainDataRequest());
 
-        await accountLogic.setDisplayedKarmaRewardsScreen(true);
+        await configLogic.setDisplayedKarmaRewardsScreen(true);
 
         setState(() {
           blockchainStats = statsResponse.stats;

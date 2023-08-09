@@ -3,7 +3,6 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/kc2/identity_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
-import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
 /// User's kc2 signup status
@@ -47,10 +46,6 @@ enum UpdateResult {
 /// After init is called. If userInfo.value is null then user not found on chain with the local accountId and should be signed up. If it is not null then user is already signed up with the local accountId.
 
 abstract class KC2UserInteface {
-  /// Trait scores - index by community id
-  final ValueNotifier<Map<int, List<TraitScore>>> traitScores =
-      ValueNotifier<Map<int, List<TraitScore>>>({0: []});
-
   /// Observeable signup status
   final ValueNotifier<SignupStatus> signupStatus =
       ValueNotifier(SignupStatus.unknown);

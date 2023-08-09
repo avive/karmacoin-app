@@ -8,7 +8,6 @@ import 'package:karma_coin/logic/kc2/txs_boss2_interface.dart';
 import 'package:karma_coin/logic/kc2/user_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
-import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
 class KC2User extends KC2UserInteface {
@@ -31,21 +30,10 @@ class KC2User extends KC2UserInteface {
   @override
   IdentityInterface get identity => _identity;
 
+  final verifiedPhoneNumberKey = "verifiedPhoneNumber";
+
   @override
   Future<bool> get hasLocalIdentity => _identity.existsInLocalStore;
-
-  /// Update observable trait scores with scores of user info
-  void _updateTraitScores(KC2UserInfo userInfo) {
-    final newTraitScores = <int, List<TraitScore>>{};
-    for (final TraitScore ts in userInfo.traitScores) {
-      if (!newTraitScores.containsKey(ts.communityId)) {
-        newTraitScores[ts.communityId] = [ts];
-      } else {
-        newTraitScores[ts.communityId]!.add(ts);
-      }
-    }
-    traitScores.value = newTraitScores;
-  }
 
   /// Initialize the user. Should be aclled on new app session after the kc2 service has been initialized and app has a connection to a kc2 api provider. Optionally provide mnenmoic to resotre this user from provided one.
   @override
@@ -263,9 +251,6 @@ class KC2User extends KC2UserInteface {
         debugPrint(">>> local user info account id mismatch - droppping it...");
         await userInfo.value?.deleteFromSecureStorage(_secureStorage);
       } else {
-        // if we have previosuly saved userInfo then we are signed up in this session
-        _updateTraitScores(userInfo.value!);
-
         signupStatus.value = SignupStatus.signedUp;
       }
     }
@@ -287,9 +272,6 @@ class KC2User extends KC2UserInteface {
 
       // update observable value
       userInfo.value = info;
-
-      // update mapped trait scores
-      _updateTraitScores(info);
 
       // persist latest user info and set signup to signedup
       await userInfo.value?.persistToSecureStorage(_secureStorage);
@@ -434,7 +416,6 @@ class KC2User extends KC2UserInteface {
 
       // update observable value
       userInfo.value = u;
-      _updateTraitScores(u);
     }
 
     updateResult.value = UpdateResult.updated;

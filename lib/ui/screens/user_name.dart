@@ -268,7 +268,8 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
         }
         break;
       case Operation.updateUserName:
-        // note: this flow is not kc2 upgraded yet
+      // note: this flow is not kc2 upgraded yet
+      /*
         debugPrint('starting update user name flow...');
         try {
           SubmitTransactionResponse resp = await accountLogic
@@ -308,6 +309,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
                 });
               }
               break;
+              
           }
         } catch (e) {
           if (context.mounted) {
@@ -325,6 +327,8 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
             });
           }
         }
+        break;
+        */
     }
   }
 

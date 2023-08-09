@@ -30,8 +30,7 @@ class _TraitsScoresWheelState extends State<TraitsScoresWheel> {
             return Container();
           }
 
-          List<TraitScore> scores =
-              kc2User.traitScores.value[widget.communityId] ?? [];
+          List<TraitScore> scores = value.getScores(widget.communityId);
 
           return Column(
             mainAxisAlignment: MainAxisAlignment.start,

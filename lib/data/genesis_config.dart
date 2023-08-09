@@ -3,6 +3,8 @@ import 'package:karma_coin/data/personality_traits.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/common_libs.dart';
 
+// todo: update to kc2
+
 class CommunityDesignTheme {
   Color backgroundColor;
   Color textColor;

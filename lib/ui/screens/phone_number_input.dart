@@ -152,7 +152,8 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
     });
 
     appState.verifiedPhoneNumber = number;
-    // await accountLogic.setUserPhoneNumber(number);
+    // store as part of local user's identity
+    await kc2User.identity.setPhoneNumber(number);
 
     // skip whatsapp verificaion and go straight to user name
     if (context.mounted) {

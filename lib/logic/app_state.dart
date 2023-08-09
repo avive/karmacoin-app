@@ -20,11 +20,11 @@ class AppState {
 
   /// user amount entry value in kcents for current appreciation
   /// we default amount to 1 Karma Coin
-  final ValueNotifier<Int64> kCentsAmount = ValueNotifier(Int64(1000));
+  final ValueNotifier<BigInt> kCentsAmount = ValueNotifier(BigInt.from(1000));
 
   //// user fee amount entry value in kcents for current appreciation
   /// we default fees to 1 Kcent
-  final ValueNotifier<Int64> kCentsFeeAmount = ValueNotifier(Int64.ONE);
+  final ValueNotifier<BigInt> kCentsFeeAmount = ValueNotifier(BigInt.one);
 
   //// Account address of send KC transaction destination
   final ValueNotifier<String> sendDestinationAddress = ValueNotifier('');
@@ -39,8 +39,9 @@ class AppState {
   //// Error message for ui feedback. todo: implement me
   final ValueNotifier<String> txSubmissionError = ValueNotifier('');
 
-  //// Mobile phone number canonical format for send KC transaction destination
-  final ValueNotifier<String> sendDestinationPhoneNumber = ValueNotifier('');
+  //// Mobile phone number hash for send KC transaction destination
+  final ValueNotifier<String> sendDestinationPhoneNumberHash =
+      ValueNotifier('');
 
   //// Apprecaite dest when signup is complete
   final ValueNotifier<bool> appreciateAfterSignup = ValueNotifier(false);

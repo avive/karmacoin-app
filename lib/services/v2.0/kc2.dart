@@ -169,12 +169,11 @@ class KarmachainService implements K2ServiceInterface {
   }
 
   @override
-  Future<List<KC2UserInfo>> getCommunityMembers(int communityId, {int? fromIndex, int? limit}) async {
+  Future<List<KC2UserInfo>> getCommunityMembers(int communityId,
+      {int? fromIndex, int? limit}) async {
     try {
-      List<dynamic> data = await kc2ApiProvider.send(
-          'community_getAllUsers',
-          [communityId, fromIndex, limit]
-      ).then((v) => v.result);
+      List<dynamic> data = await kc2ApiProvider.send('community_getAllUsers',
+          [communityId, fromIndex, limit]).then((v) => v.result);
 
       return data.map((e) => KC2UserInfo.fromJson(e)).toList();
     } catch (e) {
@@ -184,12 +183,11 @@ class KarmachainService implements K2ServiceInterface {
   }
 
   @override
-  Future<List<Contact>> getContacts(String prefix, {int? communityId, int? fromIndex, int? limit}) async {
+  Future<List<Contact>> getContacts(String prefix,
+      {int? communityId, int? fromIndex, int? limit}) async {
     try {
-      List<dynamic> data = await kc2ApiProvider.send(
-          'community_getContacts',
-          [prefix, communityId, fromIndex, limit]
-      ).then((v) => v.result);
+      List<dynamic> data = await kc2ApiProvider.send('community_getContacts',
+          [prefix, communityId, fromIndex, limit]).then((v) => v.result);
 
       return data.map((e) => Contact.fromJson(e)).toList();
     } catch (e) {
@@ -459,10 +457,13 @@ class KarmachainService implements K2ServiceInterface {
 
   // Utility
 
-  // Returns hex string hash without a trailing 0x
+  /// Returns hex string hash without a trailing 0x
   @override
   String getPhoneNumberHash(String phoneNumber) {
-    final phoneNumberHash = hasher.hashString(phoneNumber);
+    if (phoneNumber.startsWith('+')) {
+      phoneNumber = phoneNumber.substring(1);
+    }
+    final phoneNumberHash = hasher.hashString(phoneNumber.trim());
     return hex.encode(phoneNumberHash);
   }
 
@@ -470,6 +471,7 @@ class KarmachainService implements K2ServiceInterface {
   ////// private implementation methods below
   //
 
+  /// Intternal help - sign provided tx
   Future<String> _signTransaction(
       String signer, List<int> pk, MapEntry<String, dynamic> call) async {
     const extrinsicFormatVersion = 4;

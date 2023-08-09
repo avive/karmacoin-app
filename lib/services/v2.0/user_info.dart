@@ -16,7 +16,7 @@ class KC2UserInfo {
   BigInt balance;
   int nonce;
   int karmaScore;
-  List<TraitScore> traitScores;
+  late Map<int, List<TraitScore>> traitScores;
 
   KC2UserInfo({
     required this.accountId,
@@ -28,9 +28,23 @@ class KC2UserInfo {
     required this.traitScores,
   });
 
-  /// Returns the score for a provided traitId
+  /// Returns the list of trait scores for a given communityId
+  /// Use 0 for global scores
+  List<TraitScore> getScores(int communityId) {
+    if (!traitScores.containsKey(communityId)) {
+      return [];
+    }
+    return traitScores[communityId]!;
+  }
+
+  /// Returns the score for a provided traitId in a community
+  /// Pass 0 for global scores
   int getScore(int communityId, int traitId) {
-    for (TraitScore s in traitScores) {
+    if (!traitScores.containsKey(communityId)) {
+      return 0;
+    }
+
+    for (final TraitScore s in traitScores[communityId]!) {
       if (s.communityId == communityId && s.traitId == traitId) {
         return s.score;
       }
@@ -61,20 +75,38 @@ class KC2UserInfo {
             ? BigInt.parse(u['balance'])
             : BigInt.from(u['balance']),
         nonce = u['nonce'] is String ? int.parse(u['nonce']) : u['nonce'],
-        karmaScore = u['karma_score'],
-        traitScores = (u['trait_scores'] as List<dynamic>)
-            .map((e) => TraitScore.fromJson(e))
-            .toList();
+        karmaScore = u['karma_score'] {
+    List<TraitScore> scores = (u['trait_scores'] as List<dynamic>)
+        .map((s) => TraitScore.fromJson(s))
+        .toList();
 
-  Map<String, dynamic> toJson() => {
-        'account_id': accountId,
-        'phone_number_hash': phoneNumberHash,
-        'user_name': userName,
-        'balance': balance.toString(),
-        'nonce': nonce,
-        'karms_score': karmaScore,
-        'trait_scores': traitScores.map((e) => e.toJson()).toList(),
-      };
+    traitScores = <int, List<TraitScore>>{};
+
+    for (final TraitScore ts in scores) {
+      if (!traitScores.containsKey(ts.communityId)) {
+        traitScores[ts.communityId] = [ts];
+      } else {
+        traitScores[ts.communityId]!.add(ts);
+      }
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    List<TraitScore> all = [];
+    for (final List<TraitScore> l in traitScores.values) {
+      all.addAll(l);
+    }
+
+    return {
+      'account_id': accountId,
+      'phone_number_hash': phoneNumberHash,
+      'user_name': userName,
+      'balance': balance.toString(),
+      'nonce': nonce,
+      'karms_score': karmaScore,
+      'trait_scores': all.map((e) => e.toJson()).toList(),
+    };
+  }
 
   Future<void> persistToSecureStorage(FlutterSecureStorage s) async {
     try {

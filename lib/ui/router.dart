@@ -163,16 +163,7 @@ String _getInitialLocation() {
   } else {
     debugPrint('Router: No exisiting user - go to welcome..');
     return ScreenPaths.welcome;
-  }
-  /*
-  if (accountLogic.karmaCoinUser.value != null &&
-      (accountLogic.signedUpOnChain.value || accountLogic.localMode.value)) {
-    debugPrint('Signup or local mode - go to user home..');
-    return ScreenPaths.home;
-  } else {
-    debugPrint('Show welcome screen..');
-    return ScreenPaths.welcome;
-  }*/
+  }  
 }
 
 /// The route configuration

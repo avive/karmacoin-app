@@ -48,6 +48,7 @@ class AccountSetupController extends ChangeNotifier {
 
     notifyListeners();
 
+    /*
     if (accountLogic.karmaCoinUser.value == null) {
       // Create a new local karma coin user and store it in local store
       // we use this local user until we get the on-chain user
@@ -71,7 +72,7 @@ class AccountSetupController extends ChangeNotifier {
     if (!accountLogic.numberVerified()) {
       setStatus(AccountSetupStatus.incorrectVerificationCode);
       return;
-    }
+    }*/
 
     await submitSignupTransaction();
   }
@@ -119,6 +120,7 @@ class AccountSetupController extends ChangeNotifier {
 
   // Second step in signup process - submit transaction with valid validation evidence
   Future<void> submitSignupTransaction() async {
+    /*
     debugPrint('submitting signup transaction...');
 
     setStatus(AccountSetupStatus.submittingTransaction);
@@ -145,6 +147,7 @@ class AccountSetupController extends ChangeNotifier {
       setStatus(AccountSetupStatus.transactionError);
       return;
     }
+    */
 
     debugPrint('new user transaction accepted by api');
   }

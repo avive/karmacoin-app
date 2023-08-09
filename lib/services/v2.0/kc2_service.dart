@@ -105,4 +105,5 @@ abstract class K2ServiceInterface {
   UpdateUserCallback? updateUserCallback;
   AppreciationCallback? appreciationCallback;
   TransferCallback? transferCallback;
+
 }

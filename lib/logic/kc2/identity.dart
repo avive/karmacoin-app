@@ -53,6 +53,8 @@ class Identity implements IdentityInterface {
   @override
   String? get phoneNumber => _phoneNumber;
 
+  /// set the user's phone number
+  /// phoneNumber: with + prefix format
   @override
   Future<void> setPhoneNumber(String? phoneNumber) async {
     _phoneNumber = phoneNumber;

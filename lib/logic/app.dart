@@ -30,7 +30,7 @@ Verifier get verifier => GetIt.I.get<Verifier>();
 ConfigLogic get configLogic => GetIt.I.get<ConfigLogic>();
 
 AuthLogicInterface get authLogic => GetIt.I.get<AuthLogicInterface>();
-AccountLogicInterface get accountLogic => GetIt.I.get<AccountLogic>();
+// AccountLogicInterface get accountLogic => GetIt.I.get<AccountLogic>();
 
 UserNameAvailabilityLogic get userNameAvailabilityLogic =>
     GetIt.I.get<UserNameAvailabilityLogic>();
@@ -76,7 +76,8 @@ class KC2AppLogic with KC2AppLogicInterface {
     GetIt.I.registerLazySingleton<Verifier>(() => Verifier());
     GetIt.I.registerLazySingleton<KC2AppLogic>(() => KC2AppLogic());
     GetIt.I.registerLazySingleton<ConfigLogic>(() => ConfigLogic());
-    GetIt.I.registerLazySingleton<AccountLogicInterface>(() => AccountLogic());
+
+    //GetIt.I.registerLazySingleton<AccountLogicInterface>(() => AccountLogic());
 
     GetIt.I.registerLazySingleton<AuthLogicInterface>(() => AuthLogic());
     GetIt.I.registerLazySingleton<KC2UserInteface>(() => KC2User());

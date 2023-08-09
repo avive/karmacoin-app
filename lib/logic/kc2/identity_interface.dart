@@ -25,6 +25,8 @@ abstract class IdentityInterface {
   /// Available after signup on device
   String? get phoneNumber;
 
+  /// set the user's phone number
+  /// phoneNumber: with + prefix format
   Future<void> setPhoneNumber(String? phoneNumber);
 
   /// Gets the identity's public signing ed key
