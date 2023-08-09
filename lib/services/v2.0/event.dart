@@ -1,6 +1,6 @@
 class KC2Event {
   String phase;
-  int extrinsicIndex;
+  int? extrinsicIndex;
   String pallet;
   String eventName;
   dynamic data;
