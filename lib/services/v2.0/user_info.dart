@@ -17,6 +17,7 @@ class KC2UserInfo {
   int nonce;
   int karmaScore;
   late Map<int, List<TraitScore>> traitScores;
+  List<CommunityMembership> communityMembership;
 
   KC2UserInfo({
     required this.accountId,
@@ -26,6 +27,7 @@ class KC2UserInfo {
     required this.nonce,
     required this.karmaScore,
     required this.traitScores,
+    required this.communityMembership,
   });
 
   /// Returns the list of trait scores for a given communityId
@@ -35,6 +37,18 @@ class KC2UserInfo {
       return [];
     }
     return traitScores[communityId]!;
+  }
+
+  bool isMemember(int communityId) {
+    return communityMembership
+        .where((membership) => membership.communityId == communityId)
+        .isNotEmpty;
+  }
+
+  CommunityMembership? getCommunityMembership(int communityId) {
+    return communityMembership
+        .where((membership) => membership.communityId == communityId)
+        .first;
   }
 
   /// Returns the score for a provided traitId in a community
@@ -62,9 +76,8 @@ class KC2UserInfo {
           nonce: u.nonce,
           karmaScore: u.karmaScore,
           traitScores: u.traitScores,
+          communityMembership: u.communityMembership,
         );
-
-  // todo: add support for community memberships
 
   KC2UserInfo.fromJson(Map<String, dynamic> u)
       : accountId = u['account_id'],
@@ -75,6 +88,9 @@ class KC2UserInfo {
             ? BigInt.parse(u['balance'])
             : BigInt.from(u['balance']),
         nonce = u['nonce'] is String ? int.parse(u['nonce']) : u['nonce'],
+        communityMembership = (u['community_membership'] as List<dynamic>)
+            .map((e) => CommunityMembership.fromJson(e))
+            .toList(),
         karmaScore = u['karma_score'] {
     List<TraitScore> scores = (u['trait_scores'] as List<dynamic>)
         .map((s) => TraitScore.fromJson(s))
@@ -105,6 +121,8 @@ class KC2UserInfo {
       'nonce': nonce,
       'karms_score': karmaScore,
       'trait_scores': all.map((e) => e.toJson()).toList(),
+      'community_membership':
+          communityMembership.map((e) => e.toJson()).toList(),
     };
   }
 
