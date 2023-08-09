@@ -1,31 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:karma_coin/services/v2.0/types.dart';
 
 const localUserInfoStorageKey = 'kc2_local_user_info';
 const androidOptions = AndroidOptions(
   encryptedSharedPreferences: true,
 );
-
-/// A user's trait score type
-class TraitScore {
-  int traitId;
-  int score;
-  int communityId;
-
-  TraitScore(this.traitId, this.score, this.communityId);
-
-  TraitScore.fromJson(Map<String, dynamic> t)
-      : traitId = t['trait_id'],
-        score = t['karma_score'],
-        communityId = t['community_id'];
-
-  Map<String, dynamic> toJson() => {
-        'trait_id': traitId,
-        'karma_score': score,
-        'community_id': communityId,
-      };
-}
 
 /// Chain user info returned from various RPCs such as GetUserInfoByXXX()
 class KC2UserInfo {

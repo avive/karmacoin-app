@@ -8,6 +8,7 @@ import 'package:karma_coin/services/v2.0/error.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
 import 'package:karma_coin/services/v2.0/event.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
+import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:polkadart/polkadart.dart' as polkadart;
 import 'package:polkadart/substrate/substrate.dart';
@@ -163,6 +164,36 @@ class KarmachainService implements K2ServiceInterface {
     } catch (e) {
       debugPrint(
           'error getting user info by phone number hash $phoneNumberHash: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<KC2UserInfo>> getCommunityMembers(int communityId, {int? fromIndex, int? limit}) async {
+    try {
+      List<dynamic> data = await kc2ApiProvider.send(
+          'community_getAllUsers',
+          [communityId, fromIndex, limit]
+      ).then((v) => v.result);
+
+      return data.map((e) => KC2UserInfo.fromJson(e)).toList();
+    } catch (e) {
+      debugPrint('error getting community members $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<Contact>> getContacts(String prefix, {int? communityId, int? fromIndex, int? limit}) async {
+    try {
+      List<dynamic> data = await kc2ApiProvider.send(
+          'community_getContacts',
+          [prefix, communityId, fromIndex, limit]
+      ).then((v) => v.result);
+
+      return data.map((e) => Contact.fromJson(e)).toList();
+    } catch (e) {
+      debugPrint('error getting contacts $e');
       rethrow;
     }
   }
