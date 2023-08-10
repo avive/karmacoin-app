@@ -1,4 +1,4 @@
-import 'package:karma_coin/services/v2.0/staking/types.dart';
+import 'package:karma_coin/services/v2.0/nomination/types.dart';
 
 abstract class KC2NominationPoolsInterface {
   /// Stake funds with a pool. The amount to bond is transferred from the member to the
@@ -54,7 +54,7 @@ abstract class KC2NominationPoolsInterface {
   /// are available). However, it may not be possible to release the current unlocking chunks,
   /// in which case, the result of this call will likely be the `NoMoreChunks` error from the
   /// staking system.
-  Future<String> unbond(String accountId, BigInt unboindingPoints);
+  Future<String> unbond(String accountId, BigInt unbondingPoints);
 
   /// Withdraw unbonded funds from `member_account`. If no bonded funds can be unbonded, an
   /// error is returned.
@@ -128,16 +128,29 @@ abstract class KC2NominationPoolsInterface {
 
   /// Set the commission of a pool.
   ///
-  /// Both a commission percentage and a commission payee must be provided in the `current`
-  /// tuple. Where a `current` of `None` is provided, any current commission will be removed.
-  ///
   /// - If a `null` is supplied to `commission` and `beneficiary`, existing commission will be removed.
-  /// - Both `beneficiary` and `beneficiary` must be supplied or be `null`
+  /// - Both `commission` and `beneficiary` must be supplied or be `null`
   Future<String> setCommission(PoolId poolId, BigInt? commission, String? beneficiary);
 
-  // TODO: setCommissionMax
-  // TODO: setCommissionChangeRate
-  // TODO: claimCommission
+  /// Set the maximum commission of a pool.
+  ///
+  /// - Initial max can be set to any `Perbill`, and only smaller values thereafter.
+  /// - Current commission will be lowered in the event it is higher than a new max
+  ///   commission.
+  Future<String> setCommissionMax(PoolId poolId, BigInt? maxCommission);
+
+  /// Set the commission change rate for a pool.
+  ///
+  /// Initial change rate is not bounded, whereas subsequent updates can only be more
+  /// restrictive than the current.
+  Future<String> setCommissionChangeRate(PoolId poolId, CommissionChangeRate commissionChangeRate);
+
+  /// Claim pending commission.
+  ///
+  /// The dispatch origin of this call must be signed by the `root` role of the pool. Pending
+  /// commission is paid out and added to total claimed commission`. Total pending commission
+  /// is reset to zero. the current.
+  Future<String> claimCommission(PoolId poolId);
 
   // RPC
 
