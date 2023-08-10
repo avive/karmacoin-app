@@ -409,14 +409,7 @@ class KarmachainService extends ChainApiProvider implements K2ServiceInterface  
   /// return decoded events
   Future<List<KC2Event>> _getEvents(String blockHash) async {
     try {
-      final pallet = polkadart.Hasher.twoxx128.hashString('System');
-      final storage = polkadart.Hasher.twoxx128.hashString('Events');
-
-      final bytes = BytesBuilder();
-      bytes.add(pallet);
-      bytes.add(storage);
-
-      final value = await super.api.getStorage(bytes.toBytes());
+      final value = await readStorage('System', 'Events');
 
       final List<KC2Event> events = chainInfo.scaleCodec
           .decode('EventCodec', ByteInput(value!))

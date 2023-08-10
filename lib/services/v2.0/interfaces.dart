@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/kc2/keyring.dart';
 import 'package:polkadart/polkadart.dart' as polkadart;
@@ -132,5 +134,19 @@ abstract class ChainApiProvider {
       debugPrint('Failed to submit transaction: $e');
       rethrow;
     }
+  }
+
+  Future<Uint8List?> readStorage(String module, String storage, {List<int>? key}) async {
+    final modulePrefix = polkadart.Hasher.twoxx128.hashString(module);
+    final storagePrefix = polkadart.Hasher.twoxx128.hashString(storage);
+
+    key = key ?? [];
+
+    final bytes = BytesBuilder();
+    bytes.add(modulePrefix);
+    bytes.add(storagePrefix);
+    bytes.add(key);
+
+    return await api.getStorage(bytes.toBytes());
   }
 }
