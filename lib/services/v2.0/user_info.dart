@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 
 // todo: create public interface

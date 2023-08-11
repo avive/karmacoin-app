@@ -1,4 +1,3 @@
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/services/v2.0/types.dart';

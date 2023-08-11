@@ -1,3 +1,5 @@
+import 'package:karma_coin/data/genesis_config.dart';
+import 'package:karma_coin/data/personality_traits.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 
 /// kc2 appreciation tx
@@ -40,4 +42,15 @@ class KC2AppreciationTxV1 extends KC2Tx {
     required super.rawData,
     required super.signer,
   });
+
+  String getTitle() {
+    if (charTraitId != null &&
+        charTraitId != 0 &&
+        charTraitId! < GenesisConfig.personalityTraits.length) {
+      PersonalityTrait trait = GenesisConfig.personalityTraits[charTraitId!];
+      return '${trait.emoji} You are ${trait.name.toLowerCase()}';
+    } else {
+      return '🤑 Karma Coin Payment';
+    }
+  }
 }

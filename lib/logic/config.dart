@@ -49,12 +49,13 @@ class ConfigLogic {
   late final requestedUserName = ValueNotifier<String>('');
 
 // Set received FCM push note token
+/*
   Future<void> _setFCMPushNoteToken(String token) async {
     await secureStorage.write(
         key: _pushTokenKey, value: token, aOptions: _aOptions);
 
     fcmToken.value = token;
-  }
+  }*/
 
   // Get known FCM push note token
   final ValueNotifier<String?> fcmToken = ValueNotifier<String?>(null);

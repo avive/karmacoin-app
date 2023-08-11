@@ -39,7 +39,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
 
     Widget pict = Padding(
       padding: const EdgeInsets.only(),
-      child: RandomAvatar(widget.user!.userName, height: 30, width: 30),
+      child: RandomAvatar(widget.user.userName, height: 30, width: 30),
     );
 
     tiles.add(
@@ -57,7 +57,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
             style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
         leading: const Icon(CupertinoIcons.circle, size: 28),
         // todo: number format
-        trailing: Text(widget.user!.karmaScore.format(),
+        trailing: Text(widget.user.karmaScore.format(),
             style: CupertinoTheme.of(context).textTheme.textStyle),
       ),
     );
@@ -74,7 +74,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
           padding: const EdgeInsets.only(top: 2),
           child: Text(
               KarmaCoinAmountFormatter.format(
-                widget.user!.balance,
+                widget.user.balance,
               ),
               maxLines: 3,
               style: CupertinoTheme.of(context).textTheme.textStyle),
@@ -137,7 +137,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 3),
           child: Text(
-            KarmaCoinAmountFormatter.formatKCents(widget.user!.balance),
+            KarmaCoinAmountFormatter.formatKCents(widget.user.balance),
             maxLines: 2,
             style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                   TextStyle(
@@ -157,7 +157,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
               const EdgeInsets.only(top: 12, bottom: 12, left: 12, right: 14),
           title: Text('Transactions Counter',
               style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
-          trailing: Text(widget.user!.nonce.toString(),
+          trailing: Text(widget.user.nonce.toString(),
               style: CupertinoTheme.of(context).textTheme.textStyle),
           leading: const Icon(CupertinoIcons.number, size: 28)),
     );
@@ -265,10 +265,10 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
   @override
   build(BuildContext context) {
     Row row = Row(children: [
-      RandomAvatar(widget.user!.userName, height: 30, width: 30),
+      RandomAvatar(widget.user.userName, height: 30, width: 30),
       const SizedBox(width: 8),
       Text(
-        widget.user!.userName,
+        widget.user.userName,
         style: getNavBarTitleTextStyle(context),
         textAlign: TextAlign.left,
       ),

@@ -13,7 +13,6 @@ import 'package:karma_coin/ui/screens/actions.dart';
 import 'package:karma_coin/ui/screens/appreciations.dart';
 import 'package:karma_coin/ui/screens/phone_number_input.dart';
 import 'package:karma_coin/ui/screens/sms_code_input.dart';
-import 'package:karma_coin/ui/screens/payment_tx_details.dart';
 import 'package:karma_coin/ui/screens/user_details.dart';
 import 'package:karma_coin/ui/screens/home.dart';
 import 'package:karma_coin/ui/screens/user_name.dart';
@@ -263,8 +262,9 @@ final GoRouter appRouter = GoRouter(
           if (txId == null) {
             // todo: redirect to home screen
           }
-
-          return TransactionDetailsScreen(Key(txId!), txId);
+          // todo: fix me
+          return Container();
+          // TransactionDetailsScreen(Key(txId!), txId);
         }),
     GoRoute(
         name: ScreenNames.account,

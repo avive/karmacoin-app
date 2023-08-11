@@ -1,4 +1,3 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/data/genesis_config.dart';

@@ -1,6 +1,5 @@
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/data/kc_user_OLD.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/services/api/api.pbgrpc.dart';
 // import 'package:karma_coin/services/api/types.pb.dart';
@@ -72,9 +71,6 @@ abstract class AccountLogicInterface {
 
   /// Submit delete account tx
   Future<SubmitTransactionResponse> submitDeleteAccountTransaction();
-
-  final ValueNotifier<KarmaCoinUser?> karmaCoinUser =
-      ValueNotifier<KarmaCoinUser?>(null);
 
   /// Local mode - KarmaUser was created locally, signup tx submitted and accepted but not confirmed yet... we use this to allow user to start appreicating other users as soon as it signs up...
   /// user name should be taken from KarmaUser.

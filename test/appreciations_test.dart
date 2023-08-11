@@ -88,7 +88,7 @@ void main() {
             expect(tx.toAddress, katya.accountId);
             expect(tx.toPhoneNumberHash,
                 '0x${kc2Service.getPhoneNumberHash(katyaPhoneNumber)}');
-            expect(tx.toUsername, katyaUserName);
+            expect(tx.toUserName, katyaUserName);
             expect(tx.signer, punch.accountId);
 
             if (!completer.isCompleted) {

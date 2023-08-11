@@ -1,11 +1,8 @@
-import 'package:countup/countup.dart';
-import 'package:karma_coin/services/api/api.pb.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:status_alert/status_alert.dart';
 
-const _karmaRewardsInfoUrl = 'https://karmaco.in/karmarewards/';
+// const _karmaRewardsInfoUrl = 'https://karmaco.in/karmarewards/';
 
 class AboutKarmaMining extends StatefulWidget {
   final GenesisData? genesisData;
@@ -21,9 +18,10 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
   // we assume api is available until we know otherwise
   bool apiOffline = false;
 
-  GenesisData? genesisData;
-  BlockchainStats? blockchainStats;
+  // GenesisData? genesisData;
+  // BlockchainStats? blockchainStats;
 
+  /*
   @override
   initState() {
     super.initState();
@@ -229,6 +227,7 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
 
     return res;
   }
+  */
 
   @override
   build(BuildContext context) {
@@ -257,7 +256,8 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
           ),
           SliverFillRemaining(
             hasScrollBody: false,
-            child: _getBodyContent(context),
+            // todo: fix me when api becomes clearer
+            child: Container(), //_getBodyContent(context),
           ),
         ],
       ),
