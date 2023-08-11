@@ -33,6 +33,7 @@ UserNameAvailabilityLogic get userNameAvailabilityLogic =>
 AppState get appState => GetIt.I.get<AppState>();
 
 K2ServiceInterface get kc2Service => GetIt.I.get<K2ServiceInterface>();
+
 KC2UserInteface get kc2User => GetIt.I.get<KC2UserInteface>();
 
 mixin KC2AppLogicInterface {
@@ -71,6 +72,7 @@ class KC2AppLogic with KC2AppLogicInterface {
 
     GetIt.I.registerLazySingleton<AuthLogicInterface>(() => AuthLogic());
     GetIt.I.registerLazySingleton<KC2UserInteface>(() => KC2User());
+    
     GetIt.I.registerLazySingleton<UserNameAvailabilityLogic>(
         () => UserNameAvailabilityLogic());
     

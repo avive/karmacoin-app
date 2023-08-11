@@ -40,6 +40,9 @@ class KarmachainService implements K2ServiceInterface {
   late ChainInfo chainInfo;
 
   @override
+  String? get apiWsUrl => _apiWsUrl;
+
+  @override
   BigInt get existentialDeposit =>
       chainInfo.constants['Balances']!['ExistentialDeposit']!.value;
 
@@ -879,8 +882,9 @@ class KarmachainService implements K2ServiceInterface {
         transactionEvents: txEvents,
         rawData: rawData,
       );
-
-      await newUserCallback!(newUserTx);
+      if (newUserCallback != null) {
+        await newUserCallback!(newUserTx);
+      }
     } catch (e) {
       debugPrint('error processing new user tx: $e');
       rethrow;
@@ -923,7 +927,9 @@ class KarmachainService implements K2ServiceInterface {
         rawData: rawData,
       );
 
-      await updateUserCallback!(updateUserTx);
+      if (updateUserCallback != null) {
+        await updateUserCallback!(updateUserTx);
+      }
     } catch (e) {
       debugPrint('error processing update user tx: $e');
       rethrow;
@@ -963,7 +969,7 @@ class KarmachainService implements K2ServiceInterface {
           toAccountId = ss58.Codec(42).encode(accountIdentityValue.cast<int>());
 
           if (toAccountId == accountId) {
-            toUserName = kc2User.userInfo.value!.userName;
+            toUserName = kc2User.userInfo.value?.userName ?? 'UNKNOWN';
             toPhoneNumberHash = kc2User.userInfo.value!.phoneNumberHash;
           } else {
             // call api to get missing fields
@@ -980,7 +986,7 @@ class KarmachainService implements K2ServiceInterface {
           break;
         case 'Username':
           toUserName = accountIdentityValue;
-          if (toUserName != kc2User.userInfo.value!.userName) {
+          if (toUserName != kc2User.userInfo.value?.userName) {
             // call api to get missing fields
             final res = await getUserInfoByUserName(toUserName!);
             if (res == null) {
@@ -991,7 +997,7 @@ class KarmachainService implements K2ServiceInterface {
             toPhoneNumberHash = res.phoneNumberHash;
           } else {
             toAccountId = accountId;
-            toPhoneNumberHash = kc2User.userInfo.value!.phoneNumberHash;
+            toPhoneNumberHash = kc2User.userInfo.value?.phoneNumberHash;
           }
           break;
         default:
@@ -1002,8 +1008,7 @@ class KarmachainService implements K2ServiceInterface {
           final res = await getUserInfoByPhoneNumberHash(toPhoneNumberHash);
           // todo: handle null result case
           if (res == null) {
-            debugPrint('failed to get user id by phone hash via api');
-            return;
+            throw 'failed to get user id by phone hash via api';
           }
 
           // complete missing fields in tx with data from api
@@ -1024,14 +1029,13 @@ class KarmachainService implements K2ServiceInterface {
 
       if (signer == accountId) {
         fromAddress = signer;
-        fromUserName = kc2User.userInfo.value!.userName;
+        fromUserName = kc2User.userInfo.value?.userName ?? 'UNKNOWN';
         // outgoing apprecation
       } else {
         // incoming appreciation - get username of signer
         final res = await getUserInfoByAccountId(signer);
         if (res == null) {
-          debugPrint('failed to get user id by username via api');
-          return;
+          throw 'failed to get user by signer address from api';
         }
 
         fromAddress = res.accountId;
@@ -1060,7 +1064,11 @@ class KarmachainService implements K2ServiceInterface {
         rawData: rawData,
       );
 
-      await appreciationCallback!(appreciationTx);
+      if (appreciationCallback != null) {
+        await appreciationCallback!(appreciationTx);
+      } else {
+        debugPrint('No registered appreciation callback');
+      }
     } catch (e) {
       debugPrint("Error processing appreciation tx: $e");
       rethrow;
@@ -1133,7 +1141,7 @@ class KarmachainService implements K2ServiceInterface {
       String toUserName = '';
 
       if (signer == accountId) {
-        fromUserName = kc2User.userInfo.value!.userName;
+        fromUserName = kc2User.userInfo.value?.userName ?? 'UNKNOWN';
         final res = await getUserInfoByAccountId(toAddress);
         if (res != null) {
           toUserName = res.userName;
@@ -1141,7 +1149,7 @@ class KarmachainService implements K2ServiceInterface {
           debugPrint('>> failed to get user info by account id $toAddress');
         }
       } else {
-        toUserName = kc2User.userInfo.value!.userName;
+        toUserName = kc2User.userInfo.value?.userName ?? 'UNKNOWN';
         final res = await getUserInfoByAccountId(signer);
         if (res != null) {
           fromUserName = res.userName;
@@ -1169,7 +1177,9 @@ class KarmachainService implements K2ServiceInterface {
         rawData: rawData,
       );
 
-      transferCallback!(transferTx);
+      if (transferCallback != null) {
+        transferCallback!(transferTx);
+      }
     } catch (e) {
       debugPrint('error processing transfer tx: $e');
       rethrow;
@@ -1205,7 +1215,4 @@ class KarmachainService implements K2ServiceInterface {
 
     return ChainError.fromSubstrateMetadata(errorMetadata);
   }
-
-  @override
-  String? get apiWsUrl => _apiWsUrl;
 }

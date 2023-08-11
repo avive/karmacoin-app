@@ -26,7 +26,9 @@ void main() {
         // Create a new identity for local user
         IdentityInterface katya = Identity();
         await katya.initNoStorage();
-        String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
+        String katyaUserName =
+            "katya${katya.accountId.substring(0, 5)}".toLowerCase();
+
         String katyaPhoneNumber = randomPhoneNumber;
         String phoneNumberHash =
             kc2Service.getPhoneNumberHash(katyaPhoneNumber);
@@ -135,7 +137,8 @@ void main() {
         String newPhoneNumberHash =
             kc2Service.getPhoneNumberHash(katyaNewPhoneNumber);
 
-        String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
+        String katyaUserName =
+            "Katya${katya.accountId.substring(0, 5)}".toLowerCase();
 
         // Set katya as signer
         kc2Service.setKeyring(katya.keyring);
@@ -258,9 +261,11 @@ void main() {
         // Create a new identity for local user
         IdentityInterface katya = Identity();
         await katya.initNoStorage();
-        String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
+        String katyaUserName =
+            "Katya${katya.accountId.substring(0, 5)}".toLowerCase();
         String katyaPhoneNumber = randomPhoneNumber;
-        String katyaNewUserName = "Katya${katya.accountId.substring(5, 10)}";
+        String katyaNewUserName =
+            "Katya${katya.accountId.substring(5, 10)}".toLowerCase();
 
         // Set katya as signer
         kc2Service.setKeyring(katya.keyring);
@@ -389,7 +394,8 @@ void main() {
         await katya.initNoStorage();
         await punch.initNoStorage();
 
-        String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
+        String katyaUserName =
+            "Katya${katya.accountId.substring(0, 5)}".toLowerCase();
         String katyaPhoneNumber = randomPhoneNumber;
         String punchPhoneNumber = randomPhoneNumber;
 

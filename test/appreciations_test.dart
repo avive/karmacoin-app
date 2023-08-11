@@ -2,8 +2,11 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/logic/kc2/identity.dart';
 import 'package:karma_coin/logic/kc2/identity_interface.dart';
+import 'package:karma_coin/logic/kc2/user.dart';
+import 'package:karma_coin/logic/kc2/user_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
@@ -16,6 +19,10 @@ void main() {
   // WidgetsFlutterBinding.ensureInitialized();
 
   GetIt.I.registerLazySingleton<K2ServiceInterface>(() => KarmachainService());
+
+  GetIt.I.registerLazySingleton<AppState>(() => AppState());
+
+  GetIt.I.registerLazySingleton<KC2UserInteface>(() => KC2User());
 
   group('appreciations tests', () {
     test(
@@ -32,9 +39,11 @@ void main() {
         await katya.initNoStorage();
         await punch.initNoStorage();
 
-        String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
+        String katyaUserName =
+            "Katya${katya.accountId.substring(0, 5)}".toLowerCase();
         String katyaPhoneNumber = randomPhoneNumber;
-        String punchUserName = "Punch${punch.accountId.substring(0, 5)}";
+        String punchUserName =
+            "Punch${punch.accountId.substring(0, 5)}".toLowerCase();
         String punchPhoneNumber = randomPhoneNumber;
 
         Timer? accountBlocksTimer;
