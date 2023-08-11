@@ -19,19 +19,10 @@ void main() async {
     debugPrint(e.toString());
   });
 
-  /*
-  try {
-    final result = await FirebaseFunctions.instance
-        .httpsCallable('getUserId')
-        .call({'phoneNumber': '+972549805380'});
-    debugPrint(result.data.toString());
-  } on FirebaseFunctionsException catch (error) {
-    debugPrint('${error.code}, ${error.details}, ${error.message}}');
-  }*/
-
   await appLogic.bootstrap();
 
   // setup push notes (but don't wait on it per docs)
+  // todo: fix me
   // settingsLogic.setupPushNotifications();
 
   runApp(KarmaCoinApp());
