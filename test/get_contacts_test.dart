@@ -5,6 +5,7 @@ import 'package:karma_coin/logic/kc2/identity.dart';
 import 'package:karma_coin/logic/kc2/identity_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
+import 'package:karma_coin/services/v2.0/types.dart';
 
 final random = Random.secure();
 String get randomPhoneNumber => (random.nextInt(900000) + 100000).toString();
@@ -22,28 +23,30 @@ void main() {
           await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
           // Allow to run this test multiply times on same chain
-          String prefix = randomPhoneNumber.substring(0, 5);
+          String prefix = randomPhoneNumber.substring(0, 5).toLowerCase();
 
           IdentityInterface tom = Identity();
           await tom.initNoStorage();
-          String tomUserName = "${prefix}Tom${tom.accountId.substring(0, 5)}";
+          String tomUserName =
+              "${prefix}Tom${tom.accountId.substring(0, 5)}".toLowerCase();
           String tomPhoneNumber = randomPhoneNumber;
 
           IdentityInterface tomas = Identity();
           await tomas.initNoStorage();
           String tomasUserName =
-              "${prefix}Tomas${tomas.accountId.substring(0, 5)}";
+              "${prefix}Tomas${tomas.accountId.substring(0, 5)}".toLowerCase();
           String tomasPhoneNumber = randomPhoneNumber;
 
           IdentityInterface tor = Identity();
           await tor.initNoStorage();
-          String torUserName = "${prefix}Tor${tor.accountId.substring(0, 5)}";
+          String torUserName =
+              "${prefix}Tor${tor.accountId.substring(0, 5)}".toLowerCase();
           String torPhoneNumber = randomPhoneNumber;
 
           IdentityInterface platon = Identity();
           await platon.initNoStorage();
           String platonUserName =
-              "${prefix}Platon${platon.accountId.substring(0, 5)}";
+              "${prefix}Platon${platon.accountId.substring(0, 5)}.toLowerCase()";
           String platonPhoneNumber = randomPhoneNumber;
 
           int counter = 0;
@@ -77,7 +80,11 @@ void main() {
                     platon.accountId, platonUserName, platonPhoneNumber);
               // When all users created
               case 4:
-                final contacts = await kc2Service.getContacts('${prefix}To');
+                debugPrint('Getting contacts...');
+                List<Contact> contacts =
+                    await kc2Service.getContacts('${prefix}to');
+                debugPrint('Got ${contacts.length} contacts');
+                expect(contacts.length, 3);
                 expect(
                     contacts.any((contact) => contact.userName == tomUserName),
                     isTrue);
@@ -92,6 +99,9 @@ void main() {
                     contacts
                         .any((contacts) => contacts.userName == platonUserName),
                     isFalse);
+
+                contacts = await kc2Service.getContacts('XXXXXXXX');
+                expect(contacts.length, 0);
 
                 completer.complete(true);
             }

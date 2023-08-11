@@ -19,6 +19,8 @@ import 'package:substrate_metadata_fixed/substrate_metadata.dart';
 import 'package:convert/convert.dart';
 import 'package:substrate_metadata_fixed/types/metadata_types.dart';
 
+String verificationBypassToken = 'dummy';
+
 class KarmachainService implements K2ServiceInterface {
   late polkadart.Provider kc2ApiProvider;
   // optional verifier provider differenet that karmnachain api provider
@@ -205,42 +207,48 @@ class KarmachainService implements K2ServiceInterface {
   /// accountId - ss58 encoded address of localUser
   @override
   Future<FetchAppreciationsStatus> getTransactions(String accountId) async {
-    debugPrint('Getting all txs for account: $accountId');
-    final txs = await kc2ApiProvider.send(
-        'transactions_getTransactions', [accountId]).then((v) => v.result);
+    try {
+      debugPrint('Getting all txs for account: $accountId');
+      final txs = await kc2ApiProvider.send(
+          'transactions_getTransactions', [accountId]).then((v) => v.result);
 
-    txs?.forEach((transaction) async {
-      try {
-        // todo: verify status is 'OnChain'
-        final BigInt blockNumber = BigInt.from(transaction['block_number']);
-        final int transactionIndex = transaction['transaction_index'];
-        final bytes = transaction['signed_transaction']['transaction_body'];
-        final transactionBody =
-            _decodeTransaction(Input.fromBytes(bytes.cast<int>()));
-        final int timestamp = transaction['timestamp'];
-        final List<KC2Event> events =
-            await _getTransactionEvents(blockNumber, transactionIndex);
-        await _processTransaction(accountId, transactionBody, events,
-            BigInt.from(timestamp), null, blockNumber, transactionIndex);
-      } catch (e) {
-        debugPrint('error processing tx: $transaction $e');
-        // don't throw so we can process valid txs even when one is bad
+      int processed = 0;
 
-        return FetchAppreciationsStatus.error;
-      }
-    });
+      txs?.forEach((transaction) async {
+        try {
+          // todo: verify status is 'OnChain'
+          final BigInt blockNumber = BigInt.from(transaction['block_number']);
+          final int transactionIndex = transaction['transaction_index'];
+          final bytes = transaction['signed_transaction']['transaction_body'];
+          final transactionBody =
+              _decodeTransaction(Input.fromBytes(bytes.cast<int>()));
+          final int timestamp = transaction['timestamp'];
+          final List<KC2Event> events =
+              await _getTransactionEvents(blockNumber, transactionIndex);
+          await _processTransaction(accountId, transactionBody, events,
+              BigInt.from(timestamp), null, blockNumber, transactionIndex);
+          processed++;
+        } catch (e) {
+          // don't throw so we can process valid txs even when one is bad
+          debugPrint('error processing tx: $transaction $e');
+        }
+      });
 
-    debugPrint('Processed ${txs.length} txs for account: $accountId}');
-    // debugPrint('Account transactions: $txs');
+      debugPrint(
+          'Processed $processed / ${txs.length} txs for account: $accountId}');
+      // debugPrint('Account transactions: $txs');
 
-    return FetchAppreciationsStatus.fetched;
+      return FetchAppreciationsStatus.fetched;
+    } catch (e) {
+      debugPrint('error fetching txs: $e');
+      return FetchAppreciationsStatus.error;
+    }
   }
 
   Future<List<KC2Event>> _getTransactionEvents(
       BigInt blockNumber, int transactionIndex) async {
     try {
       final String blockNumberString = '0x${blockNumber.toRadixString(16)}';
-
       final blockHash = await kc2ApiProvider.send(
           'chain_getBlockHash', [blockNumberString]).then((v) => v.result);
       final events = await _getEvents(blockHash);
@@ -255,10 +263,11 @@ class KarmachainService implements K2ServiceInterface {
     }
   }
 
-  // Transactions
+  // Transactions submission
 
   /// Signup  a new user with the provided data.
   /// This method will attempt to obtain verifier evidence regarding the association between the accountId, userName and phoneNumber
+  /// Returns an (evidence, errorMessage) result.
   @override
   Future<(String?, String?)> newUser(
       String accountId, String username, String phoneNumber) async {
@@ -268,8 +277,15 @@ class KarmachainService implements K2ServiceInterface {
       // than the provider used by the api. right now we assume provider
       // is a verifier
       //
-      final evidence = await kc2ApiProvider.send('verifier_verify',
-          [accountId, username, phoneNumber, 'dummy']).then((v) => v.result);
+      // todo: use new whatsapp verifier microservice when it is ready
+      // it includes a session id param...
+      //
+      final evidence = await kc2ApiProvider.send('verifier_verify', [
+        accountId,
+        username,
+        phoneNumber,
+        verificationBypassToken
+      ]).then((v) => v.result);
       // debugPrint('Verifier evidence - $evidence');
 
       if (evidence == null) {
@@ -323,7 +339,7 @@ class KarmachainService implements K2ServiceInterface {
           userInfo!.accountId,
           userInfo.userName,
           phoneNumber,
-          'dummy'
+          verificationBypassToken
         ]).then((v) => v.result);
 
         if (evidence == null) {
@@ -683,7 +699,7 @@ class KarmachainService implements K2ServiceInterface {
           _processTransaction(accountId, transaction, transactionEvents,
               timestamp, hash, blockNumber, transactionIndex);
         } catch (e) {
-          debugPrint('Failed tx processing: $e');
+          debugPrint('>>> failed block tx processing: $e');
         }
       });
 
@@ -732,9 +748,9 @@ class KarmachainService implements K2ServiceInterface {
 
       final failedReason = _processFailedEventData(failedEventData);
 
-      if (newUserCallback != null &&
-          pallet == 'Identity' &&
-          method == 'new_user') {
+      if (pallet == 'Identity' &&
+          method == 'new_user' &&
+          newUserCallback != null) {
         final txAccountId =
             ss58.Codec(42).encode(args['account_id'].cast<int>());
         if (signer == accountId || accountId == txAccountId) {
@@ -755,10 +771,10 @@ class KarmachainService implements K2ServiceInterface {
         return;
       }
 
-      if (updateUserCallback != null &&
-          pallet == 'Identity' &&
+      if (pallet == 'Identity' &&
           method == 'update_user' &&
-          signer == accountId) {
+          signer == accountId &&
+          updateUserCallback != null) {
         await _processUpdateUserTransaction(
             hash,
             timestamp,
@@ -775,9 +791,9 @@ class KarmachainService implements K2ServiceInterface {
         return;
       }
 
-      if (appreciationCallback != null &&
-          pallet == 'Appreciation' &&
-          method == 'appreciation') {
+      if (pallet == 'Appreciation' &&
+          method == 'appreciation' &&
+          appreciationCallback != null) {
         await _processAppreciationTransaction(
             hash,
             timestamp,
@@ -809,7 +825,8 @@ class KarmachainService implements K2ServiceInterface {
     }*/
 
       if (pallet == 'Balances' &&
-          (method == 'transfer_keep_alive' || method == 'transfer')) {
+          (method == 'transfer_keep_alive' || method == 'transfer') &&
+          transferCallback != null) {
         await _processTransferTransaction(
             hash,
             timestamp,
@@ -826,11 +843,9 @@ class KarmachainService implements K2ServiceInterface {
         return;
       }
 
-      debugPrint('Skipped tx $pallet/$method');
+      debugPrint('Skipped processing tx $pallet/$method');
     } catch (e) {
       debugPrint('error processing tx: $e');
-      //_processTransaction(
-      //    address, tx, txEvents, timestamp, hash, blockNumber, blockIndex);
     }
   }
 
@@ -882,6 +897,7 @@ class KarmachainService implements K2ServiceInterface {
         transactionEvents: txEvents,
         rawData: rawData,
       );
+
       if (newUserCallback != null) {
         await newUserCallback!(newUserTx);
       }
