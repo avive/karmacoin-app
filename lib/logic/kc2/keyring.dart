@@ -14,6 +14,8 @@ class KC2KeyRing {
   KC2KeyRing({String? mnemonic}) {
     if (mnemonic == null) {
       _mnemonic = bip39.generateMnemonic();
+    } else {
+      _mnemonic = mnemonic;
     }
     Uint8List seed = bip39.mnemonicToSeed(_mnemonic).sublist(0, 32);
     _privateKey = ed.newKeyFromSeed(seed);
