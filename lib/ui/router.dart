@@ -1,5 +1,5 @@
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/services/api/types.pb.dart';
+import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:karma_coin/ui/screens/about.dart';
 import 'package:karma_coin/ui/screens/backup_account.dart';
 import 'package:karma_coin/ui/screens/community_home.dart';
@@ -163,7 +163,7 @@ String _getInitialLocation() {
   } else {
     debugPrint('Router: No exisiting user - go to welcome..');
     return ScreenPaths.welcome;
-  }  
+  }
 }
 
 /// The route configuration
@@ -271,7 +271,7 @@ final GoRouter appRouter = GoRouter(
         path: ScreenPaths.account,
         builder: (BuildContext context, GoRouterState state) {
           if (state.extra != null) {
-            User user = state.extra as User;
+            KC2UserInfo user = state.extra as KC2UserInfo;
             return UserDetailsScreen(Key(user.userName), user);
           }
 

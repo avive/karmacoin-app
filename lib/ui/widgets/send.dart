@@ -1,9 +1,7 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
@@ -30,9 +28,7 @@ class _SendWidgetState extends State<SendWidget> {
 
   // validate input data and show alert if invalid
   Future<bool> _validateData() async {
-    KarmaCoinUser? user = accountLogic.karmaCoinUser.value;
-
-    if (user == null) {
+    if (kc2User.userInfo.value == null) {
       if (context.mounted) {
         StatusAlert.show(
           context,
@@ -81,7 +77,7 @@ class _SendWidgetState extends State<SendWidget> {
           return false;
         }
 
-        if (user.mobileNumber.value.number ==
+        if (kc2User.userInfo.value!.accountId ==
             appState.sendDestinationAddress.value) {
           if (context.mounted) {
             StatusAlert.show(
@@ -133,7 +129,7 @@ class _SendWidgetState extends State<SendWidget> {
         String number =
             '+${phoneController.value!.countryCode}${phoneController.value!.nsn}';
 
-        if (user.mobileNumber.value.number == number) {
+        if (kc2User.identity.phoneNumber == number) {
           if (context.mounted) {
             StatusAlert.show(
               context,
@@ -151,7 +147,7 @@ class _SendWidgetState extends State<SendWidget> {
         break;
     }
 
-    if (appState.kCentsAmount.value == Int64.ZERO) {
+    if (appState.kCentsAmount.value == BigInt.zero) {
       if (context.mounted) {
         StatusAlert.show(
           context,
@@ -166,9 +162,9 @@ class _SendWidgetState extends State<SendWidget> {
       return false;
     }
 
-    debugPrint('user balance: ${user.balance.value}');
+    debugPrint('user balance: ${kc2User.userInfo.value!.balance.toString()}');
 
-    if (user.balance.value < appState.kCentsAmount.value) {
+    if (kc2User.userInfo.value!.balance < appState.kCentsAmount.value) {
       if (context.mounted) {
         StatusAlert.show(
           context,

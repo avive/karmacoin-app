@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:karma_coin/data/genesis_config.dart';
+import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/data/personality_traits.dart';
 import 'package:karma_coin/data/phone_number_formatter.dart';
-import 'package:karma_coin/data/signed_transaction.dart';
 import 'package:karma_coin/services/api/types.pb.dart' as types;
 import 'package:karma_coin/ui/helpers/transactions.dart';
 import 'package:karma_coin/ui/widgets/pill.dart';
 
 /// Display transaction details for a a locally available transaction
 class TransactionDetailsScreen extends StatefulWidget {
-  // 0x212...
-  final String txId;
+  final KC2Tx tx;
 
-  const TransactionDetailsScreen(Key? key, this.txId) : super(key: key);
+  const TransactionDetailsScreen(Key? key, {required this.tx})
+      : super(key: key);
 
   @override
   State<TransactionDetailsScreen> createState() =>
@@ -23,28 +23,16 @@ class TransactionDetailsScreen extends StatefulWidget {
 }
 
 class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
-  late final SignedTransactionWithStatusEx? transaction;
-  late final types.TransactionEvent? transactionEvent;
-
+  
   @override
   initState() {
     super.initState();
-    transaction = txsBoss.getTranscation(widget.txId);
-    if (transaction == null) {
-      return;
-    }
-
-    transactionEvent = txsBoss.txEventsNotifer.value[widget.txId];
-    transaction!.openned.value = true;
   }
 
   /// Return the list secionts
   List<CupertinoListSection> _getSections(
       BuildContext context, types.PaymentTransactionV1 paymentData) {
-    if (transaction == null) {
-      return [];
-    }
-
+   
     SignedTransactionWithStatusEx tx = transaction!;
 
     List<CupertinoListTile> tiles = [];

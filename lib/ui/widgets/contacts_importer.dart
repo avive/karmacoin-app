@@ -109,8 +109,8 @@ class _AmountInputWidgetState extends State<ContactsImporter> {
       });
 
       appState.sendDestination.value = Destination.phoneNumber;
-      appState.sendDestinationPhoneNumber.value =
-          '+${widget.phoneController.value!.countryCode}${widget.phoneController.value!.nsn}';
+      appState.sendDestinationPhoneNumberHash.value = kc2Service.getPhoneNumberHash(
+          '${widget.phoneController.value!.countryCode}${widget.phoneController.value!.nsn}');
     }
   }
 

@@ -1,7 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:karma_coin/data/personality_traits.dart';
-import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/services/v2.0/types.dart';
 
 // todo: update to kc2
 
@@ -73,6 +73,7 @@ class GenesisConfig {
         twitterUrl: 'https://twitter.com/TheGratefulDAO',
         instaUrl: 'https://www.instagram.com/gratefulgiraffes',
         discordUrl: 'https://discord.gg/7FMTXavy8N',
+        faceUrl: '',
         charTraitIds: [10, 4, 3, 11, 15, 18, 39, 42, 60])
   };
 

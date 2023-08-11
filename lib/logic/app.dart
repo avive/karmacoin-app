@@ -5,9 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
-import 'package:karma_coin/logic/account_interface.dart';
-import 'package:karma_coin/logic/account_logic.dart';
-import 'package:karma_coin/logic/api.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/logic/auth.dart';
 import 'package:karma_coin/logic/auth_interface.dart';
@@ -15,8 +12,6 @@ import 'package:karma_coin/logic/config.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/logic/kc2/user.dart';
 import 'package:karma_coin/logic/kc2/user_interface.dart';
-import 'package:karma_coin/logic/txs_boss.dart';
-import 'package:karma_coin/logic/txs_boss_interface.dart';
 import 'package:karma_coin/logic/user_name_availability.dart';
 import 'package:karma_coin/logic/verifier.dart';
 import 'package:karma_coin/services/v2.0/kc2.dart';
@@ -35,15 +30,10 @@ AuthLogicInterface get authLogic => GetIt.I.get<AuthLogicInterface>();
 UserNameAvailabilityLogic get userNameAvailabilityLogic =>
     GetIt.I.get<UserNameAvailabilityLogic>();
 
-TransactionsBossInterface get txsBoss =>
-    GetIt.I.get<TransactionsBossInterface>();
-
 AppState get appState => GetIt.I.get<AppState>();
 
 K2ServiceInterface get kc2Service => GetIt.I.get<K2ServiceInterface>();
 KC2UserInteface get kc2User => GetIt.I.get<KC2UserInteface>();
-
-Api get api => GetIt.I.get<Api>();
 
 mixin KC2AppLogicInterface {
   /// Indicates to the rest of the app that bootstrap has not completed.
@@ -83,13 +73,10 @@ class KC2AppLogic with KC2AppLogicInterface {
     GetIt.I.registerLazySingleton<KC2UserInteface>(() => KC2User());
     GetIt.I.registerLazySingleton<UserNameAvailabilityLogic>(
         () => UserNameAvailabilityLogic());
-    GetIt.I.registerLazySingleton<TransactionsBossInterface>(
-        () => TransactionsBoss());
+    
     GetIt.I.registerLazySingleton<AppState>(() => AppState());
     GetIt.I
         .registerLazySingleton<K2ServiceInterface>(() => KarmachainService());
-
-    GetIt.I.registerLazySingleton<Api>(() => Api());
   }
 
   /// Initialize the app and singleton services

@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:typed_data';
-
 import 'package:collection/collection.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/logic/kc2/keyring.dart';
 import 'package:karma_coin/services/v2.0/error.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
@@ -27,6 +27,7 @@ class KarmachainService implements K2ServiceInterface {
   late KC2KeyRing keyring;
   Blake2bHasher hasher = const Blake2bHasher(64);
   bool _connectedToApi = false;
+  late String _apiWsUrl;
 
   /// Decoded chain metadata
   late DecodedMetadata decodedMetadata;
@@ -78,6 +79,7 @@ class KarmachainService implements K2ServiceInterface {
       verifierProvider = null;
 
       debugPrint('Connecting to kc2 api...');
+      _apiWsUrl = apiWsUrl;
       kc2ApiProvider = polkadart.Provider(Uri.parse(apiWsUrl));
       api = polkadart.StateApi(kc2ApiProvider);
       final metadata = await kc2ApiProvider.send('state_getMetadata', []);
@@ -197,7 +199,7 @@ class KarmachainService implements K2ServiceInterface {
   }
 
   /// Get all on-chain txs to or form an account
-  /// accountId - ss58 encoded address
+  /// accountId - ss58 encoded address of localUser
   @override
   Future<FetchAppreciationsStatus> getTransactions(String accountId) async {
     debugPrint('Getting all txs for account: $accountId');
@@ -215,7 +217,7 @@ class KarmachainService implements K2ServiceInterface {
         final int timestamp = transaction['timestamp'];
         final List<KC2Event> events =
             await _getTransactionEvents(blockNumber, transactionIndex);
-        _processTransaction(accountId, transactionBody, events,
+        await _processTransaction(accountId, transactionBody, events,
             BigInt.from(timestamp), null, blockNumber, transactionIndex);
       } catch (e) {
         debugPrint('error processing tx: $transaction $e');
@@ -379,6 +381,7 @@ class KarmachainService implements K2ServiceInterface {
 
   @override
   Future<String> sendTransfer(String accountId, BigInt amount) async {
+    appState.txSubmissionStatus.value = TxSubmissionStatus.submitting;
     try {
       final call = MapEntry(
           'Balances',
@@ -387,8 +390,11 @@ class KarmachainService implements K2ServiceInterface {
             'value': amount
           }));
 
-      return await _signAndSendTransaction(call);
+      String txHash = await _signAndSendTransaction(call);
+      appState.txSubmissionStatus.value = TxSubmissionStatus.submitted;
+      return txHash;
     } on PlatformException catch (e) {
+      appState.txSubmissionStatus.value = TxSubmissionStatus.error;
       debugPrint('Failed to send transfer: ${e.details}');
       rethrow;
     }
@@ -404,6 +410,8 @@ class KarmachainService implements K2ServiceInterface {
     if (phoneNumberHash.startsWith('0x')) {
       phoneNumberHash = phoneNumberHash.substring(2);
     }
+    appState.txSubmissionStatus.value = TxSubmissionStatus.submitting;
+
     try {
       final call = MapEntry(
           'Appreciation',
@@ -414,9 +422,12 @@ class KarmachainService implements K2ServiceInterface {
             'char_trait_id': Option.some(charTraitId),
           }));
 
-      return await _signAndSendTransaction(call);
+      String txHash = await _signAndSendTransaction(call);
+      appState.txSubmissionStatus.value = TxSubmissionStatus.submitted;
+      return txHash;
     } on PlatformException catch (e) {
       debugPrint('Failed to send appreciation: ${e.details}');
+      appState.txSubmissionStatus.value = TxSubmissionStatus.error;
       rethrow;
     }
   }
@@ -443,11 +454,11 @@ class KarmachainService implements K2ServiceInterface {
 
   /// Subscribe to account transactions and events
   @override
-  Timer subscribeToAccount(String address) {
+  Timer subscribeToAccount(String accountId) {
     BigInt blockNumber = BigInt.zero;
     return Timer.periodic(const Duration(seconds: 12), (Timer t) async {
       try {
-        blockNumber = await _processBlock(address, blockNumber);
+        blockNumber = await _processBlock(accountId, blockNumber);
         // debugPrint('>>> set prev block to $blockNumber');
       } catch (e) {
         debugPrint('Failed to process block: $e');
@@ -613,7 +624,7 @@ class KarmachainService implements K2ServiceInterface {
   }
 
   Future<BigInt> _processBlock(
-      String address, BigInt previousBlockNumber) async {
+      String accountId, BigInt previousBlockNumber) async {
     try {
       final header = await kc2ApiProvider
           .send('chain_getHeader', []).then((v) => v.result);
@@ -666,7 +677,7 @@ class KarmachainService implements K2ServiceInterface {
             .toList();
 
         try {
-          _processTransaction(address, transaction, transactionEvents,
+          _processTransaction(accountId, transaction, transactionEvents,
               timestamp, hash, blockNumber, transactionIndex);
         } catch (e) {
           debugPrint('Failed tx processing: $e');
@@ -685,15 +696,15 @@ class KarmachainService implements K2ServiceInterface {
   }
 
   /// Process a single kc2 tx
-  void _processTransaction(
-    String address,
+  Future<void> _processTransaction(
+    String accountId,
     Map<String, dynamic> tx,
     List<KC2Event> txEvents,
     BigInt timestamp,
     String? hash,
     BigInt blockNumber,
     int blockIndex,
-  ) {
+  ) async {
     try {
       hash =
           '0x${hex.encode(Hasher.blake2b256.hash(ExtrinsicsCodec(chainInfo: chainInfo).encode(tx)))}';
@@ -721,9 +732,10 @@ class KarmachainService implements K2ServiceInterface {
       if (newUserCallback != null &&
           pallet == 'Identity' &&
           method == 'new_user') {
-        final accountId = ss58.Codec(42).encode(args['account_id'].cast<int>());
-        if (signer == address || accountId == address) {
-          _processNewUserTransaction(
+        final txAccountId =
+            ss58.Codec(42).encode(args['account_id'].cast<int>());
+        if (signer == accountId || accountId == txAccountId) {
+          await _processNewUserTransaction(
               hash,
               timestamp,
               accountId,
@@ -743,11 +755,11 @@ class KarmachainService implements K2ServiceInterface {
       if (updateUserCallback != null &&
           pallet == 'Identity' &&
           method == 'update_user' &&
-          signer == address) {
-        _processUpdateUserTransaction(
+          signer == accountId) {
+        await _processUpdateUserTransaction(
             hash,
             timestamp,
-            address,
+            accountId,
             signer,
             args,
             failedReason,
@@ -763,10 +775,10 @@ class KarmachainService implements K2ServiceInterface {
       if (appreciationCallback != null &&
           pallet == 'Appreciation' &&
           method == 'appreciation') {
-        _processAppreciationTransaction(
+        await _processAppreciationTransaction(
             hash,
             timestamp,
-            address,
+            accountId,
             signer,
             args,
             failedReason,
@@ -795,10 +807,10 @@ class KarmachainService implements K2ServiceInterface {
 
       if (pallet == 'Balances' &&
           (method == 'transfer_keep_alive' || method == 'transfer')) {
-        _processTransferTransaction(
+        await _processTransferTransaction(
             hash,
             timestamp,
-            address,
+            accountId,
             signer,
             args,
             failedReason,
@@ -833,7 +845,7 @@ class KarmachainService implements K2ServiceInterface {
     return ss58.Codec(42).encode(address.cast<int>());
   }
 
-  void _processNewUserTransaction(
+  Future<void> _processNewUserTransaction(
       String hash,
       BigInt timeStamp,
       String accountId,
@@ -875,10 +887,10 @@ class KarmachainService implements K2ServiceInterface {
     }
   }
 
-  void _processUpdateUserTransaction(
+  Future<void> _processUpdateUserTransaction(
       String hash,
       BigInt timeStamp,
-      String address,
+      String accountId,
       String signer,
       Map<String, dynamic> args,
       ChainError? failedReason,
@@ -918,10 +930,10 @@ class KarmachainService implements K2ServiceInterface {
     }
   }
 
-  void _processAppreciationTransaction(
+  Future<void> _processAppreciationTransaction(
       String hash,
       BigInt timeStamp,
-      String address,
+      String accountId,
       String signer,
       Map<String, dynamic> args,
       ChainError? failedReason,
@@ -933,9 +945,7 @@ class KarmachainService implements K2ServiceInterface {
       List<KC2Event> txEvents) async {
     try {
       // debugPrint("Appreciation tx args: $args");
-
       final to = args['to'];
-
       final BigInt amount = args['amount'];
       final int? communityId = args['community_id'].value;
       final int? charTraitId = args['char_trait_id'].value;
@@ -952,28 +962,37 @@ class KarmachainService implements K2ServiceInterface {
         case 'AccountId':
           toAccountId = ss58.Codec(42).encode(accountIdentityValue.cast<int>());
 
-          // call api to get missing fields
-          final res = await getUserInfoByAccountId(toAccountId);
-          if (res == null) {
-            throw 'failed to get user id by username via api';
-          }
+          if (toAccountId == accountId) {
+            toUserName = kc2User.userInfo.value!.userName;
+            toPhoneNumberHash = kc2User.userInfo.value!.phoneNumberHash;
+          } else {
+            // call api to get missing fields
+            final res = await getUserInfoByAccountId(toAccountId);
+            if (res == null) {
+              throw 'failed to get user id by username via api';
+            }
 
-          // complete tx data fields from info
-          toUserName = res.userName;
-          toPhoneNumberHash = res.phoneNumberHash;
+            // complete tx data fields from info
+            toUserName = res.userName;
+            toPhoneNumberHash = res.phoneNumberHash;
+          }
 
           break;
         case 'Username':
           toUserName = accountIdentityValue;
-
-          // call api to get missing fields
-          final res = await getUserInfoByUserName(accountIdentityValue);
-          if (res == null) {
-            debugPrint('failed to get user id by username via api');
-            return;
+          if (toUserName != kc2User.userInfo.value!.userName) {
+            // call api to get missing fields
+            final res = await getUserInfoByUserName(toUserName!);
+            if (res == null) {
+              debugPrint('failed to get user id by username via api');
+              return;
+            }
+            toAccountId = res.accountId;
+            toPhoneNumberHash = res.phoneNumberHash;
+          } else {
+            toAccountId = accountId;
+            toPhoneNumberHash = kc2User.userInfo.value!.phoneNumberHash;
           }
-          toAccountId = res.accountId;
-          toPhoneNumberHash = res.phoneNumberHash;
           break;
         default:
           toPhoneNumberHash =
@@ -987,43 +1006,44 @@ class KarmachainService implements K2ServiceInterface {
             return;
           }
 
-          // complete missing field in tx with data from api
+          // complete missing fields in tx with data from api
           toAccountId = res.accountId;
           toUserName = res.userName;
           break;
       }
 
-      if (signer != address && toAccountId != address) {
+      if (signer != accountId && toAccountId != accountId) {
         // appreciation not to or from watched local account
         // todo: consider local user phone number hash and don't return if tx
-        // is to or from that phone number!
+        // is to or from that phone number! (account migration case)
         return;
       }
 
-      if (charTraitId == 0 || charTraitId == null) {
-        final transferTx = KC2TransferTxV1(
-            fromAddress: signer,
-            toAddress: toAccountId,
-            amount: amount,
-            transactionEvents: txEvents,
-            args: args,
-            pallet: pallet,
-            method: method,
-            failedReason: failedReason,
-            timestamp: timeStamp,
-            hash: hash,
-            blockNumber: blockNumber,
-            blockIndex: blockIndex,
-            rawData: rawData,
-            signer: signer);
-        await transferCallback!(transferTx);
+      String fromAddress;
+      String fromUserName;
+
+      if (signer == accountId) {
+        fromAddress = signer;
+        fromUserName = kc2User.userInfo.value!.userName;
+        // outgoing apprecation
+      } else {
+        // incoming appreciation - get username of signer
+        final res = await getUserInfoByAccountId(signer);
+        if (res == null) {
+          debugPrint('failed to get user id by username via api');
+          return;
+        }
+
+        fromAddress = res.accountId;
+        fromUserName = res.userName;
       }
 
       final appreciationTx = KC2AppreciationTxV1(
-        fromAddress: signer,
+        fromAddress: fromAddress,
+        fromUserName: fromUserName,
         toAddress: toAccountId,
         toPhoneNumberHash: toPhoneNumberHash,
-        toUsername: toUserName,
+        toUserName: toUserName,
         amount: amount,
         communityId: communityId,
         charTraitId: charTraitId,
@@ -1085,10 +1105,10 @@ class KarmachainService implements K2ServiceInterface {
   }*/
 
   /// Process a coin transfer tx
-  void _processTransferTransaction(
+  Future<void> _processTransferTransaction(
       String hash,
       BigInt timeStamp,
-      String address,
+      String accountId,
       String signer,
       Map<String, dynamic> args,
       ChainError? failedReason,
@@ -1097,10 +1117,11 @@ class KarmachainService implements K2ServiceInterface {
       BigInt blockNumber,
       int blockIndex,
       Map<String, dynamic> rawData,
-      List<KC2Event> txEvents) {
+      List<KC2Event> txEvents) async {
     try {
       final toAddress = ss58.Codec(42).encode(args['dest'].value.cast<int>());
-      if (signer != address && toAddress == address) {
+      if (signer != accountId && toAddress == accountId) {
+        // sender and receiver is not local user - skip
         return;
       }
 
@@ -1108,9 +1129,32 @@ class KarmachainService implements K2ServiceInterface {
 
       final amount = args['value'];
 
+      String fromUserName = '';
+      String toUserName = '';
+
+      if (signer == accountId) {
+        fromUserName = kc2User.userInfo.value!.userName;
+        final res = await getUserInfoByAccountId(toAddress);
+        if (res != null) {
+          toUserName = res.userName;
+        } else {
+          debugPrint('>> failed to get user info by account id $toAddress');
+        }
+      } else {
+        toUserName = kc2User.userInfo.value!.userName;
+        final res = await getUserInfoByAccountId(signer);
+        if (res != null) {
+          fromUserName = res.userName;
+        } else {
+          debugPrint('>> failed to get user info by account id $signer');
+        }
+      }
+
       final KC2TransferTxV1 transferTx = KC2TransferTxV1(
         fromAddress: signer,
         toAddress: toAddress,
+        fromUserName: fromUserName,
+        toUserName: toUserName,
         amount: amount,
         args: args,
         pallet: pallet,
@@ -1161,4 +1205,7 @@ class KarmachainService implements K2ServiceInterface {
 
     return ChainError.fromSubstrateMetadata(errorMetadata);
   }
+
+  @override
+  String? get apiWsUrl => _apiWsUrl;
 }

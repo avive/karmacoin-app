@@ -1,4 +1,5 @@
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/ui/widgets/about_karma_mining.dart';
 import 'package:karma_coin/ui/widgets/communities_list.dart';
@@ -24,14 +25,15 @@ class ActionsScreen extends StatefulWidget {
 
 class _ActionsScreenState extends State<ActionsScreen> {
   Widget _getAppreciationsIcon(BuildContext context) {
-    return ValueListenableBuilder<int>(
-        valueListenable: txsBoss.incomingAppreciationsNotOpenedCount,
+    return ValueListenableBuilder<Map<String, KC2Tx>>(
+        valueListenable: kc2User.incomingAppreciations,
         builder: (context, value, child) {
-          return ValueListenableBuilder<int>(
-              valueListenable: txsBoss.outcomingAppreciationsNotOpenedCount,
+          return ValueListenableBuilder<Map<String, KC2Tx>>(
+              valueListenable: kc2User.outgoingAppreciations,
               builder: (context, value1, child) {
-                if (value + value1 > 0) {
-                  final label = (value + value1).toString();
+                final total = value.length + value1.length;
+                if (total > 0) {
+                  final label = total.toString();
                   return badges.Badge(
                       badgeStyle: const badges.BadgeStyle(
                           badgeColor: CupertinoColors.systemBlue),

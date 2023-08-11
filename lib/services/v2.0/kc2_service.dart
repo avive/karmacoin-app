@@ -32,6 +32,9 @@ abstract class K2ServiceInterface {
 
   bool get connectedToApi;
 
+  // currently connected api url
+  String? get apiWsUrl;
+
   // rpc methods
   //
 
@@ -46,11 +49,13 @@ abstract class K2ServiceInterface {
 
   /// Fetch list of community members with information
   /// about each member account
-  Future<List<KC2UserInfo>> getCommunityMembers(int communityId, {int? fromIndex, int? limit});
+  Future<List<KC2UserInfo>> getCommunityMembers(int communityId,
+      {int? fromIndex, int? limit});
 
   /// Fetch list of users who's username starts with `prefix`
   /// also can be filtered by `communityId`, `null` mean no filtering
-  Future<List<Contact>> getContacts(String prefix, {int? communityId, int? fromIndex, int? limit});
+  Future<List<Contact>> getContacts(String prefix,
+      {int? communityId, int? fromIndex, int? limit});
 
   // transactions
 
@@ -65,7 +70,7 @@ abstract class K2ServiceInterface {
   /// Update user's user name or phone number
   Future<(String?, String?)> updateUser(String? username, String? phoneNumber);
 
-  /// Update user's user name or phone number
+  /// delete user from chain
   Future<String> deleteUser();
 
   /// Transfer coins from local account to an account
@@ -105,5 +110,4 @@ abstract class K2ServiceInterface {
   UpdateUserCallback? updateUserCallback;
   AppreciationCallback? appreciationCallback;
   TransferCallback? transferCallback;
-
 }

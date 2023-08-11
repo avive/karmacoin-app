@@ -1,20 +1,16 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:fixnum/fixnum.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/data/genesis_config.dart';
-import 'package:karma_coin/data/phone_number_formatter.dart';
-import 'package:karma_coin/services/api/types.pb.dart' as api_types;
+import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:flutter/material.dart';
-import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/ui/widgets/amount_input.dart';
 import 'package:karma_coin/ui/widgets/contacts_importer.dart';
-import 'package:karma_coin/ui/widgets/users_selector.dart';
 import 'package:karma_coin/ui/widgets/traits_picker.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:status_alert/status_alert.dart';
@@ -23,7 +19,7 @@ import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart
 
 class AppreciateWidget extends StatefulWidget {
   final int communityId;
-  final api_types.Contact? contact;
+  final Contact? contact;
 
   const AppreciateWidget({
     super.key,
@@ -45,7 +41,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   bool withLabel = true;
   bool useRtl = false;
   bool isUsercommunityAdmin = false;
-  api_types.Contact? contact;
+  Contact? contact;
 
   // country selector ux
   late CountrySelectorNavigator selectorNavigator;
@@ -110,7 +106,8 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
 
     if (widget.contact != null) {
       contact = widget.contact;
-      phoneController.value = PhoneNumber.parse(contact!.mobileNumber.number);
+
+      phoneController.value = PhoneNumber.parse(contact!.phoneNumberHash);
     }
   }
 
@@ -294,6 +291,8 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   }
 
   Widget _getCommunityMemberInfo() {
+    return Container();
+    /*
     String phoneNumber = '+${contact!.mobileNumber.number.formatPhoneNumber()}';
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -312,7 +311,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
               ),
         ),
       ],
-    );
+    );*/
   }
 
   List<Widget> _getBodyWidget(BuildContext context) {
@@ -363,6 +362,8 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
           CupertinoButton(
             padding: const EdgeInsets.only(),
             onPressed: () {
+              // todo: fix me with proper contacts
+              /*
               // only show contacts in a community
               int communityId = widget.communityId;
 
@@ -371,7 +372,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                   builder: ((context) => KarmaCoinUserSelector(
                       title: 'Members',
                       communityId: communityId,
-                      setPhoneNumberCallback: setPhoneNumberCallback))));
+                      setPhoneNumberCallback: setPhoneNumberCallback))));*/
             },
             child: Text(
               'A community Member',
@@ -498,20 +499,22 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     widgets.add(CupertinoButton(
       padding: const EdgeInsets.only(left: 0),
       onPressed: () {
+        // todo: fixme
+        /*
         // only show contacts in a community
         int communityId = widget.communityId;
 
-        // todo: fix this
-        //if (accountLogic.karmaCoinUser.value!.isCommunityAdmin(communityId)) {
-        // let admin see non-community members users
-        // communityId = 0;
-        //}
+        if (accountLogic.karmaCoinUser.value!.isCommunityAdmin(communityId)) {
+         // let admin see non-community members users
+         communityId = 0;
+        }
 
+        
         Navigator.of(context).push(CupertinoPageRoute(
             fullscreenDialog: true,
             builder: ((context) => KarmaCoinUserSelector(
                 communityId: communityId,
-                setPhoneNumberCallback: setPhoneNumberCallback))));
+                setPhoneNumberCallback: setPhoneNumberCallback))));*/
       },
       child: Text(
         'User',
@@ -524,7 +527,9 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     return Row(mainAxisAlignment: MainAxisAlignment.center, children: widgets);
   }
 
-  void setPhoneNumberCallback(api_types.Contact selectedContact) {
+  // todo: fix this
+  /*
+  void setPhoneNumberCallback(Contact selectedContact) {
     debugPrint('setPhoneNumberCallback: $selectedContact');
     setState(() {
       contact = selectedContact;
@@ -538,7 +543,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     }).catchError((e) {
       debugPrint(e.toString());
     });
-  }
+  }*/
 
   Widget _getAppreciateButton(BuildContext context) {
     if (widget.communityId == 0) {

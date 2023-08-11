@@ -1,22 +1,25 @@
 import 'package:karma_coin/data/genesis_config.dart';
+import 'package:karma_coin/data/phone_number_formatter.dart';
+import 'package:karma_coin/services/v2.0/types.dart';
+import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/data/personality_traits.dart';
-import 'package:karma_coin/data/phone_number_formatter.dart';
-import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:random_avatar/random_avatar.dart';
 
 /// Display user details for provided user or for local user
 class UserDetailsScreen extends StatefulWidget {
   // 0x212...
-  late final User? user;
+  late final KC2UserInfo user;
   late final bool isLocal;
+  late final String? phoneNumber;
 
   /// Set user to display details for or null for local user
-  UserDetailsScreen(Key? key, User? aUser) : super(key: key) {
+  UserDetailsScreen(Key? key, KC2UserInfo? aUser) : super(key: key) {
     if (aUser == null) {
-      user = accountLogic.karmaCoinUser.value!.userData;
+      user = kc2User.userInfo.value!;
+      phoneNumber = kc2User.identity.phoneNumber;
       isLocal = true;
     } else {
       user = aUser;
@@ -31,10 +34,6 @@ class UserDetailsScreen extends StatefulWidget {
 class _UserDetailsScreenState extends State<UserDetailsScreen> {
   /// Return the list secionts
   List<CupertinoListSection> _getSections(BuildContext context) {
-    if (widget.user == null) {
-      return [];
-    }
-
     List<CupertinoListTile> tiles = [];
     List<CupertinoListTile> techSectionTiles = [];
 
@@ -83,25 +82,24 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
       ),
     );
 
-    var numberDisplay =
-        '+${widget.user!.mobileNumber.number.formatPhoneNumber()}';
+    if (widget.phoneNumber != null) {
+      String numberDisplay = '+${widget.phoneNumber!.formatPhoneNumber()}';
 
-    tiles.add(
-      CupertinoListTile.notched(
-        title: Text('Mobile Number',
-            style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
-        leading: const Icon(CupertinoIcons.phone, size: 28),
-        // todo: number format
-        subtitle: Text(numberDisplay,
-            style: CupertinoTheme.of(context).textTheme.textStyle),
-        trailing: const Icon(CupertinoIcons.share),
-        onTap: () async {
-          await Clipboard.setData(ClipboardData(text: numberDisplay));
-        },
-      ),
-    );
-
-    String accountId = widget.user!.accountId.data.toHexString();
+      tiles.add(
+        CupertinoListTile.notched(
+          title: Text('Mobile Number',
+              style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
+          leading: const Icon(CupertinoIcons.phone, size: 28),
+          // todo: number format
+          subtitle: Text(numberDisplay,
+              style: CupertinoTheme.of(context).textTheme.textStyle),
+          trailing: const Icon(CupertinoIcons.share),
+          onTap: () async {
+            await Clipboard.setData(ClipboardData(text: numberDisplay));
+          },
+        ),
+      );
+    }
 
     techSectionTiles.add(
       CupertinoListTile.notched(
@@ -113,7 +111,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
           padding: const EdgeInsets.only(top: 6, right: 12),
           child: Text(
             maxLines: 3,
-            accountId,
+            widget.user.accountId,
             style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                   TextStyle(
                       fontSize: 16,
@@ -125,7 +123,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
         leading: const Icon(CupertinoIcons.creditcard, size: 28),
         trailing: const Icon(CupertinoIcons.share),
         onTap: () async {
-          await Clipboard.setData(ClipboardData(text: accountId));
+          await Clipboard.setData(ClipboardData(text: widget.user.accountId));
         },
       ),
     );
@@ -166,13 +164,8 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
 
     List<CupertinoListTile> karmaTiles = [];
 
-    for (TraitScore score in widget.user!.traitScores) {
+    for (TraitScore score in widget.user.getScores(0)) {
       PersonalityTrait trait = GenesisConfig.personalityTraits[score.traitId];
-
-      if (score.communityId != 0) {
-        // we only display global traits here and not community ones
-        continue;
-      }
 
       karmaTiles.add(
         CupertinoListTile.notched(

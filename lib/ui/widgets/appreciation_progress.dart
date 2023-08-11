@@ -28,13 +28,10 @@ class _AppreciationProgressState extends State<AppreciationProgress> {
   }
 
   void _postFrameCallback(BuildContext context) {
-    // submit transaction here
-    appState.txSubmissionStatus.value = TxSubmissionStatus.submitting;
-
     Future.delayed(Duration.zero, () async {
       try {
         String txHash = await kc2Service.sendAppreciation(
-            widget.data.destPhoneNumberHash,
+            widget.data.destPhoneNumberHash!,
             appState.kCentsAmount.value,
             widget.data.communityId,
             appState.selectedPersonalityTrait.value.index);

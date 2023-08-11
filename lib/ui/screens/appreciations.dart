@@ -3,9 +3,8 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/data/personality_traits.dart';
-import 'package:karma_coin/data/phone_number_formatter.dart';
-import 'package:karma_coin/data/signed_transaction.dart';
-import 'package:karma_coin/services/api/types.pb.dart' as types;
+import 'package:karma_coin/services/v2.0/txs/tx.dart';
+import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/ui/helpers/transactions.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
@@ -23,12 +22,26 @@ class AppreciationsScreen extends StatefulWidget {
 class _AppreciationsScreenState extends State<AppreciationsScreen> {
   Group _selectedSegment = Group.received;
 
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _postFrameCallback(context));
+  }
+
+  void _postFrameCallback(BuildContext context) {
+    Future.delayed(Duration.zero, () async {
+      await kc2User.fetchAppreciations();
+    });
+  }
+
   Widget _getRecivedLabel(BuildContext context) {
-    return ValueListenableBuilder<int>(
-        valueListenable: txsBoss.incomingAppreciationsNotOpenedCount,
+    return ValueListenableBuilder<Map<String, KC2Tx>>(
+        valueListenable: kc2User.incomingAppreciations,
         builder: (context, value, child) {
-          if (value > 0) {
-            final label = (value).toString();
+          if (value.isNotEmpty) {
+            final label = (value.length).toString();
             return badges.Badge(
               badgeStyle: const badges.BadgeStyle(
                   badgeColor: CupertinoColors.systemBlue),
@@ -48,11 +61,11 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
   }
 
   Widget _getSentLabel(BuildContext context) {
-    return ValueListenableBuilder<int>(
-        valueListenable: txsBoss.outcomingAppreciationsNotOpenedCount,
+    return ValueListenableBuilder<Map<String, KC2Tx>>(
+        valueListenable: kc2User.outgoingAppreciations,
         builder: (context, value, child) {
-          if (value > 0) {
-            final label = value.toString();
+          if (value.isNotEmpty) {
+            final label = value.length.toString();
             return badges.Badge(
               badgeStyle: const badges.BadgeStyle(
                   badgeColor: CupertinoColors.systemBlue),
@@ -141,9 +154,9 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
   }
 
   Widget _displayIncomingTxs(BuildContext context) {
-    return ValueListenableBuilder<List<SignedTransactionWithStatusEx>>(
+    return ValueListenableBuilder<Map<String, KC2Tx>>(
       // todo: how to make this not assert when karmaCoinUser is null?
-      valueListenable: txsBoss.incomingAppreciationsNotifer,
+      valueListenable: kc2User.incomingAppreciations,
       builder: (context, value, child) {
         if (value.isEmpty) {
           return Padding(
@@ -198,14 +211,12 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
           );
         }
 
+        List<KC2Tx> txs = value.values.toList();
         return ListView.builder(
           shrinkWrap: true,
-          itemCount: value.length,
+          itemCount: txs.length,
           itemBuilder: (context, index) {
-            SignedTransactionWithStatusEx tx =
-                txsBoss.incomingAppreciationsNotifer.value[index];
-            return _getAppreciationWidget(context, tx, true, index);
-            // return Container(key: Key(index.toString()));
+            return _getTxWidget(context, txs[index], true, index);
           },
         );
       },
@@ -213,9 +224,9 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
   }
 
   Widget _displayOutgoingTxs(BuildContext context) {
-    return ValueListenableBuilder<List<SignedTransactionWithStatusEx>>(
+    return ValueListenableBuilder<Map<String, KC2Tx>>(
         // todo: how to make this not assert when karmaCoinUser is null?
-        valueListenable: txsBoss.outgoingAppreciationsNotifer,
+        valueListenable: kc2User.outgoingAppreciations,
         builder: (context, value, child) {
           if (value.isEmpty) {
             return Padding(
@@ -272,6 +283,8 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
             );
           }
 
+          List<KC2Tx> txs = value.values.toList();
+
           return ListView.separated(
             separatorBuilder: (context, index) {
               return const Divider(
@@ -279,103 +292,44 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
                 indent: 58,
               );
             },
-            itemCount: value.length,
+            itemCount: txs.length,
             itemBuilder: (context, index) {
-              SignedTransactionWithStatusEx tx =
-                  txsBoss.outgoingAppreciationsNotifer.value[index];
-              return _getAppreciationWidget(context, tx, false, index);
+              return _getTxWidget(context, txs[index], false, index);
             },
           );
         });
   }
 
-  Widget _getAppreciationWidget(BuildContext context,
-      SignedTransactionWithStatusEx tx, bool incoming, int index) {
+  Widget _getAppreciationWidget(
+      BuildContext context, KC2AppreciationTxV1 tx, bool incoming, int index) {
     try {
-      final String txHash = tx.getHash().toHexString();
-
-      // Get any event associated with this transaction
-      final types.TransactionEvent? txEvent =
-          txsBoss.txEventsNotifer.value[txHash];
-
-      types.PaymentTransactionV1 appreciation =
-          tx.txData as types.PaymentTransactionV1;
-
-      String amount = KarmaCoinAmountFormatter.format(appreciation.amount);
-
-      TransactionStatus status = TransactionStatus.pending;
-
-      // an incoming appreciation is always confirmed on chain
-      if (incoming) {
-        status = TransactionStatus.confirmed;
-      }
-
-      if (txEvent != null) {
-        // get the status from the tx event
-        if (txEvent.result == types.ExecutionResult.EXECUTION_RESULT_EXECUTED) {
-          status = TransactionStatus.confirmed;
-        } else {
-          status = TransactionStatus.failed;
-        }
-      }
+      String amount = KarmaCoinAmountFormatter.format(tx.amount);
+      TransactionStatus status = tx.failedReason == null
+          ? TransactionStatus.confirmed
+          : TransactionStatus.failed;
 
       PersonalityTrait? trait;
       String title = 'Karma Coins payment';
       String emoji = '🤑';
 
-      if (appreciation.charTraitId != 0 &&
-          appreciation.charTraitId < GenesisConfig.personalityTraits.length) {
-        trait = GenesisConfig.personalityTraits[appreciation.charTraitId];
+      if (tx.charTraitId != null &&
+          tx.charTraitId! != 0 &&
+          tx.charTraitId! < GenesisConfig.personalityTraits.length) {
+        trait = GenesisConfig.personalityTraits[tx.charTraitId!];
         title = 'You are ${trait.name.toLowerCase()}';
         emoji = trait.emoji;
       }
 
       // title font weight based on openned state
       FontWeight titleWeight = FontWeight.w400;
-      if (!tx.openned.value) {
-        titleWeight = FontWeight.w600;
-      }
-
-      String detailsLabel = "";
-      if (tx.incoming) {
-        final types.User? sender = tx.getFromUser();
-
-        if (sender != null) {
-          detailsLabel = 'From · ${sender.userName}';
-
-          if (sender.mobileNumber.number.isNotEmpty) {
-            final senderPhoneNumber =
-                sender.mobileNumber.number.formatPhoneNumber();
-
-            detailsLabel += ' · $senderPhoneNumber';
-          }
-        }
-      } else {
-        final types.User? receiver = tx.getToUser();
-        detailsLabel = 'To ';
-
-        if (receiver != null) {
-          detailsLabel += ' ${receiver.userName} · ';
-        }
-
-        if (appreciation.toAccountId.data.isNotEmpty) {
-          detailsLabel +=
-              '${appreciation.toAccountId.data.toShortHexString()} · ';
-        }
-
-        if (appreciation.toNumber.number.isNotEmpty) {
-          final toPhoneNumber =
-              appreciation.toNumber.number.formatPhoneNumber();
-          detailsLabel += '$toPhoneNumber · ';
-        }
-      }
-
-      detailsLabel += tx.getTimesAgo();
+      String detailsLabel =
+          incoming ? 'From · ${tx.fromUserName}' : 'To · ${tx.toUserName}';
+      detailsLabel += '· ${tx.timeAgo}';
 
       return CupertinoListTile(
         onTap: () {
           context.pushNamed(ScreenNames.transactionDetails,
-              params: {'txId': txHash});
+              params: {'txId': tx.hash});
         },
         key: Key(index.toString()),
         padding: const EdgeInsets.only(top: 6, bottom: 6, left: 14, right: 14),
@@ -400,7 +354,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _getCommunityDetails(context, appreciation),
+            _getCommunityDetails(context, tx),
             const SizedBox(height: 2),
             Text(
               amount,
@@ -432,14 +386,26 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
     }
   }
 
+  Widget _getTxWidget(
+      BuildContext context, KC2Tx tx, bool incoming, int index) {
+    if (tx is KC2AppreciationTxV1) {
+      return _getAppreciationWidget(context, tx, incoming, index);
+    } else if (tx is KC2TransferTxV1) {
+      // todo: implement
+      return Container();
+    } else {
+      debugPrint('Unexpected tx type: $tx');
+      return Container();
+    }
+  }
+
   Widget _getCommunityDetails(
-      BuildContext context, types.PaymentTransactionV1 appreciation) {
+      BuildContext context, KC2AppreciationTxV1 appreciation) {
     if (appreciation.communityId == 0) {
       return Container();
     }
 
-    types.Community community =
-        GenesisConfig.communities[appreciation.communityId]!;
+    Community community = GenesisConfig.communities[appreciation.communityId]!;
     String label = '${community.emoji} a ${community.name} appreciation';
 
     return Text(label,

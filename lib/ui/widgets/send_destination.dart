@@ -38,8 +38,8 @@ class _SendDestinationState extends State<SendDestination> {
 
     appState.sendDestination.value = Destination.phoneNumber;
     appState.sendDestinationAddress.value = _accountAddressTextController.text;
-    appState.sendDestinationPhoneNumber.value =
-        '+${widget.phoneController.value!.countryCode}${widget.phoneController.value!.nsn}';
+    appState.sendDestinationPhoneNumberHash.value = kc2Service.getPhoneNumberHash(
+        '${widget.phoneController.value!.countryCode}${widget.phoneController.value!.nsn}');
   }
 
   @override
@@ -114,7 +114,9 @@ class _SendDestinationState extends State<SendDestination> {
             if (value != null) {
               // set canonical representation of phone number
               String number = '+${value.countryCode}${value.nsn}';
-              appState.sendDestinationPhoneNumber.value = number;
+              appState.sendDestinationPhoneNumberHash.value =
+                  kc2Service.getPhoneNumberHash(number);
+              number;
               appState.sendDestination.value = Destination.phoneNumber;
             }
           },

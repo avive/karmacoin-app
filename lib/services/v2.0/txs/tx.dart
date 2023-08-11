@@ -1,5 +1,6 @@
 import 'package:karma_coin/services/v2.0/event.dart';
 import 'package:karma_coin/services/v2.0/error.dart';
+import 'package:time_ago_provider/time_ago_provider.dart' as time_ago;
 
 // export all tx types
 export 'package:karma_coin/services/v2.0/txs/appreciation_tx.dart';
@@ -38,4 +39,7 @@ abstract class KC2Tx {
     required this.rawData,
     required this.signer,
   });
+
+  String get timeAgo =>
+      time_ago.format(DateTime.fromMillisecondsSinceEpoch(timestamp.toInt()));
 }

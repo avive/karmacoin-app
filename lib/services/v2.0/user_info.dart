@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
+
+// todo: create public interface
 
 const localUserInfoStorageKey = 'kc2_local_user_info';
 const androidOptions = AndroidOptions(
@@ -17,7 +20,7 @@ class KC2UserInfo {
   int nonce;
   int karmaScore;
   late Map<int, List<TraitScore>> traitScores;
-  List<CommunityMembership> communityMembership;
+  List<CommunityMembership> communityMemberships;
 
   KC2UserInfo({
     required this.accountId,
@@ -27,7 +30,7 @@ class KC2UserInfo {
     required this.nonce,
     required this.karmaScore,
     required this.traitScores,
-    required this.communityMembership,
+    required this.communityMemberships,
   });
 
   /// Returns the list of trait scores for a given communityId
@@ -39,14 +42,21 @@ class KC2UserInfo {
     return traitScores[communityId]!;
   }
 
-  bool isMemember(int communityId) {
-    return communityMembership
+  bool isAdmin(int communityId) {
+    return communityMemberships
+        .where((membership) =>
+            membership.communityId == communityId && membership.isAdmin)
+        .isNotEmpty;
+  }
+
+  bool isMember(int communityId) {
+    return communityMemberships
         .where((membership) => membership.communityId == communityId)
         .isNotEmpty;
   }
 
   CommunityMembership? getCommunityMembership(int communityId) {
-    return communityMembership
+    return communityMemberships
         .where((membership) => membership.communityId == communityId)
         .first;
   }
@@ -76,7 +86,7 @@ class KC2UserInfo {
           nonce: u.nonce,
           karmaScore: u.karmaScore,
           traitScores: u.traitScores,
-          communityMembership: u.communityMembership,
+          communityMemberships: u.communityMemberships,
         );
 
   KC2UserInfo.fromJson(Map<String, dynamic> u)
@@ -88,7 +98,7 @@ class KC2UserInfo {
             ? BigInt.parse(u['balance'])
             : BigInt.from(u['balance']),
         nonce = u['nonce'] is String ? int.parse(u['nonce']) : u['nonce'],
-        communityMembership = (u['community_membership'] as List<dynamic>)
+        communityMemberships = (u['community_membership'] as List<dynamic>)
             .map((e) => CommunityMembership.fromJson(e))
             .toList(),
         karmaScore = u['karma_score'] {
@@ -122,7 +132,7 @@ class KC2UserInfo {
       'karms_score': karmaScore,
       'trait_scores': all.map((e) => e.toJson()).toList(),
       'community_membership':
-          communityMembership.map((e) => e.toJson()).toList(),
+          communityMemberships.map((e) => e.toJson()).toList(),
     };
   }
 

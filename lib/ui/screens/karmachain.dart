@@ -1,12 +1,5 @@
-import 'package:fixnum/fixnum.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/data/kc_amounts_formatter.dart';
-import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
-import 'package:status_alert/status_alert.dart';
-import 'package:karma_coin/services/api/api.pbgrpc.dart';
-import 'package:time_ago_provider/time_ago_provider.dart' as time_ago;
 
 /// Display user details for provided user or for local user
 class Karmachain extends StatefulWidget {
@@ -17,22 +10,54 @@ class Karmachain extends StatefulWidget {
   State<Karmachain> createState() => _KarmachainState();
 }
 
-const _githubUrl = 'https://github.com/karma-coin/karmacoin-server';
-const _githubNextrUrl = 'https://github.com/karma-coin/karmachain';
+// const _githubUrl = 'https://github.com/karma-coin/karmacoin-server';
+// const _githubNextrUrl = 'https://github.com/karma-coin/karmachain';
 
 class _KarmachainState extends State<Karmachain> {
   _KarmachainState();
 
-  GenesisData? genesisData;
-  BlockchainStats? chainData;
-  Block? genesisBlock;
+  // GenesisData? genesisData;
+  // BlockchainStats? chainData;
+  // Block? genesisBlock;
 
   @override
   void initState() {
     super.initState();
+  }
 
+  @override
+  build(BuildContext context) {
+    return Title(
+        color: CupertinoColors.black, // This is required
+        title: 'Karma Coin - Karmachain',
+        child: CupertinoPageScaffold(
+          child: NestedScrollView(
+            headerSliverBuilder:
+                (BuildContext context, bool innerBoxIsScrolled) {
+              return <Widget>[
+                kcNavBar(context, 'Karmachain'),
+              ];
+            },
+            body: MediaQuery.removePadding(
+              context: context,
+              removeTop: false,
+              child: ListView(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                primary: true,
+                children: const [], //_getSections(context)),
+              ),
+            ),
+          ),
+        ));
+  }
+}
+
+  /*
     Future.delayed(Duration.zero, () async {
       try {
+        kc2Service.chainInfo
+
         GetBlockchainDataResponse cData = await api.apiServiceClient
             .getBlockchainData(GetBlockchainDataRequest());
 
@@ -65,9 +90,9 @@ class _KarmachainState extends State<Karmachain> {
             maxWidth: statusAlertWidth);
         debugPrint('error getting karmachain data: $e');
       }
-    });
-  }
+    });*/
 
+  /*
   /// Return the list secionts
   List<CupertinoListSection> _getSections(BuildContext context) {
     List<CupertinoListTile> tiles = [];
@@ -169,7 +194,7 @@ class _KarmachainState extends State<Karmachain> {
       ),
     );
 
-/*
+
     tiles.add(
       CupertinoListTile.notched(
         title: Text('Appreciations'),
@@ -177,7 +202,7 @@ class _KarmachainState extends State<Karmachain> {
         trailing: Text(chain_data!.appreciationsTransactionsCount.toString()),
       ),
     );
-*/
+
 
     tiles.add(
       CupertinoListTile.notched(
@@ -241,7 +266,7 @@ class _KarmachainState extends State<Karmachain> {
       ),
     );
 
-    /*
+    
     tiles.add(
       CupertinoListTile.notched(
         padding: EdgeInsets.only(top: 6, bottom: 6, left: 12),
@@ -253,7 +278,7 @@ class _KarmachainState extends State<Karmachain> {
           onPressed: () {},
         ),
       ),
-    );*/
+    );
 
     tiles.add(
       CupertinoListTile.notched(
@@ -302,30 +327,5 @@ class _KarmachainState extends State<Karmachain> {
       ),
     ];
   }
+  */
 
-  @override
-  build(BuildContext context) {
-    return Title(
-      color: CupertinoColors.black, // This is required
-      title: 'Karma Coin - Karmachain',
-      child: CupertinoPageScaffold(
-        child: NestedScrollView(
-          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-            return <Widget>[
-              kcNavBar(context, 'Karmachain'),
-            ];
-          },
-          body: MediaQuery.removePadding(
-            context: context,
-            removeTop: false,
-            child: ListView(
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                primary: true,
-                children: _getSections(context)),
-          ),
-        ),
-      ),
-    );
-  }
-}
