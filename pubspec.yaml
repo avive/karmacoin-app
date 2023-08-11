@@ -120,7 +120,6 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets: 
-    - assets/js/kc2.js
     - assets/images/
     - assets/images/giraffes_tile.png
     - assets/images/giraffes_banner.png
