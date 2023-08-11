@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/logic/kc2/user.dart';
 import 'package:karma_coin/logic/kc2/user_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2.dart';
@@ -19,6 +20,10 @@ void main() {
   GetIt.I.registerLazySingleton<K2ServiceInterface>(() => KarmachainService());
 
   K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
+
+  GetIt.I.registerLazySingleton<AppState>(() => AppState());
+
+  GetIt.I.registerLazySingleton<KC2UserInteface>(() => KC2User());
 
   group('kc2 user txs tests', () {
     test(

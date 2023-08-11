@@ -2,8 +2,11 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/logic/kc2/identity.dart';
 import 'package:karma_coin/logic/kc2/identity_interface.dart';
+import 'package:karma_coin/logic/kc2/user.dart';
+import 'package:karma_coin/logic/kc2/user_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
@@ -16,6 +19,10 @@ void main() {
   // WidgetsFlutterBinding.ensureInitialized();
 
   GetIt.I.registerLazySingleton<K2ServiceInterface>(() => KarmachainService());
+
+  GetIt.I.registerLazySingleton<AppState>(() => AppState());
+
+  GetIt.I.registerLazySingleton<KC2UserInteface>(() => KC2User());
 
   group(
     'payments',
@@ -76,8 +83,8 @@ void main() {
             // Define empty appreciation callback
             kc2Service.appreciationCallback = (tx) async {};
 
-            kc2Service.transferCallback = (tx) async {
-              debugPrint('>> transfer callback called');
+            kc2Service.appreciationCallback = (tx) async {
+              debugPrint('>> appreciation callback called');
               if (tx.hash != transferTxHash) {
                 debugPrint(
                     'unexpected tx hash: ${tx.hash}. Expected: $transferTxHash');
@@ -90,12 +97,13 @@ void main() {
                 return;
               }
 
-              debugPrint('>> transfer tx: $tx');
+              debugPrint('>> appreciation tx: $tx');
               expect(tx.failedReason, isNull);
               expect(tx.amount, BigInt.from(1000));
               expect(tx.fromAddress, punch.accountId);
               expect(tx.toAddress, katya.accountId);
               expect(tx.signer, punch.accountId);
+              expect(tx.charTraitId, 0);
 
               // todo: test all other tx props here
 
