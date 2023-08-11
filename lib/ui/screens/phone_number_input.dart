@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/services/api/verifier.pbgrpc.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:status_alert/status_alert.dart';
@@ -155,42 +156,48 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
     // store as part of local user's identity
     await kc2User.identity.setPhoneNumber(number);
 
-    // skip whatsapp verificaion and go straight to user name
-    if (context.mounted) {
-      context.push(ScreenPaths.newUserName);
+    if (configLogic.skipWhatsappVerification) {
+      // skip whatsapp verificaion and go straight to user name
+      setState(() {
+        isSigninIn = false;
+      });
+      
+      if (context.mounted) {
+        context.push(ScreenPaths.newUserName);
+      }
+      return;
+    } else {
+      try {
+        SendVerificationCodeResponse resp = await verifier.verifierServiceClient
+            .sendVerificationCode(
+                SendVerificationCodeRequest(mobileNumber: number));
+
+        appState.twilloVerificationSid = resp.sessionId;
+
+        setState(() {
+          isSigninIn = false;
+        });
+
+        if (context.mounted) {
+          context.push(ScreenPaths.verify);
+        }
+      } catch (e) {
+        debugPrint('error: $e');
+        if (context.mounted) {
+          StatusAlert.show(context,
+              duration: const Duration(seconds: 4),
+              title: 'Server error',
+              subtitle: 'Please try again later.',
+              configuration: const IconConfiguration(
+                  icon: CupertinoIcons.exclamationmark_triangle),
+              dismissOnBackgroundTap: true,
+              maxWidth: statusAlertWidth);
+        }
+        setState(() {
+          isSigninIn = false;
+        });
+      }
     }
-
-    /*
-    try {
-      SendVerificationCodeResponse resp = await verifier.verifierServiceClient
-          .sendVerificationCode(
-              SendVerificationCodeRequest(mobileNumber: number));
-
-      appState.twilloVerificationSid = resp.sessionId;
-
-      setState(() {
-        isSigninIn = false;
-      });
-
-      if (context.mounted) {
-        context.push(ScreenPaths.verify);
-      }
-    } catch (e) {
-      debugPrint('error: $e');
-      if (context.mounted) {
-        StatusAlert.show(context,
-            duration: const Duration(seconds: 4),
-            title: 'Server error',
-            subtitle: 'Please try again later.',
-            configuration: const IconConfiguration(
-                icon: CupertinoIcons.exclamationmark_triangle),
-            dismissOnBackgroundTap: true,
-            maxWidth: statusAlertWidth);
-      }
-      setState(() {
-        isSigninIn = false;
-      });
-    }*/
   }
 
   @override

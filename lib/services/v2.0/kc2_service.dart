@@ -43,7 +43,7 @@ abstract class K2ServiceInterface {
 
   Future<KC2UserInfo?> getUserInfoByUserName(String username);
 
-  // Use getPhoneNumberHash of an international number w/o leading +
+  // Use getPhoneNumberHash of an international number w/o leading '+'
   // Hex string may be 0x prefixed or not
   Future<KC2UserInfo?> getUserInfoByPhoneNumberHash(String phoneNumberHash);
 
@@ -53,7 +53,7 @@ abstract class K2ServiceInterface {
       {int? fromIndex, int? limit});
 
   /// Fetch list of users who's username starts with `prefix`
-  /// also can be filtered by `communityId`, `null` mean no filtering
+  /// Can be filtered by `communityId`. Pass null communitId for no filtering
   Future<List<Contact>> getContacts(String prefix,
       {int? communityId, int? fromIndex, int? limit});
 
@@ -76,7 +76,7 @@ abstract class K2ServiceInterface {
   /// Transfer coins from local account to an account
   Future<String> sendTransfer(String accountId, BigInt amount);
 
-  /// Send a new appreciation or transfer transaction (charTraitId == 0)
+  /// Send a new appreciation with optional charTraitId
   /// phoneNumberHash - canonical hex string of phone number hash using blake32.
   /// Use getPhoneNumberHash() to get hash of a number
   /// Returns submitted transaction hash
@@ -90,7 +90,7 @@ abstract class K2ServiceInterface {
 
   /// Subscribe to account-related tranactions
   /// accountId - ss58 encoded address
-  /// Transactions will be delivered to registered event handlers
+  /// Events will be delivered to registered event handlers
   Timer subscribeToAccount(String accountId);
 
   /// Get all transactions from chain to, or from an account
@@ -100,7 +100,9 @@ abstract class K2ServiceInterface {
 
   // helpers
 
-  /// Get canonical hex string of a phone number
+  /// Get canonical hex string hash of a phone number
+  /// phoneNumber - international phone number without leading '+'
+  /// When a leading '+' is incluided - it will be removed prior to hashing.
   String getPhoneNumberHash(String phoneNumber);
 
   // available client txs callbacks

@@ -15,6 +15,9 @@ class ConfigLogic {
   // dev mode has some text field input shortcuts to save time in dev
   final bool devMode = true;
 
+  // Skip whatsapp verification for local testing
+  final bool skipWhatsappVerification = true;
+
   // check internet connections and show error messages
   final bool enableInternetConnectionChecking = false;
 

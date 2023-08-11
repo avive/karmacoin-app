@@ -73,7 +73,11 @@ class _SignupProgressScreeenState extends State<SignupProgressScreeen> {
 
       debugPrint('Signing up user...');
 
-      // signup user on kc2
+      if (!configLogic.skipWhatsappVerification) {
+        throw 'Not implemented yet! todo: implement whatsapp verification api call';
+      }
+
+      // signup user on kc2 - for now bypassing verification
       await kc2User.signup(
           appState.requestedUserName!, appState.verifiedPhoneNumber!);
     });

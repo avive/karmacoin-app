@@ -44,6 +44,12 @@ class KarmachainService implements K2ServiceInterface {
   @override
   String? get apiWsUrl => _apiWsUrl;
 
+  /// Set a local user's identity keyring for purpose of signing txs
+  @override
+  void setKeyring(KC2KeyRing keyring) {
+    this.keyring = keyring;
+  }
+
   @override
   BigInt get existentialDeposit =>
       chainInfo.constants['Balances']!['ExistentialDeposit']!.value;
@@ -63,12 +69,6 @@ class KarmachainService implements K2ServiceInterface {
   /// Local user's account data update
   @override
   UpdateUserCallback? updateUserCallback;
-
-  /// Set a local user's identity keyring for purpose of signing txs
-  @override
-  void setKeyring(KC2KeyRing keyring) {
-    this.keyring = keyring;
-  }
 
   /// Connect to a karmachain api service. e.g
   /// Local running node - "ws://127.0.0.1:9944"
@@ -113,7 +113,8 @@ class KarmachainService implements K2ServiceInterface {
     }
   }
 
-  // RPC
+  // RPCs
+  //
 
   @override
   Future<KC2UserInfo?> getUserInfoByAccountId(String accountId) async {

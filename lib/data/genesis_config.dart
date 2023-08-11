@@ -20,10 +20,10 @@ class GenesisConfig {
   static const netName = "Karmachain Testnet 1";
 
   /// Signup reward in kCents (phase I reward)
-  static final kCentsSignupReward = Int64(10 * kCentsPerCoin);
+  static final kCentsSignupReward = BigInt.from(10 * kCentsPerCoin);
 
   /// Default user tx fee
-  static const kCentsDefaultFee = Int64.ONE;
+  static final kCentsDefaultFee = BigInt.one;
 
   /// Default personality trait index for trait picket
   static const defaultAppreciationTraitIndex = 27;
@@ -92,6 +92,7 @@ class GenesisConfig {
   };
 
   static final List<PersonalityTrait> personalityTraits = [
+    // No trait provided in an appreciation
     PersonalityTrait(0, '', ''),
     // user gets it for on signup
     PersonalityTrait(1, 'a Karma Grower', '💚'),
@@ -159,6 +160,8 @@ class GenesisConfig {
     PersonalityTrait(59, 'a Dynamo', '🚀'),
     PersonalityTrait(60, 'an Imaginative Motivator', '🌻'),
     PersonalityTrait(61, 'a Campaigner', '📣'),
+
+    // Users gets this when they win a karma reward (only once per user)
     PersonalityTrait(62, 'A Karma Rewards Winner', '🏆'),
   ];
 }

@@ -256,9 +256,6 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
 
     appState.requestedUserName = _textController.text;
 
-    // store the user's reuqested name in account logic
-    // await accountLogic.setRequestedUserName(_textController.text);
-
     switch (widget.operation) {
       case Operation.signUp:
         debugPrint('*** Navigating to signup progress screen');

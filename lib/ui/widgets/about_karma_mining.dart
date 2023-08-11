@@ -1,8 +1,9 @@
+import 'package:countup/countup.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 
-// const _karmaRewardsInfoUrl = 'https://karmaco.in/karmarewards/';
+const _karmaRewardsInfoUrl = 'https://karmaco.in/karmarewards/';
 
 class AboutKarmaMining extends StatefulWidget {
   final GenesisData? genesisData;
@@ -62,7 +63,7 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
         debugPrint('error getting data: $e');
       }
     });
-  }
+  }*/
 
   Widget _getBodyContent(BuildContext context) {
     if (apiOffline) {
@@ -77,11 +78,12 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
       );
     }
 
+    /*
     if (genesisData == null) {
       return const Center(
         child: CupertinoActivityIndicator(),
       );
-    }
+    }*/
 
     return Padding(
       padding: const EdgeInsets.only(left: 0, right: 12, top: 0, bottom: 24),
@@ -157,11 +159,10 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
       ),
     );
 
-    // get data from genesis config
-    int signupReward = genesisData!.signupRewardPhase1Amount.toInt() ~/ 1000000;
-    int referralReward =
-        genesisData!.referralRewardPhase1Amount.toInt() ~/ 1000000;
-    int karmaReward = genesisData!.karmaRewardAmount.toInt() ~/ 1000000;
+    // todo: get data from RPC
+    int signupReward = 10;
+    int referralReward = 100;
+    int karmaReward = 10;
 
     res.add(Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -227,7 +228,6 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
 
     return res;
   }
-  */
 
   @override
   build(BuildContext context) {
