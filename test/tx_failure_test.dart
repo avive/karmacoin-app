@@ -28,7 +28,8 @@ void main() {
         await katya.initNoStorage();
 
         String katyaPhoneNumber = randomPhoneNumber;
-        String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
+        String katyaUserName =
+            "Katya${katya.accountId.substring(0, 5)}".toLowerCase();
 
         // Set katya as signer
         kc2Service.setKeyring(katya.keyring);
@@ -111,9 +112,11 @@ void main() {
         await katya.initNoStorage();
         await punch.initNoStorage();
 
-        String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
+        String katyaUserName =
+            "Katya${katya.accountId.substring(0, 5)}".toLowerCase();
         String katyaPhoneNumber = randomPhoneNumber;
-        String punchUserName = "Punch${punch.accountId.substring(0, 5)}";
+        String punchUserName =
+            "Punch${punch.accountId.substring(0, 5)}".toLowerCase();
         String punchPhoneNumber = randomPhoneNumber;
 
         Timer? blockProcessingTimer;

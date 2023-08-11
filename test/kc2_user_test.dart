@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/logic/kc2/user.dart';
 import 'package:karma_coin/logic/kc2/user_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2.dart';
@@ -21,6 +22,10 @@ void main() {
 
   K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
+  GetIt.I.registerLazySingleton<AppState>(() => AppState());
+
+  GetIt.I.registerLazySingleton<KC2UserInteface>(() => KC2User());
+
   /// Tests using K2CUser
 
   group('KC2User tests', () {
@@ -34,7 +39,7 @@ void main() {
         await katya.init();
 
         String katyaUserName =
-            "Katya${katya.identity.accountId.substring(0, 5)}";
+            "Katya${katya.identity.accountId.substring(0, 5)}".toLowerCase();
 
         String katyaPhoneNumber = randomPhoneNumber;
 
@@ -104,10 +109,10 @@ void main() {
         await katya.init();
 
         String katyaUserName =
-            "Katya${katya.identity.accountId.substring(0, 5)}";
+            "Katya${katya.identity.accountId.substring(0, 5)}".toLowerCase();
 
         String katyaUserName1 =
-            "Katya${katya.identity.accountId.substring(5, 10)}";
+            "Katya${katya.identity.accountId.substring(5, 10)}".toLowerCase();
 
         final completer = Completer<bool>();
 
@@ -176,7 +181,7 @@ void main() {
         await katya.init();
 
         String katyaUserName =
-            "Katya${katya.identity.accountId.substring(0, 5)}";
+            "Katya${katya.identity.accountId.substring(0, 5)}".toLowerCase();
 
         String phoneNumber = randomPhoneNumber;
         String phoneNumberHash =
@@ -249,7 +254,7 @@ void main() {
         await katya.init();
 
         String katyaUserName =
-            "Katya${katya.identity.accountId.substring(0, 5)}";
+            "Katya${katya.identity.accountId.substring(0, 5)}".toLowerCase();
 
         String katyaPhoneNumber = randomPhoneNumber;
 
@@ -351,10 +356,10 @@ void main() {
         await katya.init();
 
         String katyaUserName =
-            "Katya${katya.identity.accountId.substring(0, 5)}";
+            "Katya${katya.identity.accountId.substring(0, 5)}".toLowerCase();
 
         String punchUserName =
-            "Punch${katya.identity.accountId.substring(5, 10)}";
+            "Punch${katya.identity.accountId.substring(5, 10)}".toLowerCase();
 
         String katyaPhoneNumber = randomPhoneNumber;
         String punchPhoneNumber = randomPhoneNumber;
@@ -450,7 +455,7 @@ void main() {
         await katya.init();
 
         String katyaUserName =
-            "Katya${katya.identity.accountId.substring(0, 5)}";
+            "Katya${katya.identity.accountId.substring(0, 5)}".toLowerCase();
 
         String katyaPhoneNumber = randomPhoneNumber;
 
