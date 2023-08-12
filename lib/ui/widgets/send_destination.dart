@@ -21,6 +21,7 @@ class SendDestination extends StatefulWidget {
 class _SendDestinationState extends State<SendDestination> {
   Destination _selectedSegment = Destination.phoneNumber;
   late TextEditingController _accountTextController;
+  String? _suggestedUserName;
 
 // country selector ux
   CountrySelectorNavigator selectorNavigator =
@@ -170,14 +171,23 @@ class _SendDestinationState extends State<SendDestination> {
         debugPrint('Candidate match! setting dest contact');
         appState.sendDestinationContact.value = candidate;
         appState.sendDestination.value = Destination.contact;
+        setState(() {
+          _suggestedUserName = null;
+        });
         return;
       } else {
         debugPrint('Candiate name ${candidate.userName} does not match $value');
+        setState(() {
+          _suggestedUserName = candidate.userName;
+        });
         appState.sendDestinationContact.value = null;
       }
     } else {
       debugPrint('User not found');
       appState.sendDestinationContact.value = null;
+      setState(() {
+        _suggestedUserName = null;
+      });
     }
   }
 
@@ -200,38 +210,36 @@ class _SendDestinationState extends State<SendDestination> {
         }));
   }
 
+  Widget _getTextWidget(BuildContext context, String text) {
+    return Text(text,
+        style: CupertinoTheme.of(context)
+            .textTheme
+            .textStyle
+            .merge(const TextStyle(fontSize: 14)));
+  }
+
   Widget _getAddressText(BuildContext context) {
     return ValueListenableBuilder<TextEditingValue>(
         valueListenable: _accountTextController,
         builder: ((context, value, child) {
           if (value.text.isEmpty) {
-            if (_accountTextController.value.text.isEmpty) {
-              return Text('Enter reciever\'s user name or account address.',
-                  style: CupertinoTheme.of(context)
-                      .textTheme
-                      .textStyle
-                      .merge(const TextStyle(fontSize: 14)));
-            }
+            return _getTextWidget(
+                context, 'Enter reciever\'s user name or account address.');
           }
 
           if (appState.sendDestinationContact.value == null) {
-            return Text(
-                'No Karma Coin user named ${_accountTextController.value.text}.',
-                style: CupertinoTheme.of(context)
-                    .textTheme
-                    .textStyle
-                    .merge(const TextStyle(fontSize: 14)));
+            if (_suggestedUserName != null) {
+              return _getTextWidget(context,
+                  'No matching user. Did you mean $_suggestedUserName ?');
+            }
+
+            return _getTextWidget(
+                context, 'No Karma Coin user named ${value.text}.');
           } else if (appState.sendDestinationContact.value!.userName ==
               value.text) {
-            return Text('${value.text} is a Karma Coin user.',
-                style: CupertinoTheme.of(context)
-                    .textTheme
-                    .textStyle
-                    .merge(const TextStyle(fontSize: 14)));
-          } else {
-            // todo check address
-            return Container();
+            return _getTextWidget(context, '${value.text} is on Karma Coin.');
           }
+          return Container();
         }));
   }
 

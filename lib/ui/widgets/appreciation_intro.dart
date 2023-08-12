@@ -58,7 +58,7 @@ class _AppreciationIntroState extends State<AppreciationIntro> {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'Just pick a contact from your phone\'s contacts or enter recipient\'s phone number.',
+                  'Just pick a contact from your WhatsApp contacts or enter recipient\'s WhatsApp phone number.',
                   style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                         const TextStyle(fontSize: fontSize),
                       ),
@@ -78,7 +78,7 @@ class _AppreciationIntroState extends State<AppreciationIntro> {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'Ask recipient to sign up to Karma Coin with its phone number.',
+                  'Ask appreciation receiver\'s to sign up to Karma Coin with its WhatsApp phone number.',
                   style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                         const TextStyle(fontSize: fontSize),
                       ),
@@ -98,7 +98,7 @@ class _AppreciationIntroState extends State<AppreciationIntro> {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'You get a referral reward when recipient signs up.',
+                  'You get a 100 Karma Coins referral reward when it signs up.',
                   style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                         const TextStyle(fontSize: fontSize),
                       ),
