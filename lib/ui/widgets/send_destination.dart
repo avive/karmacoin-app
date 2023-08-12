@@ -4,7 +4,7 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/ui/widgets/phone_contact_importer.dart';
-import 'package:karma_coin/ui/widgets/kc2_user_browser.dart';
+import 'package:karma_coin/ui/widgets/users_browser.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:random_avatar/random_avatar.dart';
 
@@ -263,11 +263,11 @@ class _SendDestinationState extends State<SendDestination> {
             textAlign: TextAlign.start,
             padding: const EdgeInsets.all(14.0),
             decoration: const BoxDecoration(
-              color: CupertinoColors.secondarySystemBackground,
+              color: CupertinoColors.systemGrey4,
               border: Border(
                 bottom: BorderSide(
-                  width: 1.5,
-                  color: CupertinoColors.systemBlue,
+                  width: 2.0,
+                  color: Colors.blue,
                 ),
               ),
             ),

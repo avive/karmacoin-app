@@ -37,10 +37,13 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
   List<Contact> contacts = [];
   late TextEditingController textController;
   // limit per request
-  final limit = 20;
+  final limit = 30;
   final localUserName = kc2User.userInfo.value!.userName;
   final localUserPhoneNumberHash = kc2User.userInfo.value!.phoneNumberHash;
   FetchStatus featchStatus = FetchStatus.idle;
+  late String? lastPrefix;
+  final ScrollController scrollController = ScrollController();
+  bool additionalResultsAvailable = false;
   //
   //
   int lastRequestFromIndex = 0;
@@ -52,14 +55,24 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
     });
   }
 
+  void _loadAdditionalContacts() {
+    if (additionalResultsAvailable) {
+      debugPrint('Loading more contacts on scroll...');
+      _loadContacts(lastPrefix!);
+    } else {
+      debugPrint('No more results to load on scrol...');
+    }
+  }
+
   /// Load more contacts from the server for a prefix
-  void _loadAdditionalContacts(String prefix) {
+  void _loadContacts(String prefix) {
     prefix = prefix.toLowerCase();
+
     if (prefix != lastRequestedPrefix) {
       // change of prefix - reset index and contacts
-      lastRequestedPrefix = prefix;
-      lastRequestFromIndex = 0;
       setState(() {
+        lastRequestedPrefix = prefix;
+        lastRequestFromIndex = 0;
         contacts.clear();
       });
     }
@@ -70,6 +83,9 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
         setFetchState(FetchStatus.loading);
         List<Contact> results = await kc2Service.getContacts(prefix,
             fromIndex: lastRequestFromIndex, limit: limit);
+
+        // if there are less results than limit, we know there are no more results to fetch
+        additionalResultsAvailable = results.length < limit ? false : true;
 
         lastRequestFromIndex += results.length;
 
@@ -106,11 +122,19 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
   }
 
   @override
+  void dispose() {
+    scrollController.dispose();
+    textController.dispose();
+    super.dispose();
+  }
+
+  @override
   initState() {
     super.initState();
     apiOffline = false;
     textController = TextEditingController();
-    _loadAdditionalContacts('');
+    scrollController.addListener(_loadAdditionalContacts);
+    _loadContacts('');
   }
 
   Widget _getBodyContent(BuildContext context) {
@@ -137,7 +161,7 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
             keyboardType: TextInputType.text,
             placeholder: 'Enter a user name',
             onChanged: (value) {
-              _loadAdditionalContacts(value);
+              _loadContacts(value);
             },
             style: CupertinoTheme.of(context).textTheme.pickerTextStyle),
       ),
@@ -188,6 +212,7 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
             indent: 0,
           );
         },
+        controller: scrollController,
         itemCount: contacts.length,
         itemBuilder: (context, index) {
           return _getContactWidget(context, contacts[index], index);

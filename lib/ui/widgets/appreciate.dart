@@ -9,7 +9,6 @@ import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/ui/widgets/amount_input.dart';
-import 'package:karma_coin/ui/widgets/phone_contact_importer.dart';
 import 'package:karma_coin/ui/widgets/send_destination.dart';
 import 'package:karma_coin/ui/widgets/traits_picker.dart';
 import 'package:phone_form_field/phone_form_field.dart';
@@ -115,16 +114,6 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   void dispose() {
     phoneController.dispose();
     super.dispose();
-  }
-
-  PhoneNumberInputValidator? _getValidator() {
-    List<PhoneNumberInputValidator> validators = [];
-    if (mobileOnly) {
-      validators.add(PhoneValidator.validMobile());
-    } else {
-      validators.add(PhoneValidator.valid());
-    }
-    return validators.isNotEmpty ? PhoneValidator.compose(validators) : null;
   }
 
   // validate input data and show alert if invalid
@@ -403,65 +392,6 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
       ),
     );
   }
-
-  Widget _getContactsRow(BuildContext context) {
-    List<Widget> widgets = [];
-
-    if (PlatformInfo.isMobile) {
-      // mobile phone contacts integration
-      widgets.add(PhoneContactImporter(null, phoneController));
-      widgets.add(const SizedBox(width: 34));
-    }
-
-    // karma coin users
-    widgets.add(CupertinoButton(
-      padding: const EdgeInsets.only(left: 0),
-      onPressed: () {
-        // todo: fixme
-        /*
-        // only show contacts in a community
-        int communityId = widget.communityId;
-
-        if (accountLogic.karmaCoinUser.value!.isCommunityAdmin(communityId)) {
-         // let admin see non-community members users
-         communityId = 0;
-        }
-
-        
-        Navigator.of(context).push(CupertinoPageRoute(
-            fullscreenDialog: true,
-            builder: ((context) => KarmaCoinUserSelector(
-                communityId: communityId,
-                setPhoneNumberCallback: setPhoneNumberCallback))));*/
-      },
-      child: Text(
-        'A Karma Coin User',
-        style: CupertinoTheme.of(context).textTheme.actionTextStyle.merge(
-              const TextStyle(fontSize: 15),
-            ),
-      ),
-    ));
-
-    return Row(mainAxisAlignment: MainAxisAlignment.center, children: widgets);
-  }
-
-  // todo: fix this
-  /*
-  void setPhoneNumberCallback(Contact selectedContact) {
-    debugPrint('setPhoneNumberCallback: $selectedContact');
-    setState(() {
-      contact = selectedContact;
-      phoneController.value = PhoneNumber.parse(contact!.mobileNumber.number);
-    });
-
-    // call without awaiting but log any errors
-    FirebaseAnalytics.instance
-        .logEvent(name: "kc_user_phone_selected", parameters: {
-      "number": contact!.mobileNumber.number,
-    }).catchError((e) {
-      debugPrint(e.toString());
-    });
-  }*/
 
   Widget _getAppreciateButton(BuildContext context) {
     if (widget.communityId == 0) {

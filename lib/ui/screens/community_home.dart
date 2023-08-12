@@ -6,7 +6,7 @@ import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:karma_coin/ui/widgets/appreciate.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/ui/widgets/traits_scores_wheel.dart';
-import 'package:karma_coin/ui/widgets/kc2_user_browser.dart';
+import 'package:karma_coin/ui/widgets/users_browser.dart';
 
 class CommunityHomeScreen extends StatefulWidget {
   @required

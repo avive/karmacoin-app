@@ -1,13 +1,10 @@
 import 'package:karma_coin/common/platform_info.dart';
-import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/ui/widgets/amount_input.dart';
-import 'package:karma_coin/ui/widgets/phone_contact_importer.dart';
-import 'package:karma_coin/ui/widgets/kc2_user_browser.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:status_alert/status_alert.dart';
 import 'package:karma_coin/ui/widgets/send_destination.dart';

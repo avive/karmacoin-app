@@ -119,7 +119,7 @@ class _PhoneContactImporterState extends State<PhoneContactImporter> {
     return CupertinoButton(
         padding: const EdgeInsets.only(left: 0),
         child: Text(
-          'Pick number from a contact',
+          'Pick phone number from a contact',
           style: CupertinoTheme.of(context).textTheme.actionTextStyle.merge(
                 const TextStyle(fontSize: 15),
               ),
