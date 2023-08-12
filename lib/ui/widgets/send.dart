@@ -6,8 +6,8 @@ import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/ui/widgets/amount_input.dart';
-import 'package:karma_coin/ui/widgets/contacts_importer.dart';
-import 'package:karma_coin/ui/widgets/users_selector.dart';
+import 'package:karma_coin/ui/widgets/phone_contact_importer.dart';
+import 'package:karma_coin/ui/widgets/kc2_user_browser.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:status_alert/status_alert.dart';
 import 'package:karma_coin/ui/widgets/send_destination.dart';
@@ -60,7 +60,8 @@ class _SendWidgetState extends State<SendWidget> {
     }
 
     switch (appState.sendDestination.value) {
-      case Destination.accountAddress:
+      case Destination.contact:
+      case Destination.address:
         // todo: validate address format here 0x01fe for now...
         if (appState.sendDestinationAddress.value.isEmpty) {
           if (context.mounted) {
@@ -143,7 +144,6 @@ class _SendWidgetState extends State<SendWidget> {
           }
           return false;
         }
-
         break;
     }
 
@@ -184,7 +184,8 @@ class _SendWidgetState extends State<SendWidget> {
 
   Future<void> _send() async {
     switch (appState.sendDestination.value) {
-      case Destination.accountAddress:
+      case Destination.contact:
+      case Destination.address:
         appState.paymentTransactionData.value = PaymentTransactionData(
           kCentsAmount: appState.kCentsAmount.value,
           personalityTrait: appState.selectedPersonalityTrait.value,
@@ -217,7 +218,6 @@ class _SendWidgetState extends State<SendWidget> {
     IsoCode code = configLogic.devMode ? IsoCode.IL : IsoCode.US;
 
     // set default country code from user's mobile number's country code
-
     if (kc2User.identity.phoneNumber != null) {
       try {
         PhoneNumber userNumber =
@@ -238,48 +238,6 @@ class _SendWidgetState extends State<SendWidget> {
     super.dispose();
   }
 
-  void setPhoneNumberCallback(Contact selectedContact) {
-    debugPrint('setPhoneNumberCallback: $selectedContact');
-    setState(() {
-      // todo: figure out dealing with phone hash here
-      // phoneController.value =
-      //    PhoneNumber.parse(selectedContact.mobileNumber.number);
-      appState.sendDestination.value = Destination.phoneNumber;
-      appState.sendDestinationPhoneNumberHash.value =
-          kc2Service.getPhoneNumberHash(selectedContact.phoneNumberHash);
-    });
-  }
-
-  Widget _getContactsRow(BuildContext context) {
-    List<Widget> widgets = [];
-
-    if (PlatformInfo.isMobile) {
-      // mobile phone contacts integration
-      widgets.add(ContactsImporter(null, phoneController));
-      widgets.add(const SizedBox(width: 34));
-    }
-
-    // karma coin contacts
-    widgets.add(CupertinoButton(
-      padding: const EdgeInsets.only(left: 0),
-      onPressed: () {
-        Navigator.of(context).push(CupertinoPageRoute(
-            fullscreenDialog: true,
-            builder: ((context) => KarmaCoinUserSelector(
-                communityId: 0,
-                setPhoneNumberCallback: setPhoneNumberCallback))));
-      },
-      child: Text(
-        'User',
-        style: CupertinoTheme.of(context).textTheme.actionTextStyle.merge(
-              const TextStyle(fontSize: 15),
-            ),
-      ),
-    ));
-
-    return Row(mainAxisAlignment: MainAxisAlignment.center, children: widgets);
-  }
-
   @override
   build(BuildContext context) {
     return CupertinoPageScaffold(
@@ -296,7 +254,6 @@ class _SendWidgetState extends State<SendWidget> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SendDestination(null, phoneController),
-                    _getContactsRow(context),
                     const SizedBox(height: 12),
                     Column(
                       children: [
@@ -315,25 +272,6 @@ class _SendWidgetState extends State<SendWidget> {
                           },
                           child: ValueListenableBuilder<BigInt>(
                               valueListenable: appState.kCentsAmount,
-                              builder: (context, value, child) =>
-                                  Text(KarmaCoinAmountFormatter.format(value))),
-                        ),
-                        const SizedBox(height: 16),
-                        Text('Network fee',
-                            style: CupertinoTheme.of(context)
-                                .textTheme
-                                .pickerTextStyle),
-                        CupertinoButton(
-                          onPressed: () {
-                            Navigator.of(context).push(CupertinoPageRoute(
-                                fullscreenDialog: true,
-                                builder: ((context) => const AmountInputWidget(
-                                    coinKind: CoinKind.kCents,
-                                    feeType: FeeType.fee,
-                                    title: 'Network fee'))));
-                          },
-                          child: ValueListenableBuilder<BigInt>(
-                              valueListenable: appState.kCentsFeeAmount,
                               builder: (context, value, child) =>
                                   Text(KarmaCoinAmountFormatter.format(value))),
                         ),

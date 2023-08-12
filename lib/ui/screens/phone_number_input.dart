@@ -49,14 +49,16 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
     String defaultNumber = configLogic.devMode ? "549805381" : "";
     IsoCode code = configLogic.devMode ? IsoCode.IL : IsoCode.US;
 
-    try {
-      // ignore: deprecated_member_use
-      String? countryCode = WidgetsBinding.instance.window.locale.countryCode;
-      if (countryCode != null) {
-        code = IsoCode.fromJson(countryCode.toUpperCase());
+    if (!configLogic.devMode) {
+      try {
+        // ignore: deprecated_member_use
+        String? countryCode = WidgetsBinding.instance.window.locale.countryCode;
+        if (countryCode != null) {
+          code = IsoCode.fromJson(countryCode.toUpperCase());
+        }
+      } catch (e) {
+        debugPrint('failed to get country code from locale: $e');
       }
-    } catch (e) {
-      debugPrint('failed to get country code from locale: $e');
     }
 
     phoneController =
@@ -161,7 +163,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
       setState(() {
         isSigninIn = false;
       });
-      
+
       if (context.mounted) {
         context.push(ScreenPaths.newUserName);
       }

@@ -188,8 +188,8 @@ class KC2User extends KC2UserInteface {
       return;
     }
 
-    // set failure callback for 18 secs
-    Future.delayed(const Duration(seconds: 18), () async {
+    // set failure callback for 30 secs
+    Future.delayed(const Duration(seconds: 30), () async {
       if (signupStatus.value == SignupStatus.signingUp) {
         // timed out waiting for new user transaction
         signupStatus.value = SignupStatus.notSignedUp;
@@ -370,7 +370,6 @@ class KC2User extends KC2UserInteface {
     await getUserDataFromChain();
 
     // update value and notify after user info was fetched from chain
-    signupStatus.value = SignupStatus.signedUp;
     signupFailureReson = SignupFailureReason.unknown;
   }
 

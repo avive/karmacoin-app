@@ -18,12 +18,12 @@ class KarmaCoinUserSelector extends StatefulWidget {
 
   // todo: alwyas enbable selection and trigger appreciation of user if tapped/clicked
 
-  final Function(Contact)? setPhoneNumberCallback;
+  final Function(Contact)? contactSelectedCallback;
 
   const KarmaCoinUserSelector(
       {super.key,
       this.communityId = 0,
-      this.setPhoneNumberCallback,
+      this.contactSelectedCallback,
       this.title = 'KARMA COIN USERS',
       this.enableSelection = true});
 
@@ -36,7 +36,8 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
   bool apiOffline = false;
   List<Contact> contacts = [];
   late TextEditingController textController;
-  final limit = 10;
+  // limit per request
+  final limit = 20;
   final localUserName = kc2User.userInfo.value!.userName;
   final localUserPhoneNumberHash = kc2User.userInfo.value!.phoneNumberHash;
   FetchStatus featchStatus = FetchStatus.idle;
@@ -68,18 +69,17 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
         debugPrint('getting contatcs prefix $prefix');
         setFetchState(FetchStatus.loading);
         List<Contact> results = await kc2Service.getContacts(prefix,
-            communityId: widget.communityId,
-            fromIndex: lastRequestFromIndex,
-            limit: limit);
+            fromIndex: lastRequestFromIndex, limit: limit);
 
         lastRequestFromIndex += results.length;
 
         // cleanup results
         results.removeWhere((contact) =>
             contact.userName.trim().isEmpty ||
-            contact.userName.endsWith('old account]') ||
             contact.userName == localUserName ||
             contact.phoneNumberHash == localUserPhoneNumberHash);
+
+        debugPrint('got ${results.length} contacts');
 
         setState(() {
           apiOffline = false;
@@ -320,14 +320,14 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
                     fontWeight: FontWeight.w300,
                   ),
                 ),
-          ),          
+          ),
         ],
       ),
       leading: RandomAvatar(displayName, height: 50, width: 50),
       subtitle: _getAppreciationsStrip(context, contact),
       onTap: widget.enableSelection
           ? () {
-              widget.setPhoneNumberCallback?.call(contact);
+              widget.contactSelectedCallback?.call(contact);
               context.pop();
             }
           : null,

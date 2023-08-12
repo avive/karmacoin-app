@@ -68,7 +68,7 @@ class _IntroScreenState extends State<IntroScreen> {
 
     res.add(const SizedBox(height: 18));
 
-    res.add(_getCoinWidget(context, 10));
+    res.add(_getCoinWidget(context, 100));
 
     res.add(const SizedBox(height: 6));
 
@@ -76,7 +76,7 @@ class _IntroScreenState extends State<IntroScreen> {
       Padding(
         padding: const EdgeInsets.only(top: 6, bottom: 20, left: 16, right: 16),
         child: Text(
-          'You get a 10 Karma Coins reward once they receive your appreciation!',
+          'You get a 100 Karma Coins reward once they receive your appreciation!',
           style: textTheme.navTitleTextStyle.merge(
             const TextStyle(fontSize: 24, fontWeight: FontWeight.w400),
           ),

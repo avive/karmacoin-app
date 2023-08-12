@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/app_state.dart';
+import 'package:karma_coin/services/v2.0/types.dart';
+import 'package:karma_coin/ui/widgets/phone_contact_importer.dart';
+import 'package:karma_coin/ui/widgets/kc2_user_browser.dart';
 import 'package:phone_form_field/phone_form_field.dart';
+import 'package:random_avatar/random_avatar.dart';
 
 class SendDestination extends StatefulWidget {
   @required
@@ -15,7 +20,7 @@ class SendDestination extends StatefulWidget {
 
 class _SendDestinationState extends State<SendDestination> {
   Destination _selectedSegment = Destination.phoneNumber;
-  late TextEditingController _accountAddressTextController;
+  late TextEditingController _accountTextController;
 
 // country selector ux
   CountrySelectorNavigator selectorNavigator =
@@ -25,26 +30,17 @@ class _SendDestinationState extends State<SendDestination> {
   initState() {
     super.initState();
     _selectedSegment = Destination.phoneNumber;
-
-    // some defaults for dev mode to reduce typing in interactive testing...
-
-    if (!configLogic.devMode) {
-      _accountAddressTextController = TextEditingController(
-          text:
-              "0xdf35d76f13a7d2b3ca949909737f211e1927132e210f676e8738fe1ba9dcfbb3");
-    } else {
-      _accountAddressTextController = TextEditingController();
-    }
+    _accountTextController = TextEditingController();
 
     appState.sendDestination.value = Destination.phoneNumber;
-    appState.sendDestinationAddress.value = _accountAddressTextController.text;
-    appState.sendDestinationPhoneNumberHash.value = kc2Service.getPhoneNumberHash(
-        '${widget.phoneController.value!.countryCode}${widget.phoneController.value!.nsn}');
+    // appState.sendDestinationAddress.value = _accountTextController.text;
+    // appState.sendDestinationPhoneNumberHash.value = kc2Service.getPhoneNumberHash(
+    //    '${widget.phoneController.value!.countryCode}${widget.phoneController.value!.nsn}');
   }
 
   @override
   void dispose() {
-    _accountAddressTextController.dispose();
+    _accountTextController.dispose();
     super.dispose();
   }
 
@@ -78,7 +74,7 @@ class _SendDestinationState extends State<SendDestination> {
                   size: 20,
                   color: CupertinoTheme.of(context).textTheme.textStyle.color),
             ),
-            Destination.accountAddress: Padding(
+            Destination.contact: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Icon(CupertinoIcons.person,
                   size: 20,
@@ -94,8 +90,9 @@ class _SendDestinationState extends State<SendDestination> {
 
   Widget _getInputWidget(BuildContext context) {
     switch (_selectedSegment) {
-      case Destination.accountAddress:
-        return _getAccountAddressInputWidget(context);
+      case Destination.contact:
+      case Destination.address:
+        return _getAccountInputWidget(context);
       case Destination.phoneNumber:
         return _getPhoneNumberInputWidget(context);
     }
@@ -104,75 +101,211 @@ class _SendDestinationState extends State<SendDestination> {
   Widget _getPhoneNumberInputWidget(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 16, right: 16),
-      child: Material(
-        child: PhoneFormField(
-          controller: widget.phoneController,
-          shouldFormat: true,
-          flagSize: 32,
-          autofocus: true,
-          onChanged: (value) {
-            if (value != null) {
-              // set canonical representation of phone number
-              String number = '+${value.countryCode}${value.nsn}';
-              appState.sendDestinationPhoneNumberHash.value =
-                  kc2Service.getPhoneNumberHash(number);
-              number;
-              appState.sendDestination.value = Destination.phoneNumber;
-            }
-          },
-          autofillHints: const [AutofillHints.telephoneNumber],
-          countrySelectorNavigator: selectorNavigator,
-          defaultCountry: IsoCode.US,
-          validator: _getValidator(),
-          decoration: const InputDecoration(
-            // fillColor: CupertinoColors.white,
-            label: null,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Material(
+            child: PhoneFormField(
+              controller: widget.phoneController,
+              shouldFormat: true,
+              flagSize: 32,
+              autofocus: true,
+              onChanged: (value) {
+                if (value != null) {
+                  // set canonical representation of phone number
+                  String number = '+${value.countryCode}${value.nsn}';
+                  appState.sendDestinationPhoneNumberHash.value =
+                      kc2Service.getPhoneNumberHash(number);
+                  number;
+                  appState.sendDestination.value = Destination.phoneNumber;
+                }
+              },
+              autofillHints: const [AutofillHints.telephoneNumber],
+              countrySelectorNavigator: selectorNavigator,
+              defaultCountry: IsoCode.US,
+              validator: _getValidator(),
+              decoration: const InputDecoration(
+                // fillColor: CupertinoColors.white,
+                label: null,
+              ),
+            ),
           ),
-        ),
+          const SizedBox(height: 10),
+          Text('📱 Enter receiver\'s WhatsApp number.',
+              style: CupertinoTheme.of(context)
+                  .textTheme
+                  .textStyle
+                  .merge(const TextStyle(fontSize: 14))),
+          PlatformInfo.isMobile || configLogic.devMode
+              ? PhoneContactImporter(null, widget.phoneController)
+              : Container(),
+        ],
       ),
     );
   }
 
-  Widget _getAccountAddressInputWidget(BuildContext context) {
-    return CupertinoTextField(
-      prefix: const Icon(
-        CupertinoIcons.person_solid,
-        color: CupertinoColors.lightBackgroundGray,
-        size: 28,
-      ),
-      autofocus: true,
-      autocorrect: false,
-      clearButtonMode: OverlayVisibilityMode.editing,
-      placeholder: 'Enter receiver\'s karma coin account address',
-      maxLines: 3,
-      style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-            const TextStyle(fontSize: 14),
+  Future<void> _onUserNameInputChanged(String? value) async {
+    if (value == null) {
+      appState.sendDestinationContact.value = null;
+      return;
+    }
+
+    value = value.toLowerCase();
+
+    if (appState.sendDestinationContact.value != null &&
+        appState.sendDestinationContact.value!.userName == value) {
+      // already set dest to this user name
+      return;
+    }
+
+    // todo: figure out if address and if it is fill it and return
+    // appState.sendDestinationAddress.value = value;
+    debugPrint('Calling contacts for $value...');
+    List<Contact> candidates = await kc2Service.getContacts(value, limit: 1);
+    debugPrint('Got back ${candidates.length} candidates');
+    if (candidates.isNotEmpty) {
+      Contact candidate = candidates[0];
+      if (candidate.userName == value) {
+        debugPrint('Candidate match! setting dest contact');
+        appState.sendDestinationContact.value = candidate;
+        appState.sendDestination.value = Destination.contact;
+        return;
+      } else {
+        debugPrint('Candiate name ${candidate.userName} does not match $value');
+        appState.sendDestinationContact.value = null;
+      }
+    } else {
+      debugPrint('User not found');
+      appState.sendDestinationContact.value = null;
+    }
+  }
+
+  Widget _getContactIcon(BuildContext context) {
+    return ValueListenableBuilder<Contact?>(
+        valueListenable: appState.sendDestinationContact,
+        builder: ((context, value, child) {
+          if (value == null) {
+            return const Icon(
+              CupertinoIcons.person_solid,
+              color: CupertinoColors.systemGrey3,
+              size: 28,
+            );
+          }
+          // return contact's avatar based on user name
+          return Padding(
+            padding: const EdgeInsets.only(left: 12.0),
+            child: RandomAvatar(value.userName, height: 28, width: 28),
+          );
+        }));
+  }
+
+  Widget _getAddressText(BuildContext context) {
+    return ValueListenableBuilder<TextEditingValue>(
+        valueListenable: _accountTextController,
+        builder: ((context, value, child) {
+          if (value.text.isEmpty) {
+            if (_accountTextController.value.text.isEmpty) {
+              return Text('Enter reciever\'s user name or account address.',
+                  style: CupertinoTheme.of(context)
+                      .textTheme
+                      .textStyle
+                      .merge(const TextStyle(fontSize: 14)));
+            }
+          }
+
+          if (appState.sendDestinationContact.value == null) {
+            return Text(
+                'No Karma Coin user named ${_accountTextController.value.text}.',
+                style: CupertinoTheme.of(context)
+                    .textTheme
+                    .textStyle
+                    .merge(const TextStyle(fontSize: 14)));
+          } else if (appState.sendDestinationContact.value!.userName ==
+              value.text) {
+            return Text('${value.text} is a Karma Coin user.',
+                style: CupertinoTheme.of(context)
+                    .textTheme
+                    .textStyle
+                    .merge(const TextStyle(fontSize: 14)));
+          } else {
+            // todo check address
+            return Container();
+          }
+        }));
+  }
+
+  Widget _getAccountInputWidget(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16, right: 16),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CupertinoTextField(
+            prefix: _getContactIcon(context),
+            autofocus: true,
+            autocorrect: false,
+            clearButtonMode: OverlayVisibilityMode.editing,
+            placeholder: 'User name or account address',
+            maxLines: 1,
+            style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                  const TextStyle(fontSize: 16),
+                ),
+            textAlign: TextAlign.start,
+            padding: const EdgeInsets.all(14.0),
+            decoration: const BoxDecoration(
+              color: CupertinoColors.secondarySystemBackground,
+              border: Border(
+                bottom: BorderSide(
+                  width: 1.5,
+                  color: CupertinoColors.systemBlue,
+                ),
+              ),
+            ),
+            onChanged: (value) async => await _onUserNameInputChanged(value),
+            controller: _accountTextController,
           ),
-      textAlign: TextAlign.start,
-      padding: const EdgeInsets.all(16.0),
-      decoration: const BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            width: 1.5,
-            color: CupertinoColors.systemBlue,
-          ),
-        ),
+          const SizedBox(height: 10),
+          _getAddressText(context),
+          CupertinoButton(
+            padding: const EdgeInsets.only(left: 0),
+            onPressed: () {
+              Navigator.of(context).push(CupertinoPageRoute(
+                  fullscreenDialog: true,
+                  builder: ((context) => KarmaCoinUserSelector(
+                      communityId: 0,
+                      contactSelectedCallback: contactSelectedCallback))));
+            },
+            child: Text(
+              'Browse users',
+              style: CupertinoTheme.of(context).textTheme.actionTextStyle.merge(
+                    const TextStyle(fontSize: 15),
+                  ),
+            ),
+          )
+        ],
       ),
-      onChanged: (value) async {
-        if (value.isNotEmpty) {
-          // check availability on text change
-          appState.sendDestinationAddress.value = value;
-        }
-      },
-      controller: _accountAddressTextController,
     );
+  }
+
+  void contactSelectedCallback(Contact selectedContact) {
+    debugPrint('contactSelectedCallback: $selectedContact');
+    setState(() {
+      // todo: figure out dealing with phone hash here
+      // phoneController.value =
+      //    PhoneNumber.parse(selectedContact.mobileNumber.number);
+      appState.sendDestination.value = Destination.contact;
+      appState.sendDestinationContact.value = selectedContact;
+      _accountTextController.text = selectedContact.userName;
+      /*
+      appState.sendDestinationPhoneNumberHash.value =
+          kc2Service.getPhoneNumberHash(selectedContact.phoneNumberHash);*/
+    });
   }
 
   PhoneNumberInputValidator? _getValidator() {
-    List<PhoneNumberInputValidator> validators = [];
-    validators.add(PhoneValidator.validMobile());
-    validators.add(PhoneValidator.validFixedLine());
-
-    return validators.isNotEmpty ? PhoneValidator.compose(validators) : null;
+    List<PhoneNumberInputValidator> validators = [PhoneValidator.valid()];
+    return PhoneValidator.compose(validators);
   }
 }

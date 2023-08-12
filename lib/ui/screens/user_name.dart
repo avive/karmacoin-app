@@ -259,6 +259,9 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
     switch (widget.operation) {
       case Operation.signUp:
         debugPrint('*** Navigating to signup progress screen');
+        setState(() {
+          isSubmitInProgress = false;
+        });
         if (context.mounted) {
           context.push(ScreenPaths.signupProgress);
         }

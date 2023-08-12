@@ -77,13 +77,7 @@ dependencies:
   time_ago_provider: ^4.2.0
   countup: ^0.1.4
   simple_animations: ^5.0.0+3
-  # enable3 when 0.0.4 is in pubdev
-  # flutter_native_contact_picker: ^0.0.3
-  # we use this for with updated kotlin version
-  flutter_native_contact_picker:
-     git:
-      url: https://github.com/avive/flutter_native_contact_picker
-      ref: master # branch name
+  flutter_native_contact_picker: ^0.0.4
   pinput: ^2.2.31
   javascript: ^0.0.2
   flutter_js: ^0.7.0

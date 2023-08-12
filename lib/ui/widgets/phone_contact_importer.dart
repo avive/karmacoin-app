@@ -8,17 +8,17 @@ import 'package:karma_coin/logic/app_state.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 
 // Imports a phone contact to a phone controller
-class ContactsImporter extends StatefulWidget {
+class PhoneContactImporter extends StatefulWidget {
   @required
   final PhoneController phoneController;
 
-  const ContactsImporter(Key? key, this.phoneController) : super(key: key);
+  const PhoneContactImporter(Key? key, this.phoneController) : super(key: key);
 
   @override
-  State<ContactsImporter> createState() => _AmountInputWidgetState();
+  State<PhoneContactImporter> createState() => _PhoneContactImporterState();
 }
 
-class _AmountInputWidgetState extends State<ContactsImporter> {
+class _PhoneContactImporterState extends State<PhoneContactImporter> {
   final contact_picker.FlutterContactPicker _contactPicker =
       contact_picker.FlutterContactPicker();
 
@@ -117,9 +117,9 @@ class _AmountInputWidgetState extends State<ContactsImporter> {
   @override
   build(BuildContext context) {
     return CupertinoButton(
-        padding: const EdgeInsets.only(left: 0, right: 12),
+        padding: const EdgeInsets.only(left: 0),
         child: Text(
-          'Contact',
+          'Pick number from a contact',
           style: CupertinoTheme.of(context).textTheme.actionTextStyle.merge(
                 const TextStyle(fontSize: 15),
               ),

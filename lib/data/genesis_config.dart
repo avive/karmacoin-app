@@ -1,4 +1,3 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:karma_coin/data/personality_traits.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
@@ -17,7 +16,7 @@ class GenesisConfig {
   /// Karmachain netId. 1 is testnet 1
   static const netId = 1;
 
-  static const netName = "Karmachain Testnet 1";
+  static const netName = "Karmachain 2.0 Testnet 3";
 
   /// Signup reward in kCents (phase I reward)
   static final kCentsSignupReward = BigInt.from(10 * kCentsPerCoin);

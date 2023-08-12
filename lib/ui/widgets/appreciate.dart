@@ -9,7 +9,8 @@ import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/ui/widgets/amount_input.dart';
-import 'package:karma_coin/ui/widgets/contacts_importer.dart';
+import 'package:karma_coin/ui/widgets/phone_contact_importer.dart';
+import 'package:karma_coin/ui/widgets/send_destination.dart';
 import 'package:karma_coin/ui/widgets/traits_picker.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:status_alert/status_alert.dart';
@@ -317,71 +318,13 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     List<Widget> widgets = [];
 
     if (widget.communityId == 0) {
-      widgets.add(Text('Send to',
-          style: CupertinoTheme.of(context).textTheme.pickerTextStyle));
-    }
-
-    if (widget.communityId == 0 || isUsercommunityAdmin) {
-      // Dispaly phone picker in context of community only if user is an admin
-      // so he can ony invite non-members
-      widgets.add(Padding(
-        padding: const EdgeInsets.only(left: 16, right: 16),
-        child: Material(
-          child: PhoneFormField(
-            controller: phoneController,
-            flagSize: 32,
-            shouldFormat: shouldFormat && !useRtl,
-            autofocus: false,
-            autofillHints: const [AutofillHints.telephoneNumber],
-            countrySelectorNavigator: selectorNavigator,
-            defaultCountry: IsoCode.US,
-            validator: _getValidator(),
-            decoration: InputDecoration(
-              // fillColor: CupertinoColors.white,
-              label: null,
-              border: outlineBorder
-                  ? const OutlineInputBorder()
-                  : const UnderlineInputBorder(),
-              hintText: withLabel ? '' : 'Phone',
-            ),
-          ),
-        ),
-      ));
-      widgets.add(_getContactsRow(context));
+      widgets.add(SendDestination(null, phoneController));
     } else {
       // community member picker for a community member
       // community members can only appreicate other members
       if (contact != null) {
         widgets.add(_getCommunityMemberInfo());
       }
-
-      widgets.add(
-        Column(children: [
-          // karma coin contacts
-          CupertinoButton(
-            padding: const EdgeInsets.only(),
-            onPressed: () {
-              // todo: fix me with proper contacts
-              /*
-              // only show contacts in a community
-              int communityId = widget.communityId;
-
-              Navigator.of(context).push(CupertinoPageRoute(
-                  fullscreenDialog: true,
-                  builder: ((context) => KarmaCoinUserSelector(
-                      title: 'Members',
-                      communityId: communityId,
-                      setPhoneNumberCallback: setPhoneNumberCallback))));*/
-            },
-            child: Text(
-              'A community Member',
-              style: CupertinoTheme.of(context).textTheme.actionTextStyle.merge(
-                    const TextStyle(fontSize: 20),
-                  ),
-            ),
-          )
-        ]),
-      );
     }
 
     widgets.add(traitsPicker);
@@ -402,30 +345,6 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
           },
           child: ValueListenableBuilder<BigInt>(
               valueListenable: appState.kCentsAmount,
-              builder: (context, value, child) => Text(
-                    KarmaCoinAmountFormatter.format(value),
-                    style: CupertinoTheme.of(context)
-                        .textTheme
-                        .actionTextStyle
-                        .merge(
-                          const TextStyle(fontSize: 15),
-                        ),
-                  )),
-        ),
-        const SizedBox(height: 12),
-        Text('Network Fee',
-            style: CupertinoTheme.of(context).textTheme.pickerTextStyle),
-        CupertinoButton(
-          onPressed: () {
-            Navigator.of(context).push(CupertinoPageRoute(
-                fullscreenDialog: true,
-                builder: ((context) => const AmountInputWidget(
-                    coinKind: CoinKind.kCents,
-                    feeType: FeeType.fee,
-                    title: 'NETWORK FEE'))));
-          },
-          child: ValueListenableBuilder<BigInt>(
-              valueListenable: appState.kCentsFeeAmount,
               builder: (context, value, child) => Text(
                     KarmaCoinAmountFormatter.format(value),
                     style: CupertinoTheme.of(context)
@@ -490,7 +409,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
 
     if (PlatformInfo.isMobile) {
       // mobile phone contacts integration
-      widgets.add(ContactsImporter(null, phoneController));
+      widgets.add(PhoneContactImporter(null, phoneController));
       widgets.add(const SizedBox(width: 34));
     }
 
@@ -516,7 +435,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                 setPhoneNumberCallback: setPhoneNumberCallback))));*/
       },
       child: Text(
-        'User',
+        'A Karma Coin User',
         style: CupertinoTheme.of(context).textTheme.actionTextStyle.merge(
               const TextStyle(fontSize: 15),
             ),

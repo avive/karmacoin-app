@@ -119,19 +119,19 @@ abstract class KC2UserInteface {
   String getErrorMessageFor(SignupFailureReason reason) {
     switch (reason) {
       case SignupFailureReason.usernameTaken:
-        return 'Username was just taken. Please go back and choose a new user name.';
+        return 'Username was just taken by another person.';
       case SignupFailureReason.serverError:
-        return 'Server error. Please try again in a bit.';
+        return 'Server error.';
       case SignupFailureReason.invalidSignature:
-        return 'Invalid signature. Please try again.';
+        return 'Invalid signature.';
       case SignupFailureReason.invalidData:
-        return 'Invalid data. Please try again.';
+        return 'Invalid data.';
       case SignupFailureReason.accountMismatch:
-        return 'Account mismatch. Please try again.';
+        return 'Account Id mismatch.';
       case SignupFailureReason.connectionTimeOut:
-        return 'Connection timed out. Please try again.';
+        return 'Connection timed out.';
       default:
-        return 'Signup error. Please try again.';
+        return 'Signup error.';
     }
   }
 }

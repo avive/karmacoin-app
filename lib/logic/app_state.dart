@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/personality_traits.dart';
+import 'package:karma_coin/services/v2.0/types.dart';
 
 enum FeeType { payment, fee }
 
@@ -9,7 +10,7 @@ enum CoinKind { kCents, kCoins }
 
 enum TxSubmissionStatus { idle, submitting, submitted, error }
 
-enum Destination { accountAddress, phoneNumber }
+enum Destination { contact, address, phoneNumber }
 
 // misc runtime state such as kc amount input. Includes lifted up state from widgets
 class AppState {
@@ -27,6 +28,8 @@ class AppState {
 
   //// Account address of send KC transaction destination
   final ValueNotifier<String> sendDestinationAddress = ValueNotifier('');
+
+  final ValueNotifier<Contact?> sendDestinationContact = ValueNotifier(null);
 
   //// Transaction submission status for ui feedback
   final ValueNotifier<TxSubmissionStatus> txSubmissionStatus =
@@ -50,7 +53,7 @@ class AppState {
 
 //// Mobile phone number canonical format for send KC transaction destination
   final ValueNotifier<Destination> sendDestination =
-      ValueNotifier(Destination.accountAddress);
+      ValueNotifier(Destination.phoneNumber);
 
   /// set to true when a new user appreciation was sucessfully submitted via the api
   final ValueNotifier<bool> appreciationSent = ValueNotifier(false);

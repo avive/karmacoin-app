@@ -1,9 +1,9 @@
-import 'package:countup/countup.dart';
+// import 'package:countup/countup.dart';
 import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 
-const _karmaRewardsInfoUrl = 'https://karmaco.in/karmarewards/';
+// const _karmaRewardsInfoUrl = 'https://karmaco.in/karmarewards/';
 
 class AboutKarmaMining extends StatefulWidget {
   final GenesisData? genesisData;
@@ -65,6 +65,7 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
     });
   }*/
 
+  /*
   Widget _getBodyContent(BuildContext context) {
     if (apiOffline) {
       return Padding(
@@ -92,8 +93,9 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: _getWidgets(context)),
     );
-  }
+  }*/
 
+  /*
   Widget _getCoinWidget(BuildContext context, int amount) {
     return Container(
       height: 72,
@@ -138,8 +140,9 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
         ),
       ),
     );
-  }
+  }*/
 
+  /*
   List<Widget> _getWidgets(BuildContext context) {
     List<Widget> res = <Widget>[];
 
@@ -227,7 +230,7 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
     );
 
     return res;
-  }
+  }*/
 
   @override
   build(BuildContext context) {

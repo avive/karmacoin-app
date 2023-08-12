@@ -23,6 +23,9 @@ class SignupProgressScreeen extends StatefulWidget {
 class _SignupProgressScreeenState extends State<SignupProgressScreeen> {
   bool isSubmitInProgress = false;
 
+  static const double sepHeight = 24.0;
+  static const double fontSize = 20.0;
+
   @override
   void initState() {
     super.initState();
@@ -63,8 +66,18 @@ class _SignupProgressScreeenState extends State<SignupProgressScreeen> {
       if (appState.requestedUserName == null ||
           appState.verifiedPhoneNumber == null) {
         debugPrint(
-            'Missing required data for signup - ${appState.requestedUserName} ${appState.verifiedPhoneNumber}');
+            'Missing required data for signup - Reuested user name: ${appState.requestedUserName} Phone number: ${appState.verifiedPhoneNumber}');
         // todo: show error
+        if (context.mounted) {
+          StatusAlert.show(context,
+              duration: const Duration(seconds: 4),
+              title: 'Missing Data',
+              subtitle: 'Please go back and verify your phone number.',
+              configuration: const IconConfiguration(
+                  icon: CupertinoIcons.exclamationmark_triangle),
+              dismissOnBackgroundTap: true,
+              maxWidth: statusAlertWidth);
+        }
         return;
       }
 
@@ -141,30 +154,117 @@ class _SignupProgressScreeenState extends State<SignupProgressScreeen> {
                 children: [
                   Text(errorMessage, style: textTheme.textStyle),
                   const SizedBox(height: 24),
-                  // todo: add button to go back to user name selection
-                  // 'try again' button
+                  Text('Please go back and try again.',
+                      style: textTheme.textStyle),
                 ],
               );
             case SignupStatus.signingUp:
               return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text('Signing up...', style: textTheme.textStyle),
+                  const SizedBox(height: 12),
+                  Image.asset('assets/images/logo_400.png', width: 120),
                   const SizedBox(height: 24),
+                  Text('Signing Up...',
+                      style: textTheme.navTitleTextStyle
+                          .merge(const TextStyle(fontSize: 20))),
+                  const SizedBox(height: 14),
                   const CupertinoActivityIndicator(
                     radius: 20,
                     animating: true,
+                  ),
+                  const SizedBox(height: 14),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(children: [
+                        Text(
+                          '⏳',
+                          style: CupertinoTheme.of(context)
+                              .textTheme
+                              .textStyle
+                              .merge(
+                                const TextStyle(fontSize: 26),
+                              ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Please don\'t leave this screen.',
+                            style: CupertinoTheme.of(context)
+                                .textTheme
+                                .textStyle
+                                .merge(
+                                  const TextStyle(fontSize: fontSize),
+                                ),
+                          ),
+                        ),
+                      ]),
+                      const SizedBox(height: sepHeight),
+                      Row(
+                        children: [
+                          Text(
+                            '🔐',
+                            style: CupertinoTheme.of(context)
+                                .textTheme
+                                .textStyle
+                                .merge(
+                                  const TextStyle(fontSize: 26),
+                                ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Your phone number remains fully private and is not shared publicly.',
+                              style: CupertinoTheme.of(context)
+                                  .textTheme
+                                  .textStyle
+                                  .merge(
+                                    const TextStyle(fontSize: fontSize),
+                                  ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: sepHeight),
+                      Row(
+                        children: [
+                          Text(
+                            '⛓️',
+                            style: CupertinoTheme.of(context)
+                                .textTheme
+                                .textStyle
+                                .merge(
+                                  const TextStyle(fontSize: 28),
+                                ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Your account is saved on the Karmachain blockchain.',
+                              style: CupertinoTheme.of(context)
+                                  .textTheme
+                                  .textStyle
+                                  .merge(
+                                    const TextStyle(fontSize: fontSize),
+                                  ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ],
               );
             case SignupStatus.signedUp:
               return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    'Signed up!',
+                    '✅ Signed up!',
                     style: textTheme.textStyle,
                   ),
                 ],

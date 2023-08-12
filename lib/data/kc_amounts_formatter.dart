@@ -26,7 +26,7 @@ abstract class KarmaCoinAmountFormatter {
 
       usdEstimate = "\$ ($usdEstimate USD)";
 
-      return '${_deicmalFormat.format(amount)} $centsLabel $usdEstimate';
+      return '${_deicmalFormat.format(amount.toInt())} $centsLabel $usdEstimate';
     }
 
     String label = amount >= BigInt.from(GenesisConfig.kCentsPerCoin * 2)
@@ -79,7 +79,7 @@ abstract class KarmaCoinAmountFormatter {
 
   static String formatAmount(BigInt amount) {
     if (amount < _kCentsDisplayUpperLimit) {
-      return _deicmalFormat.format(amount);
+      return _deicmalFormat.format(amount.toInt());
     } else {
       return _deicmalFormat
           .format(amount.toDouble() / GenesisConfig.kCentsPerCoin);
@@ -89,6 +89,6 @@ abstract class KarmaCoinAmountFormatter {
   static String formatKCents(BigInt amount) {
     String label = amount == BigInt.one ? 'Karma Cent' : 'Karma Cents';
 
-    return '${_deicmalFormat.format(amount)} $label';
+    return '${_deicmalFormat.format(amount.toInt())} $label';
   }
 }
