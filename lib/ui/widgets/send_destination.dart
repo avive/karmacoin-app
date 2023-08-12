@@ -168,6 +168,14 @@ class _SendDestinationState extends State<SendDestination> {
     if (candidates.isNotEmpty) {
       Contact candidate = candidates[0];
       if (candidate.userName == value) {
+        if (candidate.userName == kc2User.userInfo.value!.userName) {
+          // can't select local user as dest
+          appState.sendDestinationContact.value = null;
+          setState(() {
+            _suggestedUserName = null;
+          });
+          return;
+        }
         debugPrint('Candidate match! setting dest contact');
         appState.sendDestinationContact.value = candidate;
         appState.sendDestination.value = Destination.contact;
@@ -231,6 +239,10 @@ class _SendDestinationState extends State<SendDestination> {
             if (_suggestedUserName != null) {
               return _getTextWidget(context,
                   'No matching user. Did you mean $_suggestedUserName ?');
+            }
+
+            if (value.text == kc2User.userInfo.value!.userName) {
+              return _getTextWidget(context, 'You can\'t send to yourself.');
             }
 
             return _getTextWidget(
