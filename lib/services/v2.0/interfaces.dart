@@ -147,6 +147,11 @@ abstract class ChainApiProvider {
     bytes.add(storagePrefix);
     bytes.add(key);
 
+    debugPrint('Read storage by ${hex.encode(bytes.toBytes().toList())}');
     return await api.getStorage(bytes.toBytes());
+  }
+
+  Future<dynamic> callRpc(String method, List<dynamic> params) async {
+    return await karmachain.send(method, params).then((response) => response.result);
   }
 }
