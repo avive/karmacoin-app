@@ -242,7 +242,6 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
           fullscreenDialog: true,
           builder: ((context) => AppreciateWidget(
                 communityId: widget.communityId,
-                contact: selectedContact,
               ))));
     });
   }

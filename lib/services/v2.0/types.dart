@@ -73,6 +73,9 @@ class Contact {
   List<CommunityMembership> communityMemberships;
   List<TraitScore> traitScores;
 
+  Contact(this.userName, this.accountId, this.phoneNumberHash,
+      this.communityMemberships, this.traitScores);
+
   String getCommunitiesBadge() {
     String badge = '';
     for (CommunityMembership m in communityMemberships) {

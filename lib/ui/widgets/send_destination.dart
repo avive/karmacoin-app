@@ -3,6 +3,7 @@ import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
+import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:karma_coin/ui/widgets/phone_contact_importer.dart';
 import 'package:karma_coin/ui/widgets/users_browser.dart';
 import 'package:phone_form_field/phone_form_field.dart';
@@ -34,9 +35,18 @@ class _SendDestinationState extends State<SendDestination> {
     _accountTextController = TextEditingController();
 
     appState.sendDestination.value = Destination.phoneNumber;
-    // appState.sendDestinationAddress.value = _accountTextController.text;
-    // appState.sendDestinationPhoneNumberHash.value = kc2Service.getPhoneNumberHash(
-    //    '${widget.phoneController.value!.countryCode}${widget.phoneController.value!.nsn}');
+
+    // appreciate from a user profile page
+    if (appState.sendDestinationUser.value != null) {
+      KC2UserInfo userInfo = appState.sendDestinationUser.value!;
+      // create contact from user
+      appState.sendDestinationContact.value = Contact(userInfo.userName,
+          userInfo.accountId, userInfo.phoneNumberHash, [], []);
+      _accountTextController.text = userInfo.userName;
+      appState.sendDestinationUser.value = null;
+      appState.sendDestination.value = Destination.contact;
+      _selectedSegment = Destination.contact;
+    }
   }
 
   @override

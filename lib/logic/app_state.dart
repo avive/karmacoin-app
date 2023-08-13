@@ -3,6 +3,7 @@ import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/personality_traits.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
+import 'package:karma_coin/services/v2.0/user_info.dart';
 
 enum FeeType { payment, fee }
 
@@ -45,8 +46,8 @@ class AppState {
   final ValueNotifier<String> sendDestinationPhoneNumberHash =
       ValueNotifier('');
 
-  //// Apprecaite dest when signup is complete
-  final ValueNotifier<bool> appreciateAfterSignup = ValueNotifier(false);
+  // User to appreciate from profile page
+  final ValueNotifier<KC2UserInfo?> sendDestinationUser = ValueNotifier(null);
 
   //// True if appreciation intro was already displayed in an app session
   final ValueNotifier<bool> appreciateIntroDisplayed = ValueNotifier(false);

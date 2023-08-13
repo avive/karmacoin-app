@@ -148,11 +148,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _getActionArea(BuildContext context) {
     if (kc2User.userInfo.value == null) {
+      // no signed-in local user
       return CupertinoButton.filled(
           onPressed: () async {
-            appState.appreciateAfterSignup.value = true;
-            appState.sendDestinationPhoneNumberHash.value =
-                userInfo!.phoneNumberHash;
+            // store user for appreciation after signup
+            appState.sendDestinationUser.value = userInfo;
+
             if (!context.mounted) return;
             context.go(ScreenPaths.welcome);
           },
@@ -163,9 +164,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return CupertinoButton.filled(
           onPressed: () async {
             // user signup - go to home screen and start appreciating
-            appState.appreciateAfterSignup.value = true;
-            appState.sendDestinationPhoneNumberHash.value =
-                kc2User.userInfo.value!.phoneNumberHash;
+            appState.sendDestinationUser.value = userInfo;
             if (!context.mounted) return;
             context.go(ScreenPaths.home);
           },

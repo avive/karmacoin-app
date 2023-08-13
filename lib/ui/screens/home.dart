@@ -62,9 +62,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     debugPrint("UserHomeScreen");
 
     // handle appreciate after signup
-    if (appState.appreciateAfterSignup.value =
-        true && appState.sendDestinationPhoneNumberHash.value.isNotEmpty) {
-      appState.appreciateAfterSignup.value = false;
+    if (appState.sendDestinationUser.value != null) {
       Navigator.of(context).push(
         CupertinoPageRoute(
           fullscreenDialog: true,

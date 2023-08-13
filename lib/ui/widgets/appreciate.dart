@@ -1,6 +1,5 @@
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/data/genesis_config.dart';
-import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
@@ -13,17 +12,13 @@ import 'package:karma_coin/ui/widgets/send_destination.dart';
 import 'package:karma_coin/ui/widgets/traits_picker.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:status_alert/status_alert.dart';
-import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart'
-    as contact_picker;
 
 class AppreciateWidget extends StatefulWidget {
   final int communityId;
-  final Contact? contact;
 
   const AppreciateWidget({
     super.key,
     this.communityId = 0,
-    this.contact,
   });
 
   @override
@@ -40,13 +35,6 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   bool withLabel = true;
   bool useRtl = false;
   bool isUsercommunityAdmin = false;
-  Contact? contact;
-
-  // country selector ux
-  late CountrySelectorNavigator selectorNavigator;
-
-  // ignore: unused_field
-  contact_picker.FlutterContactPicker? _contactPicker;
 
   //final formKey = GlobalKey<FormState>();
   //final phoneKey = GlobalKey<FormFieldState<PhoneNumber>>();
@@ -75,39 +63,10 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     } else {
       traitsPicker = TraitsPickerWidget(null,
           GenesisConfig.communityPersonalityTraits[widget.communityId]!, 6);
-
-      // todo: fix this
-      // isUsercommunityAdmin = accountLogic.karmaCoinUser.value!
-      //   .isCommunityAdmin(widget.communityId);
     }
-
-    selectorNavigator = const CountrySelectorNavigator.draggableBottomSheet();
 
     phoneController =
         PhoneController(PhoneNumber(isoCode: code, nsn: defaultNumber));
-
-    // use phone number from state if available
-    // todo: figure out how to fix this - what to display when no phone number?
-    // for example: show user name? We can obtain dest inf from api
-    // by phone hash!
-
-    if (appState.sendDestinationPhoneNumberHash.value.isNotEmpty) {
-      //phoneController.value =
-      //    PhoneNumber.parse(appState.sendDestinationPhoneNumberHash.value);
-    }
-
-    if (PlatformInfo.isMobile) {
-      // contact picker only available in native mobile iOs or Android
-      _contactPicker = contact_picker.FlutterContactPicker();
-    } else {
-      _contactPicker = null;
-    }
-
-    if (widget.contact != null) {
-      contact = widget.contact;
-
-      phoneController.value = PhoneNumber.parse(contact!.phoneNumberHash);
-    }
   }
 
   @override
@@ -279,43 +238,9 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     }
   }
 
-  Widget _getCommunityMemberInfo() {
-    return Container();
-    /*
-    String phoneNumber = '+${contact!.mobileNumber.number.formatPhoneNumber()}';
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Icon(CupertinoIcons.person, size: 28),
-        const SizedBox(
-          width: 6,
-        ),
-        Text(
-          '${contact!.userName} $phoneNumber',
-          style: CupertinoTheme.of(context).textTheme.pickerTextStyle.merge(
-                const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w300,
-                ),
-              ),
-        ),
-      ],
-    );*/
-  }
-
   List<Widget> _getBodyWidget(BuildContext context) {
     List<Widget> widgets = [];
-
-    if (widget.communityId == 0) {
-      widgets.add(SendDestination(null, phoneController));
-    } else {
-      // community member picker for a community member
-      // community members can only appreicate other members
-      if (contact != null) {
-        widgets.add(_getCommunityMemberInfo());
-      }
-    }
-
+    widgets.add(SendDestination(null, phoneController));
     widgets.add(traitsPicker);
 
     widgets.add(Column(

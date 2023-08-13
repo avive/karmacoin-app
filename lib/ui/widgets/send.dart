@@ -19,10 +19,6 @@ class SendWidget extends StatefulWidget {
 class _SendWidgetState extends State<SendWidget> {
   late PhoneController phoneController;
 
-  // country selector ux
-  CountrySelectorNavigator selectorNavigator =
-      const CountrySelectorNavigator.draggableBottomSheet();
-
   // validate input data and show alert if invalid
   Future<bool> _validateData() async {
     if (kc2User.userInfo.value == null) {
