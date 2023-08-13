@@ -16,8 +16,11 @@ class KC2User extends KC2UserInteface {
   late final _secureStorage = const FlutterSecureStorage();
   final IdentityInterface _identity = Identity();
   late KC2TransactionBossInterface _txsBoss;
-  late String? _signupTxHash;
-  late String? _updateUserTxHash;
+
+  // tx hashes of locally submitted account txs so we only update
+  // app state when they were submitted in this app session
+  late String _signupTxHash = '';
+  late String _updateUserTxHash = '';
 
   @override
   ValueNotifier<Map<String, KC2Tx>> get incomingAppreciations =>
@@ -233,8 +236,8 @@ class KC2User extends KC2UserInteface {
       }
       return;
     }
-
     if (txHash != null) {
+      // store the tx hash so we can match on it
       _signupTxHash = txHash;
     }
   }
@@ -349,13 +352,13 @@ class KC2User extends KC2UserInteface {
   }
 
   Future<void> _signupUserCallback(KC2NewUserTransactionV1 tx) async {
-    if (tx.accountId != _identity.accountId) {
-      debugPrint('unexpected tx account id in signup tx: ${tx.accountId}');
+    if (_signupTxHash != tx.hash) {
+      debugPrint('Ignore this signup tx: ${tx.hash}');
       return;
     }
 
-    if (_signupTxHash != null && tx.hash != _signupTxHash) {
-      debugPrint('mismatch tx hash in signup tx: ${tx.hash}');
+    if (tx.accountId != _identity.accountId) {
+      debugPrint('unexpected tx account id in signup tx: ${tx.accountId}');
       return;
     }
 
@@ -371,11 +374,19 @@ class KC2User extends KC2UserInteface {
 
     // update value and notify after user info was fetched from chain
     signupFailureReson = SignupFailureReason.unknown;
+
+    // we don't care about this tx anymore in this app session
+    _signupTxHash = '';
   }
 
   Future<void> _updateUserCallback(KC2UpdateUserTxV1 tx) async {
-    if (_updateUserTxHash != null && tx.hash != _updateUserTxHash) {
+    if (tx.hash != _updateUserTxHash) {
       debugPrint('mismatch tx hash in update user tx: ${tx.hash}');
+      return;
+    }
+
+    if (tx.signer != _identity.accountId) {
+      debugPrint('unexpected tx signer in update user tx: ${tx.signer}');
       return;
     }
 
@@ -416,6 +427,9 @@ class KC2User extends KC2UserInteface {
       // update observable value
       userInfo.value = u;
     }
+
+    // we don't care about this anymore in this app session
+    _updateUserTxHash = '';
 
     updateResult.value = UpdateResult.updated;
   }

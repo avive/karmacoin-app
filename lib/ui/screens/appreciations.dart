@@ -3,6 +3,7 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/data/personality_traits.dart';
+import 'package:karma_coin/services/v2.0/kc2_service.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/ui/helpers/transactions.dart';
@@ -32,6 +33,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
 
   void _postFrameCallback(BuildContext context) {
     Future.delayed(Duration.zero, () async {
+      // fetch all user txs from the api
       await kc2User.fetchAppreciations();
     });
   }
@@ -137,12 +139,92 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
               thicknessWhileDragging: 10.0,
               radius: const Radius.circular(34.0),
               radiusWhileDragging: Radius.zero,
-              child: _getList(context),
+              child: _getBody(context),
             ),
           ),
         ),
       ),
     );
+  }
+
+  Widget _getBody(BuildContext context) {
+    return ValueListenableBuilder<FetchAppreciationsStatus>(
+        // todo: how to make this not assert when karmaCoinUser is null?
+        valueListenable: kc2User.fetchAppreciationStatus,
+        builder: (context, value, child) {
+          switch (value) {
+            case FetchAppreciationsStatus.fetching:
+              return Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'One sec...',
+                        textAlign: TextAlign.center,
+                        style: CupertinoTheme.of(context)
+                            .textTheme
+                            .navTitleTextStyle
+                            .merge(
+                              TextStyle(
+                                  color: CupertinoTheme.of(context)
+                                      .textTheme
+                                      .textStyle
+                                      .color),
+                            ),
+                      ),
+                      const SizedBox(height: 24),
+                      const Center(
+                          child: CupertinoActivityIndicator(
+                        radius: 20,
+                      )),
+                    ]),
+              );
+            case FetchAppreciationsStatus.error:
+              return Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Error fetching appreciations.',
+                        textAlign: TextAlign.center,
+                        style: CupertinoTheme.of(context)
+                            .textTheme
+                            .navTitleTextStyle
+                            .merge(
+                              TextStyle(
+                                  color: CupertinoTheme.of(context)
+                                      .textTheme
+                                      .textStyle
+                                      .color),
+                            ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Please try again later',
+                        textAlign: TextAlign.center,
+                        style: CupertinoTheme.of(context)
+                            .textTheme
+                            .textStyle
+                            .merge(
+                              TextStyle(
+                                  color: CupertinoTheme.of(context)
+                                      .textTheme
+                                      .textStyle
+                                      .color),
+                            ),
+                      )
+                    ]),
+              );
+            case FetchAppreciationsStatus.fetched:
+              return _getList(context);
+            default:
+              return Container();
+          }
+        });
   }
 
   Widget _getList(BuildContext context) {

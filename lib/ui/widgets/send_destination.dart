@@ -294,7 +294,7 @@ class _SendDestinationState extends State<SendDestination> {
               color: CupertinoDynamicColor.withBrightness(
                 // todo: make identical to phone input bcg color
                 color: CupertinoColors.systemGrey6,
-                darkColor: CupertinoColors.systemGrey,
+                darkColor: CupertinoColors.darkBackgroundGray,
               ),
               border: Border(
                 bottom: BorderSide(

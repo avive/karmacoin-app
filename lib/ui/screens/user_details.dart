@@ -101,11 +101,33 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
       );
     }
 
+    String uri =
+        Uri.encodeFull('https://app.karmaco.in/#/p/${widget.user.userName}');
+
+    tiles.add(
+      CupertinoListTile.notched(
+        title: Text('Public Profile',
+            style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
+        leading: const Icon(CupertinoIcons.profile_circled, size: 28),
+        // todo: number format
+        subtitle: Text(
+          uri,
+          style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                const TextStyle(color: CupertinoColors.activeBlue),
+              ),
+        ),
+        trailing: const Icon(CupertinoIcons.share),
+        onTap: () async {
+          await Clipboard.setData(ClipboardData(text: uri));
+        },
+      ),
+    );
+
     techSectionTiles.add(
       CupertinoListTile.notched(
         padding:
             const EdgeInsets.only(top: 12, bottom: 12, left: 12, right: 14),
-        title: Text('Account Id',
+        title: Text('Account Address',
             style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 6, right: 12),
@@ -120,7 +142,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                 ),
           ),
         ),
-        leading: const Icon(CupertinoIcons.creditcard, size: 28),
+        leading: const Icon(CupertinoIcons.checkmark_seal, size: 28),
         trailing: const Icon(CupertinoIcons.share),
         onTap: () async {
           await Clipboard.setData(ClipboardData(text: widget.user.accountId));
@@ -155,9 +177,9 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
       CupertinoListTile.notched(
           padding:
               const EdgeInsets.only(top: 12, bottom: 12, left: 12, right: 14),
-          title: Text('Transactions Counter',
+          title: Text('Transactions',
               style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
-          trailing: Text(widget.user.nonce.toString(),
+          trailing: Text(widget.user.nonce.format(),
               style: CupertinoTheme.of(context).textTheme.textStyle),
           leading: const Icon(CupertinoIcons.number, size: 28)),
     );
@@ -186,39 +208,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
       );
     }
 
-    /*
-    if (isLocal) {
-      techSectionTiles.add(
-        CupertinoListTile.notched(
-          title: Text('Security Words',
-              style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
-          leading: const Icon(CupertinoIcons.lock, size: 28),
-          trailing: const Icon(CupertinoIcons.chevron_right),
-          
-          subtitle: Padding(
-            padding: EdgeInsets.only(top: 3, right: 12),
-            child: Text(
-              maxLines: 5,
-              accountLogic.accountSecurityWords.value.toString(),
-              style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                    TextStyle(
-                        fontSize: 12,
-                        color: CupertinoTheme.of(context)
-                            .textTheme
-                            .textStyle
-                            .color),
-                  ),
-            ),
-          ),
-
-          // todo: number format
-          onTap: () async {
-            // display security words
-          },
-        ),
-      );
-    }*/
-
+  
     return [
       CupertinoListSection.insetGrouped(
           header: Text(

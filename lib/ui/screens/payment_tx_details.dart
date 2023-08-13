@@ -190,7 +190,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
         title: Text('Block',
             style: CupertinoTheme.of(context).textTheme.textStyle),
         leading: const FaIcon(FontAwesomeIcons.link, size: 20),
-        subtitle: Text('Position ${widget.tx!.blockIndex}'),
+        subtitle: Text('Position ${widget.tx!.blockIndex.format()}'),
         trailing: Text(widget.tx!.blockNumber.toInt().format(),
             style: CupertinoTheme.of(context).textTheme.textStyle),
       ),
