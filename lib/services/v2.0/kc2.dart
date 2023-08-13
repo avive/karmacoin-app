@@ -1,13 +1,23 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/logic/kc2/keyring.dart';
 import 'package:karma_coin/services/v2.0/error.dart';
 import 'package:karma_coin/services/v2.0/interfaces.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
 import 'package:karma_coin/services/v2.0/event.dart';
+import 'package:karma_coin/services/v2.0/nomination/interfaces.dart';
+import 'package:karma_coin/services/v2.0/nomination/txs/claim_commission.dart';
+import 'package:karma_coin/services/v2.0/nomination/txs/claim_payout.dart';
+import 'package:karma_coin/services/v2.0/nomination/txs/create.dart';
+import 'package:karma_coin/services/v2.0/nomination/txs/join.dart';
+import 'package:karma_coin/services/v2.0/nomination/txs/nominate.dart';
+import 'package:karma_coin/services/v2.0/nomination/txs/set_commission.dart';
+import 'package:karma_coin/services/v2.0/nomination/txs/set_commission_change_rate.dart';
+import 'package:karma_coin/services/v2.0/nomination/txs/set_commission_max.dart';
+import 'package:karma_coin/services/v2.0/nomination/txs/unbond.dart';
+import 'package:karma_coin/services/v2.0/nomination/txs/update_roles.dart';
+import 'package:karma_coin/services/v2.0/nomination/txs/withdraw_unbonded.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:polkadart/polkadart.dart' as polkadart;
@@ -19,7 +29,9 @@ import 'package:substrate_metadata_fixed/substrate_metadata.dart';
 import 'package:convert/convert.dart';
 import 'package:substrate_metadata_fixed/types/metadata_types.dart';
 
-class KarmachainService extends ChainApiProvider implements K2ServiceInterface  {
+import 'nomination/txs/chill.dart';
+
+class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterface implements K2ServiceInterface {
   Blake2bHasher hasher = const Blake2bHasher(64);
 
   /// Decoded chain metadata
@@ -621,6 +633,210 @@ class KarmachainService extends ChainApiProvider implements K2ServiceInterface  
         return;
       }
 
+      if (pallet == 'NominationPools' && method == 'join') {
+        _processJoinTransaction(
+            hash,
+            timestamp,
+            address,
+            signer,
+            method,
+            pallet,
+            blockNumber,
+            args,
+            blockIndex,
+            failedReason,
+            tx,
+            txEvents);
+        return;
+      }
+
+      if (pallet == 'NominationPools' && method == 'claim_payout') {
+        _processClaimPayoutTransaction(
+            hash,
+            timestamp,
+            address,
+            signer,
+            method,
+            pallet,
+            blockNumber,
+            args,
+            blockIndex,
+            failedReason,
+            tx,
+            txEvents);
+        return;
+      }
+
+      if (pallet == 'NominationPools' && method == 'unbond') {
+        _processUnbondTransaction(
+            hash,
+            timestamp,
+            address,
+            signer,
+            method,
+            pallet,
+            blockNumber,
+            args,
+            blockIndex,
+            failedReason,
+            tx,
+            txEvents);
+        return;
+      }
+
+      if (pallet == 'NominationPools' && method == 'withdraw_unbonded') {
+        _processWithdrawUnbondedTransaction(
+            hash,
+            timestamp,
+            address,
+            signer,
+            method,
+            pallet,
+            blockNumber,
+            args,
+            blockIndex,
+            failedReason,
+            tx,
+            txEvents);
+        return;
+      }
+
+      if (pallet == 'NominationPools' && method == 'create') {
+        _processCreateTransaction(
+            hash,
+            timestamp,
+            address,
+            signer,
+            method,
+            pallet,
+            blockNumber,
+            args,
+            blockIndex,
+            failedReason,
+            tx,
+            txEvents);
+        return;
+      }
+
+      if (pallet == 'NominationPools' && method == 'nominate') {
+        _processNominateTransaction(
+            hash,
+            timestamp,
+            address,
+            signer,
+            method,
+            pallet,
+            blockNumber,
+            args,
+            blockIndex,
+            failedReason,
+            tx,
+            txEvents);
+        return;
+      }
+
+      if (pallet == 'NominationPools' && method == 'chill') {
+        _processChillTransaction(
+            hash,
+            timestamp,
+            address,
+            signer,
+            method,
+            pallet,
+            blockNumber,
+            args,
+            blockIndex,
+            failedReason,
+            tx,
+            txEvents);
+        return;
+      }
+
+      if (pallet == 'NominationPools' && method == 'update_roles') {
+        _processUpdateRolesTransaction(
+            hash,
+            timestamp,
+            address,
+            signer,
+            method,
+            pallet,
+            blockNumber,
+            args,
+            blockIndex,
+            failedReason,
+            tx,
+            txEvents);
+        return;
+      }
+
+      if (pallet == 'NominationPools' && method == 'set_commission') {
+        _processSetCommissionTransaction(
+            hash,
+            timestamp,
+            address,
+            signer,
+            method,
+            pallet,
+            blockNumber,
+            args,
+            blockIndex,
+            failedReason,
+            tx,
+            txEvents);
+        return;
+      }
+
+      if (pallet == 'NominationPools' && method == 'set_commission_max') {
+        _processSetCommissionMaxTransaction(
+            hash,
+            timestamp,
+            address,
+            signer,
+            method,
+            pallet,
+            blockNumber,
+            args,
+            blockIndex,
+            failedReason,
+            tx,
+            txEvents);
+        return;
+      }
+
+      if (pallet == 'NominationPools' && method == 'set_commission_change_rate') {
+        _processSetCommissionChangeRateTransaction(
+            hash,
+            timestamp,
+            address,
+            signer,
+            method,
+            pallet,
+            blockNumber,
+            args,
+            blockIndex,
+            failedReason,
+            tx,
+            txEvents);
+        return;
+      }
+
+      if (pallet == 'NominationPools' && method == 'claim_commission') {
+        _processClaimCommissionTransaction(
+            hash,
+            timestamp,
+            address,
+            signer,
+            method,
+            pallet,
+            blockNumber,
+            args,
+            blockIndex,
+            failedReason,
+            tx,
+            txEvents);
+        return;
+      }
+
       debugPrint('Skipped tx $pallet/$method');
     } catch (e) {
       debugPrint('error processing tx: $e');
@@ -629,7 +845,7 @@ class KarmachainService extends ChainApiProvider implements K2ServiceInterface  
     }
   }
 
-  /// Returns tx's signer address. Return null if the transaction is unsigned.
+  /// Returns transaction's signer address. Return null if the transaction is unsigned.
   String? _getTransactionSigner(Map<String, dynamic> extrinsic) {
     final signature = extrinsic['signature'];
     if (signature == null) {
@@ -970,5 +1186,530 @@ class KarmachainService extends ChainApiProvider implements K2ServiceInterface  
     debugPrint('Error metadata: $errorMetadata');
 
     return ChainError.fromSubstrateMetadata(errorMetadata);
+  }
+
+  void _processJoinTransaction(
+      String hash,
+      BigInt timeStamp,
+      String accountId,
+      String signer,
+      String method,
+      String pallet,
+      BigInt blockNumber,
+      Map<String, dynamic> args,
+      int blockIndex,
+      ChainError? failedReason,
+      Map<String, dynamic> rawData,
+      List<KC2Event> txEvents) async {
+    try {
+      if (signer != accountId) {
+        return;
+      }
+
+      final amount = args['amount'];
+      final poolId = args['pool_id'];
+
+      final joinTx = KC2JoinTxV1(
+        amount: amount,
+        poolId: poolId,
+        args: args,
+        pallet: pallet,
+        signer: signer,
+        method: method,
+        failedReason: failedReason,
+        timestamp: timeStamp,
+        hash: hash,
+        blockNumber: blockNumber,
+        blockIndex: blockIndex,
+        transactionEvents: txEvents,
+        rawData: rawData,
+      );
+
+      await joinCallback!(joinTx);
+    } catch (e) {
+      debugPrint('error processing new user tx: $e');
+      rethrow;
+    }
+  }
+
+  void _processClaimPayoutTransaction(
+      String hash,
+      BigInt timeStamp,
+      String accountId,
+      String signer,
+      String method,
+      String pallet,
+      BigInt blockNumber,
+      Map<String, dynamic> args,
+      int blockIndex,
+      ChainError? failedReason,
+      Map<String, dynamic> rawData,
+      List<KC2Event> txEvents) async {
+    try {
+      if (signer != accountId) {
+        return;
+      }
+
+      final claimPayoutTx = KC2ClaimPayoutTxV1(
+        args: args,
+        pallet: pallet,
+        signer: signer,
+        method: method,
+        failedReason: failedReason,
+        timestamp: timeStamp,
+        hash: hash,
+        blockNumber: blockNumber,
+        blockIndex: blockIndex,
+        transactionEvents: txEvents,
+        rawData: rawData,
+      );
+
+      await claimPayoutCallback!(claimPayoutTx);
+    } catch (e) {
+      debugPrint('error processing new user tx: $e');
+      rethrow;
+    }
+  }
+
+  void _processUnbondTransaction(
+      String hash,
+      BigInt timeStamp,
+      String accountId,
+      String signer,
+      String method,
+      String pallet,
+      BigInt blockNumber,
+      Map<String, dynamic> args,
+      int blockIndex,
+      ChainError? failedReason,
+      Map<String, dynamic> rawData,
+      List<KC2Event> txEvents) async {
+    try {
+      if (signer != accountId) {
+        return;
+      }
+
+      final memberAccount = args['member_account'];
+      final unbondingPoints = args['unbonding_points'];
+
+      final unbondTx = KC2UnbondTxV1(
+        memberAccount: memberAccount,
+        unbondingPoints: unbondingPoints,
+        args: args,
+        pallet: pallet,
+        signer: signer,
+        method: method,
+        failedReason: failedReason,
+        timestamp: timeStamp,
+        hash: hash,
+        blockNumber: blockNumber,
+        blockIndex: blockIndex,
+        transactionEvents: txEvents,
+        rawData: rawData,
+      );
+
+      await unbondCallback!(unbondTx);
+    } catch (e) {
+      debugPrint('error processing new user tx: $e');
+      rethrow;
+    }
+  }
+
+  void _processWithdrawUnbondedTransaction(
+      String hash,
+      BigInt timeStamp,
+      String accountId,
+      String signer,
+      String method,
+      String pallet,
+      BigInt blockNumber,
+      Map<String, dynamic> args,
+      int blockIndex,
+      ChainError? failedReason,
+      Map<String, dynamic> rawData,
+      List<KC2Event> txEvents) async {
+    try {
+      if (signer != accountId) {
+        return;
+      }
+
+      final memberAccount = args['member_account'];
+
+      final withdrawUnbondTx = KC2WithdrawUnbondedTxV1(
+        memberAccount: memberAccount,
+        args: args,
+        pallet: pallet,
+        signer: signer,
+        method: method,
+        failedReason: failedReason,
+        timestamp: timeStamp,
+        hash: hash,
+        blockNumber: blockNumber,
+        blockIndex: blockIndex,
+        transactionEvents: txEvents,
+        rawData: rawData,
+      );
+
+      await withdrawUnbondedCallback!(withdrawUnbondTx);
+    } catch (e) {
+      debugPrint('error processing new user tx: $e');
+      rethrow;
+    }
+  }
+
+  void _processCreateTransaction(
+      String hash,
+      BigInt timeStamp,
+      String accountId,
+      String signer,
+      String method,
+      String pallet,
+      BigInt blockNumber,
+      Map<String, dynamic> args,
+      int blockIndex,
+      ChainError? failedReason,
+      Map<String, dynamic> rawData,
+      List<KC2Event> txEvents) async {
+    try {
+      if (signer != accountId) {
+        return;
+      }
+
+      final amount = args['amount'];
+      final root = args['root'];
+      final nominator = args['nominator'];
+      final bouncer = args['bouncer'];
+
+      final createTx = KC2CreateTxV1(
+        amount: amount,
+        root: root,
+        nominator: nominator,
+        bouncer: bouncer,
+        args: args,
+        pallet: pallet,
+        signer: signer,
+        method: method,
+        failedReason: failedReason,
+        timestamp: timeStamp,
+        hash: hash,
+        blockNumber: blockNumber,
+        blockIndex: blockIndex,
+        transactionEvents: txEvents,
+        rawData: rawData,
+      );
+
+      await createCallback!(createTx);
+    } catch (e) {
+      debugPrint('error processing new user tx: $e');
+      rethrow;
+    }
+  }
+
+  void _processNominateTransaction(
+      String hash,
+      BigInt timeStamp,
+      String accountId,
+      String signer,
+      String method,
+      String pallet,
+      BigInt blockNumber,
+      Map<String, dynamic> args,
+      int blockIndex,
+      ChainError? failedReason,
+      Map<String, dynamic> rawData,
+      List<KC2Event> txEvents) async {
+    try {
+      if (signer != accountId) {
+        return;
+      }
+
+      final poolId = args['pool_id'];
+      final validators = args['validators'];
+
+      final nominateTx = KC2NominateTxV1(
+        poolId: poolId,
+        validatorAccounts: validators,
+        args: args,
+        pallet: pallet,
+        signer: signer,
+        method: method,
+        failedReason: failedReason,
+        timestamp: timeStamp,
+        hash: hash,
+        blockNumber: blockNumber,
+        blockIndex: blockIndex,
+        transactionEvents: txEvents,
+        rawData: rawData,
+      );
+
+      await nominateCallback!(nominateTx);
+    } catch (e) {
+      debugPrint('error processing new user tx: $e');
+      rethrow;
+    }
+  }
+
+  void _processChillTransaction(
+      String hash,
+      BigInt timeStamp,
+      String accountId,
+      String signer,
+      String method,
+      String pallet,
+      BigInt blockNumber,
+      Map<String, dynamic> args,
+      int blockIndex,
+      ChainError? failedReason,
+      Map<String, dynamic> rawData,
+      List<KC2Event> txEvents) async {
+    try {
+      if (signer != accountId) {
+        return;
+      }
+
+      final poolId = args['pool_id'];
+
+      final chillTx = KC2ChillTxV1(
+        poolId: poolId,
+        args: args,
+        pallet: pallet,
+        signer: signer,
+        method: method,
+        failedReason: failedReason,
+        timestamp: timeStamp,
+        hash: hash,
+        blockNumber: blockNumber,
+        blockIndex: blockIndex,
+        transactionEvents: txEvents,
+        rawData: rawData,
+      );
+
+      await chillCallback!(chillTx);
+    } catch (e) {
+      debugPrint('error processing new user tx: $e');
+      rethrow;
+    }
+  }
+
+  void _processUpdateRolesTransaction(
+      String hash,
+      BigInt timeStamp,
+      String accountId,
+      String signer,
+      String method,
+      String pallet,
+      BigInt blockNumber,
+      Map<String, dynamic> args,
+      int blockIndex,
+      ChainError? failedReason,
+      Map<String, dynamic> rawData,
+      List<KC2Event> txEvents) async {
+    try {
+      if (signer != accountId) {
+        return;
+      }
+
+      final poolId = args['pool_id'];
+      final newRoot = args['new_root'];
+      final newNominator = args['new_nominator'];
+      final newBouncer = args['new_bouncer'];
+
+      final updateRolesTx = KC2UpdateRolesTxV1(
+        poolId: poolId,
+        root: newRoot,
+        nominator: newNominator,
+        bouncer: newBouncer,
+        args: args,
+        pallet: pallet,
+        signer: signer,
+        method: method,
+        failedReason: failedReason,
+        timestamp: timeStamp,
+        hash: hash,
+        blockNumber: blockNumber,
+        blockIndex: blockIndex,
+        transactionEvents: txEvents,
+        rawData: rawData,
+      );
+
+      await updateRolesCallback!(updateRolesTx);
+    } catch (e) {
+      debugPrint('error processing new user tx: $e');
+      rethrow;
+    }
+  }
+
+  void _processSetCommissionTransaction(
+      String hash,
+      BigInt timeStamp,
+      String accountId,
+      String signer,
+      String method,
+      String pallet,
+      BigInt blockNumber,
+      Map<String, dynamic> args,
+      int blockIndex,
+      ChainError? failedReason,
+      Map<String, dynamic> rawData,
+      List<KC2Event> txEvents) async {
+    try {
+      if (signer != accountId) {
+        return;
+      }
+
+      final poolId = args['pool_id'];
+      final newCommission = args['new_commission'];
+
+      final setCommissionTx = KC2SetCommissionTxV1(
+        poolId: poolId,
+        commission: newCommission,
+        args: args,
+        pallet: pallet,
+        signer: signer,
+        method: method,
+        failedReason: failedReason,
+        timestamp: timeStamp,
+        hash: hash,
+        blockNumber: blockNumber,
+        blockIndex: blockIndex,
+        transactionEvents: txEvents,
+        rawData: rawData,
+      );
+
+      await setCommissionCallback!(setCommissionTx);
+    } catch (e) {
+      debugPrint('error processing new user tx: $e');
+      rethrow;
+    }
+  }
+
+  void _processSetCommissionMaxTransaction(
+      String hash,
+      BigInt timeStamp,
+      String accountId,
+      String signer,
+      String method,
+      String pallet,
+      BigInt blockNumber,
+      Map<String, dynamic> args,
+      int blockIndex,
+      ChainError? failedReason,
+      Map<String, dynamic> rawData,
+      List<KC2Event> txEvents) async {
+    try {
+      if (signer != accountId) {
+        return;
+      }
+
+      final poolId = args['pool_id'];
+      final maxCommission = args['max_commission'];
+
+      final setCommissionMaxTx = KC2SetCommisionMaxTxV1(
+        poolId: poolId,
+        maxCommission: maxCommission,
+        args: args,
+        pallet: pallet,
+        signer: signer,
+        method: method,
+        failedReason: failedReason,
+        timestamp: timeStamp,
+        hash: hash,
+        blockNumber: blockNumber,
+        blockIndex: blockIndex,
+        transactionEvents: txEvents,
+        rawData: rawData,
+      );
+
+      await setCommissionMaxCallback!(setCommissionMaxTx);
+    } catch (e) {
+      debugPrint('error processing new user tx: $e');
+      rethrow;
+    }
+  }
+
+  void _processSetCommissionChangeRateTransaction(
+      String hash,
+      BigInt timeStamp,
+      String accountId,
+      String signer,
+      String method,
+      String pallet,
+      BigInt blockNumber,
+      Map<String, dynamic> args,
+      int blockIndex,
+      ChainError? failedReason,
+      Map<String, dynamic> rawData,
+      List<KC2Event> txEvents) async {
+    try {
+      if (signer != accountId) {
+        return;
+      }
+
+      final poolId = args['pool_id'];
+      final changeRate = args['change_rate'];
+
+      final setCommissionChangeRateTx = KC2SetCommissionChangeRateTxV1(
+        poolId: poolId,
+        commissionChangeRate: changeRate,
+        args: args,
+        pallet: pallet,
+        signer: signer,
+        method: method,
+        failedReason: failedReason,
+        timestamp: timeStamp,
+        hash: hash,
+        blockNumber: blockNumber,
+        blockIndex: blockIndex,
+        transactionEvents: txEvents,
+        rawData: rawData,
+      );
+
+      await setCommissionChangeRateCallback!(setCommissionChangeRateTx);
+    } catch (e) {
+      debugPrint('error processing new user tx: $e');
+      rethrow;
+    }
+  }
+
+  void _processClaimCommissionTransaction(
+      String hash,
+      BigInt timeStamp,
+      String accountId,
+      String signer,
+      String method,
+      String pallet,
+      BigInt blockNumber,
+      Map<String, dynamic> args,
+      int blockIndex,
+      ChainError? failedReason,
+      Map<String, dynamic> rawData,
+      List<KC2Event> txEvents) async {
+    try {
+      if (signer != accountId) {
+        return;
+      }
+
+      final poolId = args['pool_id'];
+
+      final claimCommissionTx = KC2ClaimCommissionTxV1(
+        poolId: poolId,
+        args: args,
+        pallet: pallet,
+        signer: signer,
+        method: method,
+        failedReason: failedReason,
+        timestamp: timeStamp,
+        hash: hash,
+        blockNumber: blockNumber,
+        blockIndex: blockIndex,
+        transactionEvents: txEvents,
+        rawData: rawData,
+      );
+
+      await claimCommissionCallback!(claimCommissionTx);
+    } catch (e) {
+      debugPrint('error processing new user tx: $e');
+      rethrow;
+    }
   }
 }
