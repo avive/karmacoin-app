@@ -35,13 +35,16 @@ class _SendDestinationState extends State<SendDestination> {
     _accountTextController = TextEditingController();
 
     appState.sendDestination.value = Destination.phoneNumber;
+    appState.sendDestinationPhoneNumberHash.value = '';
 
     // appreciate from a user profile page
     if (appState.sendDestinationUser.value != null) {
       KC2UserInfo userInfo = appState.sendDestinationUser.value!;
       // create contact from user
+
       appState.sendDestinationContact.value = Contact(userInfo.userName,
           userInfo.accountId, userInfo.phoneNumberHash, [], []);
+      appState.sendDestinationPhoneNumberHash.value = userInfo.phoneNumberHash;
       _accountTextController.text = userInfo.userName;
       appState.sendDestinationUser.value = null;
       appState.sendDestination.value = Destination.contact;
@@ -102,10 +105,11 @@ class _SendDestinationState extends State<SendDestination> {
   Widget _getInputWidget(BuildContext context) {
     switch (_selectedSegment) {
       case Destination.contact:
-      case Destination.address:
         return _getAccountInputWidget(context);
       case Destination.phoneNumber:
         return _getPhoneNumberInputWidget(context);
+      case Destination.address:
+        throw 'not yet implemented';
     }
   }
 
@@ -188,6 +192,8 @@ class _SendDestinationState extends State<SendDestination> {
         }
         debugPrint('Candidate match! setting dest contact');
         appState.sendDestinationContact.value = candidate;
+        appState.sendDestinationPhoneNumberHash.value =
+            candidate.phoneNumberHash;
         appState.sendDestination.value = Destination.contact;
         setState(() {
           _suggestedUserName = null;
@@ -326,6 +332,8 @@ class _SendDestinationState extends State<SendDestination> {
       // phoneController.value =
       //    PhoneNumber.parse(selectedContact.mobileNumber.number);
       appState.sendDestination.value = Destination.contact;
+      appState.sendDestinationPhoneNumberHash.value =
+          selectedContact.phoneNumberHash;
       appState.sendDestinationContact.value = selectedContact;
       _accountTextController.text = selectedContact.userName;
       /*

@@ -84,7 +84,7 @@ class _SignupProgressScreeenState extends State<SignupProgressScreeen> {
       // todo: regsiter callbacks and start signup
       kc2User.signupStatus.addListener(_onSignupStatusChanged);
 
-      debugPrint('Signing up user...');
+      debugPrint('Signing up ${appState.requestedUserName!}...');
 
       if (!configLogic.skipWhatsappVerification) {
         throw 'Not implemented yet! todo: implement whatsapp verification api call';
@@ -99,7 +99,8 @@ class _SignupProgressScreeenState extends State<SignupProgressScreeen> {
   void _onSignupStatusChanged() async {
     switch (kc2User.signupStatus.value) {
       case SignupStatus.signedUp:
-        debugPrint('Signup status is signed up...');
+        debugPrint(
+            'Signup status is signed up ${kc2User.userInfo.value!.userName}');
         appState.signedUpInCurentSession.value = true;
         await FirebaseAnalytics.instance.logEvent(name: "sign_up");
         debugPrint('*** going to user home...');

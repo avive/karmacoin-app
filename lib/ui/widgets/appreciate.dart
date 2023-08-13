@@ -75,10 +75,8 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     super.dispose();
   }
 
-  // validate input data and show alert if invalid
+  /// validate all appreciation input data
   Future<bool> _validateData() async {
-    debugPrint('validate data... ${phoneController.value}');
-
     bool isConnected = await PlatformInfo.isConnected();
 
     if (!isConnected && context.mounted) {
@@ -98,7 +96,7 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
           context,
           duration: const Duration(seconds: 2),
           title: 'Ooops',
-          subtitle: 'Missing local user info.',
+          subtitle: 'Please sign up to the app first.',
           configuration:
               const IconConfiguration(icon: CupertinoIcons.xmark_circle),
           maxWidth: statusAlertWidth,
@@ -109,17 +107,33 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
 
     KC2UserInfo userInfo = kc2User.userInfo.value!;
 
-    if (phoneController.value == null ||
-        phoneController.value!.countryCode.isEmpty ||
-        phoneController.value!.nsn.isEmpty) {
+    // in all cases we expected appState phone number hash to be non-empty
+    // with receiver's phoneNumber hash
+    if (appState.sendDestinationPhoneNumberHash.value.isEmpty) {
       if (context.mounted) {
         StatusAlert.show(
           context,
           duration: const Duration(seconds: 2),
           title: 'Oops...',
-          subtitle: 'Please enter receiver\'s mobile phone number.',
+          subtitle: 'Please specify a recipient.',
           configuration: const IconConfiguration(
               icon: CupertinoIcons.exclamationmark_triangle),
+          maxWidth: statusAlertWidth,
+        );
+      }
+      return false;
+    }
+
+    if (userInfo.phoneNumberHash ==
+        appState.sendDestinationPhoneNumberHash.value) {
+      if (context.mounted) {
+        StatusAlert.show(
+          context,
+          duration: const Duration(seconds: 2),
+          title: 'Ooops',
+          subtitle: 'You can\'t appreciate yourself.',
+          configuration:
+              const IconConfiguration(icon: CupertinoIcons.xmark_circle),
           maxWidth: statusAlertWidth,
         );
       }
@@ -135,24 +149,6 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
           subtitle: 'Please enter a non-zero Karma Coin amount',
           configuration: const IconConfiguration(
               icon: CupertinoIcons.exclamationmark_triangle),
-          maxWidth: statusAlertWidth,
-        );
-      }
-      return false;
-    }
-
-    String number =
-        '+${phoneController.value!.countryCode}${phoneController.value!.nsn}';
-
-    if (kc2User.identity.phoneNumber == number) {
-      if (context.mounted) {
-        StatusAlert.show(
-          context,
-          duration: const Duration(seconds: 2),
-          title: 'Ooops',
-          subtitle: 'You can\'t appreciate yourself.',
-          configuration:
-              const IconConfiguration(icon: CupertinoIcons.xmark_circle),
           maxWidth: statusAlertWidth,
         );
       }
@@ -180,19 +176,12 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   }
 
   Future<void> _sendAppreciation() async {
-    // todo: validate data and show alerts if invalid
-
-    String phoneNumber =
-        '${phoneController.value!.countryCode}${phoneController.value!.nsn}';
-
-    String phoneNumbeRhash = kc2Service.getPhoneNumberHash(phoneNumber);
-
-    // store ugc data in app state - will be handeled in user's home screen dispatcher....
+    // create payment tx data and store it in app state
     appState.paymentTransactionData.value = PaymentTransactionData(
       kCentsAmount: appState.kCentsAmount.value,
       personalityTrait: appState.selectedPersonalityTrait.value,
       communityId: widget.communityId,
-      destPhoneNumberHash: phoneNumbeRhash,
+      destPhoneNumberHash: appState.sendDestinationPhoneNumberHash.value,
     );
 
     debugPrint(
@@ -274,7 +263,6 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
 
     widgets.add(_getAppreciateButton(context));
     widgets.add(const SizedBox(height: 1));
-
     return widgets;
   }
 

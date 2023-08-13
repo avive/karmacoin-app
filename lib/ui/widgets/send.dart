@@ -54,7 +54,6 @@ class _SendWidgetState extends State<SendWidget> {
 
     switch (appState.sendDestination.value) {
       case Destination.contact:
-      case Destination.address:
         // todo: validate address format here 0x01fe for now...
         if (appState.sendDestinationAddress.value.isEmpty) {
           if (context.mounted) {
@@ -138,6 +137,8 @@ class _SendWidgetState extends State<SendWidget> {
           return false;
         }
         break;
+      case Destination.address:
+        throw 'not implemented';
     }
 
     if (appState.kCentsAmount.value == BigInt.zero) {
@@ -178,7 +179,6 @@ class _SendWidgetState extends State<SendWidget> {
   Future<void> _send() async {
     switch (appState.sendDestination.value) {
       case Destination.contact:
-      case Destination.address:
         appState.paymentTransactionData.value = PaymentTransactionData(
           kCentsAmount: appState.kCentsAmount.value,
           personalityTrait: appState.selectedPersonalityTrait.value,
@@ -194,13 +194,16 @@ class _SendWidgetState extends State<SendWidget> {
           destPhoneNumberHash: appState.sendDestinationPhoneNumberHash.value,
         );
         break;
+      case Destination.address:
+        throw 'not yet implemented';
     }
 
     if (context.mounted) {
       context.pop();
     }
 
-    debugPrint('payment tx data: ${appState.paymentTransactionData.value}');
+    debugPrint(
+        'local payment tx data: ${appState.paymentTransactionData.value}');
   }
 
   @override

@@ -59,9 +59,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   }
 
   void _postFrameCallback(BuildContext context) {
-    debugPrint("UserHomeScreen");
-
-    // handle appreciate after signup
+    // handle appreciate from a profile page after local user signup
     if (appState.sendDestinationUser.value != null) {
       Navigator.of(context).push(
         CupertinoPageRoute(
@@ -86,6 +84,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       }
       // register for push notes but don't wait on it - may show dialog
       // disabled in this release migrating to Twillio
+      // todo: fix me
       // settingsLogic.registerPushNotifications();
     });
   }
@@ -95,23 +94,11 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         valueListenable: appState.paymentTransactionData,
         builder: (context, value, child) {
           // we only care about non-community appreciations here
-
           if (value == null || value.communityId != 0) {
             return Container();
           }
 
           // todo: customize the progress screen for just coin sending...
-
-          /*
-          debugPrint('Data: $value');
-
-          String sendingTitle = 'Sending Appreciation...';
-          String sentTitle = 'Appreciation Sent';
-
-          if (value.personalityTrait.index == 0) {
-            sendingTitle = 'Sending Karma Coins...';
-            sentTitle = 'Karma Coins Sent';
-          }*/
 
           Future.delayed(const Duration(milliseconds: 200), () async {
             if (!context.mounted) return;
@@ -124,7 +111,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             );
 
             // clear the user tx data
-            debugPrint("clearing local tx data");
+            debugPrint("clearing local new tx data...");
             appState.paymentTransactionData.value = null;
           });
 

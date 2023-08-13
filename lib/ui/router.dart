@@ -14,7 +14,7 @@ import 'package:karma_coin/ui/screens/appreciations.dart';
 import 'package:karma_coin/ui/screens/phone_number_input.dart';
 import 'package:karma_coin/ui/screens/sms_code_input.dart';
 import 'package:karma_coin/ui/screens/user_details.dart';
-import 'package:karma_coin/ui/screens/home.dart';
+import 'package:karma_coin/ui/screens/user_home.dart';
 import 'package:karma_coin/ui/screens/user_name.dart';
 import 'package:karma_coin/ui/widgets/send.dart';
 
