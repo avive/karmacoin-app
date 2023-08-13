@@ -330,7 +330,7 @@ class _SendDestinationState extends State<SendDestination> {
   }
 
   void contactSelectedCallback(Contact selectedContact) {
-    debugPrint('contactSelectedCallback: $selectedContact');
+    debugPrint('contactSelectedCallback: ${selectedContact.userName}');
     setState(() {
       // todo: figure out dealing with phone hash here
       // phoneController.value =

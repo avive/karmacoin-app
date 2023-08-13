@@ -50,7 +50,7 @@ class KC2AppreciationTxV1 extends KC2Tx {
       PersonalityTrait trait = GenesisConfig.personalityTraits[charTraitId!];
       return '${trait.emoji} You are ${trait.name.toLowerCase()}';
     } else {
-      return '🤑 Karma Coin Payment';
+      return '🤑 Karma Coin Transfer';
     }
   }
 }

@@ -1,4 +1,5 @@
 import 'package:karma_coin/common/platform_info.dart';
+import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
@@ -173,20 +174,22 @@ class _SendWidgetState extends State<SendWidget> {
     return true;
   }
 
+  /// Send coins via an apprecaition with no personality trait
   Future<void> _send() async {
     switch (appState.sendDestination.value) {
       case Destination.contact:
         appState.paymentTransactionData.value = PaymentTransactionData(
           kCentsAmount: appState.kCentsAmount.value,
-          personalityTrait: appState.selectedPersonalityTrait.value,
+          personalityTrait: GenesisConfig.personalityTraits[0],
           communityId: 0,
-          destAccountId: appState.sendDestinationAddress.value,
+          //destAccountId: appState.sendDestinationAddress.value,
+          destPhoneNumberHash: appState.sendDestinationPhoneNumberHash.value,
         );
         break;
       case Destination.phoneNumber:
         appState.paymentTransactionData.value = PaymentTransactionData(
           kCentsAmount: appState.kCentsAmount.value,
-          personalityTrait: appState.selectedPersonalityTrait.value,
+          personalityTrait: GenesisConfig.personalityTraits[0],
           communityId: 0,
           destPhoneNumberHash: appState.sendDestinationPhoneNumberHash.value,
         );

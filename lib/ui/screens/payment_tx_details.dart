@@ -89,8 +89,8 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
         tx.toUserName == kc2User.userInfo.value!.userName;
 
     String fromLabel = sentToLocalUser
-        ? 'Sent by ${tx.fromUserName} to you.'
-        : 'Sent to ${tx.toUserName} by you.';
+        ? 'Sent from ${tx.fromUserName} to you'
+        : 'Sent from you to ${tx.toUserName}';
 
     Widget? icon = sentToLocalUser
         ? RandomAvatar(tx.fromUserName, height: 34, width: 34)
@@ -191,7 +191,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
             style: CupertinoTheme.of(context).textTheme.textStyle),
         leading: const FaIcon(FontAwesomeIcons.link, size: 20),
         subtitle: Text('Position ${widget.tx!.blockIndex}'),
-        trailing: Text(widget.tx!.blockNumber.toString(),
+        trailing: Text(widget.tx!.blockNumber.toInt().format(),
             style: CupertinoTheme.of(context).textTheme.textStyle),
       ),
     );

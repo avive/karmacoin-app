@@ -309,7 +309,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
           : TransactionStatus.failed;
 
       PersonalityTrait? trait;
-      String title = 'Karma Coins payment';
+      String title = 'Karma Coin Transfer';
       String emoji = '🤑';
 
       if (tx.charTraitId != null &&
