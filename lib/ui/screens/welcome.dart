@@ -92,7 +92,7 @@ class _KC2WelcomeScreenState extends State<KC2WelcomeScreen> {
     res.add(const SizedBox(height: 12));
 
     res.add(CupertinoButton(
-      onPressed: () => context.go(ScreenPaths.restoreAccount),
+      onPressed: () => context.push(ScreenPaths.restoreAccount),
       child: const Text('Restore Account'),
     ));
 

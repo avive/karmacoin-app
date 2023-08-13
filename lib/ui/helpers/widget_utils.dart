@@ -23,6 +23,15 @@ CupertinoSliverNavigationBar kcNavBar(context, String title) {
     ),
     backgroundColor: kcPurple,
     border: kcOrangeBorder,
+    leading: CupertinoNavigationBarBackButton(
+      color: CupertinoTheme.of(context).primaryColor,
+      // must be added as default implementation throws assert
+      onPressed: () {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+      },
+    ),
     trailing: adjustNavigationBarButtonPosition(
         CupertinoButton(
           onPressed: () async {
