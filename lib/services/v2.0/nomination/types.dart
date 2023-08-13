@@ -11,6 +11,20 @@ enum ConfigOption {
   remove,
 }
 
+class PoolMember {
+  /// The identifier of the pool to which `who` belongs.
+  PoolId id;
+  /// The quantity of points this member has in the bonded pool or in a sub pool if
+  /// `Self::unbonding_era` is some.
+  BigInt points;
+
+  PoolMember(this.id, this.points);
+
+  PoolMember.fromJson(Map<String, dynamic> json)
+    : id = json['pool_id'],
+      points = BigInt.from(json['points']);
+}
+
 /// Global on-chain configuration for nomination pools
 class NominationPoolsConfiguration {
   /// Minimum amount to bond to join a pool
@@ -43,6 +57,14 @@ class NominationPoolsConfiguration {
       this.maxPoolMembersPerPool,
       this.globalMaxCommission
       );
+
+  NominationPoolsConfiguration.fromJson(Map<String, dynamic> json)
+    : minJoinBond = BigInt.parse(json['minJoinBond']),
+      minCreateBond = BigInt.parse(json['minCreateBond']),
+      maxPools = json['maxPools'] ? null : json['maxPools'],
+      maxPoolMembers = json['maxPoolMembers'] ? null : json['maxPoolMembers'],
+      maxPoolMembersPerPool = json['maxPoolMembersPerPool'] ? null : json['maxPoolMembersPerPool'],
+      globalMaxCommission = BigInt.parse(json['globalMaxCommission']);
 }
 
 /// A pool's possible states.
@@ -76,6 +98,12 @@ class PoolRoles {
   String? bouncer;
 
   PoolRoles(this.depositor, this.root, this.nominator, this.bouncer);
+
+  PoolRoles.fromJson(Map<String, dynamic> json)
+    : depositor = json['depositor'],
+      root = json['root'],
+      nominator = json['nominator'],
+      bouncer = json['bouncer'];
 }
 
 /// Pool commission change rate preferences.
@@ -92,6 +120,10 @@ class CommissionChangeRate {
   int minDelay;
 
   CommissionChangeRate(this.maxIncrease, this.minDelay);
+
+  CommissionChangeRate.fromJson(Map<String, dynamic> json)
+    : maxIncrease = BigInt.parse(json['max_increase']),
+      minDelay = json['min_delay'];
 }
 
 /// Pool commission.
@@ -122,6 +154,13 @@ class Commission {
   int? throttleFrom;
 
   Commission(this.beneficiary, this.current, this.max, this.changeRate, this.throttleFrom);
+
+  Commission.fromJson(Map<String, dynamic> json)
+    : beneficiary = json['beneficiary'],
+      current = json['current'] == null ? null : BigInt.parse(json['current']),
+      max = json['max'] == null ? null : BigInt.parse(json['max']),
+      changeRate = json['change_rate'] == null ? null : CommissionChangeRate.fromJson(json['change_rate']),
+      throttleFrom = json['throttle_from'];
 }
 
 /// Pool permissions and state
@@ -131,7 +170,7 @@ class Pool {
   /// The commission rate of the pool.
   Commission commission;
   /// Count of members that belong to the pool.
-  int memberCount;
+  int memberCounter;
   /// Total points of all the members in the pool who are actively bonded.
   BigInt points;
   /// See [`PoolRoles`].
@@ -139,5 +178,13 @@ class Pool {
   /// The current state of the pool.
   PoolState state;
 
-  Pool(this.id, this.commission, this.memberCount, this.points, this.roles, this.state);
+  Pool(this.id, this.commission, this.memberCounter, this.points, this.roles, this.state);
+
+  Pool.fromJson(Map<String, dynamic> json)
+    : id = json['id'],
+      commission = Commission.fromJson(json['commission']),
+      memberCounter = json['member_counter'],
+      points = BigInt.from(json['points']),
+      roles = PoolRoles.fromJson(json['roles']),
+      state = PoolState.values.firstWhere((e) => e.toString() == 'PoolState.${json['state'].toLowerCase()}');
 }
