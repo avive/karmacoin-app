@@ -14,6 +14,7 @@ class PaymentTransactionData {
   /// Can be provided for a payment transaction. Not used in appreciation
   String? destAccountId;
 
+  /// NYI
   String? thankYouMessage;
 
   PaymentTransactionData(

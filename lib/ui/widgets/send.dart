@@ -53,8 +53,9 @@ class _SendWidgetState extends State<SendWidget> {
     }
 
     switch (appState.sendDestination.value) {
+      case Destination.address:
       case Destination.contact:
-        // todo: validate address format here 0x01fe for now...
+        // todo: validate address format
         if (appState.sendDestinationAddress.value.isEmpty) {
           if (context.mounted) {
             StatusAlert.show(
@@ -119,10 +120,8 @@ class _SendWidgetState extends State<SendWidget> {
           return false;
         }
 
-        String number =
-            '+${phoneController.value!.countryCode}${phoneController.value!.nsn}';
-
-        if (kc2User.identity.phoneNumber == number) {
+        if (kc2User.userInfo.value!.phoneNumberHash ==
+            appState.sendDestinationPhoneNumberHash.value) {
           if (context.mounted) {
             StatusAlert.show(
               context,
@@ -137,8 +136,6 @@ class _SendWidgetState extends State<SendWidget> {
           return false;
         }
         break;
-      case Destination.address:
-        throw 'not implemented';
     }
 
     if (appState.kCentsAmount.value == BigInt.zero) {
