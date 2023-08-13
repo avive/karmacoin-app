@@ -1,9 +1,11 @@
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:karma_coin/ui/screens/about.dart';
 import 'package:karma_coin/ui/screens/backup_account.dart';
 import 'package:karma_coin/ui/screens/community_home.dart';
 import 'package:karma_coin/ui/screens/karmachain.dart';
+import 'package:karma_coin/ui/screens/payment_tx_details.dart';
 import 'package:karma_coin/ui/screens/signup_progress.dart';
 import 'package:karma_coin/ui/screens/welcome.dart';
 import 'package:karma_coin/ui/screens/profile.dart';
@@ -262,9 +264,9 @@ final GoRouter appRouter = GoRouter(
           if (txId == null) {
             // todo: redirect to home screen
           }
-          // todo: fix me
-          return Container();
-          // TransactionDetailsScreen(Key(txId!), txId);
+          // optional tx passed from caller
+          KC2Tx? tx = state.extra != null ? state.extra as KC2Tx : null;
+          return TransactionDetailsScreen(Key(txId!), txId: txId, tx: tx);
         }),
     GoRoute(
         name: ScreenNames.account,

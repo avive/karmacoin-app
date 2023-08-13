@@ -354,7 +354,7 @@ class KC2User extends KC2UserInteface {
       return;
     }
 
-    if (tx.hash != _signupTxHash) {
+    if (_signupTxHash != null && tx.hash != _signupTxHash) {
       debugPrint('mismatch tx hash in signup tx: ${tx.hash}');
       return;
     }
@@ -374,7 +374,7 @@ class KC2User extends KC2UserInteface {
   }
 
   Future<void> _updateUserCallback(KC2UpdateUserTxV1 tx) async {
-    if (tx.hash != _updateUserTxHash) {
+    if (_updateUserTxHash != null && tx.hash != _updateUserTxHash) {
       debugPrint('mismatch tx hash in update user tx: ${tx.hash}');
       return;
     }

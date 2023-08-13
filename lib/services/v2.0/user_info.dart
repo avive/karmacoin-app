@@ -19,7 +19,7 @@ class KC2UserInfo {
   int nonce;
   int karmaScore;
   late Map<int, List<TraitScore>> traitScores;
-  List<CommunityMembership> communityMemberships;
+  late List<CommunityMembership> communityMemberships;
 
   KC2UserInfo({
     required this.accountId,
@@ -97,10 +97,13 @@ class KC2UserInfo {
             ? BigInt.parse(u['balance'])
             : BigInt.from(u['balance']),
         nonce = u['nonce'] is String ? int.parse(u['nonce']) : u['nonce'],
-        communityMemberships = (u['community_membership'] as List<dynamic>)
-            .map((e) => CommunityMembership.fromJson(e))
-            .toList(),
-        karmaScore = u['karma_score'] {
+        karmaScore = u['karma_score'] is int
+            ? u['karma_score']
+            : int.parse(u['karma_score']) {
+    List<dynamic> memberships = u['community_membership'];
+    communityMemberships =
+        memberships.map((e) => CommunityMembership.fromJson(e)).toList();
+
     List<TraitScore> scores = (u['trait_scores'] as List<dynamic>)
         .map((s) => TraitScore.fromJson(s))
         .toList();
@@ -128,7 +131,7 @@ class KC2UserInfo {
       'user_name': userName,
       'balance': balance.toString(),
       'nonce': nonce,
-      'karms_score': karmaScore,
+      'karma_score': karmaScore,
       'trait_scores': all.map((e) => e.toJson()).toList(),
       'community_membership':
           communityMemberships.map((e) => e.toJson()).toList(),

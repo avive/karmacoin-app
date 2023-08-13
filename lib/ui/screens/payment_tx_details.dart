@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
-import 'package:karma_coin/data/personality_traits.dart';
 import 'package:karma_coin/ui/widgets/pill.dart';
+import 'package:random_avatar/random_avatar.dart';
 
 /// Display transaction details for a a locally available transaction
 class TransactionDetailsScreen extends StatefulWidget {
-  final KC2Tx tx;
+  // optionally passed from router - if null - should be obtained from kc2Service on load
+  final KC2Tx? tx;
+  // tx hash 0x prefixed
+  final String txId;
 
-  const TransactionDetailsScreen(Key? key, {required this.tx})
+  const TransactionDetailsScreen(Key? key,
+      {required this.txId, required this.tx})
       : super(key: key);
 
   @override
@@ -20,6 +25,15 @@ class TransactionDetailsScreen extends StatefulWidget {
 }
 
 class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // todo: if tx is null - fetch it from kc2 api
+    if (widget.tx == null) {
+      throw 'For now - tx must be passed in via router to widget';
+    }
+  }
+
   CupertinoListTile _getAmountTile(BuildContext context, BigInt amount) {
     String displayAmount = KarmaCoinAmountFormatter.formatMinimal(amount);
     String usdEstimate = KarmaCoinAmountFormatter.formatUSDEstimate(amount);
@@ -36,15 +50,33 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
   }
 
   CupertinoListTile _getAddressTile(
-      BuildContext context, String title, String address) {
+      BuildContext context, String title, String address, bool isFrom) {
+    Icon icon = isFrom
+        ? const Icon(CupertinoIcons.arrow_left, size: 28)
+        : const Icon(CupertinoIcons.arrow_right, size: 28);
+
     return CupertinoListTile.notched(
         title:
             Text(title, style: CupertinoTheme.of(context).textTheme.textStyle),
         subtitle: Text(address),
-        leading: const Icon(CupertinoIcons.arrow_right, size: 28),
+        leading: icon,
+        trailing: const Icon(CupertinoIcons.share, size: 28),
         onTap: () {
           context.push(ScreenPaths.account, extra: address);
         });
+  }
+
+  CupertinoListTile _getIdTile(
+      BuildContext context, String title, String address) {
+    return CupertinoListTile.notched(
+      title: Text(title, style: CupertinoTheme.of(context).textTheme.textStyle),
+      subtitle: Text(widget.txId),
+      leading: const Icon(CupertinoIcons.checkmark_seal, size: 28),
+      trailing: const Icon(CupertinoIcons.share, size: 28),
+      onTap: () {
+        // todo: implement me and copy
+      },
+    );
   }
 
   List<CupertinoListTile> _getAppreciationTiles(
@@ -53,21 +85,28 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
 
     tiles.add(_getAmountTile(context, tx.amount));
 
-    String fromLabel = 'Sent to ${tx.toUserName} by you.';
-    if (tx.toAddress == kc2User.identity.accountId ||
-        tx.toUserName == kc2User.userInfo.value!.userName) {
-      fromLabel = 'Sent by ${tx.fromUserName} to you.';
-    }
+    bool sentToLocalUser = tx.toAddress == kc2User.identity.accountId ||
+        tx.toUserName == kc2User.userInfo.value!.userName;
+
+    String fromLabel = sentToLocalUser
+        ? 'Sent by ${tx.fromUserName} to you.'
+        : 'Sent to ${tx.toUserName} by you.';
+
+    Widget? icon = sentToLocalUser
+        ? RandomAvatar(tx.fromUserName, height: 34, width: 34)
+        : RandomAvatar(tx.toUserName!, height: 28, width: 34);
+
     tiles.add(
       CupertinoListTile.notched(
         trailing: Text(tx.timeAgo,
             style: CupertinoTheme.of(context).textTheme.textStyle),
         title: Text(fromLabel,
             style: CupertinoTheme.of(context).textTheme.textStyle),
-        leading: const Icon(CupertinoIcons.clock, size: 28),
+        leading: icon,
       ),
     );
 
+    /*
     final traits = GenesisConfig.personalityTraits;
 
     if (tx.charTraitId != null &&
@@ -94,10 +133,10 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
           ),
         ),
       );
-    }
+    }*/
 
-    tiles.add(_getAddressTile(context, 'To address', tx.toAddress));
-    tiles.add(_getAddressTile(context, 'From address', tx.fromAddress));
+    tiles.add(_getAddressTile(context, 'To address', tx.toAddress, false));
+    tiles.add(_getAddressTile(context, 'From address', tx.fromAddress, true));
 
     return tiles;
   }
@@ -124,8 +163,8 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
       ),
     );
 
-    tiles.add(_getAddressTile(context, 'To address', tx.toAddress));
-    tiles.add(_getAddressTile(context, 'From address', tx.fromAddress));
+    tiles.add(_getAddressTile(context, 'To address', tx.toAddress, false));
+    tiles.add(_getAddressTile(context, 'From address', tx.fromAddress, true));
 
     return tiles;
   }
@@ -139,27 +178,30 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
     } else if (widget.tx is KC2TransferTxV1) {
       tiles = _getTransferTiles(context, widget.tx as KC2TransferTxV1);
     } else {
-      throw 'unexpected tx type';
+      throw 'unexpected tx type or missing tx';
     }
 
     // add fields from the base tx
 
+    tiles.add(_getIdTile(context, 'Id', widget.txId));
+
     tiles.add(
       CupertinoListTile.notched(
-        title:
-            Text('Id', style: CupertinoTheme.of(context).textTheme.textStyle),
-        trailing: Text(widget.tx.hash,
+        title: Text('Block',
             style: CupertinoTheme.of(context).textTheme.textStyle),
-        leading: const Icon(CupertinoIcons.checkmark_seal, size: 28),
+        leading: const FaIcon(FontAwesomeIcons.link, size: 20),
+        subtitle: Text('Position ${widget.tx!.blockIndex}'),
+        trailing: Text(widget.tx!.blockNumber.toString(),
+            style: CupertinoTheme.of(context).textTheme.textStyle),
       ),
     );
 
-    if (widget.tx.failedReason == null) {
+    if (widget.tx?.failedReason == null) {
       tiles.add(
         CupertinoListTile.notched(
           title: Text('Status',
               style: CupertinoTheme.of(context).textTheme.textStyle),
-          leading: const Icon(CupertinoIcons.check_mark, size: 28),
+          leading: const Icon(CupertinoIcons.info, size: 28),
           trailing: const Pill(
             title: 'CONFIRMED',
             count: 0,
@@ -172,7 +214,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
         CupertinoListTile.notched(
           title: Text('Status',
               style: CupertinoTheme.of(context).textTheme.textStyle),
-          leading: const Icon(CupertinoIcons.check_mark, size: 28),
+          leading: const Icon(CupertinoIcons.info, size: 28),
           trailing: const Pill(
             title: 'ERROR',
             count: 0,

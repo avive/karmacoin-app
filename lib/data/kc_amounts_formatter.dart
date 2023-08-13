@@ -41,7 +41,7 @@ abstract class KarmaCoinAmountFormatter {
     String centsLabel = amount > BigInt.one ? 'Karma Cents' : 'Karma Cent';
 
     if (amount <= _kCentsDisplayUpperLimit) {
-      return '${_deicmalFormat.format(amount)} $centsLabel';
+      return '${_deicmalFormat.format(amount.toInt())} $centsLabel';
     }
 
     String label = amount >= BigInt.from(GenesisConfig.kCentsPerCoin * 2)

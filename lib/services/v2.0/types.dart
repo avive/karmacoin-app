@@ -36,9 +36,14 @@ class TraitScore {
   TraitScore(this.traitId, this.score, this.communityId);
 
   TraitScore.fromJson(Map<String, dynamic> t)
-      : traitId = t['trait_id'],
-        score = t['karma_score'],
-        communityId = t['community_id'];
+      : traitId =
+            t['trait_id'] is int ? t['trait_id'] : int.parse(t['trait_id']),
+        score = t['karma_score'] is int
+            ? t['karma_score']
+            : int.parse(t['karma_score']),
+        communityId = t['community_id'] is int
+            ? t['community_id']
+            : int.parse(t['community_id']);
 
   Map<String, dynamic> toJson() => {
         'trait_id': traitId,
@@ -55,8 +60,12 @@ class CommunityMembership {
   CommunityMembership(this.communityId, this.score, this.isAdmin);
 
   CommunityMembership.fromJson(Map<String, dynamic> c)
-      : communityId = c['community_id'],
-        score = c['karma_score'],
+      : communityId = c['community_id'] is int
+            ? c['community_id']
+            : int.parse(c['community_id']),
+        score = c['karma_score'] is int
+            ? c['karma_score']
+            : int.parse(c['karma_score']),
         isAdmin = c['is_admin'];
 
   Map<String, dynamic> toJson() => {

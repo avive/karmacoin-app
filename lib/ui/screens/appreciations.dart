@@ -329,7 +329,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
       return CupertinoListTile(
         onTap: () {
           context.pushNamed(ScreenNames.transactionDetails,
-              params: {'txId': tx.hash});
+              params: {'txId': tx.hash}, extra: tx);
         },
         key: Key(index.toString()),
         padding: const EdgeInsets.only(top: 6, bottom: 6, left: 14, right: 14),

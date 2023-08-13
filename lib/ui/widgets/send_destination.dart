@@ -291,7 +291,11 @@ class _SendDestinationState extends State<SendDestination> {
             textAlign: TextAlign.start,
             padding: const EdgeInsets.all(14.0),
             decoration: const BoxDecoration(
-              color: CupertinoColors.systemGrey4,
+              color: CupertinoDynamicColor.withBrightness(
+                // todo: make identical to phone input bcg color
+                color: CupertinoColors.systemGrey6,
+                darkColor: CupertinoColors.systemGrey,
+              ),
               border: Border(
                 bottom: BorderSide(
                   width: 2.0,
