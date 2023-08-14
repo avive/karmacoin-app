@@ -191,8 +191,8 @@ class KC2User extends KC2UserInteface {
       return;
     }
 
-    // set failure callback for 30 secs
-    Future.delayed(const Duration(seconds: 30), () async {
+    // set failure callback for 60 secs
+    Future.delayed(const Duration(seconds: 60), () async {
       if (signupStatus.value == SignupStatus.signingUp) {
         // timed out waiting for new user transaction
         signupStatus.value = SignupStatus.notSignedUp;

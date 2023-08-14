@@ -123,6 +123,8 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
       ),
     );
 
+    debugPrint('Address: ${widget.user.accountId}');
+
     techSectionTiles.add(
       CupertinoListTile.notched(
         padding:
@@ -208,7 +210,6 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
       );
     }
 
-  
     return [
       CupertinoListSection.insetGrouped(
           header: Text(

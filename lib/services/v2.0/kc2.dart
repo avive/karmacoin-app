@@ -213,11 +213,13 @@ class KarmachainService implements K2ServiceInterface {
       final txs = await kc2ApiProvider.send(
           'transactions_getTransactions', [accountId]).then((v) => v.result);
 
+      debugPrint('Got ${txs.length} txs for account: $accountId');
+
       int processed = 0;
 
       txs?.forEach((transaction) async {
         try {
-          // todo: verify status is 'OnChain'
+          debugPrint('Processing tx $processed ...');
           final BigInt blockNumber = BigInt.from(transaction['block_number']);
           final int transactionIndex = transaction['transaction_index'];
           final bytes = transaction['signed_transaction']['transaction_body'];
@@ -229,15 +231,15 @@ class KarmachainService implements K2ServiceInterface {
           await _processTransaction(accountId, transactionBody, events,
               BigInt.from(timestamp), null, blockNumber, transactionIndex);
           processed++;
+          debugPrint('Processed tx $processed / ${txs.length}...');
         } catch (e) {
           // don't throw so we can process valid txs even when one is bad
-          debugPrint('error processing tx: $transaction $e');
+          debugPrint('>>>>> error processing tx: $transaction $e');
         }
       });
 
       debugPrint(
           'Processed $processed / ${txs.length} txs for account: $accountId}');
-      // debugPrint('Account transactions: $txs');
 
       return FetchAppreciationsStatus.fetched;
     } catch (e) {
@@ -259,7 +261,7 @@ class KarmachainService implements K2ServiceInterface {
 
       return transactionEvents;
     } catch (e) {
-      debugPrint('error getting tx events: $e');
+      debugPrint('>>>> error getting tx events: $e');
       rethrow;
     }
   }
