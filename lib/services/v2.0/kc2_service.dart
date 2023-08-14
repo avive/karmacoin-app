@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'package:karma_coin/logic/kc2/keyring.dart';
 import 'package:karma_coin/services/v2.0/interfaces.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
-import 'package:substrate_metadata_fixed/models/models.dart';
 
 /// Client callback types
 typedef NewUserCallback = Future<void> Function(KC2NewUserTransactionV1 tx);

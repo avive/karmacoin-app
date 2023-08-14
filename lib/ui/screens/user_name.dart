@@ -163,6 +163,12 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
             case UpdateResult.updated:
               text = 'Your user name was updated!';
               color = CupertinoColors.activeGreen;
+              kc2User.updateResult.value = UpdateResult.unknown;
+              Future.delayed(Duration.zero, () {
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                }
+              });
               break;
             case UpdateResult.usernameTaken:
               text = 'User name taken. Please try another one';
@@ -188,9 +194,10 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
           Text textWidget = Text(
             text,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: color,
-            ),
+            style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                  TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w400, color: color),
+                ),
           );
 
           if (value == UpdateResult.updating) {
@@ -282,67 +289,8 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
         }
         break;
       case Operation.updateUserName:
-      // note: this flow is not kc2 upgraded yet
-      /*
-        debugPrint('starting update user name flow...');
-        try {
-          SubmitTransactionResponse resp = await accountLogic
-              .submitUpdateUserNameTransacation(_textController.text);
-
-          switch (resp.submitTransactionResult) {
-            case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
-              if (context.mounted) {
-                StatusAlert.show(
-                  context,
-                  duration: const Duration(seconds: 2),
-                  title: 'Name updated',
-                  configuration:
-                      const IconConfiguration(icon: CupertinoIcons.wand_rays),
-                  maxWidth: statusAlertWidth,
-                );
-                setState(() {
-                  isSubmitInProgress = false;
-                });
-                context.pop();
-              }
-              debugPrint('Update user name transaction submitted and accepted');
-              break;
-            case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
-              if (context.mounted) {
-                StatusAlert.show(
-                  context,
-                  duration: const Duration(seconds: 2),
-                  title: 'Server Error',
-                  subtitle: 'Operation failed. Try again later.',
-                  configuration: const IconConfiguration(
-                      icon: CupertinoIcons.exclamationmark_triangle),
-                  maxWidth: statusAlertWidth,
-                );
-                setState(() {
-                  isSubmitInProgress = false;
-                });
-              }
-              break;
-              
-          }
-        } catch (e) {
-          if (context.mounted) {
-            StatusAlert.show(
-              context,
-              duration: const Duration(seconds: 2),
-              title: 'Oops',
-              subtitle: 'Operation failed. Try again later.',
-              configuration: const IconConfiguration(
-                  icon: CupertinoIcons.exclamationmark_triangle),
-              maxWidth: statusAlertWidth,
-            );
-            setState(() {
-              isSubmitInProgress = false;
-            });
-          }
-        }
+        await kc2User.updateUserInfo(appState.requestedUserName, null);
         break;
-        */
     }
   }
 
