@@ -682,13 +682,17 @@ class KarmachainService implements K2ServiceInterface {
         return MapEntry(extrinsicHash, extrinsic);
       }).toList();
 
-      final timestamp = extrinsics
+      var timestamp = extrinsics
           .firstWhere((e) =>
               e.value['calls'].key == 'Timestamp' &&
               e.value['calls'].value.key == 'set')
           .value['calls']
           .value
           .value['now'];
+
+      if (timestamp is BigInt) {
+        timestamp = timestamp.toInt();
+      }
 
       extrinsics.asMap().forEach((transactionIndex, e) {
         final hash = e.key;
