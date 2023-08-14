@@ -3,7 +3,7 @@ import 'package:karma_coin/services/v2.0/txs/tx.dart';
 
 class KC2SetCommissionTxV1 extends KC2Tx {
   PoolId poolId;
-  BigInt? commission;
+  int? commission;
   String? beneficiary;
 
   KC2SetCommissionTxV1({

@@ -115,14 +115,14 @@ class PoolRoles {
 /// Commission change rates are not applied to decreases in commission.
 class CommissionChangeRate {
   /// The maximum amount the commission can be updated by per `min_delay` period.
-  BigInt maxIncrease;
+  int maxIncrease;
   /// How often an update can take place.
   int minDelay;
 
   CommissionChangeRate(this.maxIncrease, this.minDelay);
 
   CommissionChangeRate.fromJson(Map<String, dynamic> json)
-    : maxIncrease = BigInt.parse(json['max_increase']),
+    : maxIncrease = json['max_increase'],
       minDelay = json['min_delay'];
 }
 
@@ -142,10 +142,10 @@ class Commission {
   /// The account commission is paid to
   String? beneficiary;
   /// Optional commission rate of the pool.
-  BigInt? current;
+  int? current;
   /// Optional maximum commission that can be set by the pool `root`. Once set, this value can
   /// only be updated to a decreased value.
-  BigInt? max;
+  int? max;
   /// Optional configuration around how often commission can be updated, and when the last
   /// commission update took place.
   CommissionChangeRate? changeRate;
@@ -157,8 +157,8 @@ class Commission {
 
   Commission.fromJson(Map<String, dynamic> json)
     : beneficiary = json['beneficiary'],
-      current = json['current'] == null ? null : BigInt.parse(json['current']),
-      max = json['max'] == null ? null : BigInt.parse(json['max']),
+      current = json['current'],
+      max = json['max'],
       changeRate = json['change_rate'] == null ? null : CommissionChangeRate.fromJson(json['change_rate']),
       throttleFrom = json['throttle_from'];
 }

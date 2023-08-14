@@ -1,11 +1,11 @@
 import 'package:karma_coin/services/v2.0/nomination/types.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 
-class KC2SetCommisionMaxTxV1 extends KC2Tx {
+class KC2SetCommissionMaxTxV1 extends KC2Tx {
   PoolId poolId;
-  BigInt maxCommission;
+  int maxCommission;
 
-  KC2SetCommisionMaxTxV1({
+  KC2SetCommissionMaxTxV1({
     required this.poolId,
     required this.maxCommission,
     required super.args,

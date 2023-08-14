@@ -26,7 +26,7 @@ typedef NominateCallback = Future<void> Function(KC2NominateTxV1 tx);
 typedef ChillCallback = Future<void> Function(KC2ChillTxV1 tx);
 typedef UpdateRolesCallback = Future<void> Function(KC2UpdateRolesTxV1 tx);
 typedef SetCommissionCallback = Future<void> Function(KC2SetCommissionTxV1 tx);
-typedef SetCommissionMaxCallback = Future<void> Function(KC2SetCommisionMaxTxV1 tx);
+typedef SetCommissionMaxCallback = Future<void> Function(KC2SetCommissionMaxTxV1 tx);
 typedef SetCommissionChangeRateCallback = Future<void> Function(KC2SetCommissionChangeRateTxV1 tx);
 typedef ClaimCommissionCallback = Future<void> Function(KC2ClaimCommissionTxV1 tx);
 
@@ -274,7 +274,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   ///
   /// - If a `null` is supplied to `commission` and `beneficiary`, existing commission will be removed.
   /// - Both `commission` and `beneficiary` must be supplied or be `null`
-  Future<String> setCommission(PoolId poolId, BigInt? commission, String? beneficiary) async {
+  Future<String> setCommission(PoolId poolId, int? commission, String? beneficiary) async {
     try {
       Option newCommission;
 
@@ -304,13 +304,13 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   /// - Initial max can be set to any `Perbill`, and only smaller values thereafter.
   /// - Current commission will be lowered in the event it is higher than a new max
   ///   commission.
-  Future<String> setCommissionMax(PoolId poolId, BigInt maxCommission) async {
+  Future<String> setCommissionMax(PoolId poolId, int maxCommission) async {
     try {
       final call = MapEntry(
           'NominationPools',
           MapEntry('set_commission_max', {
             'pool_id': poolId,
-            'new_commission': maxCommission,
+            'max_commission': maxCommission,
           })
       );
 
