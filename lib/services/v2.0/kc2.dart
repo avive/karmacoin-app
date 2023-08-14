@@ -6,18 +6,21 @@ import 'package:karma_coin/services/v2.0/error.dart';
 import 'package:karma_coin/services/v2.0/interfaces.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
 import 'package:karma_coin/services/v2.0/event.dart';
-import 'package:karma_coin/services/v2.0/nomination/interfaces.dart';
-import 'package:karma_coin/services/v2.0/nomination/txs/claim_commission.dart';
-import 'package:karma_coin/services/v2.0/nomination/txs/claim_payout.dart';
-import 'package:karma_coin/services/v2.0/nomination/txs/create.dart';
-import 'package:karma_coin/services/v2.0/nomination/txs/join.dart';
-import 'package:karma_coin/services/v2.0/nomination/txs/nominate.dart';
-import 'package:karma_coin/services/v2.0/nomination/txs/set_commission.dart';
-import 'package:karma_coin/services/v2.0/nomination/txs/set_commission_change_rate.dart';
-import 'package:karma_coin/services/v2.0/nomination/txs/set_commission_max.dart';
-import 'package:karma_coin/services/v2.0/nomination/txs/unbond.dart';
-import 'package:karma_coin/services/v2.0/nomination/txs/update_roles.dart';
-import 'package:karma_coin/services/v2.0/nomination/txs/withdraw_unbonded.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/claim_commission.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/claim_payout.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/create.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/join.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/nominate.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/set_commission.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/set_commission_change_rate.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/set_commission_max.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/unbond.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/update_roles.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/withdraw_unbonded.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/chill.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/types.dart';
+import 'package:karma_coin/services/v2.0/staking/interfaces.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:polkadart/polkadart.dart' as polkadart;
@@ -29,9 +32,7 @@ import 'package:substrate_metadata_fixed/substrate_metadata.dart';
 import 'package:convert/convert.dart';
 import 'package:substrate_metadata_fixed/types/metadata_types.dart';
 
-import 'nomination/txs/chill.dart';
-
-class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterface implements K2ServiceInterface {
+class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterface, KC2StakingInterface implements K2ServiceInterface {
   Blake2bHasher hasher = const Blake2bHasher(64);
 
   /// Decoded chain metadata
@@ -1376,9 +1377,9 @@ class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterfac
       }
 
       final amount = args['amount'];
-      final root = args['root'];
-      final nominator = args['nominator'];
-      final bouncer = args['bouncer'];
+      final root = ss58.Codec(42).encode(args['root'].value.cast<int>());
+      final nominator = ss58.Codec(42).encode(args['nominator'].value.cast<int>());
+      final bouncer = ss58.Codec(42).encode(args['bouncer'].value.cast<int>());
 
       final createTx = KC2CreateTxV1(
         amount: amount,
@@ -1424,7 +1425,7 @@ class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterfac
       }
 
       final poolId = args['pool_id'];
-      final validators = args['validators'];
+      final validators = args['validators'].map((e) => ss58.Codec(42).encode(e.cast<int>())).toList().cast<String>();
 
       final nominateTx = KC2NominateTxV1(
         poolId: poolId,
@@ -1510,9 +1511,18 @@ class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterfac
       }
 
       final poolId = args['pool_id'];
-      final newRoot = args['new_root'];
-      final newNominator = args['new_nominator'];
-      final newBouncer = args['new_bouncer'];
+      final newRoot = MapEntry(
+        ConfigOption.values.firstWhere((e) => e.toString() == 'ConfigOption.${args['new_root'].key.toLowerCase()}'),
+        args['new_root'].value == null ? null : ss58.Codec(42).encode(args['new_root'].value.cast<int>()),
+      );
+      final newNominator = MapEntry(
+        ConfigOption.values.firstWhere((e) => e.toString() == 'ConfigOption.${args['new_nominator'].key.toLowerCase()}'),
+        args['new_nominator'].value == null ? null : ss58.Codec(42).encode(args['new_nominator'].value.cast<int>()),
+      );
+      final newBouncer = MapEntry(
+        ConfigOption.values.firstWhere((e) => e.toString() == 'ConfigOption.${args['new_bouncer'].key.toLowerCase()}'),
+        args['new_bouncer'].value == null ? null : ss58.Codec(42).encode(args['new_bouncer'].value.cast<int>()),
+      );
 
       final updateRolesTx = KC2UpdateRolesTxV1(
         poolId: poolId,
@@ -1560,9 +1570,18 @@ class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterfac
       final poolId = args['pool_id'];
       final newCommission = args['new_commission'];
 
+      int? commission;
+      String? beneficiary;
+
+      if (newCommission.value != null) {
+        commission = newCommission.value[0];
+        beneficiary = ss58.Codec(42).encode(newCommission.value[1].cast<int>());
+      }
+
       final setCommissionTx = KC2SetCommissionTxV1(
         poolId: poolId,
-        commission: newCommission,
+        commission: commission,
+        beneficiary: beneficiary,
         args: args,
         pallet: pallet,
         signer: signer,
@@ -1604,7 +1623,7 @@ class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterfac
       final poolId = args['pool_id'];
       final maxCommission = args['max_commission'];
 
-      final setCommissionMaxTx = KC2SetCommisionMaxTxV1(
+      final setCommissionMaxTx = KC2SetCommissionMaxTxV1(
         poolId: poolId,
         maxCommission: maxCommission,
         args: args,
@@ -1646,7 +1665,7 @@ class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterfac
       }
 
       final poolId = args['pool_id'];
-      final changeRate = args['change_rate'];
+      final changeRate = CommissionChangeRate.fromJson(args['change_rate']);
 
       final setCommissionChangeRateTx = KC2SetCommissionChangeRateTxV1(
         poolId: poolId,
