@@ -208,7 +208,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   /// account.
   Future<String> nominate(PoolId poolId, List<String> validatorsAccountIds) async {
     try {
-      final validators = validatorsAccountIds.map((e) => ss58.Address.decode(e).pubkey);
+      final validators = validatorsAccountIds.map((e) => ss58.Address.decode(e).pubkey).toList();
 
       final call = MapEntry(
           'NominationPools',
@@ -485,9 +485,6 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
       rethrow;
     }
   }
-
-  // TODO: get list of validators for a pool
-  // TODO: get list of all validators
 
   // available client txs callbacks
   JoinCallback? joinCallback;
