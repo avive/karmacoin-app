@@ -1,4 +1,4 @@
-import 'package:karma_coin/services/v2.0/nomination/types.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/types.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 
 class KC2ChillTxV1 extends KC2Tx {

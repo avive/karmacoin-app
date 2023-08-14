@@ -1,15 +1,11 @@
-import 'package:karma_coin/services/v2.0/nomination/types.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/types.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 
-class KC2SetCommissionTxV1 extends KC2Tx {
+class KC2ClaimCommissionTxV1 extends KC2Tx {
   PoolId poolId;
-  int? commission;
-  String? beneficiary;
 
-  KC2SetCommissionTxV1({
+  KC2ClaimCommissionTxV1({
     required this.poolId,
-    this.commission,
-    this.beneficiary,
     required super.args,
     required super.pallet,
     required super.method,

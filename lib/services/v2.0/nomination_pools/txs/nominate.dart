@@ -1,13 +1,13 @@
-import 'package:karma_coin/services/v2.0/nomination/types.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/types.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 
-class KC2JoinTxV1 extends KC2Tx {
-  BigInt amount;
+class KC2NominateTxV1 extends KC2Tx {
   PoolId poolId;
+  List<String> validatorAccounts;
 
-  KC2JoinTxV1({
-    required this.amount,
+  KC2NominateTxV1({
     required this.poolId,
+    required this.validatorAccounts,
     required super.args,
     required super.pallet,
     required super.method,

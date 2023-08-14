@@ -1,17 +1,13 @@
-import 'package:karma_coin/services/v2.0/nomination/types.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/types.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 
-class KC2UpdateRolesTxV1 extends KC2Tx {
+class KC2JoinTxV1 extends KC2Tx {
+  BigInt amount;
   PoolId poolId;
-  MapEntry<ConfigOption, String?> root;
-  MapEntry<ConfigOption, String?> nominator;
-  MapEntry<ConfigOption, String?> bouncer;
 
-  KC2UpdateRolesTxV1({
+  KC2JoinTxV1({
+    required this.amount,
     required this.poolId,
-    required this.root,
-    required this.nominator,
-    required this.bouncer,
     required super.args,
     required super.pallet,
     required super.method,
