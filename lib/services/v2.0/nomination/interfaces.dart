@@ -327,8 +327,18 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   /// restrictive than the current.
   Future<String> setCommissionChangeRate(PoolId poolId, CommissionChangeRate commissionChangeRate) async {
     try {
-      // TODO: how to decode CommissionChangeRate?
-      throw UnimplementedError();
+      final call = MapEntry(
+          'NominationPools',
+          MapEntry('set_commission_change_rate', {
+            'pool_id': poolId,
+            'change_rate': {
+              'max_increase': commissionChangeRate.maxIncrease,
+              'min_delay': commissionChangeRate.minDelay,
+            },
+          })
+      );
+
+      return await signAndSendTransaction(call);
     } on PlatformException catch (e) {
       debugPrint('Failed to join nomination pool: ${e.details}');
       rethrow;
