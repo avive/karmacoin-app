@@ -293,8 +293,8 @@ class KC2User extends KC2UserInteface {
 
     updateResult.value = UpdateResult.updating;
 
-    // set failure callback for 18 secs
-    Future.delayed(const Duration(seconds: 18), () async {
+    // set failure callback for 30 secs
+    Future.delayed(const Duration(seconds: 30), () async {
       if (updateResult.value == UpdateResult.updating) {
         // timed out waiting for update transaction
         updateResult.value == UpdateResult.connectionTimeOut;
@@ -325,7 +325,7 @@ class KC2User extends KC2UserInteface {
           updateResult.value = UpdateResult.accountMismatch;
           break;
         case "NoVerifierEvidence":
-          signupFailureReson = SignupFailureReason.serverError;
+          updateResult.value = UpdateResult.serverError;
         default:
           debugPrint(">>> deal with it");
           updateResult.value = UpdateResult.invalidData;
@@ -402,6 +402,9 @@ class KC2User extends KC2UserInteface {
       return;
     }
 
+    // todo: consider just getting user info from chain - it should have the updated
+    // information so all the code below is redundant
+
     // Clone needed here as we want to set a new observable value
     KC2UserInfo u = KC2UserInfo.clone(userInfo.value!);
     bool updated = false;
@@ -431,6 +434,7 @@ class KC2User extends KC2UserInteface {
     // we don't care about this anymore in this app session
     _updateUserTxHash = '';
 
+    // Update obsrveable status
     updateResult.value = UpdateResult.updated;
   }
 }

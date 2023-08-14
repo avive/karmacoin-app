@@ -1,5 +1,6 @@
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/logic/kc2/user_interface.dart';
 import 'package:karma_coin/logic/user_name_availability.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:status_alert/status_alert.dart';
@@ -90,7 +91,9 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
                               },
                         child: submitButtonText,
                       ),
-                      _getSignupStatusRow(context),
+                      widget.operation == Operation.updateUserName
+                          ? _getUpdateNameStatus(context)
+                          : Container(),
                     ]),
               ),
             ),
@@ -142,63 +145,75 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
   }
 
   // todo: add signup status widget with status of signup
-  Widget _getSignupStatusRow(BuildContext context) {
-    return Container();
-
-    /*
-    return ValueListenableBuilder<AccountSetupStatus>(
-        valueListenable: accountSetupController.status,
+  Widget _getUpdateNameStatus(BuildContext context) {
+    return ValueListenableBuilder<UpdateResult>(
+        // todo: how to make this not assert when karmaCoinUser is null?
+        valueListenable: kc2User.updateResult,
         builder: (context, value, child) {
-          bool showIndicator = false;
           String text = '';
-          debugPrint(">>> status: $value");
+          Color? color = CupertinoColors.systemRed;
           switch (value) {
-            case AccountSetupStatus.signingUp:
-              text = 'Signing up...';
-              showIndicator = true;
-              break;
-            case AccountSetupStatus.incorrectVerificationCode:
-              text =
-                  'Incorrect verification code. Please go back and enter the correct code.';
-              break;
-            case AccountSetupStatus.transactionSubmitted:
-              text = 'Transaction submitted';
-              showIndicator = true;
-              break;
-            case AccountSetupStatus.submittingTransaction:
-              text = 'Submitting transaction';
-              showIndicator = true;
-              break;
-            case AccountSetupStatus.signedUp:
-              text = 'Signed up!';
-              break;
-            case AccountSetupStatus.accountAlreadyExists:
-              text = 'Account already exists';
-              break;
-            case AccountSetupStatus.missingData:
-              text = 'Missing data';
-              break;
-            default:
+            case UpdateResult.unknown:
               text = '';
               break;
+            case UpdateResult.updating:
+              text = 'Updating. Please wait...';
+              color = CupertinoTheme.of(context).textTheme.textStyle.color;
+              break;
+            case UpdateResult.updated:
+              text = 'Your user name was updated!';
+              color = CupertinoColors.activeGreen;
+              break;
+            case UpdateResult.usernameTaken:
+              text = 'User name taken. Please try another one';
+              break;
+            case UpdateResult.invalidData:
+              text = 'Server error. Please try again later.';
+              break;
+            case UpdateResult.invalidSignature:
+              text = 'Invalid signature. Please try again later.';
+              break;
+            case UpdateResult.serverError:
+              text = 'Server error. Please try again later.';
+
+              break;
+            case UpdateResult.accountMismatch:
+              text = 'Account mismatch error.';
+              break;
+            case UpdateResult.connectionTimeOut:
+              text = 'Connection timeout. Please try again later.';
+              break;
           }
 
-          List<Widget> children = [];
-          if (text != '') {
-            children.add(const SizedBox(height: 14));
-            children.add(Text(text,
-                style: CupertinoTheme.of(context).textTheme.textStyle));
+          Text textWidget = Text(
+            text,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: color,
+            ),
+          );
+
+          if (value == UpdateResult.updating) {
+            return Column(
+              children: [
+                const SizedBox(height: 14),
+                textWidget,
+                const SizedBox(height: 14),
+                const CupertinoActivityIndicator(
+                  radius: 20,
+                  animating: true,
+                ),
+              ],
+            );
           }
 
-          if (showIndicator) {
-            children.add(const SizedBox(height: 14));
-            children.add(const CupertinoActivityIndicator(
-              radius: 20,
-            ));
-          }
-
-          return Column(children: children);
-        });*/
+          return Column(
+            children: [
+              const SizedBox(height: 14),
+              textWidget,
+            ],
+          );
+        });
   }
 
   Future<void> _submitName(BuildContext context) async {
@@ -353,9 +368,9 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
             decoration: const BoxDecoration(
               border: Border(
                 bottom: BorderSide(
-                  width: 0,
+                  width: 2.0,
                   // todo: from theme
-                  color: CupertinoColors.inactiveGray,
+                  color: CupertinoColors.activeBlue,
                 ),
               ),
             ),
