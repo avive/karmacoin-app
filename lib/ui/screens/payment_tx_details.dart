@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:karma_coin/data/genesis_config.dart';
+import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
-import 'package:karma_coin/data/personality_traits.dart';
-import 'package:karma_coin/data/phone_number_formatter.dart';
-import 'package:karma_coin/data/signed_transaction.dart';
-import 'package:karma_coin/services/api/types.pb.dart' as types;
-import 'package:karma_coin/ui/helpers/transactions.dart';
 import 'package:karma_coin/ui/widgets/pill.dart';
+import 'package:random_avatar/random_avatar.dart';
 
 /// Display transaction details for a a locally available transaction
 class TransactionDetailsScreen extends StatefulWidget {
-  // 0x212...
+  // optionally passed from router - if null - should be obtained from kc2Service on load
+  final KC2Tx? tx;
+  // tx hash 0x prefixed
   final String txId;
 
-  const TransactionDetailsScreen(Key? key, this.txId) : super(key: key);
+  const TransactionDetailsScreen(Key? key,
+      {required this.txId, required this.tx})
+      : super(key: key);
 
   @override
   State<TransactionDetailsScreen> createState() =>
@@ -23,82 +26,95 @@ class TransactionDetailsScreen extends StatefulWidget {
 }
 
 class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
-  late final SignedTransactionWithStatusEx? transaction;
-  late final types.TransactionEvent? transactionEvent;
-
   @override
-  initState() {
+  void initState() {
     super.initState();
-    transaction = txsBoss.getTranscation(widget.txId);
-    if (transaction == null) {
-      return;
+    // todo: if tx is null - fetch it from kc2 api
+    if (widget.tx == null) {
+      throw 'For now - tx must be passed in via router to widget';
     }
-
-    transactionEvent = txsBoss.txEventsNotifer.value[widget.txId];
-    transaction!.openned.value = true;
   }
 
-  /// Return the list secionts
-  List<CupertinoListSection> _getSections(
-      BuildContext context, types.PaymentTransactionV1 paymentData) {
-    if (transaction == null) {
-      return [];
-    }
+  CupertinoListTile _getAmountTile(BuildContext context, BigInt amount) {
+    String displayAmount = KarmaCoinAmountFormatter.formatMinimal(amount);
+    String usdEstimate = KarmaCoinAmountFormatter.formatUSDEstimate(amount);
 
-    SignedTransactionWithStatusEx tx = transaction!;
+    return CupertinoListTile.notched(
+      title:
+          Text('Amount', style: CupertinoTheme.of(context).textTheme.textStyle),
+      trailing: Text(displayAmount,
+          textAlign: TextAlign.right,
+          style: CupertinoTheme.of(context).textTheme.textStyle),
+      subtitle: Text(usdEstimate),
+      leading: const Icon(CupertinoIcons.money_dollar, size: 28),
+    );
+  }
 
+  CupertinoListTile _getAddressTile(
+      BuildContext context, String title, String address, bool isFrom) {
+    Icon icon = isFrom
+        ? const Icon(CupertinoIcons.arrow_left, size: 28)
+        : const Icon(CupertinoIcons.arrow_right, size: 28);
+
+    return CupertinoListTile.notched(
+        title:
+            Text(title, style: CupertinoTheme.of(context).textTheme.textStyle),
+        subtitle: Text(address),
+        leading: icon,
+        trailing: const Icon(CupertinoIcons.share, size: 28),
+        onTap: () {
+          context.push(ScreenPaths.account, extra: address);
+        });
+  }
+
+  CupertinoListTile _getIdTile(
+      BuildContext context, String title, String address) {
+    return CupertinoListTile.notched(
+      title: Text(title, style: CupertinoTheme.of(context).textTheme.textStyle),
+      subtitle: Text(widget.txId),
+      leading: const Icon(CupertinoIcons.checkmark_seal, size: 28),
+      trailing: const Icon(CupertinoIcons.share, size: 28),
+      onTap: () {
+        // todo: implement me and copy
+      },
+    );
+  }
+
+  List<CupertinoListTile> _getAppreciationTiles(
+      BuildContext context, KC2AppreciationTxV1 tx) {
     List<CupertinoListTile> tiles = [];
-    final types.User? sender = tx.getFromUser();
-    String senderName = sender != null ? sender.userName : "n/a";
 
-    final senderPhoneNumber = sender != null &&
-            sender.hasMobileNumber() &&
-            sender.mobileNumber.number.isNotEmpty
-        ? sender.mobileNumber.number.formatPhoneNumber()
-        : "";
+    tiles.add(_getAmountTile(context, tx.amount));
 
-    TransactionStatus status = TransactionStatus.pending;
-    String operationLabel = 'Sent by you';
+    bool sentToLocalUser = tx.toAddress == kc2User.identity.accountId ||
+        tx.toUserName == kc2User.userInfo.value!.userName;
 
-    // an incoming appreciation is always confirmed on chain
-    if (tx.incoming) {
-      status = TransactionStatus.confirmed;
-      operationLabel = 'Sent to you';
-    }
+    String fromLabel = sentToLocalUser
+        ? 'Sent from ${tx.fromUserName} to you'
+        : 'Sent from you to ${tx.toUserName}';
 
-    String toUserName = "";
-    String toUserAccount = "";
-    String toUserPhoneNumber = "";
+    Widget? icon = sentToLocalUser
+        ? RandomAvatar(tx.fromUserName, height: 34, width: 34)
+        : RandomAvatar(tx.toUserName!, height: 28, width: 34);
 
-    types.User? toUser = tx.getToUser();
-    if (toUser != null) {
-      // pull user name and account id
-      toUserName = toUser.userName;
-      toUserAccount = toUser.accountId.data.toShortHexString();
-    }
+    tiles.add(
+      CupertinoListTile.notched(
+        trailing: Text(tx.timeAgo,
+            style: CupertinoTheme.of(context).textTheme.textStyle),
+        title: Text(fromLabel,
+            style: CupertinoTheme.of(context).textTheme.textStyle),
+        leading: icon,
+      ),
+    );
 
-    if (paymentData.toAccountId.hasData()) {
-      toUserAccount = paymentData.toAccountId.data.toShortHexString();
-    }
+    /*
+    final traits = GenesisConfig.personalityTraits;
 
-    if (paymentData.toNumber.number.isNotEmpty) {
-      toUserPhoneNumber = paymentData.toNumber.number.formatPhoneNumber();
-    }
+    if (tx.charTraitId != null &&
+        tx.charTraitId != 0 &&
+        tx.charTraitId! < traits.length) {
+      PersonalityTrait trait = traits[tx.charTraitId!];
 
-    if (transactionEvent != null) {
-      // get the status from the tx event
-      if (transactionEvent!.result ==
-          types.ExecutionResult.EXECUTION_RESULT_EXECUTED) {
-        status = TransactionStatus.confirmed;
-      } else {
-        status = TransactionStatus.failed;
-      }
-    }
-
-    if (paymentData.charTraitId != 0 &&
-        paymentData.charTraitId < GenesisConfig.personalityTraits.length) {
-      PersonalityTrait trait =
-          GenesisConfig.personalityTraits[paymentData.charTraitId];
       String title = 'You are ${trait.name.toLowerCase()}';
       String emoji = trait.emoji;
 
@@ -118,153 +134,102 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
           ),
         ),
       );
+    }*/
+
+    tiles.add(_getAddressTile(context, 'To address', tx.toAddress, false));
+    tiles.add(_getAddressTile(context, 'From address', tx.fromAddress, true));
+
+    return tiles;
+  }
+
+  List<CupertinoListTile> _getTransferTiles(
+      BuildContext context, KC2TransferTxV1 tx) {
+    List<CupertinoListTile> tiles = [];
+
+    tiles.add(_getAmountTile(context, tx.amount));
+
+    String fromLabel = 'Sent to ${tx.toUserName} by you.';
+    if (tx.toAddress == kc2User.identity.accountId ||
+        tx.toUserName == kc2User.userInfo.value!.userName) {
+      fromLabel = 'Sent by ${tx.fromUserName} to you.';
     }
 
-    String amount = KarmaCoinAmountFormatter.formatMinimal(paymentData.amount);
-    String usdEstimate =
-        KarmaCoinAmountFormatter.formatUSDEstimate(paymentData.amount);
-
     tiles.add(
       CupertinoListTile.notched(
-        title: Text('Amount',
+        trailing: Text(tx.timeAgo,
             style: CupertinoTheme.of(context).textTheme.textStyle),
-        trailing: Text(amount,
-            textAlign: TextAlign.right,
-            style: CupertinoTheme.of(context).textTheme.textStyle),
-        subtitle: Text(usdEstimate),
-        leading: const Icon(CupertinoIcons.money_dollar, size: 28),
-      ),
-    );
-
-    tiles.add(
-      CupertinoListTile.notched(
-        trailing: Text(tx.getTimesAgo(),
-            style: CupertinoTheme.of(context).textTheme.textStyle),
-        title: Text(operationLabel,
+        title: Text(fromLabel,
             style: CupertinoTheme.of(context).textTheme.textStyle),
         leading: const Icon(CupertinoIcons.clock, size: 28),
       ),
     );
 
-    List<Widget> senderWidgets = [Text(senderName)];
-    if (sender != null) {
-      senderWidgets.add(Text(sender.accountId.data.toShortHexString()));
+    tiles.add(_getAddressTile(context, 'To address', tx.toAddress, false));
+    tiles.add(_getAddressTile(context, 'From address', tx.fromAddress, true));
+
+    return tiles;
+  }
+
+  /// Return the list secionts
+  List<CupertinoListSection> _getSections(BuildContext context) {
+    List<CupertinoListTile> tiles = [];
+
+    if (widget.tx is KC2AppreciationTxV1) {
+      tiles = _getAppreciationTiles(context, widget.tx as KC2AppreciationTxV1);
+    } else if (widget.tx is KC2TransferTxV1) {
+      tiles = _getTransferTiles(context, widget.tx as KC2TransferTxV1);
+    } else {
+      throw 'unexpected tx type or missing tx';
     }
+
+    // add fields from the base tx
+
+    tiles.add(_getIdTile(context, 'Id', widget.txId));
+
+    final DateTime dateTime =
+        DateTime.fromMillisecondsSinceEpoch(widget.tx!.timestamp);
+    final String dateTimeString =
+        DateFormat('dd-MM-yy hh:mm:ss').format(dateTime);
 
     tiles.add(
       CupertinoListTile.notched(
-          title: Text('From',
+        title: Text('Block',
+            style: CupertinoTheme.of(context).textTheme.textStyle),
+        leading: const FaIcon(FontAwesomeIcons.link, size: 20),
+        subtitle: Text(
+            '$dateTimeString • Position ${widget.tx!.blockIndex.format()}'),
+        trailing: Text(widget.tx!.blockNumber.toInt().format(),
+            style: CupertinoTheme.of(context).textTheme.textStyle),
+      ),
+    );
+
+    if (widget.tx?.failedReason == null) {
+      tiles.add(
+        CupertinoListTile.notched(
+          title: Text('Status',
               style: CupertinoTheme.of(context).textTheme.textStyle),
-          subtitle: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: senderWidgets,
+          leading: const Icon(CupertinoIcons.info, size: 28),
+          trailing: const Pill(
+            title: 'CONFIRMED',
+            count: 0,
+            backgroundColor: CupertinoColors.activeGreen,
           ),
-          trailing: Text(senderPhoneNumber,
+        ),
+      );
+    } else {
+      tiles.add(
+        CupertinoListTile.notched(
+          title: Text('Status',
               style: CupertinoTheme.of(context).textTheme.textStyle),
-          leading: const Icon(CupertinoIcons.arrow_right, size: 28),
-          onTap: () {
-            if (tx.incoming) {
-              context.push(ScreenPaths.account, extra: sender);
-            } else {
-              context.push(ScreenPaths.account);
-            }
-          }),
-    );
-
-    // trailing label of the receiver row
-    String reciverRowTrailingLabel = toUserPhoneNumber;
-    if (toUserPhoneNumber.isEmpty) {
-      reciverRowTrailingLabel = toUserAccount;
-    }
-
-    List<Widget> recieverSubtitleWidgets = [];
-    if (toUserName.isNotEmpty) {
-      recieverSubtitleWidgets.add(Text(toUserName));
-    }
-    if (toUserAccount.isNotEmpty && toUserPhoneNumber.isNotEmpty) {
-      // add to account unless it is added to the right when no phone is available...
-      recieverSubtitleWidgets.add(Text(toUserAccount));
-    }
-
-    recieverSubtitleWidgets.add(const SizedBox(height: 6));
-
-    // payment tx always have a receiver with at least a phone number
-    // todo: if user to exists in the tx then we know the receiver's nickname and can display it....
-
-    tiles.add(
-      CupertinoListTile.notched(
-        title:
-            Text('To', style: CupertinoTheme.of(context).textTheme.textStyle),
-        subtitle: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: recieverSubtitleWidgets,
+          leading: const Icon(CupertinoIcons.info, size: 28),
+          trailing: const Pill(
+            title: 'ERROR',
+            count: 0,
+            backgroundColor: CupertinoColors.activeOrange,
+          ),
         ),
-        trailing: Text(reciverRowTrailingLabel,
-            style: CupertinoTheme.of(context).textTheme.textStyle),
-        leading: const Icon(CupertinoIcons.arrow_left, size: 28),
-        onTap: () {
-          if (toUser == null) {
-            return;
-          }
-          if (tx.incoming) {
-            context.push(ScreenPaths.account);
-          } else {
-            context.push(ScreenPaths.account, extra: toUser);
-          }
-        },
-      ),
-    );
-
-    tiles.add(
-      CupertinoListTile.notched(
-        title:
-            Text('Id', style: CupertinoTheme.of(context).textTheme.textStyle),
-        trailing: Text(widget.txId.toHex().toShortHexString(),
-            style: CupertinoTheme.of(context).textTheme.textStyle),
-        leading: const Icon(CupertinoIcons.checkmark_seal, size: 28),
-      ),
-    );
-    tiles.add(
-      CupertinoListTile.notched(
-        title: Text('Counter',
-            style: CupertinoTheme.of(context).textTheme.textStyle),
-
-        // todo: format with thousands seperator
-        trailing: Text(tx.getNonce().toString(),
-            style: CupertinoTheme.of(context).textTheme.textStyle),
-        leading: const Icon(CupertinoIcons.number, size: 28),
-      ),
-    );
-
-    String feeAmount = KarmaCoinAmountFormatter.formatMinimal(tx.txBody.fee);
-    String feeAmountusdEstimate =
-        KarmaCoinAmountFormatter.formatUSDEstimate(tx.txBody.fee);
-
-    tiles.add(
-      CupertinoListTile.notched(
-        title: Text('Network Fee',
-            style: CupertinoTheme.of(context).textTheme.textStyle),
-        trailing: Text(feeAmount,
-            style: CupertinoTheme.of(context).textTheme.textStyle),
-        subtitle: Text(feeAmountusdEstimate),
-        leading: const Icon(CupertinoIcons.money_dollar, size: 28),
-      ),
-    );
-
-    tiles.add(
-      CupertinoListTile.notched(
-        title: Text('Status',
-            style: CupertinoTheme.of(context).textTheme.textStyle),
-        leading: const Icon(CupertinoIcons.check_mark, size: 28),
-        trailing: Pill(
-          title: getStatusDisplayString(status),
-          count: 0,
-          backgroundColor: getStatusDisplayColor(status),
-        ),
-      ),
-    );
+      );
+    }
 
     return [
       CupertinoListSection.insetGrouped(header: Container(), children: tiles)
@@ -273,25 +238,25 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
 
   @override
   build(BuildContext context) {
-    if (transaction == null) {
-      return Container();
-    }
+    KC2AppreciationTxV1? appreciation = widget.tx as KC2AppreciationTxV1?;
 
-    SignedTransactionWithStatusEx tx = transaction!;
-    types.PaymentTransactionV1 paymentData =
-        tx.txData as types.PaymentTransactionV1;
-
-    if (paymentData.communityId == 0) {
-      return _buildGenericWidget(context, paymentData);
+    if (appreciation != null) {
+      if (appreciation.communityId == 0) {
+        return _buildGenericAppreciationWidget(context, appreciation);
+      } else {
+        return _buildCommunityAppreciationWidget(context, appreciation);
+      }
     } else {
-      return _buildCommunityWidget(context, paymentData);
+      return _buildTransferWidget(context, widget.tx as KC2TransferTxV1);
     }
   }
 
-  Widget _buildGenericWidget(
-      BuildContext context, types.PaymentTransactionV1 paymentData) {
-    String title = transaction!.getTransactionTypeDisplayName();
+  Widget _buildTransferWidget(BuildContext context, KC2TransferTxV1 transfer) {
+    return Container();
+  }
 
+  Widget _buildGenericAppreciationWidget(
+      BuildContext context, KC2AppreciationTxV1 appreciation) {
     return Title(
       color: CupertinoColors.black,
       title: 'Karma Coin - Appreciation Details',
@@ -299,7 +264,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
         child: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
-              kcNavBar(context, title),
+              kcNavBar(context, appreciation.getTitle()),
             ];
           },
           body: MediaQuery.removePadding(
@@ -309,19 +274,19 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
                 padding: EdgeInsets.zero,
                 shrinkWrap: true,
                 primary: true,
-                children: _getSections(context, paymentData)),
+                children: _getSections(context)),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildCommunityWidget(
-      BuildContext context, types.PaymentTransactionV1 paymentData) {
+  Widget _buildCommunityAppreciationWidget(
+      BuildContext context, KC2AppreciationTxV1 appreciation) {
     CommunityDesignTheme theme =
-        GenesisConfig.communityColors[paymentData.communityId]!;
+        GenesisConfig.communityColors[appreciation.communityId]!;
 
-    String emoji = GenesisConfig.communities[paymentData.communityId]!.emoji;
+    String emoji = GenesisConfig.communities[appreciation.communityId]!.emoji;
 
     return Title(
       color: CupertinoColors.black, // This is required
@@ -359,7 +324,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
                   width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
                       color: GenesisConfig
-                          .communityColors[paymentData.communityId]!
+                          .communityColors[appreciation.communityId]!
                           .backgroundColor),
                   child: Center(
                     child: ConstrainedBox(
@@ -368,7 +333,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
                         width: double.infinity,
                         fit: BoxFit.fill,
                         image: AssetImage(GenesisConfig
-                            .communityBannerAssets[paymentData.communityId]!),
+                            .communityBannerAssets[appreciation.communityId]!),
                       ),
                     ),
                   ),
@@ -377,7 +342,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
                   padding: EdgeInsets.zero,
                   shrinkWrap: true,
                   primary: true,
-                  children: _getSections(context, paymentData),
+                  children: _getSections(context),
                 ),
               ],
             ),
@@ -385,24 +350,5 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
         ),
       ),
     );
-  }
-
-  String getMainTitle(SignedTransactionWithStatusEx tx) {
-    final types.TransactionType txType = tx.getTxType();
-    if (txType == types.TransactionType.TRANSACTION_TYPE_PAYMENT_V1) {
-      types.PaymentTransactionV1 appreciation =
-          tx.txData as types.PaymentTransactionV1;
-
-      if (appreciation.charTraitId != 0 &&
-          appreciation.charTraitId < GenesisConfig.personalityTraits.length) {
-        PersonalityTrait trait =
-            GenesisConfig.personalityTraits[appreciation.charTraitId];
-        return '${trait.emoji} You are ${trait.name.toLowerCase()}';
-      } else {
-        return '🤑 Payment';
-      }
-    } else {
-      return 'Account update';
-    }
   }
 }

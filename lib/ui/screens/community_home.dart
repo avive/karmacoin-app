@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/genesis_config.dart';
-import 'package:karma_coin/data/kc_user.dart';
-import 'package:karma_coin/data/payment_tx_data.dart';
-import 'package:karma_coin/services/api/api.pb.dart';
-import 'package:karma_coin/services/api/types.pb.dart';
+import 'package:karma_coin/services/v2.0/types.dart';
+import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:karma_coin/ui/widgets/appreciate.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/ui/widgets/traits_scores_wheel.dart';
-import 'package:karma_coin/ui/widgets/users_selector.dart';
-import 'package:status_alert/status_alert.dart';
+import 'package:karma_coin/ui/widgets/users_browser.dart';
 
 class CommunityHomeScreen extends StatefulWidget {
   @required
@@ -61,6 +57,8 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
   }
 
   Widget _getAppreciationListener(BuildContext context) {
+    return Container();
+    /*
     return ValueListenableBuilder<PaymentTransactionData?>(
         valueListenable: appState.paymentTransactionData,
         builder: (context, value, child) {
@@ -126,13 +124,13 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
           });
 
           return Container();
-        });
+        });*/
   }
 
   Widget _getWidgetForUser(BuildContext context) {
-    return ValueListenableBuilder<KarmaCoinUser?>(
+    return ValueListenableBuilder<KC2UserInfo?>(
         // todo: how to make this not assert when karmaCoinUser is null?
-        valueListenable: accountLogic.karmaCoinUser,
+        valueListenable: kc2User.userInfo,
         builder: (context, value, child) {
           if (value == null) {
             return Container();
@@ -210,11 +208,13 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
   }
 
   Widget _getKarmaScoreWidget(BuildContext context) {
-    return ValueListenableBuilder<List<CommunityMembership>>(
-        valueListenable: accountLogic.karmaCoinUser.value!.communities,
+    return Container();
+    /*
+    return ValueListenableBuilder<KC2UserInfo?>(
+        valueListenable: kc2User.userInfo,
         builder: (context, value, child) {
-          CommunityMembership membership = value.firstWhere(
-              (element) => element.communityId == widget.communityId);
+          //CommunityMembership membership = value.traitScores.firstWhere(
+          //    (element) => element.communityId == widget.communityId);
 
           CommunityDesignTheme theme =
               GenesisConfig.communityColors[widget.communityId]!;
@@ -230,7 +230,7 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
                   ),
             ),
           );
-        });
+        });*/
   }
 
   void setPhoneNumberCallback(Contact selectedContact) {
@@ -242,7 +242,6 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
           fullscreenDialog: true,
           builder: ((context) => AppreciateWidget(
                 communityId: widget.communityId,
-                contact: selectedContact,
               ))));
     });
   }
@@ -274,7 +273,7 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
                         title: 'Members',
                         communityId: community.id,
                         enableSelection: true,
-                        setPhoneNumberCallback: setPhoneNumberCallback,
+                        contactSelectedCallback: setPhoneNumberCallback,
                       ),
                     ),
                   ),

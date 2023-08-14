@@ -1,6 +1,5 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
-import '../../common_libs.dart';
+import 'package:karma_coin/common_libs.dart';
 
 class DeleteDataTile extends StatelessWidget {
   const DeleteDataTile({super.key});
@@ -57,8 +56,8 @@ void _displayDeleteDataWarning(BuildContext context) {
             Future.delayed(const Duration(milliseconds: 300), () async {
               context.go(ScreenPaths.welcome);
               Future.delayed(const Duration(milliseconds: 300), () async {
-                await accountLogic.clear();
-                await authLogic.signOut();
+                await kc2User.signout();
+                await kc2User.init();
               });
             });
           },
@@ -93,7 +92,9 @@ void _displayDeleteAccountWarning(BuildContext context) {
               context.go(ScreenPaths.welcome);
             }
 
-            await accountLogic.submitDeleteAccountTransaction();
+            await kc2Service.deleteUser();
+            await kc2User.signout();
+            await kc2User.init();
           },
           child: const Text('Yes'),
         ),

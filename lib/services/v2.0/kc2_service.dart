@@ -1,8 +1,8 @@
 import 'dart:async';
-
 import 'package:karma_coin/logic/kc2/keyring.dart';
 import 'package:karma_coin/services/v2.0/interfaces.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
+import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:substrate_metadata_fixed/models/models.dart';
 
@@ -15,29 +15,42 @@ typedef TransferCallback = Future<void> Function(KC2TransferTxV1 tx);
 enum FetchAppreciationsStatus { idle, fetching, fetched, error }
 
 abstract class K2ServiceInterface implements ChainApiProvider {
+  /// Get the chain's existential deposit amount
+  BigInt get existentialDeposit;
+
   /// Connect to a karmachain api service. e.g
   /// Local running node - "ws://127.0.0.1:9944"
   /// Testnet - "wss://testnet.karmaco.in/testnet/ws"
-  Future<void> connectToApi(String wsUrl);
+  /// Optionally provide a verifier provider url, to allow connecting to api providers which are not
+  /// verifiers (not yet supported)
+  Future<void> connectToApi({required String apiWsUrl, String? verifierWsUrl});
+
+  bool get connectedToApi;
+
+  // currently connected api url
+  String? get apiWsUrl;
 
   // rpc methods
+  //
 
   /// accountId - ss58 address
   Future<KC2UserInfo?> getUserInfoByAccountId(String accountId);
 
   Future<KC2UserInfo?> getUserInfoByUserName(String username);
 
-  // Use getPhoneNumberHash of an international number w/o leading +
+  // Use getPhoneNumberHash of an international number w/o leading '+'
   // Hex string may be 0x prefixed or not
   Future<KC2UserInfo?> getUserInfoByPhoneNumberHash(String phoneNumberHash);
 
   /// Fetch list of community members with information
   /// about each member account
-  Future<List<KC2UserInfo>> getCommunityMembers(int communityId, {int? fromIndex, int? limit});
+  Future<List<KC2UserInfo>> getCommunityMembers(int communityId,
+      {int? fromIndex, int? limit});
 
   /// Fetch list of users who's username starts with `prefix`
-  /// also can be filtered by `communityId`, `null` mean no filtering
-  Future<List<Contact>> getContacts(String prefix, {int? communityId, int? fromIndex, int? limit});
+  /// Can be filtered by `communityId`. Pass null communitId for no filtering
+  Future<List<Contact>> getContacts(String prefix,
+      {int? communityId, int? fromIndex, int? limit});
 
   // transactions
 
@@ -46,18 +59,19 @@ abstract class K2ServiceInterface implements ChainApiProvider {
   /// userName - unique username. Must not be empty
   /// phoneNumber - user's phone number. Including country code. Excluding leading +
   /// Returns submitted transaction hash
-  Future<String> newUser(String accountId, String username, String phoneNumber);
+  Future<(String?, String?)> newUser(
+      String accountId, String username, String phoneNumber);
 
   /// Update user's user name or phone number
-  Future<String> updateUser(String? username, String? phoneNumber);
+  Future<(String?, String?)> updateUser(String? username, String? phoneNumber);
 
-  /// Update user's user name or phone number
+  /// delete user from chain
   Future<String> deleteUser();
 
   /// Transfer coins from local account to an account
   Future<String> sendTransfer(String accountId, BigInt amount);
 
-  /// Send a new appreciation or transfer transaction (charTraitId == 0)
+  /// Send a new appreciation with optional charTraitId
   /// phoneNumberHash - canonical hex string of phone number hash using blake32.
   /// Use getPhoneNumberHash() to get hash of a number
   /// Returns submitted transaction hash
@@ -71,7 +85,7 @@ abstract class K2ServiceInterface implements ChainApiProvider {
 
   /// Subscribe to account-related tranactions
   /// accountId - ss58 encoded address
-  /// Transactions will be delivered to registered event handlers
+  /// Events will be delivered to registered event handlers
   Timer subscribeToAccount(String accountId);
 
   /// Get all transactions from chain to, or from an account
@@ -81,11 +95,14 @@ abstract class K2ServiceInterface implements ChainApiProvider {
 
   // helpers
 
-  /// Get canonical hex string of a phone number
+  /// Get canonical hex string hash of a phone number
+  /// phoneNumber - international phone number without leading '+'
+  /// When a leading '+' is incluided - it will be removed prior to hashing.
   String getPhoneNumberHash(String phoneNumber);
 
   // available client txs callbacks
   //
+
   NewUserCallback? newUserCallback;
   UpdateUserCallback? updateUserCallback;
   AppreciationCallback? appreciationCallback;

@@ -1,4 +1,3 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/logic/app_state.dart';
@@ -84,7 +83,7 @@ class _AmountInputWidgetState extends State<AmountInputWidget> {
                     setState(() => coinKind = value);
                     if (value == CoinKind.kCents) {
                       // set input to 1 cents
-                      appState.kCentsAmount.value = Int64(1);
+                      appState.kCentsAmount.value = BigInt.one;
                     }
                   },
                   children: const <CoinKind, Widget>{

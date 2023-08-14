@@ -31,7 +31,7 @@ void main() {
         () async {
           KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
           // Connect to the chain
-          await kc2Service.connectToApi('ws://127.0.0.1:9944');
+          await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
           // Create a new identity for local user
           IdentityInterface katya = Identity();
@@ -114,7 +114,7 @@ void main() {
         () async {
           KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
           // Connect to the chain
-          await kc2Service.connectToApi('ws://127.0.0.1:9944');
+          await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
           // Create a new identity for local user Katya
           IdentityInterface katya = Identity();
@@ -222,7 +222,7 @@ void main() {
             () async {
           KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
           // Connect to the chain
-          await kc2Service.connectToApi('ws://127.0.0.1:9944');
+          await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
           // Create a new identity for local user
           IdentityInterface katya = Identity();
@@ -314,7 +314,7 @@ void main() {
             () async {
           KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
           // Connect to the chain
-          await kc2Service.connectToApi('ws://127.0.0.1:9944');
+          await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
           // Create a new identity for local user
           IdentityInterface katya = Identity();
@@ -405,7 +405,7 @@ void main() {
             () async {
           KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
           // Connect to the chain
-          await kc2Service.connectToApi('ws://127.0.0.1:9944');
+          await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
           // Create a new identity for local user
           IdentityInterface katya = Identity();
@@ -502,7 +502,7 @@ void main() {
             () async {
           KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
           // Connect to the chain
-          await kc2Service.connectToApi('ws://127.0.0.1:9944');
+          await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
           // Create a new identity for local user Katya
           IdentityInterface katya = Identity();
@@ -614,7 +614,7 @@ void main() {
             () async {
           KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
           // Connect to the chain
-          await kc2Service.connectToApi('ws://127.0.0.1:9944');
+          await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
           // Create a new identity for local user Katya
           IdentityInterface katya = Identity();

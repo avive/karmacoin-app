@@ -2,8 +2,11 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/logic/kc2/identity.dart';
 import 'package:karma_coin/logic/kc2/identity_interface.dart';
+import 'package:karma_coin/logic/kc2/user.dart';
+import 'package:karma_coin/logic/kc2/user_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
@@ -17,11 +20,15 @@ void main() {
 
   GetIt.I.registerLazySingleton<K2ServiceInterface>(() => KarmachainService());
 
+  GetIt.I.registerLazySingleton<AppState>(() => AppState());
+
+  GetIt.I.registerLazySingleton<KC2UserInteface>(() => KC2User());
+
   group(
     'payments',
     () {
       test(
-        'Basic payment test',
+        'Transfer via appreciation api',
         () async {
           K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
@@ -32,10 +39,14 @@ void main() {
           await katya.initNoStorage();
           await punch.initNoStorage();
 
-          String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
+          String katyaUserName =
+              "Katya${katya.accountId.substring(0, 5)}".toLowerCase();
           String katyaPhoneNumber = randomPhoneNumber;
-          String punchUserName = "Punch${punch.accountId.substring(0, 5)}";
+          String punchUserName =
+              "Punch${punch.accountId.substring(0, 5)}".toLowerCase();
           String punchPhoneNumber = randomPhoneNumber;
+
+          Timer? blocksProcessingTimer;
 
           // Set katya as signer
           kc2Service.setKeyring(katya.keyring);
@@ -43,8 +54,9 @@ void main() {
 
           final completer = Completer<bool>();
           String transferTxHash = "";
-          String katyaNewUserTxHash = "";
-          String punchNewUserTxHash = "";
+          String? katyaNewUserTxHash;
+          String? punchNewUserTxHash;
+          String? err;
 
           // remove appreciation callback which is getting called right now in case of
           // appreciation sent with charTrait == 0
@@ -64,14 +76,15 @@ void main() {
             }
 
             // switch local user to punch
+            blocksProcessingTimer?.cancel();
             kc2Service.subscribeToAccount(punch.accountId);
             kc2Service.setKeyring(punch.keyring);
 
             // Define empty appreciation callback
             kc2Service.appreciationCallback = (tx) async {};
 
-            kc2Service.transferCallback = (tx) async {
-              debugPrint('>> transfer callback called');
+            kc2Service.appreciationCallback = (tx) async {
+              debugPrint('>> appreciation callback called');
               if (tx.hash != transferTxHash) {
                 debugPrint(
                     'unexpected tx hash: ${tx.hash}. Expected: $transferTxHash');
@@ -84,12 +97,13 @@ void main() {
                 return;
               }
 
-              debugPrint('>> transfer tx: $tx');
+              debugPrint('>> appreciation tx: $tx');
               expect(tx.failedReason, isNull);
               expect(tx.amount, BigInt.from(1000));
               expect(tx.fromAddress, punch.accountId);
               expect(tx.toAddress, katya.accountId);
               expect(tx.signer, punch.accountId);
+              expect(tx.charTraitId, 0);
 
               // todo: test all other tx props here
 
@@ -122,17 +136,23 @@ void main() {
             };
 
             // signup punch
-            punchNewUserTxHash = await kc2Service.newUser(
+            (punchNewUserTxHash, err) = await kc2Service.newUser(
                 punch.accountId, punchUserName, punchPhoneNumber);
+
+            expect(punchNewUserTxHash, isNotNull);
+            expect(err, isNull);
           };
 
-          await kc2Service.connectToApi('ws://127.0.0.1:9944');
+          await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
           // subscribe to new account txs
-          kc2Service.subscribeToAccount(katya.accountId);
+          blocksProcessingTimer =
+              kc2Service.subscribeToAccount(katya.accountId);
 
-          katyaNewUserTxHash = await kc2Service.newUser(
+          (katyaNewUserTxHash, err) = await kc2Service.newUser(
               katya.accountId, katyaUserName, katyaPhoneNumber);
+
+          expect(katyaNewUserTxHash, isNotNull);
 
           // wait for completer and verify test success
           expect(await completer.future, equals(true));
@@ -141,7 +161,7 @@ void main() {
         timeout: const Timeout(Duration(seconds: 120)),
       );
       test(
-        'Basic transfer test',
+        'Basic coin transfer',
         () async {
           K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
@@ -152,19 +172,24 @@ void main() {
           await katya.initNoStorage();
           await punch.initNoStorage();
 
-          String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
+          String katyaUserName =
+              "Katya${katya.accountId.substring(0, 5)}".toLowerCase();
           String katyaPhoneNumber = randomPhoneNumber;
-          String punchUserName = "Punch${punch.accountId.substring(0, 5)}";
+          String punchUserName =
+              "Punch${punch.accountId.substring(0, 5)}".toLowerCase();
           String punchPhoneNumber = randomPhoneNumber;
 
           // Set katya as signer
           kc2Service.setKeyring(katya.keyring);
           debugPrint('Local user katya public address: ${katya.accountId}');
 
+          Timer? blockProcessingTimer;
+
           final completer = Completer<bool>();
           String transferTxHash = "";
-          String katyaNewUserTxHash = "";
-          String punchNewUserTxHash = "";
+          String? katyaNewUserTxHash;
+          String? punchNewUserTxHash;
+          String? err;
 
           // remove appreciation callback which is getting called right now in case of appreciation sent with charTrait == 0
           kc2Service.appreciationCallback = null;
@@ -183,6 +208,7 @@ void main() {
             }
 
             // switch local user to punch
+            blockProcessingTimer?.cancel();
             kc2Service.subscribeToAccount(punch.accountId);
             kc2Service.setKeyring(punch.keyring);
 
@@ -246,16 +272,19 @@ void main() {
             };
 
             // signup punch
-            punchNewUserTxHash = await kc2Service.newUser(
+            (punchNewUserTxHash, err) = await kc2Service.newUser(
                 punch.accountId, punchUserName, punchPhoneNumber);
+
+            expect(punchNewUserTxHash, isNotNull);
+            expect(err, isNull);
           };
 
-          await kc2Service.connectToApi('ws://127.0.0.1:9944');
+          await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
           // subscribe to new account txs
-          kc2Service.subscribeToAccount(katya.accountId);
+          blockProcessingTimer = kc2Service.subscribeToAccount(katya.accountId);
 
-          katyaNewUserTxHash = await kc2Service.newUser(
+          (katyaNewUserTxHash, err) = await kc2Service.newUser(
               katya.accountId, katyaUserName, katyaPhoneNumber);
 
           // wait for completer and verify test success
@@ -264,9 +293,8 @@ void main() {
         },
         timeout: const Timeout(Duration(seconds: 120)),
       );
-
       test(
-        'Basic transfer no funds test',
+        'Insufficient funds',
         () async {
           K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
@@ -277,10 +305,14 @@ void main() {
           await katya.initNoStorage();
           await punch.initNoStorage();
 
-          String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
+          String katyaUserName =
+              "Katya${katya.accountId.substring(0, 5)}".toLowerCase();
           String katyaPhoneNumber = randomPhoneNumber;
-          String punchUserName = "Punch${punch.accountId.substring(0, 5)}";
+          String punchUserName =
+              "Punch${punch.accountId.substring(0, 5)}".toLowerCase();
           String punchPhoneNumber = randomPhoneNumber;
+
+          Timer? blockProcessingTimer;
 
           // Set katya as signer
           kc2Service.setKeyring(katya.keyring);
@@ -288,8 +320,9 @@ void main() {
 
           final completer = Completer<bool>();
           String transferTxHash = "";
-          String katyaNewUserTxHash = "";
-          String punchNewUserTxHash = "";
+          String? katyaNewUserTxHash;
+          String? punchNewUserTxHash;
+          String? err;
 
           // remove appreciation callback which is getting called right now in case of appreciation sent with charTrait == 0
           kc2Service.appreciationCallback = null;
@@ -308,6 +341,7 @@ void main() {
             }
 
             // switch local user to punch
+            blockProcessingTimer?.cancel();
             kc2Service.subscribeToAccount(punch.accountId);
             kc2Service.setKeyring(punch.keyring);
 
@@ -350,6 +384,7 @@ void main() {
               KC2UserInfo? info =
                   await kc2Service.getUserInfoByUserName(punchUserName);
 
+              // amount greater than balance
               BigInt txAmount = info!.balance + BigInt.one;
 
               // Transfer
@@ -368,17 +403,23 @@ void main() {
             };
 
             // signup punch
-            punchNewUserTxHash = await kc2Service.newUser(
+            (punchNewUserTxHash, err) = await kc2Service.newUser(
                 punch.accountId, punchUserName, punchPhoneNumber);
+
+            expect(punchNewUserTxHash, isNotNull);
+            expect(err, isNull);
           };
 
-          await kc2Service.connectToApi('ws://127.0.0.1:9944');
+          await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
           // subscribe to new account txs
-          kc2Service.subscribeToAccount(katya.accountId);
+          blockProcessingTimer = kc2Service.subscribeToAccount(katya.accountId);
 
-          katyaNewUserTxHash = await kc2Service.newUser(
+          (katyaNewUserTxHash, err) = await kc2Service.newUser(
               katya.accountId, katyaUserName, katyaPhoneNumber);
+
+          expect(katyaNewUserTxHash, isNotNull);
+          expect(err, isNull);
 
           // wait for completer and verify test success
           expect(await completer.future, equals(true));

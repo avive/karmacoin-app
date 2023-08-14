@@ -1,7 +1,6 @@
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/user_name_availability.dart';
-import 'package:karma_coin/services/api/api.pb.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:status_alert/status_alert.dart';
 
@@ -22,7 +21,7 @@ class SetUserNameScreen extends StatefulWidget {
 }
 
 class _SetUserNameScreenState extends State<SetUserNameScreen> {
-  String deafaultName = settingsLogic.devMode ? "avive" : "";
+  String deafaultName = configLogic.devMode ? "avive" : "";
   late final _textController = TextEditingController(text: deafaultName);
   bool isSubmitInProgress = false;
 
@@ -91,6 +90,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
                               },
                         child: submitButtonText,
                       ),
+                      _getSignupStatusRow(context),
                     ]),
               ),
             ),
@@ -106,6 +106,10 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
       value: userNameAvailabilityLogic,
       child: Consumer<UserNameAvailabilityLogic>(
         builder: (context, state, child) {
+          if (isSubmitInProgress) {
+            return Container();
+          }
+
           switch (state.status) {
             case UserNameAvailabilityStatus.unknown:
               return Container();
@@ -137,9 +141,69 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
     );
   }
 
+  // todo: add signup status widget with status of signup
+  Widget _getSignupStatusRow(BuildContext context) {
+    return Container();
+
+    /*
+    return ValueListenableBuilder<AccountSetupStatus>(
+        valueListenable: accountSetupController.status,
+        builder: (context, value, child) {
+          bool showIndicator = false;
+          String text = '';
+          debugPrint(">>> status: $value");
+          switch (value) {
+            case AccountSetupStatus.signingUp:
+              text = 'Signing up...';
+              showIndicator = true;
+              break;
+            case AccountSetupStatus.incorrectVerificationCode:
+              text =
+                  'Incorrect verification code. Please go back and enter the correct code.';
+              break;
+            case AccountSetupStatus.transactionSubmitted:
+              text = 'Transaction submitted';
+              showIndicator = true;
+              break;
+            case AccountSetupStatus.submittingTransaction:
+              text = 'Submitting transaction';
+              showIndicator = true;
+              break;
+            case AccountSetupStatus.signedUp:
+              text = 'Signed up!';
+              break;
+            case AccountSetupStatus.accountAlreadyExists:
+              text = 'Account already exists';
+              break;
+            case AccountSetupStatus.missingData:
+              text = 'Missing data';
+              break;
+            default:
+              text = '';
+              break;
+          }
+
+          List<Widget> children = [];
+          if (text != '') {
+            children.add(const SizedBox(height: 14));
+            children.add(Text(text,
+                style: CupertinoTheme.of(context).textTheme.textStyle));
+          }
+
+          if (showIndicator) {
+            children.add(const SizedBox(height: 14));
+            children.add(const CupertinoActivityIndicator(
+              radius: 20,
+            ));
+          }
+
+          return Column(children: children);
+        });*/
+  }
+
   Future<void> _submitName(BuildContext context) async {
     if (!mounted) return;
-    if (_textController.text.isEmpty) {
+    if (_textController.text.trim().isEmpty) {
       StatusAlert.show(
         context,
         duration: const Duration(seconds: 2),
@@ -166,84 +230,8 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
       return;
     }
 
-    // check once again for availbility...
-    // await userNameAvailabilityLogic.check(_textController.text);
-
-    if (userNameAvailabilityLogic.status ==
+    if (userNameAvailabilityLogic.status !=
         UserNameAvailabilityStatus.available) {
-      setState(() {
-        isSubmitInProgress = true;
-      });
-
-      // store the user's reuqested name in account logic
-      await accountLogic.setRequestedUserName(_textController.text);
-
-      switch (widget.operation) {
-        case Operation.signUp:
-          debugPrint('*** starting signup flow...');
-          await accountSetupController.signUpUser();
-          break;
-        case Operation.updateUserName:
-          debugPrint('starting update user name flow...');
-          try {
-            SubmitTransactionResponse resp = await accountLogic
-                .submitUpdateUserNameTransacation(_textController.text);
-
-            switch (resp.submitTransactionResult) {
-              case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
-                if (context.mounted) {
-                  StatusAlert.show(
-                    context,
-                    duration: const Duration(seconds: 2),
-                    title: 'Name updated',
-                    configuration:
-                        const IconConfiguration(icon: CupertinoIcons.wand_rays),
-                    maxWidth: statusAlertWidth,
-                  );
-                  setState(() {
-                    isSubmitInProgress = false;
-                  });
-                  context.pop();
-                }
-                debugPrint(
-                    'Update user name transaction submitted and accepted');
-                break;
-              case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
-                if (context.mounted) {
-                  StatusAlert.show(
-                    context,
-                    duration: const Duration(seconds: 2),
-                    title: 'Server Error',
-                    subtitle: 'Operation failed. Try again later.',
-                    configuration: const IconConfiguration(
-                        icon: CupertinoIcons.exclamationmark_triangle),
-                    maxWidth: statusAlertWidth,
-                  );
-                  setState(() {
-                    isSubmitInProgress = false;
-                  });
-                }
-                break;
-            }
-          } catch (e) {
-            if (context.mounted) {
-              StatusAlert.show(
-                context,
-                duration: const Duration(seconds: 2),
-                title: 'Oops',
-                subtitle: 'Operation failed. Try again later.',
-                configuration: const IconConfiguration(
-                    icon: CupertinoIcons.exclamationmark_triangle),
-                maxWidth: statusAlertWidth,
-              );
-              setState(() {
-                isSubmitInProgress = false;
-              });
-            }
-          }
-          break;
-      }
-    } else {
       debugPrint('Name not available - show warning');
       if (context.mounted) {
         StatusAlert.show(
@@ -258,7 +246,88 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
         setState(() {
           isSubmitInProgress = false;
         });
+        return;
       }
+    }
+
+    setState(() {
+      isSubmitInProgress = true;
+    });
+
+    appState.requestedUserName = _textController.text;
+
+    switch (widget.operation) {
+      case Operation.signUp:
+        debugPrint('*** Navigating to signup progress screen');
+        setState(() {
+          isSubmitInProgress = false;
+        });
+        if (context.mounted) {
+          context.push(ScreenPaths.signupProgress);
+        }
+        break;
+      case Operation.updateUserName:
+      // note: this flow is not kc2 upgraded yet
+      /*
+        debugPrint('starting update user name flow...');
+        try {
+          SubmitTransactionResponse resp = await accountLogic
+              .submitUpdateUserNameTransacation(_textController.text);
+
+          switch (resp.submitTransactionResult) {
+            case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
+              if (context.mounted) {
+                StatusAlert.show(
+                  context,
+                  duration: const Duration(seconds: 2),
+                  title: 'Name updated',
+                  configuration:
+                      const IconConfiguration(icon: CupertinoIcons.wand_rays),
+                  maxWidth: statusAlertWidth,
+                );
+                setState(() {
+                  isSubmitInProgress = false;
+                });
+                context.pop();
+              }
+              debugPrint('Update user name transaction submitted and accepted');
+              break;
+            case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
+              if (context.mounted) {
+                StatusAlert.show(
+                  context,
+                  duration: const Duration(seconds: 2),
+                  title: 'Server Error',
+                  subtitle: 'Operation failed. Try again later.',
+                  configuration: const IconConfiguration(
+                      icon: CupertinoIcons.exclamationmark_triangle),
+                  maxWidth: statusAlertWidth,
+                );
+                setState(() {
+                  isSubmitInProgress = false;
+                });
+              }
+              break;
+              
+          }
+        } catch (e) {
+          if (context.mounted) {
+            StatusAlert.show(
+              context,
+              duration: const Duration(seconds: 2),
+              title: 'Oops',
+              subtitle: 'Operation failed. Try again later.',
+              configuration: const IconConfiguration(
+                  icon: CupertinoIcons.exclamationmark_triangle),
+              maxWidth: statusAlertWidth,
+            );
+            setState(() {
+              isSubmitInProgress = false;
+            });
+          }
+        }
+        break;
+        */
     }
   }
 
@@ -266,33 +335,37 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
     return Title(
       color: CupertinoColors.black, // This is required
       title: 'Karma Coin - User Name',
-      child: CupertinoTextField(
-        prefix: const Icon(
-          CupertinoIcons.person_solid,
-          color: CupertinoColors.lightBackgroundGray,
-          size: 28,
-        ),
-        autofocus: true,
-        autocorrect: false,
-        clearButtonMode: OverlayVisibilityMode.editing,
-        placeholder: 'Requested user name',
-        style: CupertinoTheme.of(context).textTheme.textStyle,
-        textAlign: TextAlign.center,
-        padding: const EdgeInsets.all(16.0),
-        decoration: const BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              width: 0,
-              // todo: from theme
-              color: CupertinoColors.inactiveGray,
+      child: Column(
+        children: [
+          CupertinoTextField(
+            prefix: const Icon(
+              CupertinoIcons.person_solid,
+              color: CupertinoColors.lightBackgroundGray,
+              size: 28,
             ),
+            autofocus: true,
+            autocorrect: false,
+            clearButtonMode: OverlayVisibilityMode.editing,
+            placeholder: 'Requested user name',
+            style: CupertinoTheme.of(context).textTheme.textStyle,
+            textAlign: TextAlign.center,
+            padding: const EdgeInsets.all(16.0),
+            decoration: const BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  width: 0,
+                  // todo: from theme
+                  color: CupertinoColors.inactiveGray,
+                ),
+              ),
+            ),
+            onChanged: (value) async {
+              // check availability on text change
+              await userNameAvailabilityLogic.check(value);
+            },
+            controller: _textController,
           ),
-        ),
-        onChanged: (value) async {
-          // check availability on text change
-          await userNameAvailabilityLogic.check(value);
-        },
-        controller: _textController,
+        ],
       ),
     );
   }

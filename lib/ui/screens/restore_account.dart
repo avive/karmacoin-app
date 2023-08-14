@@ -11,7 +11,7 @@ class RestoreAccountScreen extends StatefulWidget {
 }
 
 class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
-  List<String> backupWords = List<String>.generate(24, (int index) => '');
+  List<String> backupWords = List<String>.generate(12, (int index) => '');
 
   _RestoreAccountScreenState() {
     appState.triggerSignupAfterRestore.value = false;
@@ -31,7 +31,7 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Enter your account\'s 24 security words from your words list backup.',
+                'Enter your account\'s 12 security words from your words list backup.',
                 maxLines: 3,
                 style: CupertinoTheme.of(context)
                     .textTheme
@@ -57,12 +57,11 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
     );
 
     // fill the form with current accont restore words so no typing needed
-    if (settingsLogic.devMode &&
-        accountLogic.accountSecurityWords.value != null) {
-      backupWords = accountLogic.accountSecurityWords.value!.split(' ');
+    if (configLogic.devMode) {
+      backupWords = kc2User.identity.mnemonic.split(' ');
     }
 
-    for (int i = 0; i < 24; i++) {
+    for (int i = 0; i < 12; i++) {
       tiles.add(
         CupertinoListTile.notched(
           key: ValueKey(i),
@@ -169,9 +168,8 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
     bool valid = true;
     int firstMissingWordIdx = 0;
 
-    for (int i = 0; i < 24; i++) {
+    for (int i = 0; i < 12; i++) {
       backupWords[i] = backupWords[i].trim().toLowerCase();
-
       if (backupWords[i].isEmpty) {
         valid = false;
         firstMissingWordIdx = i;
@@ -200,31 +198,9 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
     allWords = allWords.substring(0, allWords.length - 1);
     debugPrint('User provided words: "$allWords"');
 
-    // attempt restoration before signing out from current account
-    try {
-      await accountLogic.setKeypairFromWords(allWords);
-    } catch (e) {
-      debugPrint('set keypair error: $e');
-      StatusAlert.show(
-        context,
-        duration: const Duration(seconds: 4),
-        configuration: const IconConfiguration(
-            icon: CupertinoIcons.exclamationmark_triangle),
-        title: 'Invalid Words',
-        subtitle: 'Some of the words you have entered are wrong.',
-        dismissOnBackgroundTap: true,
-        maxWidth: statusAlertWidth,
-      );
-      return;
-    }
-
-    await accountLogic.clear();
-    await authLogic.signOut();
+    await kc2User.signout();
     // set keypair based on seed restore from words
-    await accountLogic.setKeypairFromWords(allWords);
-
-    // enable validation of input for signup with dummy empty user name
-    await accountLogic.setRequestedUserName("");
+    await kc2User.init(mnemonic: allWords);
 
     // only trigger after the above to continue the flow
     appState.triggerSignupAfterRestore.value = true;

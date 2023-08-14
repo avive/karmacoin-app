@@ -1,7 +1,8 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:karma_coin/data/personality_traits.dart';
-import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/services/v2.0/types.dart';
+
+// todo: update to kc2
 
 class CommunityDesignTheme {
   Color backgroundColor;
@@ -15,13 +16,13 @@ class GenesisConfig {
   /// Karmachain netId. 1 is testnet 1
   static const netId = 1;
 
-  static const netName = "Karmachain Testnet 1";
+  static const netName = "Karmachain 2.0 Testnet 3";
 
   /// Signup reward in kCents (phase I reward)
-  static final kCentsSignupReward = Int64(10 * kCentsPerCoin);
+  static final kCentsSignupReward = BigInt.from(10 * kCentsPerCoin);
 
   /// Default user tx fee
-  static const kCentsDefaultFee = Int64.ONE;
+  static final kCentsDefaultFee = BigInt.one;
 
   /// Default personality trait index for trait picket
   static const defaultAppreciationTraitIndex = 27;
@@ -71,6 +72,7 @@ class GenesisConfig {
         twitterUrl: 'https://twitter.com/TheGratefulDAO',
         instaUrl: 'https://www.instagram.com/gratefulgiraffes',
         discordUrl: 'https://discord.gg/7FMTXavy8N',
+        faceUrl: '',
         charTraitIds: [10, 4, 3, 11, 15, 18, 39, 42, 60])
   };
 
@@ -89,6 +91,7 @@ class GenesisConfig {
   };
 
   static final List<PersonalityTrait> personalityTraits = [
+    // No trait provided in an appreciation
     PersonalityTrait(0, '', ''),
     // user gets it for on signup
     PersonalityTrait(1, 'a Karma Grower', '💚'),
@@ -156,6 +159,8 @@ class GenesisConfig {
     PersonalityTrait(59, 'a Dynamo', '🚀'),
     PersonalityTrait(60, 'an Imaginative Motivator', '🌻'),
     PersonalityTrait(61, 'a Campaigner', '📣'),
+
+    // Users gets this when they win a karma reward (only once per user)
     PersonalityTrait(62, 'A Karma Rewards Winner', '🏆'),
   ];
 }

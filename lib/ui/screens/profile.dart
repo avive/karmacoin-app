@@ -1,8 +1,6 @@
-//import 'package:countup/countup.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/services/api/api.pb.dart';
-import 'package:karma_coin/services/api/types.pb.dart';
+import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:karma_coin/ui/widgets/animated_background.dart';
 import 'package:karma_coin/ui/widgets/animated_wave.dart';
 import 'package:karma_coin/ui/widgets/animated_wave_right.dart';
@@ -34,7 +32,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   bool apiOffline = false;
   bool userNotFound = false;
-  User? user;
+  KC2UserInfo? userInfo;
 
   @override
   void initState() {
@@ -60,13 +58,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
 
       try {
-        GetUserInfoByUserNameResponse resp = await api.apiServiceClient
-            .getUserInfoByUserName(
-                GetUserInfoByUserNameRequest(userName: widget.userName));
-        debugPrint('resp: $resp');
+        // change to kc2 api
+
+        KC2UserInfo? info =
+            await kc2Service.getUserInfoByUserName(widget.userName);
+
         setState(() {
-          if (resp.hasUser()) {
-            user = resp.user;
+          if (info != null) {
+            userInfo = info;
           } else {
             userNotFound = true;
           }
@@ -88,7 +87,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _getScreenWidgets(BuildContext context) {
-    if (!apiOffline && user == null) {
+    if (!apiOffline && userInfo == null) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -139,7 +138,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             _getKarmaScoreWidget(context),
-            TraitsViewer(null, user!.traitScores),
+            TraitsViewer(null, userInfo!.getScores(0))
           ],
         ),
         _getActionArea(context),
@@ -148,25 +147,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _getActionArea(BuildContext context) {
-    if (accountLogic.karmaCoinUser.value == null) {
+    if (kc2User.userInfo.value == null) {
+      // no signed-in local user
       return CupertinoButton.filled(
           onPressed: () async {
-            appState.appreciateAfterSignup.value = true;
-            appState.sendDestinationPhoneNumber.value =
-                user!.mobileNumber.number;
+            // store user for appreciation after signup
+            appState.sendDestinationUser.value = userInfo;
+
             if (!context.mounted) return;
             context.go(ScreenPaths.welcome);
           },
           child: const Text('Appreciate Me'));
     }
 
-    if (accountLogic.karmaCoinUser.value!.userName.value != widget.userName) {
+    if (kc2User.userInfo.value?.userName != widget.userName) {
       return CupertinoButton.filled(
           onPressed: () async {
             // user signup - go to home screen and start appreciating
-            appState.appreciateAfterSignup.value = true;
-            appState.sendDestinationPhoneNumber.value =
-                user!.mobileNumber.number;
+            appState.sendDestinationUser.value = userInfo;
             if (!context.mounted) return;
             context.go(ScreenPaths.home);
           },
@@ -174,7 +172,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } else {
       // user's viewing his own profile screen
       String uri =
-          Uri.encodeFull('https://app.karmaco.in/#/p/${user!.userName}');
+          Uri.encodeFull('https://app.karmaco.in/#/p/${userInfo!.userName}');
 
       // user viewing his own profile page
       return Column(children: [
@@ -232,7 +230,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 FittedBox(
                   child: Text(
-                    user!.karmaScore.toString(),
+                    userInfo!.karmaScore.toString(),
                     style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                           TextStyle(
                               fontSize: coinNumberFontSize,

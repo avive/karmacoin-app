@@ -1,16 +1,17 @@
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/genesis_config.dart';
-import 'package:karma_coin/services/api/types.pb.dart';
+import 'package:karma_coin/services/v2.0/types.dart';
+import 'package:karma_coin/services/v2.0/user_info.dart';
 
 class CommunitiesListSection extends StatelessWidget {
   const CommunitiesListSection({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<List<CommunityMembership>>(
-        valueListenable: accountLogic.karmaCoinUser.value!.communities,
+    return ValueListenableBuilder<KC2UserInfo?>(
+        valueListenable: kc2User.userInfo,
         builder: (context, value, child) {
-          if (value.isEmpty) {
+          if (value == null) {
             return CupertinoListTile.notched(
               title: Text(
                 'Your are not a member of any community.',
@@ -27,9 +28,10 @@ class CommunitiesListSection extends StatelessWidget {
 
           return ListView.builder(
               shrinkWrap: true,
-              itemCount: value.length,
+              itemCount: value.communityMemberships.length,
               itemBuilder: (context, index) {
-                return _getCommunityTile(context, value[index]);
+                return _getCommunityTile(
+                    context, value.communityMemberships[index]);
               });
         });
   }

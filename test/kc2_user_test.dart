@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/logic/kc2/user.dart';
 import 'package:karma_coin/logic/kc2/user_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2.dart';
@@ -21,18 +22,24 @@ void main() {
 
   K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
-  group('kc2 users tests', () {
+  GetIt.I.registerLazySingleton<AppState>(() => AppState());
+
+  GetIt.I.registerLazySingleton<KC2UserInteface>(() => KC2User());
+
+  /// Tests using K2CUser
+
+  group('KC2User tests', () {
     test(
       'Signup user',
       () async {
         // connect before creating a user
-        await kc2Service.connectToApi('ws://127.0.0.1:9944');
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         KC2UserInteface katya = KC2User();
         await katya.init();
 
         String katyaUserName =
-            "Katya${katya.identity.accountId.substring(0, 5)}";
+            "Katya${katya.identity.accountId.substring(0, 5)}".toLowerCase();
 
         String katyaPhoneNumber = randomPhoneNumber;
 
@@ -60,9 +67,9 @@ void main() {
               expect(userInfo.accountId, katya.identity.accountId);
               expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
               expect(userInfo.userName, katyaUserName);
-              expect(userInfo.traitScores.length, 1);
-              expect(userInfo.traitScores[0].traitId, 1);
-              expect(userInfo.traitScores[0].score, 1);
+              expect(userInfo.traitScores[0], isNotNull);
+              expect(userInfo.traitScores[0]!.length, 1);
+              expect(userInfo.getScore(0, 1), 1);
 
               // signup reward
               expect(userInfo.balance, BigInt.from(10000000));
@@ -96,16 +103,16 @@ void main() {
       'Update user name',
       () async {
         // connect before creating a user
-        await kc2Service.connectToApi('ws://127.0.0.1:9944');
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         KC2UserInteface katya = KC2User();
         await katya.init();
 
         String katyaUserName =
-            "Katya${katya.identity.accountId.substring(0, 5)}";
+            "Katya${katya.identity.accountId.substring(0, 5)}".toLowerCase();
 
         String katyaUserName1 =
-            "Katya${katya.identity.accountId.substring(5, 10)}";
+            "Katya${katya.identity.accountId.substring(5, 10)}".toLowerCase();
 
         final completer = Completer<bool>();
 
@@ -168,13 +175,13 @@ void main() {
       'Update phone number',
       () async {
         // connect before creating a user
-        await kc2Service.connectToApi('ws://127.0.0.1:9944');
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         KC2UserInteface katya = KC2User();
         await katya.init();
 
         String katyaUserName =
-            "Katya${katya.identity.accountId.substring(0, 5)}";
+            "Katya${katya.identity.accountId.substring(0, 5)}".toLowerCase();
 
         String phoneNumber = randomPhoneNumber;
         String phoneNumberHash =
@@ -195,8 +202,7 @@ void main() {
 
               katya.userInfo.addListener(() async {
                 if (katya.userInfo.value?.phoneNumberHash == phoneNumberHash) {
-                  // skip this - this callback is due to fetching of user info from chain on
-                  // signup
+                  // skip this - this callback is due to fetching of user info from chain on signup
                   return;
                 }
 
@@ -242,13 +248,13 @@ void main() {
       'Migrate user',
       () async {
         // connect before creating a user
-        await kc2Service.connectToApi('ws://127.0.0.1:9944');
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         KC2UserInteface katya = KC2User();
         await katya.init();
 
         String katyaUserName =
-            "Katya${katya.identity.accountId.substring(0, 5)}";
+            "Katya${katya.identity.accountId.substring(0, 5)}".toLowerCase();
 
         String katyaPhoneNumber = randomPhoneNumber;
 
@@ -292,7 +298,7 @@ void main() {
                     expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
                     expect(userInfo.userName, katyaUserName);
 
-                    // expected to see balance reflecting katya's signup-reward and no additional reward on katyas1 signup
+                    // expected to see balance reflecting katya's signup-reward and no additional reward for katyas1 signup
                     expect(userInfo.balance, BigInt.from(10000000));
 
                     KC2UserInfo? oldAccountInfo =
@@ -344,16 +350,16 @@ void main() {
       'Referral reward',
       () async {
         // connect before creating a user
-        await kc2Service.connectToApi('ws://127.0.0.1:9944');
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         KC2UserInteface katya = KC2User();
         await katya.init();
 
         String katyaUserName =
-            "Katya${katya.identity.accountId.substring(0, 5)}";
+            "Katya${katya.identity.accountId.substring(0, 5)}".toLowerCase();
 
         String punchUserName =
-            "Punch${katya.identity.accountId.substring(5, 10)}";
+            "Punch${katya.identity.accountId.substring(5, 10)}".toLowerCase();
 
         String katyaPhoneNumber = randomPhoneNumber;
         String punchPhoneNumber = randomPhoneNumber;
@@ -390,7 +396,7 @@ void main() {
                     debugPrint('Punch signed up');
 
                     // expected 1 in trait from katya's appreciation
-                    expect(punch.getScore(64), 1);
+                    expect(punch.getScore(0, 64), 1);
 
                     // Get userInfo from chain for katya's phone number
                     KC2UserInfo? katyaInfo =
@@ -398,7 +404,7 @@ void main() {
 
                     // check balance and referral trait and score here
                     expect(katyaInfo!.balance, BigInt.from(20000000 - 1234));
-                    // scor`e = signup + app sent/received (spender) + (ambassador) referral trait
+                    // score = signup + app sent/received (spender) + (ambassador) referral trait
                     expect(katyaInfo.karmaScore, 3);
 
                     await punch.signout();
@@ -437,6 +443,118 @@ void main() {
         expect(completer.isCompleted, isTrue);
       },
       timeout: const Timeout(Duration(seconds: 280)),
+    );
+
+    test(
+      'Delete user',
+      () async {
+        // connect before creating a user
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+
+        KC2UserInteface katya = KC2User();
+        await katya.init();
+
+        String katyaUserName =
+            "Katya${katya.identity.accountId.substring(0, 5)}".toLowerCase();
+
+        String katyaPhoneNumber = randomPhoneNumber;
+
+        String phoneNumberHash =
+            kc2Service.getPhoneNumberHash(katyaPhoneNumber);
+
+        KC2UserInfo? katyaInfo;
+
+        final completer = Completer<bool>();
+
+        katya.signupStatus.addListener(() async {
+          switch (katya.signupStatus.value) {
+            case SignupStatus.signingUp:
+              debugPrint('Katya is signing up...');
+              break;
+            case SignupStatus.signedUp:
+              debugPrint('Katya signen up');
+
+              // Get userInfo from chain for katya's phone number
+              katyaInfo = await kc2Service
+                  .getUserInfoByAccountId(katya.identity.accountId);
+
+              // katya's signup reward
+              expect(katyaInfo!.balance, BigInt.from(10000000));
+
+              debugPrint('Deleting katya user and waiting for 1 block...');
+              await kc2Service.deleteUser();
+
+              Future.delayed(const Duration(seconds: 14), () async {
+                // check there's no user info for katya
+                KC2UserInfo? info = await kc2Service
+                    .getUserInfoByAccountId(katyaInfo!.accountId);
+                expect(info, isNull);
+
+                info = await kc2Service
+                    .getUserInfoByPhoneNumberHash(phoneNumberHash);
+                expect(info, isNull);
+
+                info =
+                    await kc2Service.getUserInfoByUserName(katyaInfo!.userName);
+                expect(info, isNull);
+
+                // new local user katya1 with same phone number
+
+                await katya.signout();
+                KC2UserInteface katya1 = KC2User();
+                await katya1.init();
+
+                katya1.signupStatus.addListener(() async {
+                  switch (katya1.signupStatus.value) {
+                    case SignupStatus.signingUp:
+                      debugPrint('Katya1 is signing up...');
+                      break;
+                    case SignupStatus.signedUp:
+                      debugPrint('Katya1 Signed up');
+
+                      // Get userInfo from chain for katya1's phone number
+                      KC2UserInfo? katya1Info =
+                          await kc2Service.getUserInfoByPhoneNumberHash(
+                              katyaInfo!.phoneNumberHash);
+
+                      expect(katya1Info, isNotNull);
+                      expect(katya1Info!.accountId, katya1.identity.accountId);
+                      expect(katya1Info.phoneNumberHash, '0x$phoneNumberHash');
+                      expect(katya1Info.userName, katyaUserName);
+
+                      // @Danylo Kyrieiev  this should be 1 - existential deposit
+                      // as soon as your change is merged
+                      expect(katya1Info.balance, BigInt.zero);
+                      await katya1.signout();
+                      completer.complete(true);
+                      break;
+                    case SignupStatus.notSignedUp:
+                      debugPrint('failed to sign up katya1');
+                      completer.complete(false);
+                      break;
+                    default:
+                      break;
+                  }
+                });
+
+                debugPrint('katya1 accountId: ${katya1.identity.accountId}');
+                // signup katya1 with same user name and phone number as katya
+                await katya1.signup(katyaUserName, katyaPhoneNumber);
+              });
+              break;
+            default:
+              break;
+          }
+        });
+
+        debugPrint('Signing up katya. AccountId: ${katya.identity.accountId}');
+        await katya.signup(katyaUserName, katyaPhoneNumber);
+
+        // wait for completer and verify test success
+        expect(await completer.future, equals(true));
+        expect(completer.isCompleted, isTrue);
+      },
+      timeout: const Timeout(Duration(seconds: 120)),
     );
   });
 }

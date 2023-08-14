@@ -1,13 +1,9 @@
 import 'dart:io';
-
-import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/data/genesis_config.dart';
-import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
-import 'package:karma_coin/services/api/types.pb.dart';
+import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:karma_coin/ui/widgets/animated_background.dart';
 import 'package:karma_coin/ui/widgets/animated_wave.dart';
 import 'package:karma_coin/ui/widgets/animated_wave_right.dart';
@@ -18,7 +14,6 @@ import 'package:karma_coin/ui/widgets/appreciation_progress.dart';
 import 'package:karma_coin/ui/widgets/into.dart';
 import 'package:karma_coin/ui/widgets/leaderboard.dart';
 import 'package:karma_coin/ui/widgets/traits_scores_wheel.dart';
-import 'package:pull_down_button/pull_down_button.dart';
 
 const smallScreenHeight = 1334;
 
@@ -64,12 +59,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   }
 
   void _postFrameCallback(BuildContext context) {
-    debugPrint("UserHomeScreen._postFrameCallback");
-
-    // handle appreciate after signup
-    if (appState.appreciateAfterSignup.value =
-        true && appState.sendDestinationPhoneNumber.value.isNotEmpty) {
-      appState.appreciateAfterSignup.value = false;
+    // handle appreciate from a profile page after local user signup
+    if (appState.sendDestinationUser.value != null) {
       Navigator.of(context).push(
         CupertinoPageRoute(
           fullscreenDialog: true,
@@ -92,7 +83,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         }
       }
       // register for push notes but don't wait on it - may show dialog
-      settingsLogic.registerPushNotifications();
+      // disabled in this release migrating to Twillio
+      // todo: fix me
+      // settingsLogic.registerPushNotifications();
     });
   }
 
@@ -101,23 +94,11 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         valueListenable: appState.paymentTransactionData,
         builder: (context, value, child) {
           // we only care about non-community appreciations here
-
           if (value == null || value.communityId != 0) {
             return Container();
           }
 
           // todo: customize the progress screen for just coin sending...
-
-          /*
-          debugPrint('Data: $value');
-
-          String sendingTitle = 'Sending Appreciation...';
-          String sentTitle = 'Appreciation Sent';
-
-          if (value.personalityTrait.index == 0) {
-            sendingTitle = 'Sending Karma Coins...';
-            sentTitle = 'Karma Coins Sent';
-          }*/
 
           Future.delayed(const Duration(milliseconds: 200), () async {
             if (!context.mounted) return;
@@ -130,7 +111,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             );
 
             // clear the user tx data
-            debugPrint("clearing local tx data");
+            debugPrint("clearing local new tx data...");
             appState.paymentTransactionData.value = null;
           });
 
@@ -173,9 +154,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   }
 
   Widget _getWidgetForUser(BuildContext context) {
-    return ValueListenableBuilder<KarmaCoinUser?>(
+    return ValueListenableBuilder<KC2UserInfo?>(
         // todo: how to make this not assert when karmaCoinUser is null?
-        valueListenable: accountLogic.karmaCoinUser,
+        valueListenable: kc2User.userInfo,
         builder: (context, value, child) {
           if (value == null) {
             return Container();
@@ -203,7 +184,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   ),
                   CupertinoButton(
                     onPressed: () async {
-                      await openUrl(settingsLogic.learnYoutubePlaylistUrl);
+                      await openUrl(configLogic.learnYoutubePlaylistUrl);
                     },
                     child: Text(
                       'Learn more',
@@ -222,144 +203,133 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   }
 
   Widget _getKarmaScoreWidget(BuildContext context) {
-    return ValueListenableBuilder<int>(
-        valueListenable: accountLogic.karmaCoinUser.value!.karmaScore,
-        builder: (context, value, child) {
-          return GestureDetector(
-            onTap: () async {
-              debugPrint('Tapped karma score');
-              if (!context.mounted) return;
+    int? score = kc2User.userInfo.value?.karmaScore;
+    if (score == null) {
+      return Container();
+    }
 
-              Navigator.of(context).push(
-                CupertinoPageRoute(
-                  fullscreenDialog: true,
-                  builder: ((context) =>
-                      const LeaderboardWidget(communityId: 0)),
-                ),
-              );
-            },
-            child: Container(
-              height: coinWidth,
-              width: coinWidth,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: kcPurple,
-                border: Border.all(
-                    width: coinOutlineWidth,
-                    color: const Color.fromARGB(255, 255, 184, 0)),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8, right: 8),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      FittedBox(
-                        child: Text(
-                          value.toString(),
-                          style: CupertinoTheme.of(context)
-                              .textTheme
-                              .textStyle
-                              .merge(
-                                TextStyle(
-                                    fontSize: coinNumberFontSize,
-                                    color:
-                                        const Color.fromARGB(255, 255, 184, 0),
-                                    fontWeight: digitFontWeight),
-                              ),
+    return GestureDetector(
+      onTap: () async {
+        debugPrint('Tapped karma score');
+        if (!context.mounted) return;
+
+        Navigator.of(context).push(
+          CupertinoPageRoute(
+            fullscreenDialog: true,
+            builder: ((context) => const LeaderboardWidget(communityId: 0)),
+          ),
+        );
+      },
+      child: Container(
+        height: coinWidth,
+        width: coinWidth,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: kcPurple,
+          border: Border.all(
+              width: coinOutlineWidth,
+              color: const Color.fromARGB(255, 255, 184, 0)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.only(left: 8, right: 8),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                FittedBox(
+                  child: Text(
+                    score.toString(),
+                    style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                          TextStyle(
+                              fontSize: coinNumberFontSize,
+                              color: const Color.fromARGB(255, 255, 184, 0),
+                              fontWeight: digitFontWeight),
                         ),
-                      ),
-                      Text(
-                        'KARMA SCORE',
-                        style: CupertinoTheme.of(context)
-                            .textTheme
-                            .textStyle
-                            .merge(
-                              TextStyle(
-                                  fontSize: coinLabelFontSize,
-                                  color: const Color.fromARGB(255, 255, 184, 0),
-                                  fontWeight: coinLabelWeight),
-                            ),
-                      ),
-                    ],
                   ),
                 ),
-              ),
+                Text(
+                  'KARMA SCORE',
+                  style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                        TextStyle(
+                            fontSize: coinLabelFontSize,
+                            color: const Color.fromARGB(255, 255, 184, 0),
+                            fontWeight: coinLabelWeight),
+                      ),
+                ),
+              ],
             ),
-          );
-        });
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _getKarmaCoinWidget(BuildContext context) {
-    return ValueListenableBuilder<Int64>(
-        valueListenable: accountLogic.karmaCoinUser.value!.balance,
-        builder: (context, value, child) {
-          // kcents value
-          double dispValue = value.toDouble();
-          String labelText = 'KARMA CENTS';
-          if (value >= 1000000) {
-            dispValue /= 1000000.0;
-            labelText = 'KARMA COINS';
-          }
+    BigInt? balance = kc2User.userInfo.value?.balance;
+    if (balance == null) {
+      return Container();
+    }
 
-          return GestureDetector(
-            onTap: () async {
-              debugPrint('Tapped karma coin');
-              if (!context.mounted) return;
-              context.push(ScreenPaths.account);
-            },
-            child: Container(
-              height: coinWidth,
-              width: coinWidth,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: kcPurple,
-                border: Border.all(width: coinOutlineWidth, color: kcOrange),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8, right: 8),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      FittedBox(
-                        child: Text(
-                          _deicmalFormat.format(dispValue),
-                          style: CupertinoTheme.of(context)
-                              .textTheme
-                              .textStyle
-                              .merge(
-                                TextStyle(
-                                    fontSize: coinNumberFontSize,
-                                    color:
-                                        const Color.fromARGB(255, 255, 184, 0),
-                                    fontWeight: digitFontWeight),
-                              ),
+    // kcents value
+    // todo: properly handle very large balance
+    double dispValue = balance.toDouble();
+    String labelText = 'KARMA CENTS';
+    if (balance >= BigInt.from(1000000)) {
+      dispValue /= 1000000.0;
+      labelText = 'KARMA COINS';
+    }
+
+    return GestureDetector(
+      onTap: () async {
+        debugPrint('Tapped karma coin');
+        if (!context.mounted) return;
+        context.push(ScreenPaths.account);
+      },
+      child: Container(
+        height: coinWidth,
+        width: coinWidth,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: kcPurple,
+          border: Border.all(width: coinOutlineWidth, color: kcOrange),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.only(left: 8, right: 8),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                FittedBox(
+                  child: Text(
+                    _deicmalFormat.format(dispValue),
+                    style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                          TextStyle(
+                              fontSize: coinNumberFontSize,
+                              color: const Color.fromARGB(255, 255, 184, 0),
+                              fontWeight: digitFontWeight),
                         ),
-                      ),
-                      Text(
-                        labelText,
-                        style: CupertinoTheme.of(context)
-                            .textTheme
-                            .textStyle
-                            .merge(
-                              TextStyle(
-                                  fontSize: coinLabelFontSize,
-                                  color: const Color.fromARGB(255, 255, 184, 0),
-                                  fontWeight: coinLabelWeight),
-                            ),
-                      ),
-                    ],
                   ),
                 ),
-              ),
+                Text(
+                  labelText,
+                  style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                        TextStyle(
+                            fontSize: coinLabelFontSize,
+                            color: const Color.fromARGB(255, 255, 184, 0),
+                            fontWeight: coinLabelWeight),
+                      ),
+                ),
+              ],
             ),
-          );
-        });
+          ),
+        ),
+      ),
+    );
   }
 
+  /*
   Widget _getCommunitiesPullDownMenuItems(BuildContext context) {
     return ValueListenableBuilder<List<CommunityMembership>>(
         valueListenable: accountLogic.karmaCoinUser.value!.communities,
@@ -415,7 +385,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             ),
           );
         });
-  }
+  }*/
 
   @override
   build(BuildContext context) {
@@ -431,7 +401,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 border: kcOrangeBorder,
                 backgroundColor: kcPurple,
                 // backgroundColor: CupertinoColors.activeOrange,
-                leading: _getCommunitiesPullDownMenuItems(context),
+                leading:
+                    Container(), //_getCommunitiesPullDownMenuItems(context),
                 trailing: adjustNavigationBarButtonPosition(
                     CupertinoButton(
                       onPressed: () => context.push(ScreenPaths.actions),

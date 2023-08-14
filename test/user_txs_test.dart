@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/logic/kc2/user.dart';
 import 'package:karma_coin/logic/kc2/user_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2.dart';
@@ -20,12 +21,16 @@ void main() {
 
   K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
+  GetIt.I.registerLazySingleton<AppState>(() => AppState());
+
+  GetIt.I.registerLazySingleton<KC2UserInteface>(() => KC2User());
+
   group('kc2 user txs tests', () {
     test(
       'Get transactions',
       () async {
         // connect before creating a user
-        await kc2Service.connectToApi('ws://127.0.0.1:9944');
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         KC2UserInteface katya = KC2User();
         await katya.init();
@@ -75,7 +80,7 @@ void main() {
                     debugPrint('Punch signed up');
 
                     // expected 1 in trait from katya's appreciation
-                    expect(punch.getScore(64), 1);
+                    expect(punch.getScore(0, 64), 1);
                     expect(punch.userInfo.value?.balance,
                         BigInt.from(10000000 + 1234));
 

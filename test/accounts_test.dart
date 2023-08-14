@@ -19,14 +19,16 @@ void main() {
 
   group('signup tests', () {
     test(
-      'Signup new user tx',
+      'Signup new user',
       () async {
         K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
         // Create a new identity for local user
         IdentityInterface katya = Identity();
         await katya.initNoStorage();
-        String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
+        String katyaUserName =
+            "katya${katya.accountId.substring(0, 5)}".toLowerCase();
+
         String katyaPhoneNumber = randomPhoneNumber;
         String phoneNumberHash =
             kc2Service.getPhoneNumberHash(katyaPhoneNumber);
@@ -36,7 +38,7 @@ void main() {
         debugPrint('Local user katya public address: ${katya.accountId}');
 
         final completer = Completer<bool>();
-        String txHash = "";
+        String? txHash;
 
         kc2Service.newUserCallback = (tx) async {
           debugPrint('>> new user callback called');
@@ -69,9 +71,10 @@ void main() {
           expect(userInfo.accountId, katya.accountId);
           expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
           expect(userInfo.userName, katyaUserName);
-          expect(userInfo.traitScores.length, 1);
-          expect(userInfo.traitScores[0].traitId, 1);
-          expect(userInfo.traitScores[0].score, 1);
+
+          expect(userInfo.traitScores[0], isNotNull);
+          expect(userInfo.traitScores[0]!.length, 1);
+          expect(userInfo.getScore(0, 1), 1);
 
           userInfo =
               await kc2Service.getUserInfoByPhoneNumberHash(phoneNumberHash);
@@ -100,14 +103,18 @@ void main() {
           completer.complete(true);
         };
 
-        await kc2Service.connectToApi('ws://127.0.0.1:9944');
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         // subscribe to new account txs
         kc2Service.subscribeToAccount(katya.accountId);
 
+        String? err;
         // signup katya
-        txHash = await kc2Service.newUser(
+        (txHash, err) = await kc2Service.newUser(
             katya.accountId, katyaUserName, katyaPhoneNumber);
+
+        expect(txHash, isNotNull);
+        expect(err, isNull);
 
         // wait for completer and verify test success
         expect(await completer.future, equals(true));
@@ -130,15 +137,16 @@ void main() {
         String newPhoneNumberHash =
             kc2Service.getPhoneNumberHash(katyaNewPhoneNumber);
 
-        String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
+        String katyaUserName =
+            "Katya${katya.accountId.substring(0, 5)}".toLowerCase();
 
         // Set katya as signer
         kc2Service.setKeyring(katya.keyring);
         debugPrint('Local user katya public address: ${katya.accountId}');
 
         final completer = Completer<bool>();
-        String txHash = "";
-        String updateTexHash = "";
+        String? txHash;
+        String? updateTexHash;
 
         kc2Service.updateUserCallback = (tx) async {
           debugPrint('>> update user update 1 called');
@@ -212,28 +220,27 @@ void main() {
           }
 
           debugPrint('calling update user...');
-          try {
-            updateTexHash =
-                await kc2Service.updateUser(null, katyaNewPhoneNumber);
-          } catch (e) {
-            debugPrint('Failed to update user: $e');
-            completer.complete(false);
-          }
+
+          String? err;
+          (updateTexHash, err) =
+              await kc2Service.updateUser(null, katyaNewPhoneNumber);
+
+          expect(updateTexHash, isNotNull);
+          expect(err, isNull);
         };
 
-        await kc2Service.connectToApi('ws://127.0.0.1:9944');
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         // subscribe to new account txs
         kc2Service.subscribeToAccount(katya.accountId);
 
         // signup katya
-        try {
-          txHash = await kc2Service.newUser(
-              katya.accountId, katyaUserName, katyaPhoneNumber);
-        } catch (e) {
-          debugPrint('Failed to signup katya: $e');
-          completer.complete(false);
-        }
+        String? err;
+        (txHash, err) = await kc2Service.newUser(
+            katya.accountId, katyaUserName, katyaPhoneNumber);
+
+        expect(txHash, isNotNull);
+        expect(err, isNull);
 
         // wait for completer and verify test success
         expect(await completer.future, equals(true));
@@ -254,17 +261,19 @@ void main() {
         // Create a new identity for local user
         IdentityInterface katya = Identity();
         await katya.initNoStorage();
-        String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
+        String katyaUserName =
+            "Katya${katya.accountId.substring(0, 5)}".toLowerCase();
         String katyaPhoneNumber = randomPhoneNumber;
-        String katyaNewUserName = "Katya${katya.accountId.substring(5, 10)}";
+        String katyaNewUserName =
+            "Katya${katya.accountId.substring(5, 10)}".toLowerCase();
 
         // Set katya as signer
         kc2Service.setKeyring(katya.keyring);
         debugPrint('Local user katya public address: ${katya.accountId}');
 
         final completer = Completer<bool>();
-        String txHash = "";
-        String updateTexHash = "";
+        String? txHash;
+        String? updateTexHash;
         String phoneNumberHash =
             kc2Service.getPhoneNumberHash(katyaPhoneNumber);
 
@@ -343,27 +352,26 @@ void main() {
           }
 
           debugPrint('calling update user...');
-          try {
-            updateTexHash = await kc2Service.updateUser(katyaNewUserName, null);
-          } catch (e) {
-            debugPrint('Failed to update user: $e');
-            completer.complete(false);
-          }
+
+          String? err;
+          (updateTexHash, err) =
+              await kc2Service.updateUser(katyaNewUserName, null);
+          expect(updateTexHash, isNotNull);
+          expect(err, isNull);
         };
 
-        await kc2Service.connectToApi('ws://127.0.0.1:9944');
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         // subscribe to new account txs
         kc2Service.subscribeToAccount(katya.accountId);
 
         // signup katya
-        try {
-          txHash = await kc2Service.newUser(
-              katya.accountId, katyaUserName, katyaPhoneNumber);
-        } catch (e) {
-          debugPrint('Failed to signup katya: $e');
-          completer.complete(false);
-        }
+        String? err;
+        (txHash, err) = await kc2Service.newUser(
+            katya.accountId, katyaUserName, katyaPhoneNumber);
+
+        expect(txHash, isNotNull);
+        expect(err, isNull);
 
         // wait for completer and verify test success
         expect(await completer.future, equals(true));
@@ -372,6 +380,80 @@ void main() {
       timeout: const Timeout(
         Duration(seconds: 120),
       ),
+    );
+
+    test(
+      'Signup with a used user name',
+      () async {
+        K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
+
+        // Create a new identity for local user
+        IdentityInterface katya = Identity();
+        IdentityInterface punch = Identity();
+
+        await katya.initNoStorage();
+        await punch.initNoStorage();
+
+        String katyaUserName =
+            "Katya${katya.accountId.substring(0, 5)}".toLowerCase();
+        String katyaPhoneNumber = randomPhoneNumber;
+        String punchPhoneNumber = randomPhoneNumber;
+
+        // Set katya as signer
+        kc2Service.setKeyring(katya.keyring);
+        debugPrint('Local user katya public address: ${katya.accountId}');
+
+        final completer = Completer<bool>();
+        String? katyaNewUserTxHash;
+        String? punchNewUserTxHash;
+
+        // remove appreciation callback which is getting called right now in case of appreciation sent with charTrait == 0
+        kc2Service.appreciationCallback = null;
+
+        kc2Service.newUserCallback = (tx) async {
+          debugPrint('>> Katya new user callback called');
+          if (tx.failedReason != null) {
+            completer.complete(false);
+            return;
+          }
+
+          if (tx.hash != katyaNewUserTxHash) {
+            debugPrint('unexpected tx hash: ${tx.hash} ');
+            completer.complete(false);
+            return;
+          }
+
+          // switch local user to punch
+          kc2Service.setKeyring(punch.keyring);
+          kc2Service.newUserCallback = null;
+
+          // attempt signup punch with used user name
+          String? err;
+          (punchNewUserTxHash, err) = await kc2Service.newUser(
+              punch.accountId, katyaUserName, punchPhoneNumber);
+
+          expect(punchNewUserTxHash, isNull);
+          expect(err, isNotNull);
+          completer.complete(true);
+        };
+
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+
+        // subscribe to new account txs
+        kc2Service.subscribeToAccount(katya.accountId);
+
+        String? err;
+        (katyaNewUserTxHash, err) = await kc2Service.newUser(
+            katya.accountId, katyaUserName, katyaPhoneNumber);
+
+        expect(katyaNewUserTxHash, isNotNull);
+        expect(err, isNull);
+
+        // wait for completer and verify test success
+        expect(await completer.future, equals(true));
+        expect(completer.isCompleted, isTrue);
+      },
+      timeout: const Timeout(Duration(seconds: 120)),
     );
   });
 }

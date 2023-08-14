@@ -3,7 +3,10 @@ import 'package:karma_coin/logic/kc2/keyring.dart';
 
 /// A kc2 persistent identity
 abstract class IdentityInterface {
-  /// Initialize the identity. If mnenomic is provided, it will be used to create the identity and it will be persisted to secure local storage. Otherwise, the identity is loaded from local store if it was previosuly presisted. If wsan't previsouly presisted then a new mnenmic is created and persisted.
+  // check if identity exists in local store. Call before calling init()
+  Future<bool> get existsInLocalStore;
+
+  /// Initialize the identity.  The identity will loaded from mnemonic in local store if it was previosuly presisted. If wsan't previsouly presisted then a new mnenmic is created and persisted for the identity.
   Future<void> init({String? mnemonic});
 
   /// Init an identity without persisting it to local storage.
@@ -18,6 +21,13 @@ abstract class IdentityInterface {
 
   /// Gets the user's public ss58 address
   String get accountId;
+
+  /// Available after signup on device
+  String? get phoneNumber;
+
+  /// set the user's phone number
+  /// phoneNumber: with + prefix format
+  Future<void> setPhoneNumber(String? phoneNumber);
 
   /// Gets the identity's public signing ed key
   List<int> get publicKey;

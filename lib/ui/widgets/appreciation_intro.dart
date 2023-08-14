@@ -1,3 +1,4 @@
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 
@@ -29,13 +30,8 @@ class _AppreciationIntroState extends State<AppreciationIntro> {
         children: [
           Row(
             children: [
-              Text(
-                '🌎',
-                style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                      const TextStyle(fontSize: 26),
-                    ),
-              ),
-              const SizedBox(width: 12),
+              const FaIcon(FontAwesomeIcons.globe, size: 30),
+              const SizedBox(width: 14),
               Expanded(
                 child: Text(
                   'You can appreciate anyone anywhere.',
@@ -49,16 +45,11 @@ class _AppreciationIntroState extends State<AppreciationIntro> {
           const SizedBox(height: sepHeight),
           Row(
             children: [
-              Text(
-                '📱',
-                style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                      const TextStyle(fontSize: 28),
-                    ),
-              ),
-              const SizedBox(width: 12),
+              const FaIcon(FontAwesomeIcons.whatsapp, size: 34),
+              const SizedBox(width: 14),
               Expanded(
                 child: Text(
-                  'Just pick a contact from your phone\'s contacts or enter recipient\'s phone number.',
+                  'Just pick a contact from your WhatsApp contacts or enter recipient\'s WhatsApp phone number.',
                   style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                         const TextStyle(fontSize: fontSize),
                       ),
@@ -69,16 +60,11 @@ class _AppreciationIntroState extends State<AppreciationIntro> {
           const SizedBox(height: sepHeight),
           Row(
             children: [
-              Text(
-                '😻',
-                style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                      const TextStyle(fontSize: 26),
-                    ),
-              ),
-              const SizedBox(width: 12),
+              const FaIcon(FontAwesomeIcons.cat, size: 30),
+              const SizedBox(width: 14),
               Expanded(
                 child: Text(
-                  'Ask recipient to sign up to Karma Coin with its phone number.',
+                  'Ask appreciation receiver\'s to sign up to Karma Coin with its WhatsApp phone number.',
                   style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                         const TextStyle(fontSize: fontSize),
                       ),
@@ -89,16 +75,11 @@ class _AppreciationIntroState extends State<AppreciationIntro> {
           const SizedBox(height: sepHeight),
           Row(
             children: [
-              Text(
-                '🥇',
-                style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                      const TextStyle(fontSize: 26),
-                    ),
-              ),
-              const SizedBox(width: 12),
+              const FaIcon(FontAwesomeIcons.medal, size: 30),
+              const SizedBox(width: 14),
               Expanded(
                 child: Text(
-                  'You get a referral reward when recipient signs up.',
+                  'You get a 100 Karma Coins referral reward when it signs up.',
                   style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                         const TextStyle(fontSize: fontSize),
                       ),

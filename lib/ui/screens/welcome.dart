@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/services/api/api.pb.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/ui/widgets/animated_background.dart';
 import 'package:karma_coin/ui/widgets/animated_wave.dart';
@@ -9,16 +8,16 @@ import 'package:karma_coin/ui/widgets/animated_wave_right.dart';
 import 'package:status_alert/status_alert.dart';
 
 /// temp screen with some
-class WelcomeScreen extends StatefulWidget {
-  const WelcomeScreen({super.key, required this.title});
+class KC2WelcomeScreen extends StatefulWidget {
+  const KC2WelcomeScreen({super.key, required this.title});
 
   final String title;
 
   @override
-  State<WelcomeScreen> createState() => _WelcomeScreenState();
+  State<KC2WelcomeScreen> createState() => _KC2WelcomeScreenState();
 }
 
-class _WelcomeScreenState extends State<WelcomeScreen> {
+class _KC2WelcomeScreenState extends State<KC2WelcomeScreen> {
   @override
   void initState() {
     super.initState();
@@ -43,11 +42,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         return;
       }
 
-      try {
-        await api.apiServiceClient.getGenesisData(GetGenesisDataRequest());
-        // todo: update genesis data
-      } catch (e) {
-        debugPrint('Can\'t get genesis data from api: $e');
+      if (!kc2Service.connectedToApi) {
         if (context.mounted) {
           StatusAlert.show(context,
               duration: const Duration(seconds: 4),
@@ -97,13 +92,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     res.add(const SizedBox(height: 12));
 
     res.add(CupertinoButton(
-      onPressed: () => context.go(ScreenPaths.restoreAccount),
+      onPressed: () => context.push(ScreenPaths.restoreAccount),
       child: const Text('Restore Account'),
     ));
 
     res.add(CupertinoButton(
       onPressed: () async {
-        await openUrl(settingsLogic.learnYoutubePlaylistUrl);
+        await openUrl(configLogic.learnYoutubePlaylistUrl);
       },
       child: const Text('Learn More'),
     ));

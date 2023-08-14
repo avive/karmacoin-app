@@ -1,6 +1,5 @@
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/services/api/api.pbgrpc.dart';
 // import 'package:karma_coin/services/api/types.pb.dart';
@@ -52,6 +51,8 @@ abstract class AccountLogicInterface {
   /// Verify user's phone number and account id
   Future<void> verifyPhoneNumber();
 
+  Future<void> setUserPhoneNumber(String phoneNumber);
+
   /// Set keypaird from seed words
   Future<void> setKeypairFromWords(String securityWords);
 
@@ -71,9 +72,6 @@ abstract class AccountLogicInterface {
   /// Submit delete account tx
   Future<SubmitTransactionResponse> submitDeleteAccountTransaction();
 
-  final ValueNotifier<KarmaCoinUser?> karmaCoinUser =
-      ValueNotifier<KarmaCoinUser?>(null);
-
   /// Local mode - KarmaUser was created locally, signup tx submitted and accepted but not confirmed yet... we use this to allow user to start appreicating other users as soon as it signs up...
   /// user name should be taken from KarmaUser.
   final ValueNotifier<bool> localMode = ValueNotifier<bool>(false);
@@ -84,6 +82,7 @@ abstract class AccountLogicInterface {
   bool validateDataForNewKarmCoinUser();
   bool validateDataForPhoneVerification();
   bool validateDataForNewUserTransaction();
+  bool numberVerified();
 
   // Set received FCM push note token
   Future<void> setFCMPushNoteToken(String token);

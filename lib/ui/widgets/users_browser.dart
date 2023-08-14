@@ -1,18 +1,14 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:karma_coin/data/genesis_config.dart';
-import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/personality_traits.dart';
-import 'package:karma_coin/data/phone_number_formatter.dart';
-import 'package:karma_coin/data/user.dart';
-import 'package:karma_coin/services/api/api.pb.dart';
-import 'package:karma_coin/services/api/types.pb.dart';
+import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/ui/widgets/pill.dart';
 import 'package:random_avatar/random_avatar.dart';
 import 'package:status_alert/status_alert.dart';
-import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
+
+enum FetchStatus { idle, loading, loaded, error }
 
 // Karma coin users selector
 class KarmaCoinUserSelector extends StatefulWidget {
@@ -22,12 +18,12 @@ class KarmaCoinUserSelector extends StatefulWidget {
 
   // todo: alwyas enbable selection and trigger appreciation of user if tapped/clicked
 
-  final Function(Contact)? setPhoneNumberCallback;
+  final Function(Contact)? contactSelectedCallback;
 
   const KarmaCoinUserSelector(
       {super.key,
       this.communityId = 0,
-      this.setPhoneNumberCallback,
+      this.contactSelectedCallback,
       this.title = 'KARMA COIN USERS',
       this.enableSelection = true});
 
@@ -38,51 +34,78 @@ class KarmaCoinUserSelector extends StatefulWidget {
 class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
   // we assume api is available until we know otherwise
   bool apiOffline = false;
-  List<Contact>? contacts;
+  List<Contact> contacts = [];
   late TextEditingController textController;
+  // limit per request
+  final limit = 30;
+  final localUserName = kc2User.userInfo.value!.userName;
+  final localUserPhoneNumberHash = kc2User.userInfo.value!.phoneNumberHash;
+  FetchStatus featchStatus = FetchStatus.idle;
+  late String? lastPrefix;
+  final ScrollController scrollController = ScrollController();
+  bool additionalResultsAvailable = false;
+  //
+  //
+  int lastRequestFromIndex = 0;
+  String lastRequestedPrefix = '';
 
-  void _getContacts(String? prefix) {
+  void setFetchState(FetchStatus status) {
+    setState(() {
+      featchStatus = status;
+    });
+  }
+
+  void _loadAdditionalContacts() {
+    if (additionalResultsAvailable) {
+      debugPrint('Loading more contacts on scroll...');
+      _loadContacts(lastPrefix!);
+    } else {
+      debugPrint('No more results to load on scrol...');
+    }
+  }
+
+  /// Load more contacts from the server for a prefix
+  void _loadContacts(String prefix) {
+    prefix = prefix.toLowerCase();
+
+    if (prefix != lastRequestedPrefix) {
+      // change of prefix - reset index and contacts
+      setState(() {
+        lastRequestedPrefix = prefix;
+        lastRequestFromIndex = 0;
+        contacts.clear();
+      });
+    }
+
     Future.delayed(Duration.zero, () async {
       try {
         debugPrint('getting contatcs prefix $prefix');
+        setFetchState(FetchStatus.loading);
+        List<Contact> results = await kc2Service.getContacts(prefix,
+            fromIndex: lastRequestFromIndex, limit: limit);
 
-        GetContactsResponse resp = await api.apiServiceClient.getContacts(
-            GetContactsRequest(
-                prefix: prefix, communityId: widget.communityId));
+        // if there are less results than limit, we know there are no more results to fetch
+        additionalResultsAvailable = results.length < limit ? false : true;
 
-        // debugPrint('got contacts: ${resp.contacts}');
+        lastRequestFromIndex += results.length;
 
-        KarmaCoinUser user = accountLogic.karmaCoinUser.value!;
-
-        if (prefix != null &&
-            prefix.isNotEmpty &&
-            prefix[0].toLowerCase() == prefix[0]) {
-          // upper case search hack until server is update to be case neutral
-
-          String prefix1 = prefix[0].toUpperCase() + prefix.substring(1);
-
-          GetContactsResponse resp1 = await api.apiServiceClient.getContacts(
-              GetContactsRequest(
-                  prefix: prefix1, communityId: widget.communityId));
-
-          resp.contacts.addAll(resp1.contacts);
-        }
-
-        // remove contacts without mobile numbers or user name
-
-        resp.contacts.removeWhere((contact) =>
+        // cleanup results
+        results.removeWhere((contact) =>
             contact.userName.trim().isEmpty ||
-            contact.userName.endsWith('old account]') ||
-            contact.userName == user.userName.value ||
-            contact.mobileNumber.number == user.mobileNumber.value.number);
+            contact.userName == localUserName ||
+            contact.phoneNumberHash == localUserPhoneNumberHash);
+
+        debugPrint('got ${results.length} contacts');
 
         setState(() {
           apiOffline = false;
-          contacts = resp.contacts;
+          featchStatus = FetchStatus.loaded;
+          contacts.addAll(results);
         });
       } catch (e) {
         setState(() {
           apiOffline = true;
+          featchStatus = FetchStatus.error;
         });
         if (!mounted) return;
         StatusAlert.show(context,
@@ -99,20 +122,27 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
   }
 
   @override
+  void dispose() {
+    scrollController.dispose();
+    textController.dispose();
+    super.dispose();
+  }
+
+  @override
   initState() {
     super.initState();
     apiOffline = false;
     textController = TextEditingController();
-    _getContacts(null);
+    scrollController.addListener(_loadAdditionalContacts);
+    _loadContacts('');
   }
 
   Widget _getBodyContent(BuildContext context) {
-    if (apiOffline) {
+    if (apiOffline == true || featchStatus == FetchStatus.error) {
       return Padding(
         padding: const EdgeInsets.only(left: 24, right: 24),
         child: Center(
-          child: Text(
-              'The Karma Coin Server is down.\n\nPlease try again later.',
+          child: Text('Server is down.\n\nPlease try again later.',
               textAlign: TextAlign.center,
               style: CupertinoTheme.of(context).textTheme.pickerTextStyle),
         ),
@@ -131,13 +161,13 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
             keyboardType: TextInputType.text,
             placeholder: 'Enter a user name',
             onChanged: (value) {
-              _getContacts(value);
+              _loadContacts(value);
             },
             style: CupertinoTheme.of(context).textTheme.pickerTextStyle),
       ),
     );
 
-    if (contacts != null && contacts!.isEmpty) {
+    if (contacts.isEmpty && featchStatus == FetchStatus.loaded) {
       widgets.add(
         Padding(
           padding: const EdgeInsets.only(top: 64, bottom: 36),
@@ -148,7 +178,7 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
           ),
         ),
       );
-    } else if (contacts == null) {
+    } else if (featchStatus == FetchStatus.loading) {
       widgets.add(
         Padding(
           padding: const EdgeInsets.only(top: 64, bottom: 36),
@@ -182,16 +212,18 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
             indent: 0,
           );
         },
-        itemCount: contacts!.length,
+        controller: scrollController,
+        itemCount: contacts.length,
         itemBuilder: (context, index) {
-          return _getContactWidget(context, contacts![index], index);
+          return _getContactWidget(context, contacts[index], index);
         },
       ),
     );
   }
 
   void _setAdmin(Contact contact) {
-    // todo: move this to kc_user
+    // todo: move this to kc2
+    /*
     Future.delayed(Duration.zero, () async {
       try {
         KarmaCoinUser localUser = accountLogic.karmaCoinUser.value!;
@@ -236,13 +268,13 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
             maxWidth: statusAlertWidth);
         return;
       }
-    });
+    });*/
   }
 
   void _showContextMenu(BuildContext conext, int index) {
     debugPrint('showing context menu for index $index');
 
-    Contact contact = contacts![index];
+    Contact contact = contacts[index];
 
     showCupertinoModalPopup<void>(
       context: context,
@@ -281,9 +313,9 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
   Widget _getContactWidget(BuildContext context, Contact contact, int index) {
     // todo: add personality trait emojis from appre
     // show appreciations strip for user :-)
-    String phoneNumber = '+${contact.mobileNumber.number.formatPhoneNumber()}';
+    // String phoneNumber = '+${contact.mobileNumber.number.formatPhoneNumber()}';
     String displayName =
-        '${contact.userName} ${getCommunitiesBadge(contact)}'.trim();
+        '${contact.userName} ${contact.getCommunitiesBadge()}'.trim();
 
     bool isAdmin = false;
 
@@ -314,23 +346,13 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
                   ),
                 ),
           ),
-          const SizedBox(height: 6),
-          Text(
-            phoneNumber,
-            style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-                  const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w300,
-                  ),
-                ),
-          ),
         ],
       ),
       leading: RandomAvatar(displayName, height: 50, width: 50),
       subtitle: _getAppreciationsStrip(context, contact),
       onTap: widget.enableSelection
           ? () {
-              widget.setPhoneNumberCallback?.call(contact);
+              widget.contactSelectedCallback?.call(contact);
               context.pop();
             }
           : null,

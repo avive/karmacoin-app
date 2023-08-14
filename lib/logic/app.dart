@@ -7,48 +7,36 @@ import 'package:get_it/get_it.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/logic/auth.dart';
+import 'package:karma_coin/logic/auth_interface.dart';
 import 'package:karma_coin/logic/config.dart';
 import 'package:karma_coin/common/platform_info.dart';
-import 'package:karma_coin/logic/account_setup_controller.dart';
-import 'package:karma_coin/logic/kc2/playground.dart';
-import 'package:karma_coin/logic/txs_boss.dart';
-import 'package:karma_coin/logic/txs_boss_interface.dart';
+import 'package:karma_coin/logic/kc2/user.dart';
+import 'package:karma_coin/logic/kc2/user_interface.dart';
 import 'package:karma_coin/logic/user_name_availability.dart';
 import 'package:karma_coin/logic/verifier.dart';
 import 'package:karma_coin/services/v2.0/kc2.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
-import 'account_logic.dart';
-import 'account_interface.dart';
-import 'api.dart';
-import 'auth_interface.dart';
 
 /// Add syntax sugar for quickly accessing the main "logic" controllers in the app
-AppLogic get appLogic => GetIt.I.get<AppLogic>();
-
-Api get api => GetIt.I.get<Api>();
+KC2AppLogic get appLogic => GetIt.I.get<KC2AppLogic>();
 
 Verifier get verifier => GetIt.I.get<Verifier>();
 
-ConfigLogic get settingsLogic => GetIt.I.get<ConfigLogic>();
+ConfigLogic get configLogic => GetIt.I.get<ConfigLogic>();
 
 AuthLogicInterface get authLogic => GetIt.I.get<AuthLogicInterface>();
-
-AccountLogicInterface get accountLogic => GetIt.I.get<AccountLogicInterface>();
+// AccountLogicInterface get accountLogic => GetIt.I.get<AccountLogic>();
 
 UserNameAvailabilityLogic get userNameAvailabilityLogic =>
     GetIt.I.get<UserNameAvailabilityLogic>();
-
-AccountSetupController get accountSetupController =>
-    GetIt.I.get<AccountSetupController>();
-
-TransactionsBossInterface get txsBoss =>
-    GetIt.I.get<TransactionsBossInterface>();
 
 AppState get appState => GetIt.I.get<AppState>();
 
 K2ServiceInterface get kc2Service => GetIt.I.get<K2ServiceInterface>();
 
-mixin AppLogicInterface {
+KC2UserInteface get kc2User => GetIt.I.get<KC2UserInteface>();
+
+mixin KC2AppLogicInterface {
   /// Indicates to the rest of the app that bootstrap has not completed.
   /// The router will use this to prevent redirects while bootstrapping.
   bool isBootstrapComplete = false;
@@ -58,7 +46,7 @@ mixin AppLogicInterface {
   Future<void> bootstrap();
 }
 
-class AppLogic with AppLogicInterface {
+class KC2AppLogic with KC2AppLogicInterface {
   @override
   bool get isLandscapeEnabled =>
       PlatformInfo.isDesktopOrWeb || deviceSize.shortestSide > 500;
@@ -77,17 +65,17 @@ class AppLogic with AppLogicInterface {
   static void registerSingletons() {
     // Top level app controller
     GetIt.I.registerLazySingleton<Verifier>(() => Verifier());
-    GetIt.I.registerLazySingleton<Api>(() => Api());
-    GetIt.I.registerLazySingleton<AppLogic>(() => AppLogic());
+    GetIt.I.registerLazySingleton<KC2AppLogic>(() => KC2AppLogic());
     GetIt.I.registerLazySingleton<ConfigLogic>(() => ConfigLogic());
+
+    //GetIt.I.registerLazySingleton<AccountLogicInterface>(() => AccountLogic());
+
     GetIt.I.registerLazySingleton<AuthLogicInterface>(() => AuthLogic());
-    GetIt.I.registerLazySingleton<AccountLogicInterface>(() => AccountLogic());
+    GetIt.I.registerLazySingleton<KC2UserInteface>(() => KC2User());
+    
     GetIt.I.registerLazySingleton<UserNameAvailabilityLogic>(
         () => UserNameAvailabilityLogic());
-    GetIt.I.registerLazySingleton<AccountSetupController>(
-        () => AccountSetupController());
-    GetIt.I.registerLazySingleton<TransactionsBossInterface>(
-        () => TransactionsBoss());
+    
     GetIt.I.registerLazySingleton<AppState>(() => AppState());
     GetIt.I
         .registerLazySingleton<K2ServiceInterface>(() => KarmachainService());
@@ -97,31 +85,6 @@ class AppLogic with AppLogicInterface {
   @override
   Future<void> bootstrap() async {
     // debugPrint('bootstrap app, deviceSize: $deviceSize, isTablet: $isLandscapeEnabled');
-
-    // Set the initial supported orientations
-    setDeviceOrientation(supportedOrientations);
-
-    // Set preferred refresh rate to the max possible (the OS may ignore this)
-    if (!kIsWeb && PlatformInfo.isAndroid) {
-      await FlutterDisplayMode.setHighRefreshRate();
-    }
-
-    // Load app settings
-    await settingsLogic.init();
-
-    // Init the account logic
-    await accountLogic.init();
-
-    // Int the auth logic
-    await authLogic.init();
-
-    if (authLogic.isUserAuthenticated()) {
-      debugPrint('user is Firebase authenticated on app startup');
-    }
-
-    if (accountLogic.signedUpOnChain.value == true) {
-      debugPrint("user has signed up (new user tx on chain)");
-    }
 
     WidgetsFlutterBinding.ensureInitialized();
 
@@ -133,12 +96,39 @@ class AppLogic with AppLogicInterface {
           .setTrustedCertificatesBytes(data.buffer.asUint8List());
     }
 
-    // Play around with kc2
-    await startKC2Playground();
+    // Set the initial supported orientations
+    setDeviceOrientation(supportedOrientations);
+
+    // Set preferred refresh rate to the max possible (the OS may ignore this)
+    if (!kIsWeb && PlatformInfo.isAndroid) {
+      await FlutterDisplayMode.setHighRefreshRate();
+    }
+
+    // Load app settings
+    await configLogic.init();
+
+    // Int the auth logic
+    await authLogic.init();
+
+    if (authLogic.isUserAuthenticated()) {
+      debugPrint('user is Firebase authenticated on app startup');
+    }
+
+    // connect ws to a kc2 api provider configured in settings
+    try {
+      await kc2Service.connectToApi(apiWsUrl: configLogic.kc2ApiUrl);
+    } catch (e) {
+      debugPrint('failed to connect to kc2 api: $e');
+    }
+
+    // Initialize kc2 user eraly. In case of account restore - get rid of this user and init a new one from mnemonic.
+    await kc2User.init();
+
+    // setup push notes (but don't wait on it per docs)
+    // configLogic.setupPushNotifications();
 
     // Flag bootStrap as complete
     isBootstrapComplete = true;
-
     debugPrint('bootstrap completed');
   }
 
