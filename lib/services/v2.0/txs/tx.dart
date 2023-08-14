@@ -17,7 +17,7 @@ abstract class KC2Tx {
   late String method;
   late ChainError? failedReason;
 
-  late BigInt timestamp;
+  late int timestamp;
   late String hash;
   late BigInt blockNumber;
   late int blockIndex;
@@ -41,5 +41,5 @@ abstract class KC2Tx {
   });
 
   String get timeAgo =>
-      time_ago.format(DateTime.fromMillisecondsSinceEpoch(timestamp.toInt()));
+      time_ago.format(DateTime.fromMillisecondsSinceEpoch(timestamp));
 }

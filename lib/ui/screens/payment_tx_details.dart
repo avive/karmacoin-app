@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
@@ -185,12 +186,18 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
 
     tiles.add(_getIdTile(context, 'Id', widget.txId));
 
+    final DateTime dateTime =
+        DateTime.fromMillisecondsSinceEpoch(widget.tx!.timestamp);
+    final String dateTimeString =
+        DateFormat('dd-MM-yy hh:mm:ss').format(dateTime);
+
     tiles.add(
       CupertinoListTile.notched(
         title: Text('Block',
             style: CupertinoTheme.of(context).textTheme.textStyle),
         leading: const FaIcon(FontAwesomeIcons.link, size: 20),
-        subtitle: Text('Position ${widget.tx!.blockIndex.format()}'),
+        subtitle: Text(
+            '$dateTimeString • Position ${widget.tx!.blockIndex.format()}'),
         trailing: Text(widget.tx!.blockNumber.toInt().format(),
             style: CupertinoTheme.of(context).textTheme.textStyle),
       ),

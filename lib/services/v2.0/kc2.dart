@@ -229,7 +229,7 @@ class KarmachainService implements K2ServiceInterface {
           final List<KC2Event> events =
               await _getTransactionEvents(blockNumber, transactionIndex);
           await _processTransaction(accountId, transactionBody, events,
-              BigInt.from(timestamp), null, blockNumber, transactionIndex);
+              timestamp, null, blockNumber, transactionIndex);
           processed++;
           debugPrint('Processed tx $processed / ${txs.length}...');
         } catch (e) {
@@ -722,7 +722,7 @@ class KarmachainService implements K2ServiceInterface {
     String accountId,
     Map<String, dynamic> tx,
     List<KC2Event> txEvents,
-    BigInt timestamp,
+    int timestamp,
     String? hash,
     BigInt blockNumber,
     int blockIndex,
@@ -868,7 +868,7 @@ class KarmachainService implements K2ServiceInterface {
 
   Future<void> _processNewUserTransaction(
       String hash,
-      BigInt timeStamp,
+      int timeStamp,
       String accountId,
       String signer,
       String method,
@@ -912,7 +912,7 @@ class KarmachainService implements K2ServiceInterface {
 
   Future<void> _processUpdateUserTransaction(
       String hash,
-      BigInt timeStamp,
+      int timeStamp,
       String accountId,
       String signer,
       Map<String, dynamic> args,
@@ -957,7 +957,7 @@ class KarmachainService implements K2ServiceInterface {
 
   Future<void> _processAppreciationTransaction(
       String hash,
-      BigInt timeStamp,
+      int timeStamp,
       String accountId,
       String signer,
       Map<String, dynamic> args,
@@ -1134,7 +1134,7 @@ class KarmachainService implements K2ServiceInterface {
   /// Process a coin transfer tx
   Future<void> _processTransferTransaction(
       String hash,
-      BigInt timeStamp,
+      int timeStamp,
       String accountId,
       String signer,
       Map<String, dynamic> args,
@@ -1152,7 +1152,7 @@ class KarmachainService implements K2ServiceInterface {
         return;
       }
 
-      debugPrint('Transfer tx: $args');
+      debugPrint('Transfer tx time: $timeStamp');
 
       final amount = args['value'];
 
