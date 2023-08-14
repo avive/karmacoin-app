@@ -167,6 +167,8 @@ class Commission {
 class Pool {
   /// The identifier of the pool.
   PoolId id;
+  /// Bonded account id of this pool.
+  String bondedAccountId;
   /// The commission rate of the pool.
   Commission commission;
   /// Count of members that belong to the pool.
@@ -178,13 +180,14 @@ class Pool {
   /// The current state of the pool.
   PoolState state;
 
-  Pool(this.id, this.commission, this.memberCounter, this.points, this.roles, this.state);
+  Pool(this.id, this.bondedAccountId, this.commission, this.memberCounter, this.points, this.roles, this.state);
 
   Pool.fromJson(Map<String, dynamic> json)
     : id = json['id'],
-      commission = Commission.fromJson(json['commission']),
-      memberCounter = json['member_counter'],
-      points = BigInt.from(json['points']),
-      roles = PoolRoles.fromJson(json['roles']),
-      state = PoolState.values.firstWhere((e) => e.toString() == 'PoolState.${json['state'].toLowerCase()}');
+        bondedAccountId = json['bonded_account'],
+        commission = Commission.fromJson(json['commission']),
+        memberCounter = json['member_counter'],
+        points = BigInt.from(json['points']),
+        roles = PoolRoles.fromJson(json['roles']),
+        state = PoolState.values.firstWhere((e) => e.toString() == 'PoolState.${json['state'].toLowerCase()}');
 }
