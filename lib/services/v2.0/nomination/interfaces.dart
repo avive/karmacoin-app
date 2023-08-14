@@ -260,10 +260,59 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
       MapEntry<ConfigOption, String?> root,
       MapEntry<ConfigOption, String?> nominator,
       MapEntry<ConfigOption, String?> bouncer,
-      ) {
+      ) async {
     try {
-      // TODO: how to decode ConfigOption?
-      throw UnimplementedError();
+      MapEntry<String, Uint8List?> newRoot;
+      MapEntry<String, Uint8List?> newNominator;
+      MapEntry<String, Uint8List?> newBouncer;
+
+      switch (root.key) {
+        case ConfigOption.noop:
+          newRoot = const MapEntry('Noop', null);
+          break;
+        case ConfigOption.remove:
+          newRoot = const MapEntry('Remove', null);
+          break;
+        case ConfigOption.set:
+          newRoot = MapEntry('Set', ss58.Address.decode(root.value!).pubkey);
+          break;
+      }
+
+      switch (nominator.key) {
+        case ConfigOption.noop:
+          newNominator = const MapEntry('Noop', null);
+          break;
+        case ConfigOption.remove:
+          newNominator = const MapEntry('Remove', null);
+          break;
+        case ConfigOption.set:
+          newNominator = MapEntry('Set', ss58.Address.decode(nominator.value!).pubkey);
+          break;
+      }
+
+      switch (bouncer.key) {
+        case ConfigOption.noop:
+          newBouncer = const MapEntry('Noop', null);
+          break;
+        case ConfigOption.remove:
+          newBouncer = const MapEntry('Remove', null);
+          break;
+        case ConfigOption.set:
+          newBouncer = MapEntry('Set', ss58.Address.decode(bouncer.value!).pubkey);
+          break;
+      }
+
+      final call = MapEntry(
+          'NominationPools',
+          MapEntry('update_roles', {
+            'pool_id': poolId,
+            'new_root': newRoot,
+            'new_nominator': newNominator,
+            'new_bouncer': newBouncer,
+          })
+      );
+
+      return await signAndSendTransaction(call);
     } on PlatformException catch (e) {
       debugPrint('Failed to join nomination pool: ${e.details}');
       rethrow;
