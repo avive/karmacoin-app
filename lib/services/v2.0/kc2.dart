@@ -33,7 +33,8 @@ import 'package:substrate_metadata_fixed/types/metadata_types.dart';
 
 String verificationBypassToken = 'dummy';
 
-class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterface, KC2StakingInterface, K2ServiceInterface {
+class KarmachainService extends ChainApiProvider
+    with KC2NominationPoolsInterface, KC2StakingInterface, K2ServiceInterface {
   bool _connectedToApi = false;
   late String _apiWsUrl;
 
@@ -112,8 +113,8 @@ class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterfac
       // Get timestamp from set timestamp extrinsic
       int timestamp = extrinsics
           .firstWhere((e) =>
-      e.value['calls'].key == 'Timestamp' &&
-          e.value['calls'].value.key == 'set')
+              e.value['calls'].key == 'Timestamp' &&
+              e.value['calls'].value.key == 'set')
           .value['calls']
           .value
           .value['now'];

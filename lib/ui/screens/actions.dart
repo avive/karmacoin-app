@@ -141,14 +141,15 @@ class _ActionsScreenState extends State<ActionsScreen> {
             trailing: const CupertinoListTileChevron(),
             onTap: () => context.push(ScreenPaths.updateUserName),
           ),
+          /*
           CupertinoListTile.notched(
             title: const Text('Change Phone Number'),
             leading: const Icon(CupertinoIcons.phone, size: 28),
             trailing: const CupertinoListTileChevron(),
             onTap: () => {
-              // TODO: implement me
+              
             },
-          ),
+          ),*/
           const DeleteDataTile().build(context) as CupertinoListTile,
           const DeleteAccountTile().build(context) as CupertinoListTile,
         ],
