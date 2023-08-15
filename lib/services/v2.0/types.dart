@@ -1,3 +1,4 @@
+import 'package:convert/convert.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 
 typedef AccountId = String;
@@ -121,4 +122,34 @@ class Contact {
             communityMemberships.map((e) => e.toJson()).toList(),
         'trait_scores': traitScores.map((e) => e.toJson()).toList(),
       };
+}
+
+enum VerificationResult {
+  unspecified,
+  usernameTaken,
+  verified,
+  unverified,
+  missingData,
+  invalidSignature,
+  accountMismatch,
+}
+
+class VerificationEvidence {
+  VerificationResult verificationResult;
+  String? verifierAccountId;
+  List<int>? signature;
+  String? accountId;
+  String? username;
+  String? phoneNumberHash;
+
+  VerificationEvidence(this.verificationResult, this.verifierAccountId,
+      this.signature, this.accountId, this.username, this.phoneNumberHash);
+
+  VerificationEvidence.fromJson(Map<String, dynamic> v)
+    : verificationResult = VerificationResult.values.firstWhere((e) => e.toString() == 'VerificationResult.${v['verification_result'].toLowerCase()}'),
+      verifierAccountId = v['verifier_account_id'],
+      signature = v['signature'] == null ? null : hex.decode(v['signature']),
+      accountId = v['account_id'],
+      username = v['username'],
+      phoneNumberHash = v['phone_number_hash'];
 }
