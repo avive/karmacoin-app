@@ -519,8 +519,20 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   void setPhoneNumberCallback(api_types.Contact selectedContact) {
     debugPrint('setPhoneNumberCallback: $selectedContact');
     setState(() {
-      contact = selectedContact;
       phoneController.value = PhoneNumber.parse(contact!.mobileNumber.number);
+      /* 
+      contact = selectedContact;
+      PhoneNumber pn = PhoneNumber.parse(contact!.mobileNumber.number);
+      String iso = pn.countryCode;
+      String nsn = pn.nsn;
+      if (nsn.startsWith(iso)) {
+        nsn = nsn.substring(iso.length);
+      }
+      if (nsn.startsWith('0')) {
+        nsn = nsn.substring(1);
+      }
+
+      phoneController.value = PhoneNumber(isoCode: pn.isoCode, nsn: nsn);*/
     });
 
     // call without awaiting but log any errors

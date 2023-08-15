@@ -1,4 +1,3 @@
-//import 'package:countup/countup.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/api/api.pb.dart';
@@ -40,6 +39,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
 
+    debugPrint('Profile page init...');
+
     Future.delayed(Duration.zero, () async {
       bool isConnected = await PlatformInfo.isConnected();
       if (!isConnected) {
@@ -67,6 +68,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         setState(() {
           if (resp.hasUser()) {
             user = resp.user;
+            userNotFound = false;
           } else {
             userNotFound = true;
           }
@@ -88,7 +90,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _getScreenWidgets(BuildContext context) {
-    if (!apiOffline && user == null) {
+    if (!apiOffline && user == null && !userNotFound) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -126,7 +128,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 20),
             Text('User not found.',
                 style: CupertinoTheme.of(context).textTheme.textStyle),
-            const TraitsScoresWheel(null, 0),
           ]);
     }
 
