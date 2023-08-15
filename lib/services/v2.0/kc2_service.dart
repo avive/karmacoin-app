@@ -142,10 +142,10 @@ mixin K2ServiceInterface implements ChainApiProvider {
   }
 
   /// Fetch supported by the chain char traits
-  Future<CharTrait> getCharTraits() async {
+  Future<List<CharTrait>> getCharTraits() async {
     try {
-      Map<String, dynamic> result = await callRpc('chain_getCharTraits', []);
-      return CharTrait.fromJson(result);
+      List<dynamic> result = await callRpc('chain_getCharTraits', []);
+      return result.map((e) => CharTrait.fromJson(e)).toList();
     } on PlatformException catch (e) {
       debugPrint('Failed to get char traits: ${e.message}');
       rethrow;
