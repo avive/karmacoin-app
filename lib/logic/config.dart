@@ -3,7 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/common/platform_info.dart';
 
-// TODO: add settings interface
+// TODO: add ConfigLogicInterface
 
 // TODO: migrate from json file to a hive box
 

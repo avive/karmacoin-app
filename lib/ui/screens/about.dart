@@ -77,22 +77,18 @@ class _AboutScreenState extends State<AboutScreen> {
     tiles.add(
       const CupertinoListTile.notched(
         padding: EdgeInsets.only(top: 6, bottom: 12, left: 12),
-
         title: Text('Copyright'),
         leading: FaIcon(FontAwesomeIcons.copyright, size: 22),
         subtitle: Text('(c) 2023 Karma Coin Authors'),
-        // TODO: number format
       ),
     );
 
     tiles.add(
       CupertinoListTile.notched(
         padding: const EdgeInsets.only(top: 6, bottom: 12, left: 12),
-
         title: const Text('App Version'),
         leading: const Icon(CupertinoIcons.app),
         subtitle: Text('$version Build $buildNumber'),
-        // TODO: number format
       ),
     );
 

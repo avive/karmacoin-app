@@ -144,10 +144,8 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
     );
   }
 
-  // TODO: add signup status widget with status of signup
   Widget _getUpdateNameStatus(BuildContext context) {
     return ValueListenableBuilder<UpdateResult>(
-        // TODO: how to make this not assert when karmaCoinUser is null?
         valueListenable: kc2User.updateResult,
         builder: (context, value, child) {
           String text = '';
@@ -317,7 +315,6 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
               border: Border(
                 bottom: BorderSide(
                   width: 2.0,
-                  // TODO: from theme
                   color: CupertinoColors.activeBlue,
                 ),
               ),

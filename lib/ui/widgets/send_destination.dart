@@ -332,17 +332,11 @@ class _SendDestinationState extends State<SendDestination> {
   void contactSelectedCallback(Contact selectedContact) {
     debugPrint('contactSelectedCallback: ${selectedContact.userName}');
     setState(() {
-      // TODO: figure out dealing with phone hash here
-      // phoneController.value =
-      //    PhoneNumber.parse(selectedContact.mobileNumber.number);
       appState.sendDestination.value = Destination.contact;
       appState.sendDestinationPhoneNumberHash.value =
           selectedContact.phoneNumberHash;
       appState.sendDestinationContact.value = selectedContact;
-      _accountTextController.text = selectedContact.userName;
-      /*
-      appState.sendDestinationPhoneNumberHash.value =
-          kc2Service.getPhoneNumberHash(selectedContact.phoneNumberHash);*/
+      _accountTextController.text = selectedContact.userName;     
     });
   }
 

@@ -90,7 +90,6 @@ class _SendWidgetState extends State<SendWidget> {
         break;
       case Destination.phoneNumber:
       case Destination.contact:
-        // TODO: validate the phone number string here
         if (appState.sendDestinationPhoneNumberHash.value.isEmpty) {
           if (context.mounted) {
             StatusAlert.show(

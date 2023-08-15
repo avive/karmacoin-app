@@ -200,7 +200,6 @@ class KC2User extends KC2UserInteface {
       }
     });
 
-    // TODO: take user name and phone number from ui via app state
     String? err;
     String? txHash;
     (txHash, err) = await kc2Service.newUser(
@@ -402,8 +401,7 @@ class KC2User extends KC2UserInteface {
       return;
     }
 
-    // TODO: consider just getting user info from chain - it should have the updated
-    // information so all the code below is redundant
+    // TODO: consider just getting user info from chain - it should have the updated information so all the code below is redundant
 
     // Clone needed here as we want to set a new observable value
     KC2UserInfo u = KC2UserInfo.clone(userInfo.value!);
