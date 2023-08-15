@@ -124,17 +124,6 @@ class Contact {
       };
 }
 
-class LeaderBoardEntry {
-  String accountId;
-  int score;
-
-  LeaderBoardEntry(this.accountId, this.score);
-
-  LeaderBoardEntry.fromJson(Map<String, dynamic> json)
-    : accountId = json['account_id'],
-      score = json['score'];
-}
-
 enum VerificationResult {
   unspecified,
   usernameTaken,
