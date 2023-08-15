@@ -89,7 +89,7 @@ class _BackupAccountScreenState extends State<BackupAccountScreen> {
     return [
       CupertinoListSection.insetGrouped(
           header: Text(
-            'About',
+            'Instructions',
             style: CupertinoTheme.of(context).textTheme.tabLabelTextStyle.merge(
                   TextStyle(
                       fontSize: 14,
