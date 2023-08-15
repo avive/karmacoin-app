@@ -221,14 +221,14 @@ class BlockchainStats {
 class SignedTransaction {
   String? accountId;
   List<int> transactionBody;
-  List<int> signature;
+  String signature;
 
   SignedTransaction(this.accountId, this.transactionBody, this.signature);
 
   SignedTransaction.fromJson(Map<String, dynamic> json)
     : accountId = json['account_id'],
-      transactionBody = json['transaction_body'],
-      signature = json['signature'];
+      transactionBody = json['transaction_body'].cast<int>(),
+      signature = json['signature'].values.first;
 }
 
 class Transaction {
@@ -244,7 +244,7 @@ class Transaction {
   Transaction(this.transaction, this.from, this.to, this.timestamp, this.events, this.blockNumber, this.transactionIndex);
 
   Transaction.fromJson(Map<String, dynamic> json)
-    : transaction = SignedTransaction.fromJson(json['transaction']),
+    : transaction = SignedTransaction.fromJson(json['signed_transaction']),
       from = json['from'] == null ? null : KC2UserInfo.fromJson(json['from']),
       to = json['to'] == null ? null : KC2UserInfo.fromJson(json['to']),
       timestamp = json['timestamp'],

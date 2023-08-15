@@ -4,10 +4,13 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/app_state.dart';
+import 'package:karma_coin/logic/kc2/identity.dart';
+import 'package:karma_coin/logic/kc2/identity_interface.dart';
 import 'package:karma_coin/logic/kc2/user.dart';
 import 'package:karma_coin/logic/kc2/user_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
+import 'package:karma_coin/services/v2.0/types.dart';
 
 final random = Random.secure();
 String get randomPhoneNumber => (random.nextInt(900000) + 100000).toString();
@@ -146,6 +149,70 @@ void main() {
         // wait for completer and verify test success
         expect(await completer.future, equals(true));
         expect(completer.isCompleted, isTrue);
+      },
+      timeout: const Timeout(Duration(seconds: 280)),
+    );
+
+    test(
+      'Get transaction by hash',
+          () async {
+            K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
+
+            // Create a new identity for local user
+            IdentityInterface katya = Identity();
+            await katya.initNoStorage();
+            String katyaUserName =
+            "katya${katya.accountId.substring(0, 5)}".toLowerCase();
+
+            String katyaPhoneNumber = randomPhoneNumber;
+
+            // Set katya as signer
+            kc2Service.setKeyring(katya.keyring);
+            debugPrint('Local user katya public address: ${katya.accountId}');
+
+            final completer = Completer<bool>();
+            String? txHash;
+
+            kc2Service.newUserCallback = (tx) async {
+              debugPrint('>> new user callback called');
+              if (tx.failedReason != null) {
+                completer.complete(false);
+                return;
+              }
+
+              if (tx.hash != txHash) {
+                debugPrint('unexpected tx hash: ${tx.hash} ');
+                completer.complete(false);
+                return;
+              }
+
+              Transaction transaction = await kc2Service.getTransactionByHash(tx.hash);
+
+              expect(transaction.timestamp, tx.timestamp);
+              expect(transaction.from?.accountId, tx.accountId);
+              expect(transaction.blockNumber, tx.blockNumber.toInt());
+              expect(transaction.transactionIndex, tx.blockIndex);
+
+              completer.complete(true);
+            };
+
+            await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+
+            // subscribe to new account txs
+            kc2Service.subscribeToAccount(katya.accountId);
+
+            String? err;
+            // signup katya
+            (txHash, err) = await kc2Service.newUser(
+                katya.accountId, katyaUserName, katyaPhoneNumber);
+
+            expect(txHash, isNotNull);
+            expect(err, isNull);
+
+            // wait for completer and verify test success
+            expect(await completer.future, equals(true));
+            expect(completer.isCompleted, isTrue);
+
       },
       timeout: const Timeout(Duration(seconds: 280)),
     );

@@ -190,6 +190,11 @@ mixin K2ServiceInterface implements ChainApiProvider {
 
   Future<List<Transaction>> getTransactionsByPhoneNumberHash(String phoneNumberHash) async {
     try {
+      // Cut `0x` prefix if exists
+      if (phoneNumberHash.startsWith('0x')) {
+        phoneNumberHash = phoneNumberHash.substring(2);
+      }
+
       List<dynamic> result = await callRpc('transactions_getTransactionsByPhoneNumberHash', [phoneNumberHash]);
       return result.map((e) => Transaction.fromJson(e)).toList();
     } on PlatformException catch (e) {
@@ -207,7 +212,6 @@ mixin K2ServiceInterface implements ChainApiProvider {
         byPassToken
       ]);
 
-      debugPrint('$result');
       return result == null ? null : VerificationEvidence.fromJson(result);
     } on PlatformException catch (e) {
       debugPrint('Failed to get verification evidence: ${e.message}');
