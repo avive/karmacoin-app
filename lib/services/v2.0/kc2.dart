@@ -89,6 +89,42 @@ class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterfac
     }
   }
 
+  @override
+  Future<int> getGenesisTimestamp() async {
+    try {
+      const blockTime = 12;
+      // Because genesis block do not contains events,
+      // we need to fetch first block instead
+      const blockNumber = '0x1';
+
+      // Get block hash by block number
+      final blockHash = await callRpc('chain_getBlockHash', [blockNumber]);
+      // Get block by hash
+      final block = await callRpc('chain_getBlock', [blockHash]);
+      // Decode block extrinsics
+      final extrinsics = block['block']['extrinsics'].map((encodedExtrinsic) {
+        final extrinsic = _decodeTransaction(Input.fromHex(encodedExtrinsic));
+        final extrinsicHash =
+            '0x${hex.encode(Hasher.blake2b256.hashString(encodedExtrinsic))}';
+
+        return MapEntry(extrinsicHash, extrinsic);
+      }).toList();
+      // Get timestamp from set timestamp extrinsic
+      int timestamp = extrinsics
+          .firstWhere((e) =>
+      e.value['calls'].key == 'Timestamp' &&
+          e.value['calls'].value.key == 'set')
+          .value['calls']
+          .value
+          .value['now'];
+
+      return timestamp;
+    } on PlatformException catch (e) {
+      debugPrint('Failed to get genesis time: ${e.message}');
+      rethrow;
+    }
+  }
+
   /// Get all on-chain txs to or form an account
   /// accountId - ss58 encoded address of localUser
   @override

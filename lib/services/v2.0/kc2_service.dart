@@ -40,7 +40,6 @@ mixin K2ServiceInterface implements ChainApiProvider {
   Future<void> connectToApi({required String apiWsUrl, String? verifierWsUrl});
 
   // rpc methods
-  //
 
   /// Provides information about user account by `AccountId`
   Future<KC2UserInfo?> getUserInfoByAccountId(String accountId) async {
@@ -110,6 +109,7 @@ mixin K2ServiceInterface implements ChainApiProvider {
     }
   }
 
+  /// Fetch list who participate in karma rewards distribution
   Future<List<KC2UserInfo>> getLeaderBoard() async {
     try {
       List<dynamic> result = await callRpc('community_getLeaderBoard', []);
@@ -119,6 +119,41 @@ mixin K2ServiceInterface implements ChainApiProvider {
       rethrow;
     }
   }
+
+  /// Fetch information about chain like last block time, rewards, etc
+  Future<BlockchainStats> getBlockchainStats() async {
+    try {
+      Map<String, dynamic> result = await callRpc('chain_getBlockchainData', []);
+      return BlockchainStats.fromJson(result);
+    } on PlatformException catch (e) {
+      debugPrint('Failed to get blockchain stats: ${e.message}');
+      rethrow;
+    }
+  }
+
+  /// Fetch chain network id like ('testnet', 'mainnet', etc)
+  Future<String> getNetId() async {
+    try {
+      return await callRpc('chain_getNetworkId', []);
+    } on PlatformException catch (e) {
+      debugPrint('Failed to get net id: ${e.message}');
+      rethrow;
+    }
+  }
+
+  /// Fetch supported by the chain char traits
+  Future<CharTrait> getCharTraits() async {
+    try {
+      Map<String, dynamic> result = await callRpc('chain_getCharTraits', []);
+      return CharTrait.fromJson(result);
+    } on PlatformException catch (e) {
+      debugPrint('Failed to get char traits: ${e.message}');
+      rethrow;
+    }
+  }
+
+  /// Fetch chain genesis time
+  Future<int> getGenesisTimestamp();
 
   // TODO: add getTransaction(int blockNumber, int txIndex)
   // TODO: add getTransactionByHash(String txHash)

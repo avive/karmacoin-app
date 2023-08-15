@@ -3,6 +3,22 @@ import 'package:karma_coin/data/genesis_config.dart';
 
 typedef AccountId = String;
 
+class CharTrait {
+  int id;
+  String name;
+  String emoji;
+
+  CharTrait(
+      {required this.id,
+      required this.name,
+      required this.emoji});
+
+  CharTrait.fromJson(Map<String, dynamic> json)
+    : id = json['id'],
+      name = json['name'],
+      emoji = json['emoji'];
+}
+
 class Community {
   int id;
   String name;
@@ -152,4 +168,51 @@ class VerificationEvidence {
       accountId = v['account_id'],
       username = v['username'],
       phoneNumberHash = v['phone_number_hash'];
+}
+
+class BlockchainStats {
+  /// Last block production time
+  int lastBlockTime;
+  /// Current block height
+  int tipHeight;
+  /// Total number of executed transactions
+  int transactionCount;
+  /// Total number of payment transactions
+  int paymentTransactionCount;
+  /// Total number of payment transactions with an appreciation
+  int appreciationsTransactionsCount;
+  /// Total number of payment transactions
+  int updateUserTransactionsCount;
+  /// Total number of verified user accounts
+  int usersCount;
+  /// Total tx fee subsidies issued by the protocol
+  BigInt feeSubsAmount;
+  /// Total funds issued by the protocol for signup
+  BigInt signupRewardsAmount;
+  /// Total funds issued by the protocol for referrals
+  BigInt referralRewardsAmount;
+  /// Total funds issued by the protocol for validating
+  BigInt validatorRewardsAmount;
+  /// Amount of rewards paid to causes
+  BigInt causesRewardsAmount;
+
+  BlockchainStats(this.lastBlockTime, this.tipHeight, this.transactionCount,
+      this.paymentTransactionCount, this.appreciationsTransactionsCount,
+      this.updateUserTransactionsCount, this.usersCount, this.feeSubsAmount,
+      this.signupRewardsAmount, this.referralRewardsAmount,
+      this.validatorRewardsAmount, this.causesRewardsAmount);
+
+  BlockchainStats.fromJson(Map<String, dynamic> json)
+    : lastBlockTime = json['last_block_time'],
+      tipHeight = json['tip_height'],
+      transactionCount = json['transaction_count'],
+      paymentTransactionCount = json['payment_transaction_count'],
+      appreciationsTransactionsCount = json['appreciations_transactions_count'],
+      updateUserTransactionsCount = json['update_user_transactions_count'],
+      usersCount = json['users_count'],
+      feeSubsAmount = BigInt.parse(json['fee_subs_amount']),
+      signupRewardsAmount = BigInt.parse(json['signup_rewards_amount']),
+      referralRewardsAmount = BigInt.parse(json['referral_rewards_amount']),
+      validatorRewardsAmount = BigInt.parse(json['validator_rewards_amount']),
+      causesRewardsAmount = BigInt.parse(json['causes_rewards_amount']);
 }
