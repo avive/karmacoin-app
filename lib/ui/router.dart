@@ -207,8 +207,6 @@ final GoRouter appRouter = GoRouter(
         name: ScreenNames.profile,
         builder: (BuildContext context, GoRouterState state) {
           final String userName = Uri.decodeFull(state.params['username']!);
-
-          // TODO: show public profile screen of username
           return ProfileScreen(ValueKey(userName), userName);
         }),
     GoRoute(

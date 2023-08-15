@@ -272,7 +272,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     }
 
     // kcents value
-    // TODO: properly handle very large balance
+    // TODO: properly handle a very large balance
     double dispValue = balance.toDouble();
     String labelText = 'KARMA CENTS';
     if (balance >= BigInt.from(1000000)) {

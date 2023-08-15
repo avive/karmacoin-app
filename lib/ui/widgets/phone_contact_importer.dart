@@ -68,7 +68,6 @@ class _PhoneContactImporterState extends State<PhoneContactImporter> {
       IsoCode isoCode = widget.phoneController.value?.isoCode ?? IsoCode.US;
       PhoneNumber? newNumber;
 
-      // TODO: do this in a more standarized and less error-prone manner....
       String rawNumber = phoneNumber
           .replaceAll('-', '')
           .replaceAll('(', '')

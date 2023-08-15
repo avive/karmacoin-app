@@ -94,9 +94,6 @@ class KarmachainService extends ChainApiProvider
       api = polkadart.StateApi(karmachain);
       final metadata = await karmachain.send('state_getMetadata', []);
 
-      // TODO: if verifierWsUrl != null then connect to verifier, otherwise we assume
-      // that the api provider is also a verifier
-
       decodedMetadata =
           MetadataDecoder.instance.decode(metadata.result.toString());
       chainInfo = ChainInfo.fromMetadata(decodedMetadata);
@@ -281,10 +278,6 @@ class KarmachainService extends ChainApiProvider
       String accountId, String username, String phoneNumber) async {
     try {
       //
-      // TODO: use configure verifier which might be different provider
-      // than the provider used by the api. right now we assume provider
-      // is a verifier
-      //
       // TODO: use new whatsapp verifier microservice when it is ready
       // it includes a session id param...
       //
@@ -426,8 +419,6 @@ class KarmachainService extends ChainApiProvider
       rethrow;
     }
   }
-
-  /// TODO: add support for sending a appreciation to a user name. To, implement, get the phone number hash from the chain for user name or id via the RPC api and send appreciation to it. No need to appreciate by accountId.
 
   /// Send an appreciation or a payment to a phone number hash.
   /// phoneNumberHash - canonical hex string of phone number hash using blake32. Can be with or without 0x prefix
@@ -1070,8 +1061,6 @@ class KarmachainService extends ChainApiProvider
 
       if (signer != accountId && toAccountId != accountId) {
         // appreciation not to or from watched local account
-        // TODO: consider local user phone number hash and don't return if tx
-        // is to or from that phone number! (account migration case)
         return;
       }
 

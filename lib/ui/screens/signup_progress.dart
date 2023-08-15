@@ -67,7 +67,6 @@ class _SignupProgressScreeenState extends State<SignupProgressScreeen> {
           appState.verifiedPhoneNumber == null) {
         debugPrint(
             'Missing required data for signup - Reuested user name: ${appState.requestedUserName} Phone number: ${appState.verifiedPhoneNumber}');
-        // TODO: show error
         if (context.mounted) {
           StatusAlert.show(context,
               duration: const Duration(seconds: 4),
@@ -81,7 +80,6 @@ class _SignupProgressScreeenState extends State<SignupProgressScreeen> {
         return;
       }
 
-      // TODO: regsiter callbacks and start signup
       kc2User.signupStatus.addListener(_onSignupStatusChanged);
 
       debugPrint('Signing up ${appState.requestedUserName!}...');
@@ -142,7 +140,6 @@ class _SignupProgressScreeenState extends State<SignupProgressScreeen> {
     CupertinoTextThemeData textTheme = CupertinoTheme.of(context).textTheme;
 
     return ValueListenableBuilder<SignupStatus>(
-        // TODO: how to make this not assert when karmaCoinUser is null?
         valueListenable: kc2User.signupStatus,
         builder: (context, value, child) {
           switch (value) {

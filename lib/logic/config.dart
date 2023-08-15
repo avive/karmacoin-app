@@ -5,8 +5,6 @@ import 'package:karma_coin/common/platform_info.dart';
 
 // TODO: add ConfigLogicInterface
 
-// TODO: migrate from json file to a hive box
-
 /// App config logic
 class ConfigLogic {
   /// Set to true to work against localhost servers. Otherwise production servers are used

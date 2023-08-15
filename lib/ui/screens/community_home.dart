@@ -129,7 +129,6 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
 
   Widget _getWidgetForUser(BuildContext context) {
     return ValueListenableBuilder<KC2UserInfo?>(
-        // TODO: how to make this not assert when karmaCoinUser is null?
         valueListenable: kc2User.userInfo,
         builder: (context, value, child) {
           if (value == null) {

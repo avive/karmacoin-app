@@ -49,7 +49,6 @@ class _RestoreAccountIntroScreenState extends State<RestoreAccountIntroScreen> {
           ),
         ),
         leading: const FaIcon(FontAwesomeIcons.triangleExclamation, size: 24),
-        // TODO: number format
       ),
     );
 

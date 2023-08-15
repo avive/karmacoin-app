@@ -29,7 +29,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    // TODO: if tx is null - fetch it from kc2 api
+    // TODO: if tx is null - fetch it from kc2 api once it is available
     if (widget.tx == null) {
       throw 'For now - tx must be passed in via router to widget';
     }
@@ -314,7 +314,6 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
               -6),
         ),
         child: SafeArea(
-          // TODO: add column and the community big tile here
           child: MediaQuery.removePadding(
             context: context,
             removeTop: false,

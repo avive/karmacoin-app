@@ -85,7 +85,6 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
                   .textTheme
                   .navTitleTextStyle
                   .merge(const TextStyle(fontSize: 18))),
-          // TODO: number format
         ),
       );
     }
