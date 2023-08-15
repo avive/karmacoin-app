@@ -292,7 +292,6 @@ class _SendDestinationState extends State<SendDestination> {
             padding: const EdgeInsets.all(14.0),
             decoration: const BoxDecoration(
               color: CupertinoDynamicColor.withBrightness(
-                // TODO: make identical to phone input bcg color
                 color: CupertinoColors.systemGrey6,
                 darkColor: CupertinoColors.darkBackgroundGray,
               ),
@@ -336,7 +335,7 @@ class _SendDestinationState extends State<SendDestination> {
       appState.sendDestinationPhoneNumberHash.value =
           selectedContact.phoneNumberHash;
       appState.sendDestinationContact.value = selectedContact;
-      _accountTextController.text = selectedContact.userName;     
+      _accountTextController.text = selectedContact.userName;
     });
   }
 

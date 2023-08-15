@@ -3,7 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/common/platform_info.dart';
 
-// TODO: add ConfigLogicInterface
+// TODO: add ConfigLogic public interface
 
 /// App config logic
 class ConfigLogic {
@@ -122,6 +122,8 @@ class ConfigLogic {
   /// Returns connection url for kc2 api
   String get kc2ApiUrl =>
       '${apiProtocol.value}://${apiHostName.value}:${apiHostPort.value}';
+
+  // TODO: completely revamp push notes to new auth scheme
 
   // push notificaiton handling
   ////////////////////
