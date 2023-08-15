@@ -1,5 +1,6 @@
 import 'package:convert/convert.dart';
 import 'package:karma_coin/data/genesis_config.dart';
+import 'package:karma_coin/services/v2.0/user_info.dart';
 
 typedef AccountId = String;
 
@@ -142,7 +143,7 @@ class Contact {
 
 enum VerificationResult {
   unspecified,
-  usernameTaken,
+  userNameTaken,
   verified,
   unverified,
   missingData,
@@ -162,7 +163,7 @@ class VerificationEvidence {
       this.signature, this.accountId, this.username, this.phoneNumberHash);
 
   VerificationEvidence.fromJson(Map<String, dynamic> v)
-    : verificationResult = VerificationResult.values.firstWhere((e) => e.toString() == 'VerificationResult.${v['verification_result'].toLowerCase()}'),
+    : verificationResult = VerificationResult.values.firstWhere((e) => e.toString().toLowerCase() == 'VerificationResult.${v['verification_result']}'.toLowerCase()),
       verifierAccountId = v['verifier_account_id'],
       signature = v['signature'] == null ? null : hex.decode(v['signature']),
       accountId = v['account_id'],
@@ -215,4 +216,39 @@ class BlockchainStats {
       referralRewardsAmount = BigInt.parse(json['referral_rewards_amount']),
       validatorRewardsAmount = BigInt.parse(json['validator_rewards_amount']),
       causesRewardsAmount = BigInt.parse(json['causes_rewards_amount']);
+}
+
+class SignedTransaction {
+  String? accountId;
+  List<int> transactionBody;
+  List<int> signature;
+
+  SignedTransaction(this.accountId, this.transactionBody, this.signature);
+
+  SignedTransaction.fromJson(Map<String, dynamic> json)
+    : accountId = json['account_id'],
+      transactionBody = json['transaction_body'],
+      signature = json['signature'];
+}
+
+class Transaction {
+  SignedTransaction transaction;
+  KC2UserInfo? from;
+  KC2UserInfo? to;
+  int timestamp;
+  // Events that need to be decoded
+  List<dynamic> events;
+  int blockNumber;
+  int transactionIndex;
+
+  Transaction(this.transaction, this.from, this.to, this.timestamp, this.events, this.blockNumber, this.transactionIndex);
+
+  Transaction.fromJson(Map<String, dynamic> json)
+    : transaction = SignedTransaction.fromJson(json['transaction']),
+      from = json['from'] == null ? null : KC2UserInfo.fromJson(json['from']),
+      to = json['to'] == null ? null : KC2UserInfo.fromJson(json['to']),
+      timestamp = json['timestamp'],
+      events = json['events'],
+      blockNumber = json['block_number'],
+      transactionIndex = json['transaction_index'];
 }

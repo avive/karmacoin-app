@@ -155,10 +155,48 @@ mixin K2ServiceInterface implements ChainApiProvider {
   /// Fetch chain genesis time
   Future<int> getGenesisTimestamp();
 
-  // TODO: add getTransaction(int blockNumber, int txIndex)
-  // TODO: add getTransactionByHash(String txHash)
-  // TODO: add getTransactionsByAccountId(String accountId)
-  // TODO: add getTransactionsByPhoneNumberHash(String phoneNumberHash)
+  /// Fetch transaction by block number and transaction index
+  Future<Transaction> getTransaction(int blockNumber, int txIndex) async {
+    try {
+      Map<String, dynamic> result = await callRpc('chain_getTransaction', [blockNumber, txIndex]);
+      return Transaction.fromJson(result);
+    } on PlatformException catch (e) {
+      debugPrint('Failed to get transactions_getTx: ${e.message}');
+      rethrow;
+    }
+  }
+
+  /// Fetch transaction by transaction hash
+  Future<Transaction> getTransactionByHash(String txHash) async {
+    try {
+      Map<String, dynamic> result = await callRpc('transactions_getTransaction', [txHash]);
+      return Transaction.fromJson(result);
+    } on PlatformException catch (e) {
+      debugPrint('Failed to get transactions_getTx: ${e.message}');
+      rethrow;
+    }
+  }
+
+  /// Fetch all transaction belong to the account id
+  Future<List<Transaction>> getTransactionsByAccountId(String accountId) async {
+    try {
+      List<dynamic> result = await callRpc('transactions_getTransactions', [accountId]);
+      return result.map((e) => Transaction.fromJson(e)).toList();
+    } on PlatformException catch (e) {
+      debugPrint('Failed to get transactions_getTransactionsByAccountId: ${e.message}');
+      rethrow;
+    }
+  }
+
+  Future<List<Transaction>> getTransactionsByPhoneNumberHash(String phoneNumberHash) async {
+    try {
+      List<dynamic> result = await callRpc('transactions_getTransactionsByPhoneNumberHash', [phoneNumberHash]);
+      return result.map((e) => Transaction.fromJson(e)).toList();
+    } on PlatformException catch (e) {
+      debugPrint('Failed to get transactions_getTransactionsByPhoneNumberHash: ${e.message}');
+      rethrow;
+    }
+  }
 
   getVerificationEvidence(String accountId, String username, String phoneNumber, {String? byPassToken}) async {
     try {
@@ -168,6 +206,8 @@ mixin K2ServiceInterface implements ChainApiProvider {
         phoneNumber,
         byPassToken
       ]);
+
+      debugPrint('$result');
       return result == null ? null : VerificationEvidence.fromJson(result);
     } on PlatformException catch (e) {
       debugPrint('Failed to get verification evidence: ${e.message}');
@@ -376,7 +416,7 @@ mixin K2ServiceInterface implements ChainApiProvider {
   /// Get all transactions from chain to, or from an account
   /// Transactions will be sent to registered event handlers based on their type
   /// accountId - ss58 encoded address
-  Future<FetchAppreciationsStatus> getTransactions(String accountId);
+  Future<FetchAppreciationsStatus> processTransactions(String accountId);
 
   // helpers
 

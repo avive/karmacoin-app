@@ -139,7 +139,7 @@ class KC2User extends KC2UserInteface {
   Future<FetchAppreciationsStatus> fetchAppreciations() async {
     fetchAppreciationStatus.value = FetchAppreciationsStatus.fetching;
     fetchAppreciationStatus.value =
-        await kc2Service.getTransactions(_identity.accountId);
+        await kc2Service.processTransactions(_identity.accountId);
 
     return fetchAppreciationStatus.value;
   }

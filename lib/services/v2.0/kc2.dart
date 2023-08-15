@@ -130,25 +130,24 @@ class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterfac
   /// Get all on-chain txs to or form an account
   /// accountId - ss58 encoded address of localUser
   @override
-  Future<FetchAppreciationsStatus> getTransactions(String accountId) async {
+  Future<FetchAppreciationsStatus> processTransactions(String accountId) async {
     try {
       debugPrint('Getting all txs for account: $accountId');
-      final txs = await karmachain.send(
-          'transactions_getTransactions', [accountId]).then((v) => v.result);
+      final txs = await getTransactionsByAccountId(accountId);
 
       debugPrint('Got ${txs.length} txs for account: $accountId');
 
       int processed = 0;
 
-      txs?.forEach((transaction) async {
+      txs.forEach((transaction) async {
         try {
           debugPrint('Processing tx $processed ...');
-          final BigInt blockNumber = BigInt.from(transaction['block_number']);
-          final int transactionIndex = transaction['transaction_index'];
-          final bytes = transaction['signed_transaction']['transaction_body'];
+          final BigInt blockNumber = BigInt.from(transaction.blockNumber);
+          final int transactionIndex = transaction.transactionIndex;
+          final bytes = transaction.transaction.transactionBody;
           final transactionBody =
-              _decodeTransaction(Input.fromBytes(bytes.cast<int>()));
-          final int timestamp = transaction['timestamp'];
+              _decodeTransaction(Input.fromBytes(bytes));
+          final int timestamp = transaction.timestamp;
           final List<KC2Event> events =
               await _getTransactionEvents(blockNumber, transactionIndex);
           await _processTransaction(accountId, transactionBody, events,
