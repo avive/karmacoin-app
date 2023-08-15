@@ -117,7 +117,20 @@ mixin K2ServiceInterface implements ChainApiProvider {
   // TODO: add getTransactionsByAccountId(String accountId)
   // TODO: add getTransactionsByPhoneNumberHash(String phoneNumberHash)
 
-  // TODO: add getVerificationEvidence(String accountId, String username, String phoneNumber)
+  getVerificationEvidence(String accountId, String username, String phoneNumber, {String? byPassToken}) async {
+    try {
+      Map<String, dynamic>? result = await callRpc('verifier_verify', [
+        accountId,
+        username,
+        phoneNumber,
+        byPassToken
+      ]);
+      return result == null ? null : VerificationEvidence.fromJson(result);
+    } on PlatformException catch (e) {
+      debugPrint('Failed to get verification evidence: ${e.message}');
+      rethrow;
+    }
+  }
 
   // transactions
 
@@ -129,40 +142,27 @@ mixin K2ServiceInterface implements ChainApiProvider {
   ///
   /// This method will attempt to obtain verifier evidence regarding the association between the accountId, userName and phoneNumber
   Future<(String?, String?)> newUser(
-      String accountId, String username, String phoneNumber) async {
+      String accountId, String username, String phoneNumber, {VerificationEvidence? verificationEvidence}) async {
     try {
-      //
-      // todo: use configure verifier which might be different provider
-      // than the provider used by the api. right now we assume provider
-      // is a verifier
-      //
-      // todo: use new whatsapp verifier microservice when it is ready
-      // it includes a session id param...
-      //
-      final evidence = await karmachain.send('verifier_verify', [
-        accountId,
-        username,
-        phoneNumber,
-        verificationBypassToken
-      ]).then((v) => v.result);
-      // debugPrint('Verifier evidence - $evidence');
+      // Get verification evidence if not provided
+      verificationEvidence ??= await getVerificationEvidence(accountId, username, phoneNumber, byPassToken: verificationBypassToken);
 
-      if (evidence == null) {
-        return (null, "NoVerifierEvidence");
+      // Failed to get verification evidence
+      if (verificationEvidence == null) {
+        return (null, 'NoVerifierEvidence');
       }
 
-      if (evidence["verification_result"] != "Verified") {
-        return (null, evidence["verification_result"] as String);
+      // Verification failed
+      if (verificationEvidence.verificationResult != VerificationResult.verified) {
+        return (null, verificationEvidence.verificationResult.toString());
       }
 
       final phoneNumberHash = hasher.hashString(phoneNumber);
-
       final call = MapEntry(
           'Identity',
           MapEntry('new_user', {
-            'verifier_public_key':
-            ss58.Codec(42).decode(evidence['verifier_account_id']),
-            'verifier_signature': hex.decode(evidence['signature']),
+            'verifier_public_key': ss58.Codec(42).decode(verificationEvidence.verifierAccountId!),
+            'verifier_signature': verificationEvidence.signature,
             'account_id': ss58.Address.decode(accountId).pubkey,
             'username': username,
             'phone_number_hash': phoneNumberHash,
@@ -183,33 +183,29 @@ mixin K2ServiceInterface implements ChainApiProvider {
   /// Returns an (evidence, errorMessage) result.
   ///
   /// Implementation will attempt to obtain verifier evidence regarding the association between the accountId, and the new userName or the new phoneNumber
-  Future<(String?, String?)> updateUser(String? username, String? phoneNumber) async {
+  Future<(String?, String?)> updateUser(String? username, String? phoneNumber, {VerificationEvidence? verificationEvidence}) async {
     try {
       Uint8List? verifierPublicKey;
       List<int>? verifierSignature;
 
-      // Get evidence for phone number change
-      if (phoneNumber != null) {
+      // Get evidence for phone number change if not provided
+      if (phoneNumber != null && verificationEvidence == null) {
         final userInfo = await getUserInfoByAccountId(keyring.getAccountId());
 
-        final evidence = await karmachain.send('verifier_verify', [
-          userInfo!.accountId,
-          userInfo.userName,
-          phoneNumber,
-          verificationBypassToken
-        ]).then((v) => v.result);
+        final verificationEvidence = await getVerificationEvidence(userInfo!.accountId, userInfo.userName, phoneNumber, byPassToken: verificationBypassToken);
 
-        if (evidence == null) {
-          return (null, "NoVerifierEvidence");
+        // Failed to get verification evidence
+        if (verificationEvidence == null) {
+          return (null, 'NoVerifierEvidence');
         }
 
-        if (evidence["verification_result"] != "Verified") {
-          return (null, evidence["verification_result"] as String);
+        // Verification failed
+        if (verificationEvidence.verificationResult != VerificationResult.verified) {
+          return (null, verificationEvidence.verificationResult.toString());
         }
 
-        verifierPublicKey =
-            ss58.Codec(42).decode(evidence['verifier_account_id']);
-        verifierSignature = hex.decode(evidence['signature']);
+        verifierPublicKey = ss58.Codec(42).decode(verificationEvidence.verifierAccountId!);
+        verifierSignature = verificationEvidence.signature;
       }
 
       final verifierPublicKeyOption = verifierPublicKey == null
@@ -242,7 +238,7 @@ mixin K2ServiceInterface implements ChainApiProvider {
     }
   }
 
-  /// delete user from chain
+  /// Delete user from chain
   Future<String> deleteUser() async {
     try {
       const call =

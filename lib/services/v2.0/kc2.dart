@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/services/v2.0/error.dart';
 import 'package:karma_coin/services/v2.0/interfaces.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
@@ -23,8 +22,6 @@ import 'package:karma_coin/services/v2.0/nomination_pools/txs/chill.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/types.dart';
 import 'package:karma_coin/services/v2.0/staking/interfaces.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
-import 'package:karma_coin/services/v2.0/types.dart';
-import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:polkadart/polkadart.dart' as polkadart;
 import 'package:polkadart/substrate/substrate.dart';
 import 'package:polkadart_scale_codec/polkadart_scale_codec.dart';
@@ -37,9 +34,6 @@ import 'package:substrate_metadata_fixed/types/metadata_types.dart';
 String verificationBypassToken = 'dummy';
 
 class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterface, KC2StakingInterface, K2ServiceInterface {
-  // optional verifier provider different that karmachain api provider
-  late polkadart.Provider? verifierProvider;
-
   bool _connectedToApi = false;
   late String _apiWsUrl;
 
@@ -66,16 +60,12 @@ class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterfac
       if (verifierWsUrl != null) {
         throw 'Custom verifier provider not supported yet';
       }
-      verifierProvider = null;
 
       debugPrint('Connecting to kc2 api...');
       _apiWsUrl = apiWsUrl;
       karmachain = polkadart.Provider(Uri.parse(apiWsUrl));
       api = polkadart.StateApi(karmachain);
       final metadata = await karmachain.send('state_getMetadata', []);
-
-      // todo: if verifierWsUrl != null then connect to verifier, otherwise we assume
-      // that the api provider is also a verifier
 
       decodedMetadata =
           MetadataDecoder.instance.decode(metadata.result.toString());
@@ -97,10 +87,6 @@ class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterfac
       rethrow;
     }
   }
-
-  // RPCs
-  //
-
 
   /// Get all on-chain txs to or form an account
   /// accountId - ss58 encoded address of localUser
