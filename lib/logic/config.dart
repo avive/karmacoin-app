@@ -3,9 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/common/platform_info.dart';
 
-// todo: add settings interface
-
-// todo: migrate from json file to a hive box
+// TODO: add ConfigLogic public interface
 
 /// App config logic
 class ConfigLogic {
@@ -124,6 +122,8 @@ class ConfigLogic {
   /// Returns connection url for kc2 api
   String get kc2ApiUrl =>
       '${apiProtocol.value}://${apiHostName.value}:${apiHostPort.value}';
+
+  // TODO: completely revamp push notes to new auth scheme
 
   // push notificaiton handling
   ////////////////////
@@ -271,7 +271,7 @@ class ConfigLogic {
   void _handleMessage(RemoteMessage message) {
     debugPrint('Got push notification: $message');
 
-    // todo: get all transactions and show appreciations screen
+    // TODO: get all transactions and show appreciations screen
 
     Future.delayed(Duration.zero, () async {
       await FirebaseAnalytics.instance.logEvent(name: "push_note_received");

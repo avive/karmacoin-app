@@ -68,7 +68,6 @@ class _PhoneContactImporterState extends State<PhoneContactImporter> {
       IsoCode isoCode = widget.phoneController.value?.isoCode ?? IsoCode.US;
       PhoneNumber? newNumber;
 
-      // todo: do this in a more standarized and less error-prone manner....
       String rawNumber = phoneNumber
           .replaceAll('-', '')
           .replaceAll('(', '')
@@ -119,7 +118,7 @@ class _PhoneContactImporterState extends State<PhoneContactImporter> {
     return CupertinoButton(
         padding: const EdgeInsets.only(left: 0),
         child: Text(
-          'Pick phone number from a contact',
+          'Pick from a contact',
           style: CupertinoTheme.of(context).textTheme.actionTextStyle.merge(
                 const TextStyle(fontSize: 15),
               ),

@@ -15,7 +15,6 @@ class _RestoreAccountIntroScreenState extends State<RestoreAccountIntroScreen> {
 
   /// Return the list secionts
   List<CupertinoListSection> _getSections(BuildContext context) {
-    
     List<CupertinoListTile> introTiles = [];
     List<CupertinoListTile> tiles = [];
 
@@ -50,7 +49,6 @@ class _RestoreAccountIntroScreenState extends State<RestoreAccountIntroScreen> {
           ),
         ),
         leading: const FaIcon(FontAwesomeIcons.triangleExclamation, size: 24),
-        // todo: number format
       ),
     );
 

@@ -55,7 +55,8 @@ class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterfac
   /// Testnet - "wss://testnet.karmaco.in/testnet/ws"
   /// Optionally provide a verifier provider url, to allow connecting to api providers which are not verifiers (not yet supported)
   @override
-  Future<void> connectToApi({required String apiWsUrl, String? verifierWsUrl}) async {
+  Future<void> connectToApi(
+      {required String apiWsUrl, String? verifierWsUrl}) async {
     try {
       if (verifierWsUrl != null) {
         throw 'Custom verifier provider not supported yet';
@@ -149,7 +150,6 @@ class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterfac
       rethrow;
     }
   }
-
   // Events
 
   /// Subscribe to account transactions and events
@@ -199,8 +199,8 @@ class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterfac
   Future<BigInt> _processBlock(
       String accountId, BigInt previousBlockNumber) async {
     try {
-      final header = await karmachain
-          .send('chain_getHeader', []).then((v) => v.result);
+      final header =
+          await karmachain.send('chain_getHeader', []).then((v) => v.result);
 
       //debugPrint('Retrieve chain head: $header');
 
@@ -402,19 +402,8 @@ class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterfac
       }
 
       if (pallet == 'NominationPools' && method == 'join') {
-        _processJoinTransaction(
-            hash,
-            timestamp,
-            accountId,
-            signer,
-            method,
-            pallet,
-            blockNumber,
-            args,
-            blockIndex,
-            failedReason,
-            tx,
-            txEvents);
+        _processJoinTransaction(hash, timestamp, accountId, signer, method,
+            pallet, blockNumber, args, blockIndex, failedReason, tx, txEvents);
         return;
       }
 
@@ -436,19 +425,8 @@ class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterfac
       }
 
       if (pallet == 'NominationPools' && method == 'unbond') {
-        _processUnbondTransaction(
-            hash,
-            timestamp,
-            accountId,
-            signer,
-            method,
-            pallet,
-            blockNumber,
-            args,
-            blockIndex,
-            failedReason,
-            tx,
-            txEvents);
+        _processUnbondTransaction(hash, timestamp, accountId, signer, method,
+            pallet, blockNumber, args, blockIndex, failedReason, tx, txEvents);
         return;
       }
 
@@ -470,53 +448,20 @@ class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterfac
       }
 
       if (pallet == 'NominationPools' && method == 'create') {
-        _processCreateTransaction(
-            hash,
-            timestamp,
-            accountId,
-            signer,
-            method,
-            pallet,
-            blockNumber,
-            args,
-            blockIndex,
-            failedReason,
-            tx,
-            txEvents);
+        _processCreateTransaction(hash, timestamp, accountId, signer, method,
+            pallet, blockNumber, args, blockIndex, failedReason, tx, txEvents);
         return;
       }
 
       if (pallet == 'NominationPools' && method == 'nominate') {
-        _processNominateTransaction(
-            hash,
-            timestamp,
-            accountId,
-            signer,
-            method,
-            pallet,
-            blockNumber,
-            args,
-            blockIndex,
-            failedReason,
-            tx,
-            txEvents);
+        _processNominateTransaction(hash, timestamp, accountId, signer, method,
+            pallet, blockNumber, args, blockIndex, failedReason, tx, txEvents);
         return;
       }
 
       if (pallet == 'NominationPools' && method == 'chill') {
-        _processChillTransaction(
-            hash,
-            timestamp,
-            accountId,
-            signer,
-            method,
-            pallet,
-            blockNumber,
-            args,
-            blockIndex,
-            failedReason,
-            tx,
-            txEvents);
+        _processChillTransaction(hash, timestamp, accountId, signer, method,
+            pallet, blockNumber, args, blockIndex, failedReason, tx, txEvents);
         return;
       }
 
@@ -571,7 +516,8 @@ class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterfac
         return;
       }
 
-      if (pallet == 'NominationPools' && method == 'set_commission_change_rate') {
+      if (pallet == 'NominationPools' &&
+          method == 'set_commission_change_rate') {
         _processSetCommissionChangeRateTransaction(
             hash,
             timestamp,
@@ -784,7 +730,7 @@ class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterfac
 
           // call api to get missing fields
           final res = await getUserInfoByPhoneNumberHash(toPhoneNumberHash);
-          // todo: handle null result case
+          // TODO: handle null result case
           if (res == null) {
             throw 'failed to get user id by phone hash via api';
           }
@@ -797,8 +743,6 @@ class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterfac
 
       if (signer != accountId && toAccountId != accountId) {
         // appreciation not to or from watched local account
-        // todo: consider local user phone number hash and don't return if tx
-        // is to or from that phone number! (account migration case)
         return;
       }
 
@@ -1183,7 +1127,8 @@ class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterfac
 
       final amount = args['amount'];
       final root = ss58.Codec(42).encode(args['root'].value.cast<int>());
-      final nominator = ss58.Codec(42).encode(args['nominator'].value.cast<int>());
+      final nominator =
+          ss58.Codec(42).encode(args['nominator'].value.cast<int>());
       final bouncer = ss58.Codec(42).encode(args['bouncer'].value.cast<int>());
 
       final createTx = KC2CreateTxV1(
@@ -1230,7 +1175,10 @@ class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterfac
       }
 
       final poolId = args['pool_id'];
-      final validators = args['validators'].map((e) => ss58.Codec(42).encode(e.cast<int>())).toList().cast<String>();
+      final validators = args['validators']
+          .map((e) => ss58.Codec(42).encode(e.cast<int>()))
+          .toList()
+          .cast<String>();
 
       final nominateTx = KC2NominateTxV1(
         poolId: poolId,
@@ -1317,16 +1265,28 @@ class KarmachainService extends ChainApiProvider with KC2NominationPoolsInterfac
 
       final poolId = args['pool_id'];
       final newRoot = MapEntry(
-        ConfigOption.values.firstWhere((e) => e.toString() == 'ConfigOption.${args['new_root'].key.toLowerCase()}'),
-        args['new_root'].value == null ? null : ss58.Codec(42).encode(args['new_root'].value.cast<int>()),
+        ConfigOption.values.firstWhere((e) =>
+            e.toString() ==
+            'ConfigOption.${args['new_root'].key.toLowerCase()}'),
+        args['new_root'].value == null
+            ? null
+            : ss58.Codec(42).encode(args['new_root'].value.cast<int>()),
       );
       final newNominator = MapEntry(
-        ConfigOption.values.firstWhere((e) => e.toString() == 'ConfigOption.${args['new_nominator'].key.toLowerCase()}'),
-        args['new_nominator'].value == null ? null : ss58.Codec(42).encode(args['new_nominator'].value.cast<int>()),
+        ConfigOption.values.firstWhere((e) =>
+            e.toString() ==
+            'ConfigOption.${args['new_nominator'].key.toLowerCase()}'),
+        args['new_nominator'].value == null
+            ? null
+            : ss58.Codec(42).encode(args['new_nominator'].value.cast<int>()),
       );
       final newBouncer = MapEntry(
-        ConfigOption.values.firstWhere((e) => e.toString() == 'ConfigOption.${args['new_bouncer'].key.toLowerCase()}'),
-        args['new_bouncer'].value == null ? null : ss58.Codec(42).encode(args['new_bouncer'].value.cast<int>()),
+        ConfigOption.values.firstWhere((e) =>
+            e.toString() ==
+            'ConfigOption.${args['new_bouncer'].key.toLowerCase()}'),
+        args['new_bouncer'].value == null
+            ? null
+            : ss58.Codec(42).encode(args['new_bouncer'].value.cast<int>()),
       );
 
       final updateRolesTx = KC2UpdateRolesTxV1(

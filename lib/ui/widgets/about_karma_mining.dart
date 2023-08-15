@@ -162,7 +162,7 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
       ),
     );
 
-    // todo: get data from RPC
+    // TODO: get data from RPC
     int signupReward = 10;
     int referralReward = 100;
     int karmaReward = 10;
@@ -259,7 +259,7 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
           ),
           SliverFillRemaining(
             hasScrollBody: false,
-            // todo: fix me when api becomes clearer
+            // TODO: fix me when api becomes clearer
             child: Container(), //_getBodyContent(context),
           ),
         ],

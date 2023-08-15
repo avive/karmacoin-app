@@ -39,9 +39,6 @@ class AppState {
   String twilloVerificationSid = '';
   String twilloVerificationCode = '';
 
-  //// Error message for ui feedback. todo: implement me
-  final ValueNotifier<String> txSubmissionError = ValueNotifier('');
-
   //// Mobile phone number hash for send KC transaction destination
   final ValueNotifier<String> sendDestinationPhoneNumberHash =
       ValueNotifier('');

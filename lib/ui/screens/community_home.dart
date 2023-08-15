@@ -39,7 +39,7 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
       //  return;
       // }
 
-      // todo: show first time user sees this screen - a welcome message
+      // TODO: show first time user sees this screen - a welcome message
 
       if (appState.signedUpInCurentSession.value) {
         appState.signedUpInCurentSession.value = false;
@@ -129,7 +129,6 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
 
   Widget _getWidgetForUser(BuildContext context) {
     return ValueListenableBuilder<KC2UserInfo?>(
-        // todo: how to make this not assert when karmaCoinUser is null?
         valueListenable: kc2User.userInfo,
         builder: (context, value, child) {
           if (value == null) {

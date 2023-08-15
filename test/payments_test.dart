@@ -105,8 +105,6 @@ void main() {
               expect(tx.signer, punch.accountId);
               expect(tx.charTraitId, 0);
 
-              // todo: test all other tx props here
-
               if (!completer.isCompleted) {
                 completer.complete(true);
               }
@@ -235,8 +233,6 @@ void main() {
               expect(tx.fromAddress, punch.accountId);
               expect(tx.toAddress, katya.accountId);
               expect(tx.signer, punch.accountId);
-
-              // todo: test all other tx props here
 
               if (!completer.isCompleted) {
                 completer.complete(true);

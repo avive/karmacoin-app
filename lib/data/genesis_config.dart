@@ -2,8 +2,6 @@ import 'package:karma_coin/data/personality_traits.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 
-// todo: update to kc2
-
 class CommunityDesignTheme {
   Color backgroundColor;
   Color textColor;
@@ -33,10 +31,6 @@ class GenesisConfig {
   /// Trait index for no appreciation - used in payemnt transactions
   static const noAppreciationTraitIndex = 0;
 
-  // todo: unify all of these props into community ClientData object and store
-  // in map by community id
-
-  /// todo: move to community manager - not part og genesis config
   static final Map<int, CommunityDesignTheme> communityColors = {
     1: CommunityDesignTheme(const Color.fromARGB(255, 183, 66, 179),
         const Color.fromARGB(255, 255, 255, 255)),
@@ -57,8 +51,6 @@ class GenesisConfig {
   static final Map<int, String> communityHomeScreenPaths = {
     1: '/community/giraffes',
   };
-
-  // todo: add asset for banner
 
   /// Meta-data for partner communitites supported by the app index by id
   static final Map<int, Community> communities = {

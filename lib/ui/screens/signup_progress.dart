@@ -67,7 +67,6 @@ class _SignupProgressScreeenState extends State<SignupProgressScreeen> {
           appState.verifiedPhoneNumber == null) {
         debugPrint(
             'Missing required data for signup - Reuested user name: ${appState.requestedUserName} Phone number: ${appState.verifiedPhoneNumber}');
-        // todo: show error
         if (context.mounted) {
           StatusAlert.show(context,
               duration: const Duration(seconds: 4),
@@ -81,13 +80,12 @@ class _SignupProgressScreeenState extends State<SignupProgressScreeen> {
         return;
       }
 
-      // todo: regsiter callbacks and start signup
       kc2User.signupStatus.addListener(_onSignupStatusChanged);
 
       debugPrint('Signing up ${appState.requestedUserName!}...');
 
       if (!configLogic.skipWhatsappVerification) {
-        throw 'Not implemented yet! todo: implement whatsapp verification api call';
+        throw 'Not implemented yet! TODO: implement whatsapp verification api call';
       }
 
       // signup user on kc2 - for now bypassing verification
@@ -105,7 +103,7 @@ class _SignupProgressScreeenState extends State<SignupProgressScreeen> {
         await FirebaseAnalytics.instance.logEvent(name: "sign_up");
         debugPrint('*** going to user home...');
         pushNamedAndRemoveUntil(ScreenPaths.home);
-        // todo: navigate to home
+        // TODO: navigate to home
         break;
       case SignupStatus.notSignedUp:
         // enable trying again
@@ -142,7 +140,6 @@ class _SignupProgressScreeenState extends State<SignupProgressScreeen> {
     CupertinoTextThemeData textTheme = CupertinoTheme.of(context).textTheme;
 
     return ValueListenableBuilder<SignupStatus>(
-        // todo: how to make this not assert when karmaCoinUser is null?
         valueListenable: kc2User.signupStatus,
         builder: (context, value, child) {
           switch (value) {

@@ -55,7 +55,7 @@ class _SendWidgetState extends State<SendWidget> {
 
     switch (appState.sendDestination.value) {
       case Destination.address:
-        // todo: validate address format
+        // TODO: validate address format
         if (appState.sendDestinationAddress.value.isEmpty) {
           if (context.mounted) {
             StatusAlert.show(
@@ -90,7 +90,6 @@ class _SendWidgetState extends State<SendWidget> {
         break;
       case Destination.phoneNumber:
       case Destination.contact:
-        // todo: validate the phone number string here
         if (appState.sendDestinationPhoneNumberHash.value.isEmpty) {
           if (context.mounted) {
             StatusAlert.show(

@@ -97,13 +97,13 @@ class _KarmachainState extends State<Karmachain> {
   List<CupertinoListSection> _getSections(BuildContext context) {
     List<CupertinoListTile> tiles = [];
     if (chainData == null || genesisData == null) {
-      // todo: add loader
+      // TODO: add loader
       tiles.add(
         const CupertinoListTile.notched(
           title: Text('Please wait...'),
           leading: Icon(CupertinoIcons.clock),
           trailing: CupertinoActivityIndicator(),
-          // todo: number format
+          // TODO: number format
         ),
       );
       return [
@@ -180,7 +180,7 @@ class _KarmachainState extends State<Karmachain> {
         leading: const Icon(CupertinoIcons.person_2),
         trailing: Text(chainData!.usersCount.toString(),
             style: CupertinoTheme.of(context).textTheme.textStyle),
-        // todo: number format
+        // TODO: number format
       ),
     );
 
@@ -190,7 +190,7 @@ class _KarmachainState extends State<Karmachain> {
         leading: const Icon(CupertinoIcons.doc),
         trailing: Text(chainData!.transactionsCount.toString(),
             style: CupertinoTheme.of(context).textTheme.textStyle),
-        // todo: number format
+        // TODO: number format
       ),
     );
 
@@ -319,7 +319,7 @@ class _KarmachainState extends State<Karmachain> {
       ),
     );
 
-    // todo: number format
+    // TODO: number format
 
     return [
       CupertinoListSection.insetGrouped(

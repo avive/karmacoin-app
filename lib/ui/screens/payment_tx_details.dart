@@ -29,7 +29,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    // todo: if tx is null - fetch it from kc2 api
+    // TODO: if tx is null - fetch it from kc2 api once it is available
     if (widget.tx == null) {
       throw 'For now - tx must be passed in via router to widget';
     }
@@ -75,7 +75,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
       leading: const Icon(CupertinoIcons.checkmark_seal, size: 28),
       trailing: const Icon(CupertinoIcons.share, size: 28),
       onTap: () {
-        // todo: implement me and copy
+        // TODO: implement me and copy
       },
     );
   }
@@ -314,7 +314,6 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
               -6),
         ),
         child: SafeArea(
-          // todo: add column and the community big tile here
           child: MediaQuery.removePadding(
             context: context,
             removeTop: false,

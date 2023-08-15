@@ -3,8 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 
-// todo: create public interface
-
 const localUserInfoStorageKey = 'kc2_local_user_info';
 const androidOptions = AndroidOptions(
   encryptedSharedPreferences: true,
