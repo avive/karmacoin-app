@@ -85,7 +85,7 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
                   .textTheme
                   .navTitleTextStyle
                   .merge(const TextStyle(fontSize: 18))),
-          // todo: number format
+          // TODO: number format
         ),
       );
     }
@@ -206,7 +206,7 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
     appState.triggerSignupAfterRestore.value = true;
 
     Future.delayed(Duration.zero, () async {
-      // todo: only if not came from welcome?
+      // TODO: only if not came from welcome?
       if (context.mounted) {
         debugPrint("mounted - puhsing signup screen");
         context.go(ScreenPaths.signup, extra: 'Verify Number');

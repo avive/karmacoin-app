@@ -208,7 +208,7 @@ final GoRouter appRouter = GoRouter(
         builder: (BuildContext context, GoRouterState state) {
           final String userName = Uri.decodeFull(state.params['username']!);
 
-          // todo: show public profile screen of username
+          // TODO: show public profile screen of username
           return ProfileScreen(ValueKey(userName), userName);
         }),
     GoRoute(
@@ -262,7 +262,7 @@ final GoRouter appRouter = GoRouter(
         builder: (BuildContext context, GoRouterState state) {
           var txId = state.params['txId'];
           if (txId == null) {
-            // todo: redirect to home screen
+            // TODO: redirect to home screen
           }
           // optional tx passed from caller
           KC2Tx? tx = state.extra != null ? state.extra as KC2Tx : null;

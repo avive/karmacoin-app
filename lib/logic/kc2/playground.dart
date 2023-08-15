@@ -92,12 +92,12 @@ Future<void> startKC2Playground() async {
 
   kc2Service.appreciationCallback = (tx) async {
     debugPrint('>> appreciation tx: $tx');
-    // todo: check we see the tx to/from katya
+    // TODO: check we see the tx to/from katya
   };
 
   kc2Service.transferCallback = (tx) async {
     debugPrint('>> transfer tx: $tx');
-    // todo: check we see the expected transfer to/from
+    // TODO: check we see the expected transfer to/from
   };
 
   try {

@@ -51,7 +51,7 @@ class _BackupAccountScreenState extends State<BackupAccountScreen> {
           ),
         ),
         leading: const Icon(CupertinoIcons.archivebox, size: 28),
-        // todo: number format
+        // TODO: number format
       ),
     );
 
@@ -72,7 +72,7 @@ class _BackupAccountScreenState extends State<BackupAccountScreen> {
                   .textTheme
                   .navTitleTextStyle
                   .merge(const TextStyle(fontSize: 18))),
-          // todo: number format
+          // TODO: number format
         ),
       );
     });

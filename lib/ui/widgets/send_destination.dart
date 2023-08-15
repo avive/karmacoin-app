@@ -174,7 +174,7 @@ class _SendDestinationState extends State<SendDestination> {
       return;
     }
 
-    // todo: figure out if address and if it is fill it and return
+    // TODO: figure out if address and if it is fill it and return
     // appState.sendDestinationAddress.value = value;
     debugPrint('Calling contacts for $value...');
     List<Contact> candidates = await kc2Service.getContacts(value, limit: 1);
@@ -292,7 +292,7 @@ class _SendDestinationState extends State<SendDestination> {
             padding: const EdgeInsets.all(14.0),
             decoration: const BoxDecoration(
               color: CupertinoDynamicColor.withBrightness(
-                // todo: make identical to phone input bcg color
+                // TODO: make identical to phone input bcg color
                 color: CupertinoColors.systemGrey6,
                 darkColor: CupertinoColors.darkBackgroundGray,
               ),
@@ -332,7 +332,7 @@ class _SendDestinationState extends State<SendDestination> {
   void contactSelectedCallback(Contact selectedContact) {
     debugPrint('contactSelectedCallback: ${selectedContact.userName}');
     setState(() {
-      // todo: figure out dealing with phone hash here
+      // TODO: figure out dealing with phone hash here
       // phoneController.value =
       //    PhoneNumber.parse(selectedContact.mobileNumber.number);
       appState.sendDestination.value = Destination.contact;

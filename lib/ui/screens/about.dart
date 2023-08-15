@@ -81,7 +81,7 @@ class _AboutScreenState extends State<AboutScreen> {
         title: Text('Copyright'),
         leading: FaIcon(FontAwesomeIcons.copyright, size: 22),
         subtitle: Text('(c) 2023 Karma Coin Authors'),
-        // todo: number format
+        // TODO: number format
       ),
     );
 
@@ -92,7 +92,7 @@ class _AboutScreenState extends State<AboutScreen> {
         title: const Text('App Version'),
         leading: const Icon(CupertinoIcons.app),
         subtitle: Text('$version Build $buildNumber'),
-        // todo: number format
+        // TODO: number format
       ),
     );
 

@@ -142,7 +142,7 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
 
   Widget _getUserWidget(
       BuildContext context, LeaderboardEntry entry, int index) {
-// todo: add personality trait emojis from appre
+// TODO: add personality trait emojis from appre
 
     return CupertinoListTile(
       key: Key(index.toString()),
@@ -186,7 +186,7 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
           ),
           SliverFillRemaining(
             hasScrollBody: true,
-            // todo: fix me when KC2 API is available
+            // TODO: fix me when KC2 API is available
             child: Container(), //_getBodyContent(context),
           ),
         ],

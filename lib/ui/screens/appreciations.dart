@@ -149,7 +149,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
 
   Widget _getBody(BuildContext context) {
     return ValueListenableBuilder<FetchAppreciationsStatus>(
-        // todo: how to make this not assert when karmaCoinUser is null?
+        // TODO: how to make this not assert when karmaCoinUser is null?
         valueListenable: kc2User.fetchAppreciationStatus,
         builder: (context, value, child) {
           switch (value) {
@@ -237,7 +237,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
 
   Widget _displayIncomingTxs(BuildContext context) {
     return ValueListenableBuilder<Map<String, KC2Tx>>(
-      // todo: how to make this not assert when karmaCoinUser is null?
+      // TODO: how to make this not assert when karmaCoinUser is null?
       valueListenable: kc2User.incomingAppreciations,
       builder: (context, value, child) {
         if (value.isEmpty) {
@@ -307,7 +307,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
 
   Widget _displayOutgoingTxs(BuildContext context) {
     return ValueListenableBuilder<Map<String, KC2Tx>>(
-        // todo: how to make this not assert when karmaCoinUser is null?
+        // TODO: how to make this not assert when karmaCoinUser is null?
         valueListenable: kc2User.outgoingAppreciations,
         builder: (context, value, child) {
           if (value.isEmpty) {
@@ -452,7 +452,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
                     .tabLabelTextStyle
                     .merge(const TextStyle(fontSize: 14))),
             const SizedBox(height: 6),
-            // todo: change to pill widget
+            // TODO: change to pill widget
 
             Pill(
               title: getStatusDisplayString(status),
@@ -473,7 +473,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
     if (tx is KC2AppreciationTxV1) {
       return _getAppreciationWidget(context, tx, incoming, index);
     } else if (tx is KC2TransferTxV1) {
-      // todo: implement
+      // TODO: implement
       return Container();
     } else {
       debugPrint('Unexpected tx type: $tx');

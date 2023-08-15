@@ -47,7 +47,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
           title: Text('Profile image',
               style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
           leading: const Icon(CupertinoIcons.person, size: 28),
-          // todo: number format
+          // TODO: number format
           trailing: pict),
     );
 
@@ -56,7 +56,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
         title: Text('Karma Score',
             style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
         leading: const Icon(CupertinoIcons.circle, size: 28),
-        // todo: number format
+        // TODO: number format
         trailing: Text(widget.user.karmaScore.format(),
             style: CupertinoTheme.of(context).textTheme.textStyle),
       ),
@@ -69,7 +69,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
             style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
 
         leading: const Icon(CupertinoIcons.money_dollar, size: 28),
-        // todo: number format
+        // TODO: number format
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 2),
           child: Text(
@@ -90,7 +90,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
           title: Text('Mobile Number',
               style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
           leading: const Icon(CupertinoIcons.phone, size: 28),
-          // todo: number format
+          // TODO: number format
           subtitle: Text(numberDisplay,
               style: CupertinoTheme.of(context).textTheme.textStyle),
           trailing: const Icon(CupertinoIcons.share),
@@ -109,7 +109,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
         title: Text('Public Profile',
             style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
         leading: const Icon(CupertinoIcons.profile_circled, size: 28),
-        // todo: number format
+        // TODO: number format
         subtitle: Text(
           uri,
           style: CupertinoTheme.of(context).textTheme.textStyle.merge(
@@ -270,7 +270,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
     if (widget.isLocal) {
       trailingWidget = CupertinoButton(
         onPressed: () {
-          // todo: push update username screen
+          // TODO: push update username screen
         },
         child: adjustNavigationBarButtonPosition(
             const Icon(CupertinoIcons.pencil, size: 24), 0, -6),
