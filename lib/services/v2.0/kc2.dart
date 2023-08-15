@@ -93,6 +93,7 @@ class KarmachainService extends ChainApiProvider
   @override
   Future<int> getGenesisTimestamp() async {
     try {
+      const blockTime = 12000;
       // Because genesis block do not contains events,
       // we need to fetch first block instead
       const blockNumber = '0x1';
@@ -118,7 +119,9 @@ class KarmachainService extends ChainApiProvider
           .value
           .value['now'];
 
-      return timestamp;
+      // As we first block time (not genesis block time),
+      // we can calculate genesis time
+      return timestamp - blockTime;
     } on PlatformException catch (e) {
       debugPrint('Failed to get genesis time: ${e.message}');
       rethrow;
