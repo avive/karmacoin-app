@@ -124,6 +124,28 @@ class Contact {
       };
 }
 
+class LeaderBoardEntry {
+  String username;
+  String accountId;
+  String phoneNumberHash;
+  List<CommunityMembership> communityMemberships;
+  List<TraitScore> traitScores;
+
+  LeaderBoardEntry(this.username, this.accountId, this.phoneNumberHash,
+      this.communityMemberships, this.traitScores);
+
+  LeaderBoardEntry.fromJson(Map<String, dynamic> json)
+    : username = json['user_name'],
+      accountId = json['account_id'],
+      phoneNumberHash = json['phone_number_hash'],
+      communityMemberships = (json['community_membership'] as List<dynamic>)
+        .map((e) => CommunityMembership.fromJson(e))
+        .toList(),
+      traitScores = (json['trait_scores'] as List<dynamic>)
+        .map((e) => TraitScore.fromJson(e))
+        .toList();
+}
+
 enum VerificationResult {
   unspecified,
   usernameTaken,

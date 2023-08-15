@@ -110,7 +110,15 @@ mixin K2ServiceInterface implements ChainApiProvider {
     }
   }
 
-  // TODO: add getLeaderBoard
+  Future<List<LeaderBoardEntry>> getLeaderBoard() async {
+    try {
+      List<dynamic> result = await callRpc('community_getLeaderBoard', []);
+      return result.map((e) => LeaderBoardEntry.fromJson(e)).toList();
+    } on PlatformException catch (e) {
+      debugPrint('Failed to get leader board: ${e.message}');
+      rethrow;
+    }
+  }
 
   // TODO: add getTransaction(int blockNumber, int txIndex)
   // TODO: add getTransactionByHash(String txHash)
