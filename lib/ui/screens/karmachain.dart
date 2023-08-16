@@ -138,7 +138,7 @@ class _KarmachainState extends State<Karmachain> {
     tiles.add(
       CupertinoListTile.notched(
           title: const Text('Network'),
-          leading: const FaIcon(FontAwesomeIcons.hashtag, size: 20),
+          leading: const FaIcon(FontAwesomeIcons.networkWired, size: 20),
           trailing: Text(
               'Karmachain 2.0 ${networkType.name} ${chainInfo.version}',
               style: textStyle)),
@@ -147,14 +147,14 @@ class _KarmachainState extends State<Karmachain> {
     tiles.add(
       CupertinoListTile.notched(
           title: const Text('Api Provider'),
-          leading: const FaIcon(FontAwesomeIcons.networkWired, size: 20),
+          leading: const FaIcon(FontAwesomeIcons.server, size: 20),
           trailing: Text(apiHost, style: textStyle)),
     );
 
     tiles.add(
       CupertinoListTile.notched(
         title: const Text('Genesis Time'),
-        leading: const Icon(CupertinoIcons.clock),
+        leading: const FaIcon(FontAwesomeIcons.sun, size: 20),
         //subtitle: Text(dateDisp),
         trailing: Text(time_ago.format(genesisDateTime!), style: textStyle),
       ),
@@ -180,20 +180,10 @@ class _KarmachainState extends State<Karmachain> {
       ),
     );
 
-    /*
-  BigInt signupRewardsAmount;
-  /// Total funds issued by the protocol for referrals
-  BigInt referralRewardsAmount;
-  /// Total funds issued by the protocol for validating
-  BigInt validatorRewardsAmount;
-  /// Amount of rewards paid to causes
-  BigInt causesRewardsAmount;
-  */
-
     tiles.add(
       CupertinoListTile.notched(
         title: const Text('Users'),
-        leading: const Icon(CupertinoIcons.person_2),
+        leading: const FaIcon(FontAwesomeIcons.users, size: 20),
         trailing: Text(stats!.usersCount.format(), style: textStyle),
       ),
     );
@@ -201,7 +191,7 @@ class _KarmachainState extends State<Karmachain> {
     tiles.add(
       CupertinoListTile.notched(
         title: const Text('Transactions'),
-        leading: const Icon(CupertinoIcons.doc),
+        leading: const FaIcon(FontAwesomeIcons.signature, size: 20),
         // TODO: update when api doesn't include 1 tx per block by default...
         trailing: Text((stats!.transactionCount - stats!.tipHeight).format(),
             style: textStyle),
@@ -211,7 +201,7 @@ class _KarmachainState extends State<Karmachain> {
     tiles.add(
       CupertinoListTile.notched(
         title: const Text('Appreciations'),
-        leading: const Icon(CupertinoIcons.app),
+        leading: const FaIcon(FontAwesomeIcons.handsPraying, size: 20),
         trailing: Text(stats!.appreciationsTransactionsCount.format(),
             style: textStyle),
       ),
@@ -220,7 +210,7 @@ class _KarmachainState extends State<Karmachain> {
     tiles.add(
       CupertinoListTile.notched(
         title: const Text('Payments'),
-        leading: const Icon(CupertinoIcons.money_dollar),
+        leading: const FaIcon(FontAwesomeIcons.moneyBillTransfer, size: 20),
         trailing:
             Text(stats!.paymentTransactionCount.format(), style: textStyle),
       ),
@@ -229,7 +219,7 @@ class _KarmachainState extends State<Karmachain> {
     tiles.add(
       CupertinoListTile.notched(
         title: Text('Circulation', style: textStyle),
-        leading: const Icon(CupertinoIcons.money_dollar),
+        leading: const FaIcon(FontAwesomeIcons.globe, size: 20),
         trailing: Text(stats!.totalIssuance.formatAmount(),
             style: textTheme.textStyle),
       ),
@@ -239,7 +229,7 @@ class _KarmachainState extends State<Karmachain> {
       CupertinoListTile.notched(
         title: const Text('Fee Subsedies'),
         subtitle: Text(stats!.feeSubsCount.format()),
-        leading: const Icon(CupertinoIcons.money_dollar),
+        leading: const FaIcon(FontAwesomeIcons.coins, size: 20),
         trailing: Text(stats!.feeSubsTotalIssuedAmount.formatAmount(),
             style: textStyle),
       ),
@@ -248,7 +238,7 @@ class _KarmachainState extends State<Karmachain> {
     tiles.add(
       CupertinoListTile.notched(
         title: const Text('Signup Rewards'),
-        leading: const Icon(CupertinoIcons.person),
+        leading: const FaIcon(FontAwesomeIcons.medal, size: 20),
         subtitle: Text(stats!.signupRewardsCount.format(), style: textStyle),
         trailing: Text(stats!.signupRewardsTotalIssuedAmount.formatAmount(),
             style: textStyle),
@@ -258,7 +248,7 @@ class _KarmachainState extends State<Karmachain> {
     tiles.add(
       CupertinoListTile.notched(
         title: const Text('Referral Rewards'),
-        leading: const Icon(CupertinoIcons.person_2),
+        leading: const FaIcon(FontAwesomeIcons.peopleArrows, size: 20),
         subtitle: Text(stats!.referralRewardsCount.format(), style: textStyle),
         trailing: Text(stats!.referralRewardsTotalIssuedAmount.formatAmount(),
             style: textStyle),
@@ -268,7 +258,7 @@ class _KarmachainState extends State<Karmachain> {
     tiles.add(
       CupertinoListTile.notched(
         title: const Text('Validators Rewards'),
-        leading: const Icon(CupertinoIcons.person_2),
+        leading: const FaIcon(FontAwesomeIcons.peopleGroup, size: 20),
         subtitle: Text(stats!.validatorRewardsCount.format(), style: textStyle),
         trailing: Text(stats!.validatorRewardsTotalIssuedAmount.formatAmount(),
             style: textStyle),
@@ -279,7 +269,7 @@ class _KarmachainState extends State<Karmachain> {
       CupertinoListTile.notched(
         padding: const EdgeInsets.only(top: 6, bottom: 6, left: 12),
         title: const Text('Powered by Karmachain'),
-        leading: const Icon(CupertinoIcons.sunrise, size: 26),
+        leading: const FaIcon(FontAwesomeIcons.yinYang, size: 20),
         subtitle: CupertinoButton(
           padding: const EdgeInsets.only(left: 0),
           child: const Text(_karmaChainUrl),
@@ -294,7 +284,7 @@ class _KarmachainState extends State<Karmachain> {
       CupertinoListTile.notched(
         padding: const EdgeInsets.only(top: 6, bottom: 6, left: 12),
         title: const Text('100% Open Source'),
-        leading: const FaIcon(FontAwesomeIcons.code, size: 18),
+        leading: const FaIcon(FontAwesomeIcons.code, size: 20),
         subtitle: CupertinoButton(
           padding: const EdgeInsets.only(left: 0),
           child: const Text(_githubUrl),
