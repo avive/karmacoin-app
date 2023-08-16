@@ -190,7 +190,7 @@ class _SignupProgressScreeenState extends State<SignupProgressScreeen> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            'Please don\'t leave this screen.',
+                            'Please don\'t leave this screen. Just take few deep breathes...',
                             style: CupertinoTheme.of(context)
                                 .textTheme
                                 .textStyle

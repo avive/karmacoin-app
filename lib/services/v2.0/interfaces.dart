@@ -15,7 +15,7 @@ abstract class ChainApiProvider {
   late polkadart.StateApi api;
   late KC2KeyRing keyring;
   late ChainInfo chainInfo;
-  late int ss58Format;
+  int netId = 42;
 
   /// Set an identity's keyring - call with local user's identity keyring on new app session
   void setKeyring(KC2KeyRing keyring) {
@@ -160,10 +160,10 @@ abstract class ChainApiProvider {
   }
 
   Uint8List decodeAccountId(String accountId) {
-    return ss58.Codec(ss58Format).decode(accountId);
+    return ss58.Codec(netId).decode(accountId);
   }
 
   String encodeAccountId(List<int> accountId) {
-    return ss58.Codec(ss58Format).encode(accountId);
+    return ss58.Codec(netId).encode(accountId);
   }
 }

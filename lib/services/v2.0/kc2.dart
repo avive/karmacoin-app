@@ -36,11 +36,7 @@ class KarmachainService extends ChainApiProvider
     with KC2NominationPoolsInterface, KC2StakingInterface, K2ServiceInterface {
   bool _connectedToApi = false;
   late String _apiWsUrl;
-  late int? _netId;
-
-  @override
-  int? get netId => _netId;
-
+  
   @override
   bool get connectedToApi => _connectedToApi;
 
@@ -73,13 +69,13 @@ class KarmachainService extends ChainApiProvider
       final metadata = await karmachain.send('state_getMetadata', []);
 
       // get network id. Default to 42 (testnet)
-      _netId =
+      netId =
           await callRpc('system_properties', []).then((r) => r['ss58Format']) ??
               42;
 
       // check network id from node matches the client network type intent
-      if (_netId != configLogic.networkId.value) {
-        throw 'Invalid network id returned by node. Expected ${configLogic.networkId.value}, got $_netId';
+      if (netId != configLogic.networkId.value) {
+        throw 'Invalid network id returned by node. Expected ${configLogic.networkId.value}, got $netId';
       }
 
       decodedMetadata =
