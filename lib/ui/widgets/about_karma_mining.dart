@@ -18,6 +18,11 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
   // we assume api is available until we know otherwise
   bool apiOffline = false;
   BlockchainStats? blockchainStats;
+  late int signupReward;
+  late int referralReward;
+  late int karmaReward;
+
+  static final _oneKcInCents = BigInt.from(1000000);
 
   @override
   initState() {
@@ -30,10 +35,22 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
         await configLogic.setDisplayedKarmaRewardsScreen(true);
         setState(() {
           blockchainStats = stats;
+          signupReward = (blockchainStats!.signupRewardsCurrentRewardAmount ~/
+                  _oneKcInCents)
+              .toInt();
+
+          referralReward =
+              (blockchainStats!.referralRewardsCurrentRewardAmount ~/
+                      _oneKcInCents)
+                  .toInt();
+
+          karmaReward = (blockchainStats!.karmaRewardsCurrentRewardAmount ~/
+                  _oneKcInCents)
+              .toInt();
         });
       } catch (e) {
         setState(() {
-          // apiOffline = true;
+          apiOffline = true;
         });
         if (!mounted) return;
         StatusAlert.show(context,
@@ -145,13 +162,6 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
         ),
       ),
     );
-
-    // TODO: get this from blockchainStats when data is available
-    int signupReward = 10;
-    int referralReward = 100;
-    int karmaReward = 10;
-
-    /// TODO: display how many rewards and total issued for each reward
 
     res.add(Column(
       mainAxisAlignment: MainAxisAlignment.start,

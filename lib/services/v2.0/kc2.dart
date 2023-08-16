@@ -36,7 +36,7 @@ class KarmachainService extends ChainApiProvider
     with KC2NominationPoolsInterface, KC2StakingInterface, K2ServiceInterface {
   bool _connectedToApi = false;
   late String _apiWsUrl;
-  
+
   @override
   bool get connectedToApi => _connectedToApi;
 
@@ -75,6 +75,7 @@ class KarmachainService extends ChainApiProvider
 
       // check network id from node matches the client network type intent
       if (netId != configLogic.networkId.value) {
+        // TODO: deal with it so client knows about issue
         throw 'Invalid network id returned by node. Expected ${configLogic.networkId.value}, got $netId';
       }
 
