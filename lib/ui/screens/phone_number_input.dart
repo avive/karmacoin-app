@@ -429,7 +429,6 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
     if (isSigninIn) {
       return const CupertinoActivityIndicator(
         radius: 20,
-        animating: true,
       );
     } else {
       return Container();

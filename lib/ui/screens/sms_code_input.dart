@@ -41,7 +41,6 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
     if (submitInProgress) {
       return const CupertinoActivityIndicator(
         radius: 20,
-        animating: true,
       );
     } else {
       return Container();

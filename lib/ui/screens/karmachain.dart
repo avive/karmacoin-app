@@ -1,5 +1,10 @@
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
+import 'package:status_alert/status_alert.dart';
+import 'package:substrate_metadata_fixed/models/models.dart';
+import 'package:time_ago_provider/time_ago_provider.dart' as time_ago;
 
 /// Display user details for provided user or for local user
 class Karmachain extends StatefulWidget {
@@ -10,73 +15,40 @@ class Karmachain extends StatefulWidget {
   State<Karmachain> createState() => _KarmachainState();
 }
 
-// const _githubUrl = 'https://github.com/karma-coin/karmacoin-server';
-// const _githubNextrUrl = 'https://github.com/karma-coin/karmachain';
+const _githubUrl = 'https://github.com/karma-coin/karmacoin-server';
+const _githubNextrUrl = 'https://github.com/karma-coin/karmachain';
 
 class _KarmachainState extends State<Karmachain> {
   _KarmachainState();
 
-  // GenesisData? genesisData;
-  // BlockchainStats? chainData;
-  // Block? genesisBlock;
+  bool apiAvailable = true;
+
+  KCNetworkType networkType = configLogic.networkId;
+  String apiHost = configLogic.apiHostName.value;
+  ChainInfo chainInfo = kc2Service.chainInfo;
+  bool localMode = configLogic.apiLocalMode;
+  bool devMode = configLogic.devMode;
+
+  String? networkName;
+  BlockchainStats? stats;
+  int? genesisTimestamp;
+  DateTime? genesisDateTime;
 
   @override
   void initState() {
     super.initState();
-  }
-
-  @override
-  build(BuildContext context) {
-    return Title(
-        color: CupertinoColors.black, // This is required
-        title: 'Karma Coin - Karmachain',
-        child: CupertinoPageScaffold(
-          child: NestedScrollView(
-            headerSliverBuilder:
-                (BuildContext context, bool innerBoxIsScrolled) {
-              return <Widget>[
-                kcNavBar(context, 'Karmachain'),
-              ];
-            },
-            body: MediaQuery.removePadding(
-              context: context,
-              removeTop: false,
-              child: ListView(
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                primary: true,
-                children: const [], //_getSections(context)),
-              ),
-            ),
-          ),
-        ));
-  }
-}
-
-  /*
     Future.delayed(Duration.zero, () async {
       try {
-        kc2Service.chainInfo
-
-        GetBlockchainDataResponse cData = await api.apiServiceClient
-            .getBlockchainData(GetBlockchainDataRequest());
-
-        GetGenesisDataResponse resp =
-            await api.apiServiceClient.getGenesisData(GetGenesisDataRequest());
-
-        // get genesis block
-        GetBlocksResponse blockResp = await api.apiServiceClient.getBlocks(
-          GetBlocksRequest(
-              fromBlockHeight: Int64.ONE, toBlockHeight: Int64.ONE),
-        );
-
+        String netName = await kc2Service.getNetId();
+        int genesisTime = 0;
+        // await kc2Service.getGenesisTimestamp();
+        BlockchainStats blockchainStats = await kc2Service.getBlockchainStats();
         setState(() {
-          chainData = cData.stats;
-          genesisData = resp.genesisData;
-          genesisBlock =
-              blockResp.blocks.isNotEmpty ? blockResp.blocks.first : null;
-          debugPrint(chainData.toString());
-          //debugPrint(genesisData.toString());
+          networkName = netName;
+          genesisTimestamp = genesisTime;
+          genesisDateTime = DateTime.fromMillisecondsSinceEpoch(genesisTime);
+          stats = blockchainStats;
+          apiAvailable = true;
         });
       } catch (e) {
         if (!mounted) return;
@@ -88,99 +60,147 @@ class _KarmachainState extends State<Karmachain> {
                 icon: CupertinoIcons.exclamationmark_triangle),
             dismissOnBackgroundTap: true,
             maxWidth: statusAlertWidth);
+        setState(() {
+          apiAvailable = false;
+        });
         debugPrint('error getting karmachain data: $e');
       }
-    });*/
+    });
+  }
 
-  /*
+  @override
+  build(BuildContext context) {
+    return Title(
+      color: CupertinoColors.black, // This is required
+      title: 'Karma Coin - Karmachain',
+      child: CupertinoPageScaffold(
+        child: NestedScrollView(
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return <Widget>[
+              kcNavBar(context, 'Karmachain'),
+            ];
+          },
+          body: MediaQuery.removePadding(
+              context: context, removeTop: false, child: _getBody(context)),
+        ),
+      ),
+    );
+  }
+
   /// Return the list secionts
-  List<CupertinoListSection> _getSections(BuildContext context) {
-    List<CupertinoListTile> tiles = [];
-    if (chainData == null || genesisData == null) {
-      // TODO: add loader
-      tiles.add(
-        const CupertinoListTile.notched(
-          title: Text('Please wait...'),
-          leading: Icon(CupertinoIcons.clock),
-          trailing: CupertinoActivityIndicator(),
-          // TODO: number format
+  Widget _getBody(BuildContext context) {
+    final textTheme = CupertinoTheme.of(context).textTheme;
+
+    if (!apiAvailable) {
+      return Padding(
+        padding: const EdgeInsets.only(left: 24, right: 24),
+        child: Center(
+          child: Text(
+              'The Karma Coin Server is down.\n\nPlease try again later.',
+              textAlign: TextAlign.center,
+              style: textTheme.pickerTextStyle),
         ),
       );
-      return [
-        CupertinoListSection.insetGrouped(
-          children: tiles,
-        ),
-      ];
     }
+
+    if (stats == null) {
+      return Padding(
+        padding: const EdgeInsets.only(left: 24, right: 24),
+        child: Center(
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 24),
+                Text('One sec...',
+                    style: textTheme.navTitleTextStyle
+                        .merge(const TextStyle(fontSize: 20))),
+                const SizedBox(height: 14),
+                const CupertinoActivityIndicator(
+                  radius: 20,
+                ),
+              ]),
+        ),
+      );
+    }
+
+    return _getSections(context);
+  }
+
+  Widget _getSections(BuildContext context) {
+    final textTheme = CupertinoTheme.of(context).textTheme;
+
+    List<CupertinoListTile> tiles = [];
 
     tiles.add(
       CupertinoListTile.notched(
           title: const Text('Version'),
           leading: const FaIcon(FontAwesomeIcons.hashtag, size: 20),
-          trailing: Text('Karmachain 1.0',
-              style: CupertinoTheme.of(context).textTheme.textStyle)),
+          trailing: Text(
+              'Karmachain 2.0 ${networkType.name} ${chainInfo.version}',
+              style: textTheme.textStyle)),
     );
 
     tiles.add(
       CupertinoListTile.notched(
           title: const Text('Network'),
           leading: const FaIcon(FontAwesomeIcons.networkWired, size: 20),
-          trailing: Text('Testnet 1 (NetId ${genesisData!.netId})',
-              style: CupertinoTheme.of(context).textTheme.textStyle)),
+          trailing:
+              Text('Testnet 1 (NetId $apiHost)', style: textTheme.textStyle)),
     );
-
-    DateTime genesisTime = DateTime.fromMillisecondsSinceEpoch(
-        genesisData!.genesisTime.toInt() * 1000);
-
-    if (genesisBlock != null) {
-      genesisTime =
-          DateTime.fromMillisecondsSinceEpoch(genesisBlock!.time.toInt());
-    }
-
-    String ago = time_ago.format(genesisTime);
-
-    //String dateDisp = DateFormat().format(genesis_time);
 
     tiles.add(
       CupertinoListTile.notched(
-        title: const Text('Genesis'),
+          title: const Text('Api Provider'),
+          leading: const FaIcon(FontAwesomeIcons.networkWired, size: 20),
+          trailing: Text(apiHost, style: textTheme.textStyle)),
+    );
+
+    tiles.add(
+      CupertinoListTile.notched(
+        title: const Text('Genesis Time'),
         leading: const Icon(CupertinoIcons.clock),
         //subtitle: Text(dateDisp),
         trailing:
-            Text(ago, style: CupertinoTheme.of(context).textTheme.textStyle),
+            Text(time_ago.format(genesisDateTime!), style: textTheme.textStyle),
       ),
     );
-
-    DateTime lastBlockTime =
-        DateTime.fromMillisecondsSinceEpoch(chainData!.lastBlockTime.toInt());
-
-    //String blockDisp = DateFormat().format(last_block_time);
 
     tiles.add(
       CupertinoListTile.notched(
         title: const Text('Blocks'),
         leading: const FaIcon(FontAwesomeIcons.link, size: 20),
-        trailing: Text('${chainData!.tipHeight}',
-            style: CupertinoTheme.of(context).textTheme.textStyle),
+        trailing: Text(stats!.tipHeight.format(), style: textTheme.textStyle),
       ),
     );
 
+    DateTime lastBlockTime =
+        DateTime.fromMillisecondsSinceEpoch(stats!.lastBlockTime);
+    String lastBlockAgo = time_ago.format(lastBlockTime);
+
     tiles.add(
       CupertinoListTile.notched(
-        title: const Text('Current block'),
+        title: const Text('Last block'),
         leading: const FaIcon(FontAwesomeIcons.square, size: 20),
-        trailing: Text(time_ago.format(lastBlockTime),
-            style: CupertinoTheme.of(context).textTheme.textStyle),
+        trailing: Text(lastBlockAgo, style: textTheme.textStyle),
       ),
     );
+
+    /*
+  BigInt signupRewardsAmount;
+  /// Total funds issued by the protocol for referrals
+  BigInt referralRewardsAmount;
+  /// Total funds issued by the protocol for validating
+  BigInt validatorRewardsAmount;
+  /// Amount of rewards paid to causes
+  BigInt causesRewardsAmount;
+  */
 
     tiles.add(
       CupertinoListTile.notched(
         title: const Text('Users'),
         leading: const Icon(CupertinoIcons.person_2),
-        trailing: Text(chainData!.usersCount.toString(),
-            style: CupertinoTheme.of(context).textTheme.textStyle),
-        // TODO: number format
+        trailing: Text(stats!.usersCount.format(), style: textTheme.textStyle),
       ),
     );
 
@@ -188,38 +208,26 @@ class _KarmachainState extends State<Karmachain> {
       CupertinoListTile.notched(
         title: const Text('Transactions'),
         leading: const Icon(CupertinoIcons.doc),
-        trailing: Text(chainData!.transactionsCount.toString(),
-            style: CupertinoTheme.of(context).textTheme.textStyle),
-        // TODO: number format
+        trailing:
+            Text(stats!.transactionCount.format(), style: textTheme.textStyle),
       ),
     );
-
 
     tiles.add(
       CupertinoListTile.notched(
-        title: Text('Appreciations'),
+        title: const Text('Appreciations'),
         leading: const Icon(CupertinoIcons.app),
-        trailing: Text(chain_data!.appreciationsTransactionsCount.toString()),
+        trailing: Text(stats!.appreciationsTransactionsCount.format(),
+            style: textTheme.textStyle),
       ),
     );
-
 
     tiles.add(
       CupertinoListTile.notched(
         title: const Text('Payments'),
         leading: const Icon(CupertinoIcons.money_dollar),
-        trailing: Text(chainData!.paymentsTransactionsCount.toString(),
-            style: CupertinoTheme.of(context).textTheme.textStyle),
-      ),
-    );
-
-    tiles.add(
-      CupertinoListTile.notched(
-        title: const Text('Fees'),
-        leading: const Icon(CupertinoIcons.money_dollar),
-        subtitle: Text(KarmaCoinAmountFormatter.format(chainData!.feesAmount)),
-        trailing: Text(chainData!.transactionsCount.toString(),
-            style: CupertinoTheme.of(context).textTheme.textStyle),
+        trailing: Text(stats!.paymentTransactionCount.format(),
+            style: textTheme.textStyle),
       ),
     );
 
@@ -227,13 +235,12 @@ class _KarmachainState extends State<Karmachain> {
       CupertinoListTile.notched(
         title: const Text('Fee Subsedies'),
         leading: const Icon(CupertinoIcons.money_dollar),
-        subtitle:
-            Text(KarmaCoinAmountFormatter.format(chainData!.feeSubsAmount)),
-        trailing: Text(chainData!.feeSubsCount.toString(),
-            style: CupertinoTheme.of(context).textTheme.textStyle),
+        trailing: Text(stats!.feeSubsAmount.toInt().format(),
+            style: textTheme.textStyle),
       ),
     );
 
+    /*
     tiles.add(
       CupertinoListTile.notched(
         title: const Text('Circulation'),
@@ -242,16 +249,15 @@ class _KarmachainState extends State<Karmachain> {
           KarmaCoinAmountFormatter.format(chainData!.mintedAmount),
         ),
       ),
-    );
+    );*/
 
     tiles.add(
       CupertinoListTile.notched(
         title: const Text('Signup Rewards'),
         leading: const Icon(CupertinoIcons.person),
-        subtitle: Text(
-            KarmaCoinAmountFormatter.format(chainData!.signupRewardsAmount)),
-        trailing: Text(chainData!.signupRewardsCount.toString(),
-            style: CupertinoTheme.of(context).textTheme.textStyle),
+        subtitle: const Text('add me'),
+        trailing: Text(stats!.signupRewardsAmount.toInt().format(),
+            style: textTheme.textStyle),
       ),
     );
 
@@ -259,21 +265,29 @@ class _KarmachainState extends State<Karmachain> {
       CupertinoListTile.notched(
         title: const Text('Referral Rewards'),
         leading: const Icon(CupertinoIcons.person_2),
-        subtitle: Text(
-            KarmaCoinAmountFormatter.format(chainData!.referralRewardsAmount)),
-        trailing: Text(chainData!.referralRewardsCount.toString(),
-            style: CupertinoTheme.of(context).textTheme.textStyle),
+        subtitle: const Text('add me'),
+        trailing: Text(stats!.referralRewardsAmount.toInt().format(),
+            style: textTheme.textStyle),
       ),
     );
 
-    
     tiles.add(
       CupertinoListTile.notched(
-        padding: EdgeInsets.only(top: 6, bottom: 6, left: 12),
+        title: const Text('Validators Rewards'),
+        leading: const Icon(CupertinoIcons.person_2),
+        subtitle: const Text('add me'),
+        trailing: Text(stats!.validatorRewardsAmount.toInt().format(),
+            style: textTheme.textStyle),
+      ),
+    );
+
+    tiles.add(
+      CupertinoListTile.notched(
+        padding: const EdgeInsets.only(top: 6, bottom: 6, left: 12),
         title: const Text('Powered by Karmachain'),
         leading: const Icon(CupertinoIcons.sunrise, size: 26),
         subtitle: CupertinoButton(
-          padding: EdgeInsets.only(left: 0),
+          padding: const EdgeInsets.only(left: 0),
           child: const Text('https://karmacha.in'),
           onPressed: () {},
         ),
@@ -296,21 +310,6 @@ class _KarmachainState extends State<Karmachain> {
     );
 
     tiles.add(
-      CupertinoListTile.notched(
-        padding: const EdgeInsets.only(top: 6, bottom: 6, left: 12),
-        title: const Text('Karmachain 2.0 (next version)'),
-        leading: const FaIcon(FontAwesomeIcons.handSparkles, size: 18),
-        subtitle: CupertinoButton(
-          padding: const EdgeInsets.only(left: 0),
-          child: const Text(_githubNextrUrl),
-          onPressed: () async {
-            await openUrl(_githubNextrUrl);
-          },
-        ),
-      ),
-    );
-
-    tiles.add(
       const CupertinoListTile.notched(
         title: SizedBox(
           height: 64,
@@ -319,13 +318,14 @@ class _KarmachainState extends State<Karmachain> {
       ),
     );
 
-    // TODO: number format
-
-    return [
-      CupertinoListSection.insetGrouped(
-        children: tiles,
-      ),
-    ];
+    return ListView(
+        padding: EdgeInsets.zero,
+        shrinkWrap: true,
+        primary: true,
+        children: [
+          CupertinoListSection.insetGrouped(
+            children: tiles,
+          ),
+        ]);
   }
-  */
-
+}

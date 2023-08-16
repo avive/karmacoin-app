@@ -206,7 +206,6 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
                 const SizedBox(height: 14),
                 const CupertinoActivityIndicator(
                   radius: 20,
-                  animating: true,
                 ),
               ],
             );

@@ -11,6 +11,15 @@ enum KCNetworkType {
 
   const KCNetworkType(this.value);
   final num value;
+
+  String get name {
+    switch (this) {
+      case KCNetworkType.testnet:
+        return 'Testnet';
+      case KCNetworkType.mainnet:
+        return 'Mainnet';
+    }
+  }
 }
 
 /// App config logic
