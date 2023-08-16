@@ -28,6 +28,9 @@ mixin K2ServiceInterface implements ChainApiProvider {
   /// Currently connected API URL
   String? get apiWsUrl;
 
+  /// Connected network id. 42 for testnet and 21 for mainnet
+  int? get netId;
+
   /// Hasher to use with phone number
   Blake2bHasher hasher = const Blake2bHasher(64);
 

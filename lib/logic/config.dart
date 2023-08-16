@@ -30,8 +30,7 @@ class ConfigLogic {
   // dev mode has some text field input shortcuts to save time in dev
   final bool devMode = true;
 
-  // Defaults to testnet. Change it if user specifies to change between testnet and mainnet
-  // and call init() again
+  // Defaults to testnet. Change this if user specifies to change between testnet and mainnet. and call init() again to configure connection to mainnet and vice versa when moving from mainnet to testnet...
   KCNetworkType networkId = KCNetworkType.testnet;
 
   // Skip whatsapp verification for local testing

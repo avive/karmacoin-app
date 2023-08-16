@@ -174,6 +174,7 @@ class _KarmachainState extends State<Karmachain> {
         title: const Text('Last block'),
         leading: const FaIcon(FontAwesomeIcons.square, size: 20),
         subtitle: Text(DateFormat('dd-MM-yy HH:mm:ss').format(lastBlockTime)),
+        // TODO: fixme
         trailing:
             Text('about 5 seconds ago' /*lastBlockAgo*/, style: textStyle),
       ),
