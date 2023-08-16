@@ -25,7 +25,6 @@ import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:polkadart/polkadart.dart' as polkadart;
 import 'package:polkadart/substrate/substrate.dart';
 import 'package:polkadart_scale_codec/polkadart_scale_codec.dart';
-import 'package:ss58/ss58.dart' as ss58;
 import 'package:substrate_metadata_fixed/models/models.dart';
 import 'package:substrate_metadata_fixed/substrate_metadata.dart';
 import 'package:convert/convert.dart';
@@ -68,6 +67,12 @@ class KarmachainService extends ChainApiProvider
       karmachain = polkadart.Provider(Uri.parse(apiWsUrl));
       api = polkadart.StateApi(karmachain);
       final metadata = await karmachain.send('state_getMetadata', []);
+
+
+      // If we are connected to a local node, we need to fetch the ss58 prefix from the node
+      // if `ss58Format` not specified use default `42`
+      ss58Format = await callRpc('system_properties', [])
+          .then((r) => r['ss58Format']) ?? 42;
 
       decodedMetadata =
           MetadataDecoder.instance.decode(metadata.result.toString());
@@ -346,8 +351,7 @@ class KarmachainService extends ChainApiProvider
       if (pallet == 'Identity' &&
           method == 'new_user' &&
           newUserCallback != null) {
-        final txAccountId =
-            ss58.Codec(42).encode(args['account_id'].cast<int>());
+        final txAccountId = encodeAccountId(args['account_id'].cast<int>());
         if (signer == accountId || accountId == txAccountId) {
           await _processNewUserTransaction(
               hash,
@@ -605,7 +609,7 @@ class KarmachainService extends ChainApiProvider
       return null;
     }
 
-    return ss58.Codec(42).encode(address.cast<int>());
+    return encodeAccountId(address.cast<int>());
   }
 
   Future<void> _processNewUserTransaction(
@@ -727,7 +731,7 @@ class KarmachainService extends ChainApiProvider
       // Complete missing fields in tx data via the api based on incomplete data
       switch (accountIdentityType) {
         case 'AccountId':
-          toAccountId = ss58.Codec(42).encode(accountIdentityValue.cast<int>());
+          toAccountId = encodeAccountId(accountIdentityValue.cast<int>());
 
           if (toAccountId == accountId) {
             toUserName = kc2User.userInfo.value?.userName ?? 'UNKNOWN';
@@ -850,7 +854,7 @@ class KarmachainService extends ChainApiProvider
 
     switch (accountIdentityType) {
       case 'AccountId':
-        accountId = ss58.Codec(42).encode(accountIdentityValue.cast<int>());
+        accountId = encodeAccountId(accountIdentityValue.cast<int>());
         break;
       case 'Username':
         final result = await getUserInfoByUsername(accountIdentityValue);
@@ -885,7 +889,7 @@ class KarmachainService extends ChainApiProvider
       Map<String, dynamic> rawData,
       List<KC2Event> txEvents) async {
     try {
-      final toAddress = ss58.Codec(42).encode(args['dest'].value.cast<int>());
+      final toAddress = encodeAccountId(args['dest'].value.cast<int>());
       if (signer != accountId && toAddress == accountId) {
         // sender and receiver is not local user - skip
         return;
@@ -1162,10 +1166,9 @@ class KarmachainService extends ChainApiProvider
       }
 
       final amount = args['amount'];
-      final root = ss58.Codec(42).encode(args['root'].value.cast<int>());
-      final nominator =
-          ss58.Codec(42).encode(args['nominator'].value.cast<int>());
-      final bouncer = ss58.Codec(42).encode(args['bouncer'].value.cast<int>());
+      final root = encodeAccountId(args['root'].value.cast<int>());
+      final nominator = encodeAccountId(args['nominator'].value.cast<int>());
+      final bouncer = encodeAccountId(args['bouncer'].value.cast<int>());
 
       final createTx = KC2CreateTxV1(
         amount: amount,
@@ -1212,7 +1215,7 @@ class KarmachainService extends ChainApiProvider
 
       final poolId = args['pool_id'];
       final validators = args['validators']
-          .map((e) => ss58.Codec(42).encode(e.cast<int>()))
+          .map((e) => encodeAccountId(e.cast<int>()))
           .toList()
           .cast<String>();
 
@@ -1306,7 +1309,7 @@ class KarmachainService extends ChainApiProvider
             'ConfigOption.${args['new_root'].key.toLowerCase()}'),
         args['new_root'].value == null
             ? null
-            : ss58.Codec(42).encode(args['new_root'].value.cast<int>()),
+            : encodeAccountId(args['new_root'].value.cast<int>()),
       );
       final newNominator = MapEntry(
         ConfigOption.values.firstWhere((e) =>
@@ -1314,7 +1317,7 @@ class KarmachainService extends ChainApiProvider
             'ConfigOption.${args['new_nominator'].key.toLowerCase()}'),
         args['new_nominator'].value == null
             ? null
-            : ss58.Codec(42).encode(args['new_nominator'].value.cast<int>()),
+            : encodeAccountId(args['new_nominator'].value.cast<int>()),
       );
       final newBouncer = MapEntry(
         ConfigOption.values.firstWhere((e) =>
@@ -1322,7 +1325,7 @@ class KarmachainService extends ChainApiProvider
             'ConfigOption.${args['new_bouncer'].key.toLowerCase()}'),
         args['new_bouncer'].value == null
             ? null
-            : ss58.Codec(42).encode(args['new_bouncer'].value.cast<int>()),
+            : encodeAccountId(args['new_bouncer'].value.cast<int>()),
       );
 
       final updateRolesTx = KC2UpdateRolesTxV1(
@@ -1376,7 +1379,7 @@ class KarmachainService extends ChainApiProvider
 
       if (newCommission.value != null) {
         commission = newCommission.value[0];
-        beneficiary = ss58.Codec(42).encode(newCommission.value[1].cast<int>());
+        beneficiary = encodeAccountId(newCommission.value[1].cast<int>());
       }
 
       final setCommissionTx = KC2SetCommissionTxV1(

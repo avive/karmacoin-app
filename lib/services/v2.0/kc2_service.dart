@@ -8,7 +8,6 @@ import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:polkadart/substrate/substrate.dart';
 import 'package:polkadart_scale_codec/primitives/primitives.dart';
-import 'package:ss58/ss58.dart' as ss58;
 
 /// Client callback types
 typedef NewUserCallback = Future<void> Function(KC2NewUserTransactionV1 tx);
@@ -264,10 +263,9 @@ mixin K2ServiceInterface implements ChainApiProvider {
       final call = MapEntry(
           'Identity',
           MapEntry('new_user', {
-            'verifier_public_key':
-                ss58.Codec(42).decode(verificationEvidence.verifierAccountId!),
+            'verifier_public_key': decodeAccountId(verificationEvidence.verifierAccountId!),
             'verifier_signature': verificationEvidence.signature,
-            'account_id': ss58.Address.decode(accountId).pubkey,
+            'account_id': decodeAccountId(accountId),
             'username': username,
             'phone_number_hash': phoneNumberHash,
           }));
@@ -312,8 +310,7 @@ mixin K2ServiceInterface implements ChainApiProvider {
           return (null, verificationEvidence.verificationResult.toString());
         }
 
-        verifierPublicKey =
-            ss58.Codec(42).decode(verificationEvidence.verifierAccountId!);
+        verifierPublicKey = decodeAccountId(verificationEvidence.verifierAccountId!);
         verifierSignature = verificationEvidence.signature;
       }
 
@@ -367,7 +364,7 @@ mixin K2ServiceInterface implements ChainApiProvider {
       final call = MapEntry(
           'Balances',
           MapEntry('transfer', {
-            'dest': MapEntry('Id', ss58.Address.decode(accountId).pubkey),
+            'dest': MapEntry('Id', decodeAccountId(accountId)),
             'value': amount
           }));
 
@@ -420,8 +417,7 @@ mixin K2ServiceInterface implements ChainApiProvider {
           'Appreciation',
           MapEntry('set_admin', {
             'community_id': communityId,
-            'new_admin':
-                MapEntry('AccountId', ss58.Address.decode(accountId).pubkey),
+            'new_admin': MapEntry('AccountId', decodeAccountId(accountId)),
           }));
 
       return await signAndSendTransaction(call);
