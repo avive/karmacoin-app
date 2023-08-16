@@ -227,7 +227,7 @@ class _KarmachainState extends State<Karmachain> {
         title: const Text('Fee Subsedies'),
         subtitle: Text(stats!.feeSubsCount.format()),
         leading: const Icon(CupertinoIcons.money_dollar),
-        trailing: Text(stats!.feeSubsCurrentRewardAmount.formatAmount(),
+        trailing: Text(stats!.feeSubsTotalIssuedAmount.formatAmount(),
             style: textStyle),
       ),
     );
