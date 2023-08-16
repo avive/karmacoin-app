@@ -93,10 +93,10 @@ class KarmachainService extends ChainApiProvider
   @override
   Future<int> getGenesisTimestamp() async {
     try {
-      const blockTime = 12000;
+      final BigInt blockTime = BigInt.from(12000);
       // Because genesis block do not contains events,
       // we need to fetch first block instead
-      const blockNumber = '0x1';
+      const String blockNumber = '0x1';
 
       // Get block hash by block number
       final blockHash = await callRpc('chain_getBlockHash', [blockNumber]);
@@ -111,7 +111,7 @@ class KarmachainService extends ChainApiProvider
         return MapEntry(extrinsicHash, extrinsic);
       }).toList();
       // Get timestamp from set timestamp extrinsic
-      int timestamp = extrinsics
+      BigInt timestamp = extrinsics
           .firstWhere((e) =>
               e.value['calls'].key == 'Timestamp' &&
               e.value['calls'].value.key == 'set')
@@ -121,7 +121,7 @@ class KarmachainService extends ChainApiProvider
 
       // As we first block time (not genesis block time),
       // we can calculate genesis time
-      return timestamp - blockTime;
+      return (timestamp - blockTime).toInt();
     } on PlatformException catch (e) {
       debugPrint('Failed to get genesis time: ${e.message}');
       rethrow;

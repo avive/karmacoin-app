@@ -41,7 +41,7 @@ class _KarmachainState extends State<Karmachain> {
       try {
         String netName = await kc2Service.getNetId();
         int genesisTime = 0;
-        // await kc2Service.getGenesisTimestamp();
+        await kc2Service.getGenesisTimestamp();
         BlockchainStats blockchainStats = await kc2Service.getBlockchainStats();
         setState(() {
           networkName = netName;
