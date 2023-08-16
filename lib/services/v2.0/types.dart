@@ -176,6 +176,8 @@ class BlockchainStats {
   int lastBlockTime;
   /// Current block height
   int tipHeight;
+  /// The total units issued in the system.
+  BigInt totalIssuance;
   /// Total number of executed transactions
   int transactionCount;
   /// Total number of payment transactions
@@ -187,35 +189,94 @@ class BlockchainStats {
   /// Total number of verified user accounts
   int usersCount;
   /// Total tx fee subsidies issued by the protocol
-  BigInt feeSubsAmount;
+  BigInt feeSubsTotalIssuedAmount;
+  /// Total number of tx fee subsidies issued by the protocol
+  int feeSubsCount;
+  /// Current amount of tx fee subsidies reward
+  BigInt feeSubsCurrentRewardAmount;
   /// Total funds issued by the protocol for signup
-  BigInt signupRewardsAmount;
+  BigInt signupRewardsTotalIssuedAmount;
+  /// Total number of funds issued by the protocol for signup
+  int signupRewardsCount;
+  /// Current amount of funds issued by the protocol for signup
+  BigInt signupRewardsCurrentRewardAmount;
   /// Total funds issued by the protocol for referrals
-  BigInt referralRewardsAmount;
+  BigInt referralRewardsTotalIssuedAmount;
+  /// Total number of funds issued by the protocol for referrals
+  int referralRewardsCount;
+  /// Current amount of funds issued by the protocol for referrals
+  BigInt referralRewardsCurrentRewardAmount;
   /// Total funds issued by the protocol for validating
-  BigInt validatorRewardsAmount;
+  BigInt validatorRewardsTotalIssuedAmount;
+  /// Total number of funds issued by the protocol for validating
+  int validatorRewardsCount;
+  /// Current amount of funds issued by the protocol for validating
+  BigInt validatorRewardsCurrentRewardAmount;
   /// Amount of rewards paid to causes
-  BigInt causesRewardsAmount;
+  BigInt causesRewardsTotalIssuedAmount;
+  /// Total number of rewards paid to causes
+  int causesRewardsCount;
+  /// Current amount of rewards paid to causes
+  BigInt causesRewardsCurrentRewardAmount;
+  /// Current amount of funds issued by the protocol for karma
+  BigInt karmaRewardsTotalIssuedAmount;
+  /// Total number of funds issued by the protocol for karma
+  int karmaRewardsCount;
+  /// Current amount of funds issued by the protocol for karma
+  BigInt karmaRewardsCurrentRewardAmount;
+  /// Total number of users that get karma rewards
+  int karmaRewardsUsersRewardedCount;
+  /// Last time when karma reward were issued, measured in blocks
+  int karmaRewardsLastTime;
+  /// Next time when karma reward will be issued, measured in blocks
+  int karmaRewardsNextTime;
 
-  BlockchainStats(this.lastBlockTime, this.tipHeight, this.transactionCount,
-      this.paymentTransactionCount, this.appreciationsTransactionsCount,
-      this.updateUserTransactionsCount, this.usersCount, this.feeSubsAmount,
-      this.signupRewardsAmount, this.referralRewardsAmount,
-      this.validatorRewardsAmount, this.causesRewardsAmount);
+  BlockchainStats(this.lastBlockTime, this.tipHeight, this.totalIssuance,
+      this.transactionCount, this.paymentTransactionCount,
+      this.appreciationsTransactionsCount, this.updateUserTransactionsCount,
+      this.usersCount, this.feeSubsTotalIssuedAmount, this.feeSubsCount,
+      this.feeSubsCurrentRewardAmount, this.signupRewardsTotalIssuedAmount,
+      this.signupRewardsCount, this.signupRewardsCurrentRewardAmount,
+      this.referralRewardsTotalIssuedAmount, this.referralRewardsCount,
+      this.referralRewardsCurrentRewardAmount,
+      this.validatorRewardsTotalIssuedAmount, this.validatorRewardsCount,
+      this.validatorRewardsCurrentRewardAmount,
+      this.causesRewardsTotalIssuedAmount, this.causesRewardsCount,
+      this.causesRewardsCurrentRewardAmount, this.karmaRewardsTotalIssuedAmount,
+      this.karmaRewardsCount, this.karmaRewardsCurrentRewardAmount,
+      this.karmaRewardsUsersRewardedCount, this.karmaRewardsLastTime,
+      this.karmaRewardsNextTime);
 
   BlockchainStats.fromJson(Map<String, dynamic> json)
     : lastBlockTime = json['last_block_time'],
       tipHeight = json['tip_height'],
+      totalIssuance = BigInt.from(json['total_issuance']),
       transactionCount = json['transaction_count'],
       paymentTransactionCount = json['payment_transaction_count'],
       appreciationsTransactionsCount = json['appreciations_transactions_count'],
       updateUserTransactionsCount = json['update_user_transactions_count'],
       usersCount = json['users_count'],
-      feeSubsAmount = BigInt.parse(json['fee_subs_amount']),
-      signupRewardsAmount = BigInt.parse(json['signup_rewards_amount']),
-      referralRewardsAmount = BigInt.parse(json['referral_rewards_amount']),
-      validatorRewardsAmount = BigInt.parse(json['validator_rewards_amount']),
-      causesRewardsAmount = BigInt.parse(json['causes_rewards_amount']);
+      feeSubsTotalIssuedAmount = BigInt.from(json['fee_subs_total_issued_amount']),
+      feeSubsCount = json['fee_subs_count'],
+      feeSubsCurrentRewardAmount = BigInt.from(json['fee_subs_current_reward_amount']),
+      signupRewardsTotalIssuedAmount = BigInt.from(json['signup_rewards_total_issued_amount']),
+      signupRewardsCount = json['signup_rewards_count'],
+      signupRewardsCurrentRewardAmount = BigInt.from(json['signup_rewards_current_reward_amount']),
+      referralRewardsTotalIssuedAmount = BigInt.from(json['referral_rewards_total_issued_amount']),
+      referralRewardsCount = json['referral_rewards_count'],
+      referralRewardsCurrentRewardAmount = BigInt.from(json['referral_rewards_current_reward_amount']),
+      validatorRewardsTotalIssuedAmount = BigInt.from(json['validator_rewards_total_issued_amount']),
+      validatorRewardsCount = json['validator_rewards_count'],
+      validatorRewardsCurrentRewardAmount = BigInt.from(json['validator_rewards_current_reward_amount']),
+      causesRewardsTotalIssuedAmount = BigInt.from(json['causes_rewards_total_issued_amount']),
+      causesRewardsCount = json['causes_rewards_count'],
+      causesRewardsCurrentRewardAmount = BigInt.from(json['causes_rewards_current_reward_amount']),
+      karmaRewardsTotalIssuedAmount = BigInt.from(json['karma_rewards_total_issued_amount']),
+      karmaRewardsCount = json['karma_rewards_count'],
+      karmaRewardsCurrentRewardAmount = BigInt.from(json['karma_rewards_current_reward_amount']),
+      karmaRewardsUsersRewardedCount = json['karma_rewards_users_rewarded_count'],
+      karmaRewardsLastTime = json['karma_rewards_last_time'],
+      karmaRewardsNextTime = json['karma_rewards_next_time'];
 }
 
 class SignedTransaction {
