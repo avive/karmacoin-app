@@ -40,6 +40,8 @@ mixin K2ServiceInterface implements ChainApiProvider {
 
   // rpc methods
 
+  Future<String> getNodeVersion();
+
   /// Provides information about user account by `AccountId`
   Future<KC2UserInfo?> getUserInfoByAccountId(String accountId) async {
     try {
@@ -133,7 +135,7 @@ mixin K2ServiceInterface implements ChainApiProvider {
           await callRpc('chain_getBlockchainData', []);
       return BlockchainStats.fromJson(result);
     } catch (e) {
-        debugPrint('Failed to get blockchain stats: $e');
+      debugPrint('Failed to get blockchain stats: $e');
       rethrow;
     }
   }
@@ -263,7 +265,8 @@ mixin K2ServiceInterface implements ChainApiProvider {
       final call = MapEntry(
           'Identity',
           MapEntry('new_user', {
-            'verifier_public_key': decodeAccountId(verificationEvidence.verifierAccountId!),
+            'verifier_public_key':
+                decodeAccountId(verificationEvidence.verifierAccountId!),
             'verifier_signature': verificationEvidence.signature,
             'account_id': decodeAccountId(accountId),
             'username': username,
@@ -310,7 +313,8 @@ mixin K2ServiceInterface implements ChainApiProvider {
           return (null, verificationEvidence.verificationResult.toString());
         }
 
-        verifierPublicKey = decodeAccountId(verificationEvidence.verifierAccountId!);
+        verifierPublicKey =
+            decodeAccountId(verificationEvidence.verifierAccountId!);
         verifierSignature = verificationEvidence.signature;
       }
 

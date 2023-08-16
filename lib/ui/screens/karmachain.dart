@@ -34,6 +34,7 @@ class _KarmachainState extends State<Karmachain> {
   bool devMode = configLogic.devMode;
 
   String? networkName;
+  String? nodeVersion;
   BlockchainStats? stats;
   int? genesisTimestamp;
   DateTime? genesisDateTime;
@@ -46,7 +47,9 @@ class _KarmachainState extends State<Karmachain> {
         String netName = await kc2Service.getNetId();
         int genesisTime = await kc2Service.getGenesisTimestamp();
         BlockchainStats blockchainStats = await kc2Service.getBlockchainStats();
+        String nodeInfo = await kc2Service.getNodeVersion();
         setState(() {
+          nodeVersion = nodeInfo;
           networkName = netName;
           genesisTimestamp = genesisTime;
           genesisDateTime = DateTime.fromMillisecondsSinceEpoch(genesisTime);
@@ -146,13 +149,6 @@ class _KarmachainState extends State<Karmachain> {
 
     tiles.add(
       CupertinoListTile.notched(
-          title: const Text('Api Provider'),
-          leading: const FaIcon(FontAwesomeIcons.server, size: 20),
-          trailing: Text(apiHost, style: textStyle)),
-    );
-
-    tiles.add(
-      CupertinoListTile.notched(
         title: const Text('Genesis Time'),
         leading: const FaIcon(FontAwesomeIcons.sun, size: 20),
         subtitle:
@@ -177,7 +173,9 @@ class _KarmachainState extends State<Karmachain> {
       CupertinoListTile.notched(
         title: const Text('Last block'),
         leading: const FaIcon(FontAwesomeIcons.square, size: 20),
-        trailing: Text(lastBlockAgo, style: textStyle),
+        subtitle: Text(DateFormat('dd-MM-yy HH:mm:ss').format(lastBlockTime)),
+        trailing:
+            Text('about 5 seconds ago' /*lastBlockAgo*/, style: textStyle),
       ),
     );
 
@@ -220,9 +218,7 @@ class _KarmachainState extends State<Karmachain> {
       CupertinoListTile.notched(
         title: const Text('Circulation'),
         leading: const FaIcon(FontAwesomeIcons.globe, size: 20),
-        subtitle: Text(stats!.totalIssuance.formatAmount(),
-            style: textTheme.textStyle.merge(const TextStyle(fontSize: 14)),
-            maxLines: 2),
+        subtitle: Text(stats!.totalIssuance.formatAmount(), maxLines: 2),
       ),
     );
 
@@ -231,8 +227,8 @@ class _KarmachainState extends State<Karmachain> {
         title: const Text('Fee Subsedies'),
         trailing: Text(stats!.feeSubsCount.format()),
         leading: const FaIcon(FontAwesomeIcons.coins, size: 20),
-        subtitle: Text(stats!.feeSubsTotalIssuedAmount.formatAmount(),
-            style: textStyle.merge(const TextStyle(fontSize: 14)), maxLines: 2),
+        subtitle:
+            Text(stats!.feeSubsTotalIssuedAmount.formatAmount(), maxLines: 2),
       ),
     );
 
@@ -243,7 +239,6 @@ class _KarmachainState extends State<Karmachain> {
         trailing: Text(stats!.signupRewardsCount.format(), style: textStyle),
         subtitle: Text(
           stats!.signupRewardsTotalIssuedAmount.formatAmount(),
-          style: textStyle.merge(const TextStyle(fontSize: 14)),
           maxLines: 2,
         ),
       ),
@@ -256,7 +251,6 @@ class _KarmachainState extends State<Karmachain> {
         trailing: Text(stats!.referralRewardsCount.format(), style: textStyle),
         subtitle: Text(
           stats!.referralRewardsTotalIssuedAmount.formatAmount(),
-          style: textStyle.merge(const TextStyle(fontSize: 14)),
           maxLines: 2,
         ),
       ),
@@ -269,10 +263,17 @@ class _KarmachainState extends State<Karmachain> {
         trailing: Text(stats!.validatorRewardsCount.format(), style: textStyle),
         subtitle: Text(
           stats!.validatorRewardsTotalIssuedAmount.formatAmount(),
-          style: textStyle.merge(const TextStyle(fontSize: 14)),
           maxLines: 2,
         ),
       ),
+    );
+
+    tiles.add(
+      CupertinoListTile.notched(
+          title: const Text('Api Provider'),
+          leading: const FaIcon(FontAwesomeIcons.server, size: 20),
+          subtitle: Text(nodeVersion!),
+          trailing: Text(apiHost, style: textStyle)),
     );
 
     tiles.add(

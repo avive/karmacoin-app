@@ -68,11 +68,11 @@ class KarmachainService extends ChainApiProvider
       api = polkadart.StateApi(karmachain);
       final metadata = await karmachain.send('state_getMetadata', []);
 
-
       // If we are connected to a local node, we need to fetch the ss58 prefix from the node
       // if `ss58Format` not specified use default `42`
-      ss58Format = await callRpc('system_properties', [])
-          .then((r) => r['ss58Format']) ?? 42;
+      ss58Format =
+          await callRpc('system_properties', []).then((r) => r['ss58Format']) ??
+              42;
 
       decodedMetadata =
           MetadataDecoder.instance.decode(metadata.result.toString());
@@ -93,6 +93,11 @@ class KarmachainService extends ChainApiProvider
       _connectedToApi = false;
       rethrow;
     }
+  }
+
+  @override
+  Future<String> getNodeVersion() async {
+    return await callRpc('system_version', []);
   }
 
   @override
