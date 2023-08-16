@@ -140,9 +140,8 @@ class _KarmachainState extends State<Karmachain> {
       CupertinoListTile.notched(
           title: const Text('Network'),
           leading: const FaIcon(FontAwesomeIcons.networkWired, size: 20),
-          trailing: Text(
-              'Karmachain 2.0 ${networkType.name} ${chainInfo.version}',
-              style: textStyle)),
+          trailing:
+              Text('Karmachain 2.0 ${networkType.name}', style: textStyle)),
     );
 
     tiles.add(
@@ -222,7 +221,8 @@ class _KarmachainState extends State<Karmachain> {
         title: const Text('Circulation'),
         leading: const FaIcon(FontAwesomeIcons.globe, size: 20),
         subtitle: Text(stats!.totalIssuance.formatAmount(),
-            style: textTheme.textStyle, maxLines: 2),
+            style: textTheme.textStyle.merge(const TextStyle(fontSize: 14)),
+            maxLines: 2),
       ),
     );
 
@@ -232,7 +232,7 @@ class _KarmachainState extends State<Karmachain> {
         trailing: Text(stats!.feeSubsCount.format()),
         leading: const FaIcon(FontAwesomeIcons.coins, size: 20),
         subtitle: Text(stats!.feeSubsTotalIssuedAmount.formatAmount(),
-            style: textStyle, maxLines: 2),
+            style: textStyle.merge(const TextStyle(fontSize: 14)), maxLines: 2),
       ),
     );
 
@@ -243,7 +243,7 @@ class _KarmachainState extends State<Karmachain> {
         trailing: Text(stats!.signupRewardsCount.format(), style: textStyle),
         subtitle: Text(
           stats!.signupRewardsTotalIssuedAmount.formatAmount(),
-          style: textStyle,
+          style: textStyle.merge(const TextStyle(fontSize: 14)),
           maxLines: 2,
         ),
       ),
@@ -256,7 +256,7 @@ class _KarmachainState extends State<Karmachain> {
         trailing: Text(stats!.referralRewardsCount.format(), style: textStyle),
         subtitle: Text(
           stats!.referralRewardsTotalIssuedAmount.formatAmount(),
-          style: textStyle,
+          style: textStyle.merge(const TextStyle(fontSize: 14)),
           maxLines: 2,
         ),
       ),
@@ -269,7 +269,7 @@ class _KarmachainState extends State<Karmachain> {
         trailing: Text(stats!.validatorRewardsCount.format(), style: textStyle),
         subtitle: Text(
           stats!.validatorRewardsTotalIssuedAmount.formatAmount(),
-          style: textStyle,
+          style: textStyle.merge(const TextStyle(fontSize: 14)),
           maxLines: 2,
         ),
       ),
