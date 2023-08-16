@@ -1,5 +1,6 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:status_alert/status_alert.dart';
@@ -16,7 +17,7 @@ class Karmachain extends StatefulWidget {
 }
 
 const _githubUrl = 'https://github.com/karma-coin/karmacoin-server';
-const _githubNextrUrl = 'https://github.com/karma-coin/karmachain';
+// const _githubNextrUrl = 'https://github.com/karma-coin/karmachain';
 
 class _KarmachainState extends State<Karmachain> {
   _KarmachainState();
@@ -40,8 +41,7 @@ class _KarmachainState extends State<Karmachain> {
     Future.delayed(Duration.zero, () async {
       try {
         String netName = await kc2Service.getNetId();
-        int genesisTime = 0;
-        await kc2Service.getGenesisTimestamp();
+        int genesisTime = await kc2Service.getGenesisTimestamp();
         BlockchainStats blockchainStats = await kc2Service.getBlockchainStats();
         setState(() {
           networkName = netName;
@@ -129,31 +129,24 @@ class _KarmachainState extends State<Karmachain> {
 
   Widget _getSections(BuildContext context) {
     final textTheme = CupertinoTheme.of(context).textTheme;
+    final textStyle = textTheme.textStyle;
 
     List<CupertinoListTile> tiles = [];
 
     tiles.add(
       CupertinoListTile.notched(
-          title: const Text('Version'),
+          title: const Text('Network'),
           leading: const FaIcon(FontAwesomeIcons.hashtag, size: 20),
           trailing: Text(
               'Karmachain 2.0 ${networkType.name} ${chainInfo.version}',
-              style: textTheme.textStyle)),
-    );
-
-    tiles.add(
-      CupertinoListTile.notched(
-          title: const Text('Network'),
-          leading: const FaIcon(FontAwesomeIcons.networkWired, size: 20),
-          trailing:
-              Text('Testnet 1 (NetId $apiHost)', style: textTheme.textStyle)),
+              style: textStyle)),
     );
 
     tiles.add(
       CupertinoListTile.notched(
           title: const Text('Api Provider'),
           leading: const FaIcon(FontAwesomeIcons.networkWired, size: 20),
-          trailing: Text(apiHost, style: textTheme.textStyle)),
+          trailing: Text(apiHost, style: textStyle)),
     );
 
     tiles.add(
@@ -161,8 +154,7 @@ class _KarmachainState extends State<Karmachain> {
         title: const Text('Genesis Time'),
         leading: const Icon(CupertinoIcons.clock),
         //subtitle: Text(dateDisp),
-        trailing:
-            Text(time_ago.format(genesisDateTime!), style: textTheme.textStyle),
+        trailing: Text(time_ago.format(genesisDateTime!), style: textStyle),
       ),
     );
 
@@ -170,7 +162,7 @@ class _KarmachainState extends State<Karmachain> {
       CupertinoListTile.notched(
         title: const Text('Blocks'),
         leading: const FaIcon(FontAwesomeIcons.link, size: 20),
-        trailing: Text(stats!.tipHeight.format(), style: textTheme.textStyle),
+        trailing: Text(stats!.tipHeight.format(), style: textStyle),
       ),
     );
 
@@ -182,7 +174,7 @@ class _KarmachainState extends State<Karmachain> {
       CupertinoListTile.notched(
         title: const Text('Last block'),
         leading: const FaIcon(FontAwesomeIcons.square, size: 20),
-        trailing: Text(lastBlockAgo, style: textTheme.textStyle),
+        trailing: Text(lastBlockAgo, style: textStyle),
       ),
     );
 
@@ -200,7 +192,7 @@ class _KarmachainState extends State<Karmachain> {
       CupertinoListTile.notched(
         title: const Text('Users'),
         leading: const Icon(CupertinoIcons.person_2),
-        trailing: Text(stats!.usersCount.format(), style: textTheme.textStyle),
+        trailing: Text(stats!.usersCount.format(), style: textStyle),
       ),
     );
 
@@ -208,8 +200,7 @@ class _KarmachainState extends State<Karmachain> {
       CupertinoListTile.notched(
         title: const Text('Transactions'),
         leading: const Icon(CupertinoIcons.doc),
-        trailing:
-            Text(stats!.transactionCount.format(), style: textTheme.textStyle),
+        trailing: Text(stats!.transactionCount.format(), style: textStyle),
       ),
     );
 
@@ -218,7 +209,7 @@ class _KarmachainState extends State<Karmachain> {
         title: const Text('Appreciations'),
         leading: const Icon(CupertinoIcons.app),
         trailing: Text(stats!.appreciationsTransactionsCount.format(),
-            style: textTheme.textStyle),
+            style: textStyle),
       ),
     );
 
@@ -226,38 +217,37 @@ class _KarmachainState extends State<Karmachain> {
       CupertinoListTile.notched(
         title: const Text('Payments'),
         leading: const Icon(CupertinoIcons.money_dollar),
-        trailing: Text(stats!.paymentTransactionCount.format(),
-            style: textTheme.textStyle),
+        trailing:
+            Text(stats!.paymentTransactionCount.format(), style: textStyle),
       ),
     );
 
     tiles.add(
       CupertinoListTile.notched(
         title: const Text('Fee Subsedies'),
+        subtitle: Text(stats!.feeSubsCount.format()),
         leading: const Icon(CupertinoIcons.money_dollar),
-        trailing: Text(stats!.feeSubsAmount.toInt().format(),
-            style: textTheme.textStyle),
+        trailing: Text(stats!.feeSubsCurrentRewardAmount.formatAmount(),
+            style: textStyle),
       ),
     );
 
-    /*
     tiles.add(
       CupertinoListTile.notched(
-        title: const Text('Circulation'),
+        title: Text('Circulation', style: textStyle),
         leading: const Icon(CupertinoIcons.money_dollar),
-        subtitle: Text(
-          KarmaCoinAmountFormatter.format(chainData!.mintedAmount),
-        ),
+        trailing: Text(stats!.totalIssuance.formatAmount(),
+            style: textTheme.textStyle),
       ),
-    );*/
+    );
 
     tiles.add(
       CupertinoListTile.notched(
         title: const Text('Signup Rewards'),
         leading: const Icon(CupertinoIcons.person),
-        subtitle: const Text('add me'),
-        trailing: Text(stats!.signupRewardsAmount.toInt().format(),
-            style: textTheme.textStyle),
+        subtitle: Text(stats!.signupRewardsCount.format(), style: textStyle),
+        trailing: Text(stats!.signupRewardsTotalIssuedAmount.formatAmount(),
+            style: textStyle),
       ),
     );
 
@@ -265,9 +255,9 @@ class _KarmachainState extends State<Karmachain> {
       CupertinoListTile.notched(
         title: const Text('Referral Rewards'),
         leading: const Icon(CupertinoIcons.person_2),
-        subtitle: const Text('add me'),
-        trailing: Text(stats!.referralRewardsAmount.toInt().format(),
-            style: textTheme.textStyle),
+        subtitle: Text(stats!.referralRewardsCount.format(), style: textStyle),
+        trailing: Text(stats!.referralRewardsTotalIssuedAmount.formatAmount(),
+            style: textStyle),
       ),
     );
 
@@ -275,9 +265,9 @@ class _KarmachainState extends State<Karmachain> {
       CupertinoListTile.notched(
         title: const Text('Validators Rewards'),
         leading: const Icon(CupertinoIcons.person_2),
-        subtitle: const Text('add me'),
-        trailing: Text(stats!.validatorRewardsAmount.toInt().format(),
-            style: textTheme.textStyle),
+        subtitle: Text(stats!.validatorRewardsCount.format(), style: textStyle),
+        trailing: Text(stats!.validatorRewardsTotalIssuedAmount.formatAmount(),
+            style: textStyle),
       ),
     );
 
