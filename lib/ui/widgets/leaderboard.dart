@@ -19,7 +19,6 @@ const _karmaRewardsInfoUrl = 'https://karmaco.in/karmarewards/';
 class _LeaderboardWidgetState extends State<LeaderboardWidget> {
   // we assume api is available until we know otherwise
   bool apiOffline = false;
-
   List<KC2UserInfo>? entries;
 
   @override
@@ -69,7 +68,9 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
 
     if (entries == null) {
       return const Center(
-        child: CupertinoActivityIndicator(),
+        child: CupertinoActivityIndicator(
+          radius: 20,
+        ),
       );
     }
 
@@ -132,9 +133,7 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
     );
   }
 
-  Widget _getUserWidget(
-      BuildContext context, KC2UserInfo entry, int index) {
-
+  Widget _getUserWidget(BuildContext context, KC2UserInfo entry, int index) {
     return CupertinoListTile(
       key: Key(index.toString()),
       padding: const EdgeInsets.only(top: 0, bottom: 6, left: 14, right: 14),
@@ -170,7 +169,7 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
                 0,
                 0),
             largeTitle: Center(
-              child: Text('☥ KARMA REWARDS',
+              child: Text('☥ LEADERBOARD',
                   style: getNavBarTitleTextStyle(context)),
             ),
           ),

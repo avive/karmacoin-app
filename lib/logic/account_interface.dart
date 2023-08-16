@@ -11,12 +11,13 @@ abstract class AccountLogicInterface {
   // Set the user's karma coin user data and store it
   // Future<void> updateKarmaCoinUser(User user);
 
-  // Persist karma coin user
+  /// Persist karma coin user
   Future<void> persistKarmaCoinUser();
 
-  // Set the user reuqested user name
+  /// Set the user reuqested user name
   Future<void> setRequestedUserName(String requestedUserName);
 
+  /// indicate that user has seen karma rewards screen in this session
   Future<void> setDisplayedKarmaRewardsScreen(bool value);
 
   /// Clear all local account data

@@ -1,15 +1,14 @@
-// import 'package:countup/countup.dart';
-import 'package:karma_coin/services/api/types.pb.dart';
+import 'package:countup/countup.dart';
+import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:status_alert/status_alert.dart';
 
-// const _karmaRewardsInfoUrl = 'https://karmaco.in/karmarewards/';
+const _karmaRewardsInfoUrl = 'https://karmaco.in/karmarewards/';
 
 class AboutKarmaMining extends StatefulWidget {
-  final GenesisData? genesisData;
   final bool enableBackButton;
-  const AboutKarmaMining(
-      {super.key, this.genesisData, this.enableBackButton = false});
+  const AboutKarmaMining({super.key, this.enableBackButton = false});
 
   @override
   State<AboutKarmaMining> createState() => _AboutKarmaMiningState();
@@ -18,11 +17,8 @@ class AboutKarmaMining extends StatefulWidget {
 class _AboutKarmaMiningState extends State<AboutKarmaMining> {
   // we assume api is available until we know otherwise
   bool apiOffline = false;
+  BlockchainStats? blockchainStats;
 
-  // GenesisData? genesisData;
-  // BlockchainStats? blockchainStats;
-
-  /*
   @override
   initState() {
     super.initState();
@@ -30,26 +26,14 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
 
     Future.delayed(Duration.zero, () async {
       try {
-        GetGenesisDataResponse? genesisDataResponse;
-        if (genesisData == null) {
-          genesisDataResponse = await api.apiServiceClient
-              .getGenesisData(GetGenesisDataRequest());
-        }
-
-        GetBlockchainDataResponse statsResponse = await api.apiServiceClient
-            .getBlockchainData(GetBlockchainDataRequest());
-
+        BlockchainStats stats = await kc2Service.getBlockchainStats();
         await configLogic.setDisplayedKarmaRewardsScreen(true);
-
         setState(() {
-          blockchainStats = statsResponse.stats;
-          if (genesisDataResponse != null) {
-            genesisData = genesisDataResponse.genesisData;
-          }
+          blockchainStats = stats;
         });
       } catch (e) {
         setState(() {
-          apiOffline = true;
+          // apiOffline = true;
         });
         if (!mounted) return;
         StatusAlert.show(context,
@@ -63,9 +47,8 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
         debugPrint('error getting data: $e');
       }
     });
-  }*/
+  }
 
-  /*
   Widget _getBodyContent(BuildContext context) {
     if (apiOffline) {
       return Padding(
@@ -79,10 +62,13 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
       );
     }
 
+    // TODO: enable back when api doesn't throw an exception
     /*
-    if (genesisData == null) {
+    if (blockchainStats == null) {
       return const Center(
-        child: CupertinoActivityIndicator(),
+        child: CupertinoActivityIndicator(
+          radius: 20,
+        ),
       );
     }*/
 
@@ -93,9 +79,8 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: _getWidgets(context)),
     );
-  }*/
+  }
 
-  /*
   Widget _getCoinWidget(BuildContext context, int amount) {
     return Container(
       height: 72,
@@ -140,9 +125,8 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
         ),
       ),
     );
-  }*/
+  }
 
-  /*
   List<Widget> _getWidgets(BuildContext context) {
     List<Widget> res = <Widget>[];
 
@@ -155,17 +139,19 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
         child: Text(
           'The more you give, the more you get...',
           style: textTheme.navTitleTextStyle.merge(
-            const TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
+            const TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
           ),
           textAlign: TextAlign.center,
         ),
       ),
     );
 
-    // TODO: get data from RPC
+    // TODO: get this from blockchainStats when data is available
     int signupReward = 10;
     int referralReward = 100;
     int karmaReward = 10;
+
+    /// TODO: display how many rewards and total issued for each reward
 
     res.add(Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -230,7 +216,7 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
     );
 
     return res;
-  }*/
+  }
 
   @override
   build(BuildContext context) {
@@ -259,8 +245,7 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
           ),
           SliverFillRemaining(
             hasScrollBody: false,
-            // TODO: fix me when api becomes clearer
-            child: Container(), //_getBodyContent(context),
+            child: _getBodyContent(context),
           ),
         ],
       ),
