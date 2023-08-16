@@ -16,6 +16,8 @@ class Karmachain extends StatefulWidget {
   State<Karmachain> createState() => _KarmachainState();
 }
 
+const _karmaChainUrl = 'https://karmaco.in/karmachain';
+
 const _githubUrl = 'https://github.com/karma-coin/karmacoin-server';
 // const _githubNextrUrl = 'https://github.com/karma-coin/karmachain';
 
@@ -200,7 +202,9 @@ class _KarmachainState extends State<Karmachain> {
       CupertinoListTile.notched(
         title: const Text('Transactions'),
         leading: const Icon(CupertinoIcons.doc),
-        trailing: Text(stats!.transactionCount.format(), style: textStyle),
+        // TODO: update when api doesn't include 1 tx per block by default...
+        trailing: Text((stats!.transactionCount - stats!.tipHeight).format(),
+            style: textStyle),
       ),
     );
 
@@ -224,20 +228,20 @@ class _KarmachainState extends State<Karmachain> {
 
     tiles.add(
       CupertinoListTile.notched(
-        title: const Text('Fee Subsedies'),
-        subtitle: Text(stats!.feeSubsCount.format()),
+        title: Text('Circulation', style: textStyle),
         leading: const Icon(CupertinoIcons.money_dollar),
-        trailing: Text(stats!.feeSubsTotalIssuedAmount.formatAmount(),
-            style: textStyle),
+        trailing: Text(stats!.totalIssuance.formatAmount(),
+            style: textTheme.textStyle),
       ),
     );
 
     tiles.add(
       CupertinoListTile.notched(
-        title: Text('Circulation', style: textStyle),
+        title: const Text('Fee Subsedies'),
+        subtitle: Text(stats!.feeSubsCount.format()),
         leading: const Icon(CupertinoIcons.money_dollar),
-        trailing: Text(stats!.totalIssuance.formatAmount(),
-            style: textTheme.textStyle),
+        trailing: Text(stats!.feeSubsTotalIssuedAmount.formatAmount(),
+            style: textStyle),
       ),
     );
 
@@ -278,8 +282,10 @@ class _KarmachainState extends State<Karmachain> {
         leading: const Icon(CupertinoIcons.sunrise, size: 26),
         subtitle: CupertinoButton(
           padding: const EdgeInsets.only(left: 0),
-          child: const Text('https://karmacha.in'),
-          onPressed: () {},
+          child: const Text(_karmaChainUrl),
+          onPressed: () async {
+            await openUrl(_karmaChainUrl);
+          },
         ),
       ),
     );
