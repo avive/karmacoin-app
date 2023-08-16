@@ -15,6 +15,7 @@ abstract class ChainApiProvider {
   late polkadart.StateApi api;
   late KC2KeyRing keyring;
   late ChainInfo chainInfo;
+  late int ss58Format;
 
   /// Set an identity's keyring - call with local user's identity keyring on new app session
   void setKeyring(KC2KeyRing keyring) {
@@ -84,7 +85,7 @@ abstract class ChainApiProvider {
     // experiment with an unsigned transaction here, we can set this to None::<()> instead.
     final signatureToEncode = [
       // The account ID that's signing the payload:
-      MapEntry('Id', ss58.Address.decode(signer).pubkey),
+      MapEntry('Id', decodeAccountId(signer)),
       // The actual signature, computed above:
       MapEntry('Ed25519', signature),
       // Extra information to be included in the transaction:
@@ -120,7 +121,7 @@ abstract class ChainApiProvider {
   /// Sign with current key and send transaction to the chain
   Future<String> signAndSendTransaction(MapEntry<String, dynamic> call) async {
     try {
-      final signer = ss58.Codec(42).encode(keyring.getPublicKey());
+      final signer = encodeAccountId(keyring.getPublicKey());
       final encodedHex =
       await _signTransaction(signer, call);
       // debugPrint('Encoded extrinsic: $encodedHex');
@@ -153,5 +154,13 @@ abstract class ChainApiProvider {
 
   Future<dynamic> callRpc(String method, List<dynamic> params) async {
     return await karmachain.send(method, params).then((response) => response.result);
+  }
+
+  Uint8List decodeAccountId(String accountId) {
+    return ss58.Codec(ss58Format).decode(accountId);
+  }
+
+  String encodeAccountId(List<int> accountId) {
+    return ss58.Codec(ss58Format).encode(accountId);
   }
 }

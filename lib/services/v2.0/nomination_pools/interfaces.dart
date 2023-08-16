@@ -14,7 +14,6 @@ import 'package:karma_coin/services/v2.0/nomination_pools/txs/withdraw_unbonded.
 import 'package:karma_coin/services/v2.0/nomination_pools/types.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:polkadart/scale_codec.dart';
-import 'package:ss58/ss58.dart' as ss58;
 
 /// Client callback types
 typedef JoinCallback = Future<void> Function(KC2JoinTxV1 tx);
@@ -114,7 +113,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
       final call = MapEntry(
           'NominationPools',
           MapEntry('unbond', {
-            'member_account': MapEntry('Id', ss58.Address.decode(accountId).pubkey),
+            'member_account': MapEntry('Id', decodeAccountId(accountId)),
             'unbonding_points': unbondingPoints,
           })
       );
@@ -153,7 +152,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
       final call = MapEntry(
           'NominationPools',
           MapEntry('withdraw_unbonded', {
-            'member_account': MapEntry('Id', ss58.Address.decode(accountId).pubkey),
+            'member_account': MapEntry('Id', decodeAccountId(accountId)),
             'num_slashing_spans': numSlashingSpans,
           })
       );
@@ -186,9 +185,9 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
           'NominationPools',
           MapEntry('create', {
             'amount': amount,
-            'root': MapEntry('Id', ss58.Address.decode(root).pubkey),
-            'nominator': MapEntry('Id', ss58.Address.decode(nominator).pubkey),
-            'bouncer': MapEntry('Id', ss58.Address.decode(bouncer).pubkey),
+            'root': MapEntry('Id', decodeAccountId(root)),
+            'nominator': MapEntry('Id', decodeAccountId(nominator)),
+            'bouncer': MapEntry('Id', decodeAccountId(bouncer)),
           })
       );
 
@@ -208,7 +207,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   /// account.
   Future<String> nominate(PoolId poolId, List<String> validatorsAccountIds) async {
     try {
-      final validators = validatorsAccountIds.map((e) => ss58.Address.decode(e).pubkey).toList();
+      final validators = validatorsAccountIds.map((e) => decodeAccountId(e)).toList();
 
       final call = MapEntry(
           'NominationPools',
@@ -274,7 +273,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
           newRoot = const MapEntry('Remove', null);
           break;
         case ConfigOption.set:
-          newRoot = MapEntry('Set', ss58.Address.decode(root.value!).pubkey);
+          newRoot = MapEntry('Set', decodeAccountId(root.value!));
           break;
       }
 
@@ -286,7 +285,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
           newNominator = const MapEntry('Remove', null);
           break;
         case ConfigOption.set:
-          newNominator = MapEntry('Set', ss58.Address.decode(nominator.value!).pubkey);
+          newNominator = MapEntry('Set', decodeAccountId(nominator.value!));
           break;
       }
 
@@ -298,7 +297,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
           newBouncer = const MapEntry('Remove', null);
           break;
         case ConfigOption.set:
-          newBouncer = MapEntry('Set', ss58.Address.decode(bouncer.value!).pubkey);
+          newBouncer = MapEntry('Set', decodeAccountId(bouncer.value!));
           break;
       }
 
@@ -328,7 +327,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
       Option newCommission;
 
       if (commission != null && beneficiary != null) {
-        newCommission = Option.some([commission, ss58.Address.decode(beneficiary).pubkey]);
+        newCommission = Option.some([commission, decodeAccountId(beneficiary)]);
       } else {
         newCommission = const Option.none();
       }
