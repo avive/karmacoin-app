@@ -140,15 +140,14 @@ class KarmachainService extends ChainApiProvider
 
       int processed = 0;
 
-      txs.forEach((transaction) async {
+      for (final tx in txs) {
         try {
           debugPrint('Processing tx $processed ...');
-          final BigInt blockNumber = BigInt.from(transaction.blockNumber);
-          final int transactionIndex = transaction.transactionIndex;
-          final bytes = transaction.transaction.transactionBody;
-          final transactionBody =
-              _decodeTransaction(Input.fromBytes(bytes));
-          final int timestamp = transaction.timestamp;
+          final BigInt blockNumber = BigInt.from(tx.blockNumber);
+          final int transactionIndex = tx.transactionIndex;
+          final bytes = tx.transaction.transactionBody;
+          final transactionBody = _decodeTransaction(Input.fromBytes(bytes));
+          final int timestamp = tx.timestamp;
           final List<KC2Event> events =
               await _getTransactionEvents(blockNumber, transactionIndex);
           await _processTransaction(accountId, transactionBody, events,
@@ -157,9 +156,9 @@ class KarmachainService extends ChainApiProvider
           debugPrint('Processed tx $processed / ${txs.length}...');
         } catch (e) {
           // don't throw so we can process valid txs even when one is bad
-          debugPrint('>>>>> error processing tx: $transaction $e');
+          debugPrint('>>>>> error processing tx: $tx $e');
         }
-      });
+      }
 
       debugPrint(
           'Processed $processed / ${txs.length} txs for account: $accountId}');
@@ -768,7 +767,6 @@ class KarmachainService extends ChainApiProvider
 
           // call api to get missing fields
           final res = await getUserInfoByPhoneNumberHash(toPhoneNumberHash);
-          // TODO: handle null result case
           if (res == null) {
             throw 'failed to get user id by phone hash via api';
           }

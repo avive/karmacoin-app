@@ -1,5 +1,9 @@
+import 'package:flutter/material.dart';
+import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:random_avatar/random_avatar.dart';
+import 'package:status_alert/status_alert.dart';
 
 class LeaderboardWidget extends StatefulWidget {
   final int communityId;
@@ -10,17 +14,14 @@ class LeaderboardWidget extends StatefulWidget {
   State<LeaderboardWidget> createState() => _LeaderboardWidgetState();
 }
 
-// const _karmaRewardsInfoUrl = 'https://karmaco.in/karmarewards/';
+const _karmaRewardsInfoUrl = 'https://karmaco.in/karmarewards/';
 
 class _LeaderboardWidgetState extends State<LeaderboardWidget> {
   // we assume api is available until we know otherwise
   bool apiOffline = false;
 
-  // List<LeaderboardEntry>? entries;
+  List<KC2UserInfo>? entries;
 
-  // BlockchainStats? blockchainStats;
-
-  /*
   @override
   initState() {
     super.initState();
@@ -29,20 +30,11 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
     Future.delayed(Duration.zero, () async {
       try {
         debugPrint('getting leaderboard data...');
-        GetLeaderBoardResponse resp =
-            await api.apiServiceClient.getLeaderBoard(GetLeaderBoardRequest());
-
-        GetBlockchainDataResponse statsResponse = await api.apiServiceClient
-            .getBlockchainData(GetBlockchainDataRequest());
-
-        debugPrint('got entries: ${resp.leaderboardEntries}');
-
-        List<LeaderboardEntry> newEntries = resp.leaderboardEntries;
+        List<KC2UserInfo> users = await kc2Service.getLeaderBoard();
+        debugPrint('got ${users.length} entries');
 
         setState(() {
-          debugPrint('setting entries: $newEntries');
-          blockchainStats = statsResponse.stats;
-          entries = newEntries;
+          entries = users;
         });
       } catch (e) {
         setState(() {
@@ -141,8 +133,7 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
   }
 
   Widget _getUserWidget(
-      BuildContext context, LeaderboardEntry entry, int index) {
-// TODO: add personality trait emojis from appre
+      BuildContext context, KC2UserInfo entry, int index) {
 
     return CupertinoListTile(
       key: Key(index.toString()),
@@ -157,7 +148,6 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
       leading: RandomAvatar(entry.userName, height: 50, width: 50),
     );
   }
-*/
 
   @override
   build(BuildContext context) {
@@ -186,8 +176,7 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
           ),
           SliverFillRemaining(
             hasScrollBody: true,
-            // TODO: fix me when KC2 API is available
-            child: Container(), //_getBodyContent(context),
+            child: _getBodyContent(context),
           ),
         ],
       ),
