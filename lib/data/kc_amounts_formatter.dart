@@ -1,6 +1,16 @@
 import 'package:intl/intl.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 
+extension KarmaCoinFormat on BigInt {
+  String formatAmount() {
+    return KarmaCoinAmountFormatter.format(this);
+  }
+
+  String formatAmountMinimal() {
+    return KarmaCoinAmountFormatter.formatMinimal(this);
+  }
+}
+
 abstract class KarmaCoinAmountFormatter {
   static final NumberFormat _deicmalFormat = NumberFormat("#,###.#####");
 

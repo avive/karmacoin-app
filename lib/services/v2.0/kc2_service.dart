@@ -43,7 +43,8 @@ mixin K2ServiceInterface implements ChainApiProvider {
   /// Provides information about user account by `AccountId`
   Future<KC2UserInfo?> getUserInfoByAccountId(String accountId) async {
     try {
-      Map<String, dynamic>? result = await callRpc('identity_getUserInfoByAccountId', [accountId]);
+      Map<String, dynamic>? result =
+          await callRpc('identity_getUserInfoByAccountId', [accountId]);
       return result == null ? null : KC2UserInfo.fromJson(result);
     } on PlatformException catch (e) {
       debugPrint('Failed to get user information by account id: ${e.message}');
@@ -54,7 +55,8 @@ mixin K2ServiceInterface implements ChainApiProvider {
   /// Provides information about user account by `Username`
   Future<KC2UserInfo?> getUserInfoByUserName(String username) async {
     try {
-      Map<String, dynamic>? result = await callRpc('identity_getUserInfoByUsername', [username]);
+      Map<String, dynamic>? result =
+          await callRpc('identity_getUserInfoByUsername', [username]);
       return result == null ? null : KC2UserInfo.fromJson(result);
     } on PlatformException catch (e) {
       debugPrint('Failed to get user information by username: ${e.message}');
@@ -66,17 +68,20 @@ mixin K2ServiceInterface implements ChainApiProvider {
   ///
   /// Use getPhoneNumberHash of an international number w/o leading '+'.
   /// Hex string may be 0x prefixed or not
-  Future<KC2UserInfo?> getUserInfoByPhoneNumberHash(String phoneNumberHash) async {
+  Future<KC2UserInfo?> getUserInfoByPhoneNumberHash(
+      String phoneNumberHash) async {
     try {
       // Cut `0x` prefix if exists
       if (phoneNumberHash.startsWith('0x')) {
         phoneNumberHash = phoneNumberHash.substring(2);
       }
 
-      Map<String, dynamic>? result = await callRpc('identity_getUserInfoByPhoneNumberHash', [phoneNumberHash]);
+      Map<String, dynamic>? result = await callRpc(
+          'identity_getUserInfoByPhoneNumberHash', [phoneNumberHash]);
       return result == null ? null : KC2UserInfo.fromJson(result);
     } on PlatformException catch (e) {
-      debugPrint('Failed to get user information by phone number hash: ${e.message}');
+      debugPrint(
+          'Failed to get user information by phone number hash: ${e.message}');
       rethrow;
     }
   }
@@ -86,7 +91,8 @@ mixin K2ServiceInterface implements ChainApiProvider {
   Future<List<KC2UserInfo>> getCommunityMembers(int communityId,
       {int? fromIndex, int? limit}) async {
     try {
-      List<dynamic> result = await callRpc('community_getAllUsers', [communityId, fromIndex, limit]);
+      List<dynamic> result = await callRpc(
+          'community_getAllUsers', [communityId, fromIndex, limit]);
 
       return result.map((e) => KC2UserInfo.fromJson(e)).toList();
     } on PlatformException catch (e) {
@@ -100,7 +106,8 @@ mixin K2ServiceInterface implements ChainApiProvider {
   Future<List<Contact>> getContacts(String prefix,
       {int? communityId, int? fromIndex, int? limit}) async {
     try {
-      List<dynamic> result = await callRpc('community_getContacts', [prefix, communityId, fromIndex, limit]);
+      List<dynamic> result = await callRpc(
+          'community_getContacts', [prefix, communityId, fromIndex, limit]);
       return result.map((e) => Contact.fromJson(e)).toList();
     } on PlatformException catch (e) {
       debugPrint('Failed to get contacts: ${e.message}');
@@ -122,10 +129,11 @@ mixin K2ServiceInterface implements ChainApiProvider {
   /// Fetch information about chain like last block time, rewards, etc
   Future<BlockchainStats> getBlockchainStats() async {
     try {
-      Map<String, dynamic> result = await callRpc('chain_getBlockchainData', []);
+      Map<String, dynamic> result =
+          await callRpc('chain_getBlockchainData', []);
       return BlockchainStats.fromJson(result);
-    } on PlatformException catch (e) {
-      debugPrint('Failed to get blockchain stats: ${e.message}');
+    } catch (e) {
+        debugPrint('Failed to get blockchain stats: $e');
       rethrow;
     }
   }
@@ -157,7 +165,8 @@ mixin K2ServiceInterface implements ChainApiProvider {
   /// Fetch transaction by block number and transaction index
   Future<Transaction> getTransaction(int blockNumber, int txIndex) async {
     try {
-      Map<String, dynamic> result = await callRpc('chain_getTransaction', [blockNumber, txIndex]);
+      Map<String, dynamic> result =
+          await callRpc('chain_getTransaction', [blockNumber, txIndex]);
       return Transaction.fromJson(result);
     } on PlatformException catch (e) {
       debugPrint('Failed to get transactions_getTx: ${e.message}');
@@ -168,7 +177,8 @@ mixin K2ServiceInterface implements ChainApiProvider {
   /// Fetch transaction by transaction hash
   Future<Transaction> getTransactionByHash(String txHash) async {
     try {
-      Map<String, dynamic> result = await callRpc('transactions_getTransaction', [txHash]);
+      Map<String, dynamic> result =
+          await callRpc('transactions_getTransaction', [txHash]);
       return Transaction.fromJson(result);
     } on PlatformException catch (e) {
       debugPrint('Failed to get transactions_getTx: ${e.message}');
@@ -179,37 +189,39 @@ mixin K2ServiceInterface implements ChainApiProvider {
   /// Fetch all transaction belong to the account id
   Future<List<Transaction>> getTransactionsByAccountId(String accountId) async {
     try {
-      List<dynamic> result = await callRpc('transactions_getTransactions', [accountId]);
+      List<dynamic> result =
+          await callRpc('transactions_getTransactions', [accountId]);
       return result.map((e) => Transaction.fromJson(e)).toList();
     } on PlatformException catch (e) {
-      debugPrint('Failed to get transactions_getTransactionsByAccountId: ${e.message}');
+      debugPrint(
+          'Failed to get transactions_getTransactionsByAccountId: ${e.message}');
       rethrow;
     }
   }
 
-  Future<List<Transaction>> getTransactionsByPhoneNumberHash(String phoneNumberHash) async {
+  Future<List<Transaction>> getTransactionsByPhoneNumberHash(
+      String phoneNumberHash) async {
     try {
       // Cut `0x` prefix if exists
       if (phoneNumberHash.startsWith('0x')) {
         phoneNumberHash = phoneNumberHash.substring(2);
       }
 
-      List<dynamic> result = await callRpc('transactions_getTransactionsByPhoneNumberHash', [phoneNumberHash]);
+      List<dynamic> result = await callRpc(
+          'transactions_getTransactionsByPhoneNumberHash', [phoneNumberHash]);
       return result.map((e) => Transaction.fromJson(e)).toList();
     } on PlatformException catch (e) {
-      debugPrint('Failed to get transactions_getTransactionsByPhoneNumberHash: ${e.message}');
+      debugPrint(
+          'Failed to get transactions_getTransactionsByPhoneNumberHash: ${e.message}');
       rethrow;
     }
   }
 
-  getVerificationEvidence(String accountId, String username, String phoneNumber, {String? byPassToken}) async {
+  getVerificationEvidence(String accountId, String username, String phoneNumber,
+      {String? byPassToken}) async {
     try {
-      Map<String, dynamic>? result = await callRpc('verifier_verify', [
-        accountId,
-        username,
-        phoneNumber,
-        byPassToken
-      ]);
+      Map<String, dynamic>? result = await callRpc(
+          'verifier_verify', [accountId, username, phoneNumber, byPassToken]);
 
       return result == null ? null : VerificationEvidence.fromJson(result);
     } on PlatformException catch (e) {
@@ -228,10 +240,13 @@ mixin K2ServiceInterface implements ChainApiProvider {
   ///
   /// This method will attempt to obtain verifier evidence regarding the association between the accountId, userName and phoneNumber
   Future<(String?, String?)> newUser(
-      String accountId, String username, String phoneNumber, {VerificationEvidence? verificationEvidence}) async {
+      String accountId, String username, String phoneNumber,
+      {VerificationEvidence? verificationEvidence}) async {
     try {
       // Get verification evidence if not provided
-      verificationEvidence ??= await getVerificationEvidence(accountId, username, phoneNumber, byPassToken: verificationBypassToken);
+      verificationEvidence ??= await getVerificationEvidence(
+          accountId, username, phoneNumber,
+          byPassToken: verificationBypassToken);
 
       // Failed to get verification evidence
       if (verificationEvidence == null) {
@@ -239,7 +254,8 @@ mixin K2ServiceInterface implements ChainApiProvider {
       }
 
       // Verification failed
-      if (verificationEvidence.verificationResult != VerificationResult.verified) {
+      if (verificationEvidence.verificationResult !=
+          VerificationResult.verified) {
         return (null, verificationEvidence.verificationResult.toString());
       }
 
@@ -269,7 +285,8 @@ mixin K2ServiceInterface implements ChainApiProvider {
   /// Returns an (evidence, errorMessage) result.
   ///
   /// Implementation will attempt to obtain verifier evidence regarding the association between the accountId, and the new userName or the new phoneNumber
-  Future<(String?, String?)> updateUser(String? username, String? phoneNumber, {VerificationEvidence? verificationEvidence}) async {
+  Future<(String?, String?)> updateUser(String? username, String? phoneNumber,
+      {VerificationEvidence? verificationEvidence}) async {
     try {
       Uint8List? verifierPublicKey;
       List<int>? verifierSignature;
@@ -278,7 +295,9 @@ mixin K2ServiceInterface implements ChainApiProvider {
       if (phoneNumber != null && verificationEvidence == null) {
         final userInfo = await getUserInfoByAccountId(keyring.getAccountId());
 
-        final verificationEvidence = await getVerificationEvidence(userInfo!.accountId, userInfo.userName, phoneNumber, byPassToken: verificationBypassToken);
+        final verificationEvidence = await getVerificationEvidence(
+            userInfo!.accountId, userInfo.userName, phoneNumber,
+            byPassToken: verificationBypassToken);
 
         // Failed to get verification evidence
         if (verificationEvidence == null) {
@@ -286,7 +305,8 @@ mixin K2ServiceInterface implements ChainApiProvider {
         }
 
         // Verification failed
-        if (verificationEvidence.verificationResult != VerificationResult.verified) {
+        if (verificationEvidence.verificationResult !=
+            VerificationResult.verified) {
           return (null, verificationEvidence.verificationResult.toString());
         }
 
@@ -301,9 +321,9 @@ mixin K2ServiceInterface implements ChainApiProvider {
           ? const Option.none()
           : Option.some(verifierSignature);
       final usernameOption =
-      username == null ? const Option.none() : Option.some(username);
+          username == null ? const Option.none() : Option.some(username);
       final Uint8List? phoneNumberHash =
-      phoneNumber != null ? hasher.hashString(phoneNumber) : null;
+          phoneNumber != null ? hasher.hashString(phoneNumber) : null;
       final phoneNumberHashOption = phoneNumberHash == null
           ? const Option.none()
           : Option.some(phoneNumberHash);
@@ -328,7 +348,7 @@ mixin K2ServiceInterface implements ChainApiProvider {
   Future<String> deleteUser() async {
     try {
       const call =
-      MapEntry('Identity', MapEntry('delete_user', <String, dynamic>{}));
+          MapEntry('Identity', MapEntry('delete_user', <String, dynamic>{}));
 
       return await signAndSendTransaction(call);
     } on PlatformException catch (e) {
@@ -358,14 +378,13 @@ mixin K2ServiceInterface implements ChainApiProvider {
     }
   }
 
-
   /// Send a new appreciation with optional charTraitId
   /// phoneNumberHash - canonical hex string of phone number hash using blake32.
   /// Use getPhoneNumberHash() to get hash of a number
   /// Returns submitted transaction hash
   /// todo: add support for sending a appreciation to a user name. To, implement, get the phone number hash from the chain for user name or id via the RPC api and send appreciation to it. No need to appreciate by accountId.
-  Future<String> sendAppreciation(
-      String phoneNumberHash, BigInt amount, int communityId, int charTraitId) async {
+  Future<String> sendAppreciation(String phoneNumberHash, BigInt amount,
+      int communityId, int charTraitId) async {
     if (phoneNumberHash.startsWith('0x')) {
       phoneNumberHash = phoneNumberHash.substring(2);
     }
@@ -398,8 +417,7 @@ mixin K2ServiceInterface implements ChainApiProvider {
           'Appreciation',
           MapEntry('set_admin', {
             'community_id': communityId,
-            'new_admin':
-            MapEntry('AccountId', decodeAccountId(accountId)),
+            'new_admin': MapEntry('AccountId', decodeAccountId(accountId)),
           }));
 
       return await signAndSendTransaction(call);
