@@ -1,4 +1,5 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
@@ -155,7 +156,8 @@ class _KarmachainState extends State<Karmachain> {
       CupertinoListTile.notched(
         title: const Text('Genesis Time'),
         leading: const FaIcon(FontAwesomeIcons.sun, size: 20),
-        //subtitle: Text(dateDisp),
+        subtitle:
+            Text(DateFormat('dd-MM-yy HH:mm:ss').format(genesisDateTime!)),
         trailing: Text(time_ago.format(genesisDateTime!), style: textStyle),
       ),
     );
@@ -192,7 +194,6 @@ class _KarmachainState extends State<Karmachain> {
       CupertinoListTile.notched(
         title: const Text('Transactions'),
         leading: const FaIcon(FontAwesomeIcons.signature, size: 20),
-        // TODO: update when api doesn't include 1 tx per block by default...
         trailing: Text((stats!.transactionCount - stats!.tipHeight).format(),
             style: textStyle),
       ),
@@ -218,20 +219,20 @@ class _KarmachainState extends State<Karmachain> {
 
     tiles.add(
       CupertinoListTile.notched(
-        title: Text('Circulation', style: textStyle),
+        title: const Text('Circulation'),
         leading: const FaIcon(FontAwesomeIcons.globe, size: 20),
-        trailing: Text(stats!.totalIssuance.formatAmount(),
-            style: textTheme.textStyle),
+        subtitle: Text(stats!.totalIssuance.formatAmount(),
+            style: textTheme.textStyle, maxLines: 2),
       ),
     );
 
     tiles.add(
       CupertinoListTile.notched(
         title: const Text('Fee Subsedies'),
-        subtitle: Text(stats!.feeSubsCount.format()),
+        trailing: Text(stats!.feeSubsCount.format()),
         leading: const FaIcon(FontAwesomeIcons.coins, size: 20),
-        trailing: Text(stats!.feeSubsTotalIssuedAmount.formatAmount(),
-            style: textStyle),
+        subtitle: Text(stats!.feeSubsTotalIssuedAmount.formatAmount(),
+            style: textStyle, maxLines: 2),
       ),
     );
 
@@ -239,9 +240,12 @@ class _KarmachainState extends State<Karmachain> {
       CupertinoListTile.notched(
         title: const Text('Signup Rewards'),
         leading: const FaIcon(FontAwesomeIcons.medal, size: 20),
-        subtitle: Text(stats!.signupRewardsCount.format(), style: textStyle),
-        trailing: Text(stats!.signupRewardsTotalIssuedAmount.formatAmount(),
-            style: textStyle),
+        trailing: Text(stats!.signupRewardsCount.format(), style: textStyle),
+        subtitle: Text(
+          stats!.signupRewardsTotalIssuedAmount.formatAmount(),
+          style: textStyle,
+          maxLines: 2,
+        ),
       ),
     );
 
@@ -249,9 +253,12 @@ class _KarmachainState extends State<Karmachain> {
       CupertinoListTile.notched(
         title: const Text('Referral Rewards'),
         leading: const FaIcon(FontAwesomeIcons.peopleArrows, size: 20),
-        subtitle: Text(stats!.referralRewardsCount.format(), style: textStyle),
-        trailing: Text(stats!.referralRewardsTotalIssuedAmount.formatAmount(),
-            style: textStyle),
+        trailing: Text(stats!.referralRewardsCount.format(), style: textStyle),
+        subtitle: Text(
+          stats!.referralRewardsTotalIssuedAmount.formatAmount(),
+          style: textStyle,
+          maxLines: 2,
+        ),
       ),
     );
 
@@ -259,9 +266,12 @@ class _KarmachainState extends State<Karmachain> {
       CupertinoListTile.notched(
         title: const Text('Validators Rewards'),
         leading: const FaIcon(FontAwesomeIcons.peopleGroup, size: 20),
-        subtitle: Text(stats!.validatorRewardsCount.format(), style: textStyle),
-        trailing: Text(stats!.validatorRewardsTotalIssuedAmount.formatAmount(),
-            style: textStyle),
+        trailing: Text(stats!.validatorRewardsCount.format(), style: textStyle),
+        subtitle: Text(
+          stats!.validatorRewardsTotalIssuedAmount.formatAmount(),
+          style: textStyle,
+          maxLines: 2,
+        ),
       ),
     );
 

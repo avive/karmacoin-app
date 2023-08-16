@@ -189,7 +189,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
     final DateTime dateTime =
         DateTime.fromMillisecondsSinceEpoch(widget.tx!.timestamp);
     final String dateTimeString =
-        DateFormat('dd-MM-yy hh:mm:ss').format(dateTime);
+        DateFormat('dd-MM-yy HH:mm:ss').format(dateTime);
 
     tiles.add(
       CupertinoListTile.notched(
