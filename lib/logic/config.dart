@@ -5,6 +5,14 @@ import 'package:karma_coin/common/platform_info.dart';
 
 // TODO: add ConfigLogic public interface
 
+enum KCNetworkType {
+  testnet(42),
+  mainnet(21);
+
+  const KCNetworkType(this.value);
+  final num value;
+}
+
 /// App config logic
 class ConfigLogic {
   /// Set to true to work against localhost servers. Otherwise production servers are used
@@ -12,6 +20,10 @@ class ConfigLogic {
 
   // dev mode has some text field input shortcuts to save time in dev
   final bool devMode = true;
+
+  // Defaults to testnet. Change it if user specifies to change between testnet and mainnet
+  // and call init() again
+  KCNetworkType networkId = KCNetworkType.testnet;
 
   // Skip whatsapp verification for local testing
   final bool skipWhatsappVerification = true;
@@ -73,9 +85,13 @@ class ConfigLogic {
     karmaMiningScreenDisplayed.value = value;
   }
 
+  /// Call this everytime network is changed from the ui. e.g. switch between mainnet to testnet...
   Future<void> init() async {
     if (apiLocalMode) {
-      debugPrint("Wroking against local kc2 api provider");
+      // note: we default to testnet in local mode.
+      // to connect to a local mainnet mode. set networkId to mainnet and call init()
+      debugPrint(
+          "Wroking against local kc2 api provider. Expected net id $networkId");
       if (await PlatformInfo.isRunningOnAndroidEmulator()) {
         debugPrint('Running in Android emulator');
         // on android emulator, use the host machine ip address
@@ -92,15 +108,31 @@ class ConfigLogic {
 
       verifierSecureConnection.value = false;
     } else {
-      debugPrint('Working against kc2 testnet api provider');
-      apiHostName.value = 'testnet.karmaco.in/testnet/ws';
-      apiHostPort.value = 80;
-      apiProtocol.value = 'wss';
-      //
-      // verifier info
-      verifierHostName.value = 'api.karmaco.in';
-      verifierHostPort.value = 443;
-      verifierSecureConnection.value = true;
+      switch (networkId) {
+        case KCNetworkType.testnet:
+          debugPrint('Working against a remote kc2 testnet api provider');
+          apiHostName.value = 'testnet.karmaco.in/testnet/ws';
+          apiHostPort.value = 80;
+          apiProtocol.value = 'wss';
+          //
+          // verifier info for testnet
+          verifierHostName.value = 'api.karmaco.in';
+          verifierHostPort.value = 443;
+          verifierSecureConnection.value = true;
+          break;
+        case KCNetworkType.mainnet:
+          debugPrint('Working against a remote kc2 mainnet api provider');
+          // TODO: add mainnet api node here
+          apiHostName.value = '[add mainnent public api node here]';
+          apiHostPort.value = 80;
+          apiProtocol.value = 'wss';
+          //
+          // verifier info for mainnet
+          verifierHostName.value = 'api.karmaco.in';
+          verifierHostPort.value = 443;
+          verifierSecureConnection.value = true;
+          break;
+      }
     }
 
     // Read last known fcm token for device

@@ -17,12 +17,12 @@ void main() {
 
   GetIt.I.registerLazySingleton<KarmachainService>(() => KarmachainService());
   GetIt.I.registerLazySingleton<K2ServiceInterface>(
-          () => GetIt.I.get<KarmachainService>());
+      () => GetIt.I.get<KarmachainService>());
 
   group('genesis tests', () {
     test(
       'get net id works',
-          () async {
+      () async {
         KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
         // Connect to the chain
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
@@ -34,21 +34,18 @@ void main() {
       timeout: const Timeout(Duration(seconds: 280)),
     );
 
-    test(
-      'char traits exists on genesis',
-        () async {
-          KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
-          // Connect to the chain
-          await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+    test('char traits exists on genesis', () async {
+      KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
+      // Connect to the chain
+      await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
-          List<CharTrait> traits = await kc2Service.getCharTraits();
+      List<CharTrait> traits = await kc2Service.getCharTraits();
 
-          expect(traits.length, 62);
+      expect(traits.length, 62);
 
-          CharTrait trait = traits.firstWhere((t) => t.id == 36);
-          expect(trait.id, 36);
-          expect(trait.name, 'a Wizard');
-        }
-    );
+      CharTrait trait = traits.firstWhere((t) => t.id == 36);
+      expect(trait.id, 36);
+      expect(trait.name, 'a Wizard');
+    });
   });
 }
