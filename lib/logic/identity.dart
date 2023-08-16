@@ -1,7 +1,7 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/logic/kc2/identity_interface.dart';
-import 'package:karma_coin/logic/kc2/keyring.dart';
+import 'package:karma_coin/logic/identity_interface.dart';
+import 'package:karma_coin/logic/keyring.dart';
 
 const _mnemonicStoreKey = "kc2menomonic";
 const _phoneNumberStoreKey = "kc2phonenumber";

@@ -1,5 +1,5 @@
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/logic/kc2/txs_boss2_interface.dart';
+import 'package:karma_coin/logic/txs_boss2_interface.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 
 class KC2TransactionBoss extends KC2TransactionBossInterface {

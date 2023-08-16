@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/logic/kc2/keyring.dart';
+import 'package:karma_coin/logic/keyring.dart';
 import 'package:polkadart/polkadart.dart' as polkadart;
 import 'package:polkadart/substrate/substrate.dart';
 import 'package:polkadart_scale_codec/polkadart_scale_codec.dart';
@@ -22,7 +22,8 @@ abstract class ChainApiProvider {
     this.keyring = keyring;
   }
 
-  Future<String> _signTransaction(String signer, MapEntry<String, dynamic> call) async {
+  Future<String> _signTransaction(
+      String signer, MapEntry<String, dynamic> call) async {
     const extrinsicFormatVersion = 4;
     final nonce = await karmachain
         .send('system_accountNextIndex', [signer]).then((v) => v.result);
@@ -122,12 +123,11 @@ abstract class ChainApiProvider {
   Future<String> signAndSendTransaction(MapEntry<String, dynamic> call) async {
     try {
       final signer = encodeAccountId(keyring.getPublicKey());
-      final encodedHex =
-      await _signTransaction(signer, call);
+      final encodedHex = await _signTransaction(signer, call);
       // debugPrint('Encoded extrinsic: $encodedHex');
 
       final result =
-      await karmachain.send('author_submitExtrinsic', [encodedHex]);
+          await karmachain.send('author_submitExtrinsic', [encodedHex]);
       // debugPrint('Submit extrinsic result: ${result.result.toString()}');
 
       return result.result.toString();
@@ -137,7 +137,8 @@ abstract class ChainApiProvider {
     }
   }
 
-  Future<Uint8List?> readStorage(String module, String storage, {List<int>? key}) async {
+  Future<Uint8List?> readStorage(String module, String storage,
+      {List<int>? key}) async {
     final modulePrefix = polkadart.Hasher.twoxx128.hashString(module);
     final storagePrefix = polkadart.Hasher.twoxx128.hashString(storage);
 
@@ -153,7 +154,9 @@ abstract class ChainApiProvider {
   }
 
   Future<dynamic> callRpc(String method, List<dynamic> params) async {
-    return await karmachain.send(method, params).then((response) => response.result);
+    return await karmachain
+        .send(method, params)
+        .then((response) => response.result);
   }
 
   Uint8List decodeAccountId(String accountId) {

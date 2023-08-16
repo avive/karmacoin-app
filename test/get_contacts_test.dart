@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/logic/kc2/identity.dart';
-import 'package:karma_coin/logic/kc2/identity_interface.dart';
+import 'package:karma_coin/logic/identity.dart';
+import 'package:karma_coin/logic/identity_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
 import 'package:karma_coin/services/v2.0/types.dart';

@@ -1,5 +1,5 @@
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/logic/kc2/keyring.dart';
+import 'package:karma_coin/logic/keyring.dart';
 
 /// A kc2 persistent identity
 abstract class IdentityInterface {
