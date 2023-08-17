@@ -18,6 +18,7 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
   // we assume api is available until we know otherwise
   bool apiOffline = false;
   BlockchainStats? blockchainStats;
+  // coin amounts in KC
   late int signupReward;
   late int referralReward;
   late int karmaReward;
