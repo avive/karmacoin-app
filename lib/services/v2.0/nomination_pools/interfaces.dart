@@ -110,8 +110,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   /// [`Call::pool_withdraw_unbonded`] to try to free chunks if necessary
   /// (ie. if unbound was called and no unlocking chunks are available).
   /// However, it may not be possible to release the current unlocking chunks,
-  /// in which case, the result of this call will likely be the `NoMoreChunks`
-  /// error from the staking system.
+  /// in which case, the result of this call will likely be the `NoMoreChunks` error from the staking system.
   Future<String> unbond(String accountId, BigInt unbondingPoints) async {
     try {
       // TODO: use balance as argument and convert it to points inside function
@@ -216,8 +215,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
 
   /// Nominate on behalf of the pool.
   ///
-  /// The dispatch origin of this call must be signed by the pool nominator or
-  /// the pool root role.
+  /// The dispatch origin of this call must be signed by the pool nominator
+  /// or the pool root role.
   ///
   /// This directly forward the call to the staking pallet, on behalf of the
   /// pool bonded account.
@@ -243,8 +242,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
 
   /// Chill on behalf of the pool.
   ///
-  /// The dispatch origin of this call must be signed by the pool nominator or
-  /// the pool root role, same as [`Pallet::nominate`].
+  /// The dispatch origin of this call must be signed by the pool nominator
+  /// or the pool root role, same as [`Pallet::nominate`].
   ///
   /// This directly forward the call to the staking pallet, on behalf of the
   /// pool bonded account.
@@ -268,9 +267,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   /// The root is the only entity that can change any of the roles, including
   /// itself, excluding the depositor, who can never change.
   ///
-  /// It emits an event, notifying UIs of the role change. This event is quite
-  /// relevant to most pool members and they should be informed of changes to
-  /// pool roles.
+  /// It emits an event, notifying UIs of the role change. This event is quite relevant to most pool members and they should be informed of changes to pool roles.
   Future<String> updatePoolRoles(
     PoolId poolId,
     MapEntry<ConfigOption, String?> root,
@@ -366,9 +363,10 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
 
   /// Set the maximum commission of a pool.
   ///
-  /// - Initial max can be set to any `Perbill`, and only smaller values thereafter.
-  /// - Current commission will be lowered in the event it is higher than a new max
-  ///   commission.
+  /// - Initial max can be set to any `Perbill`, and only smaller values
+  ///   thereafter.
+  /// - Current commission will be lowered in the event it is higher than a
+  ///   new max commission.
   Future<String> setPoolCommissionMax(PoolId poolId, int maxCommission) async {
     try {
       final call = MapEntry(
@@ -387,8 +385,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
 
   /// Set the commission change rate for a pool.
   ///
-  /// Initial change rate is not bounded, whereas subsequent updates can only be more
-  /// restrictive than the current.
+  /// Initial change rate is not bounded, whereas subsequent updates can only be more restrictive than the current.
   Future<String> setPoolCommissionChangeRate(
       PoolId poolId, CommissionChangeRate commissionChangeRate) async {
     try {
@@ -411,9 +408,9 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
 
   /// Claim pending commission.
   ///
-  /// The dispatch origin of this call must be signed by the `root` role of the pool. Pending
-  /// commission is paid out and added to total claimed commission`. Total pending commission
-  /// is reset to zero. the current.
+  /// The dispatch origin of this call must be signed by the `root` role of the pool.
+  /// Pending commission is paid out and added to total claimed commission`.
+  /// Total pending commission is reset to zero. the current.
   Future<String> claimPoolCommission(PoolId poolId) async {
     try {
       final call = MapEntry(
@@ -493,8 +490,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
     }
   }
 
-  /// If account id is a member of any nomination pool returns pool id of this pool
-  /// otherwise `null`
+  /// If account id is a member of any nomination pool returns pool id of this pool otherwise `null`
   Future<PoolMember?> getMembershipPool(String accountId) async {
     try {
       return await callRpc('nominationPools_memberOf', [accountId])

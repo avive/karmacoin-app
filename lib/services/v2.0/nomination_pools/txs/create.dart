@@ -1,6 +1,5 @@
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 
-// @HolyGrease please add code doc for this tx - what is it used for? what is the use case? Is this for pool creation or for pull participation?
 class KC2CreateTxV1 extends KC2Tx {
   BigInt amount;
   String root;
