@@ -208,6 +208,10 @@ void main() {
           expect(bobPoolMember!.id, tx.poolId);
           expect(bobPoolMember.points, BigInt.from(1000000));
 
+          // TODO: add a test when user tries to join same pool twice.
+
+          // TODO: crate a test when user tries to join a pool when he's already a member of another pool.
+
           completer.complete(true);
         };
 
