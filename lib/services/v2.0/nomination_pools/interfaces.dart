@@ -16,21 +16,23 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:polkadart/scale_codec.dart';
 
 /// Client callback types
-typedef JoinCallback = Future<void> Function(KC2JoinTxV1 tx);
-typedef ClaimPayoutCallback = Future<void> Function(KC2ClaimPayoutTxV1 tx);
-typedef UnbondCallback = Future<void> Function(KC2UnbondTxV1 tx);
-typedef WithdrawUnbondedCallback = Future<void> Function(
+typedef JoinPoolCallback = Future<void> Function(KC2JoinTxV1 tx);
+typedef ClaimPoolPayoutCallback = Future<void> Function(KC2ClaimPayoutTxV1 tx);
+typedef UnbondPoolCallback = Future<void> Function(KC2UnbondTxV1 tx);
+typedef WithdrawUnbondedPoolCallback = Future<void> Function(
     KC2WithdrawUnbondedTxV1 tx);
-typedef CreateCallback = Future<void> Function(KC2CreateTxV1 tx);
-typedef NominateCallback = Future<void> Function(KC2NominateTxV1 tx);
-typedef ChillCallback = Future<void> Function(KC2ChillTxV1 tx);
-typedef UpdateRolesCallback = Future<void> Function(KC2UpdateRolesTxV1 tx);
-typedef SetCommissionCallback = Future<void> Function(KC2SetCommissionTxV1 tx);
-typedef SetCommissionMaxCallback = Future<void> Function(
+typedef CreatePoolCallback = Future<void> Function(KC2CreateTxV1 tx);
+typedef NominatePoolValidatorCallback = Future<void> Function(
+    KC2NominateTxV1 tx);
+typedef ChillPoolCallback = Future<void> Function(KC2ChillTxV1 tx);
+typedef UpdatePoolRolesCallback = Future<void> Function(KC2UpdateRolesTxV1 tx);
+typedef SetPoolCommissionCallback = Future<void> Function(
+    KC2SetCommissionTxV1 tx);
+typedef SetPoolCommissionMaxCallback = Future<void> Function(
     KC2SetCommissionMaxTxV1 tx);
-typedef SetCommissionChangeRateCallback = Future<void> Function(
+typedef SetPoolCommissionChangeRateCallback = Future<void> Function(
     KC2SetCommissionChangeRateTxV1 tx);
-typedef ClaimCommissionCallback = Future<void> Function(
+typedef ClaimPoolCommissionCallback = Future<void> Function(
     KC2ClaimCommissionTxV1 tx);
 
 mixin KC2NominationPoolsInterface on ChainApiProvider {
@@ -502,16 +504,16 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   }
 
   // available client txs callbacks
-  JoinCallback? joinCallback;
-  ClaimPayoutCallback? claimPayoutCallback;
-  UnbondCallback? unbondCallback;
-  WithdrawUnbondedCallback? withdrawUnbondedCallback;
-  CreateCallback? createCallback;
-  NominateCallback? nominateCallback;
-  ChillCallback? chillCallback;
-  UpdateRolesCallback? updateRolesCallback;
-  SetCommissionCallback? setCommissionCallback;
-  SetCommissionMaxCallback? setCommissionMaxCallback;
-  SetCommissionChangeRateCallback? setCommissionChangeRateCallback;
-  ClaimCommissionCallback? claimCommissionCallback;
+  JoinPoolCallback? joinPoolCallback;
+  ClaimPoolPayoutCallback? claimPoolPayoutCallback;
+  UnbondPoolCallback? unbondPoolCallback;
+  WithdrawUnbondedPoolCallback? withdrawUnbondedPoolCallback;
+  CreatePoolCallback? createPoolCallback;
+  NominatePoolValidatorCallback? nominatePoolValidatorCallback;
+  ChillPoolCallback? chillPoolCallback;
+  UpdatePoolRolesCallback? updatePoolRolesCallback;
+  SetPoolCommissionCallback? setPoolCommissionCallback;
+  SetPoolCommissionMaxCallback? setPoolCommissionMaxCallback;
+  SetPoolCommissionChangeRateCallback? setPoolCommissionChangeRateCallback;
+  ClaimPoolCommissionCallback? claimPoolCommissionCallback;
 }

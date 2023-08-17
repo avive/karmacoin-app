@@ -1025,7 +1025,7 @@ class KarmachainService extends ChainApiProvider
         rawData: rawData,
       );
 
-      await joinCallback!(joinTx);
+      await joinPoolCallback!(joinTx);
     } catch (e) {
       debugPrint('error processing new user tx: $e');
       rethrow;
@@ -1064,7 +1064,7 @@ class KarmachainService extends ChainApiProvider
         rawData: rawData,
       );
 
-      await claimPayoutCallback!(claimPayoutTx);
+      await claimPoolPayoutCallback!(claimPayoutTx);
     } catch (e) {
       debugPrint('error processing new user tx: $e');
       rethrow;
@@ -1108,7 +1108,7 @@ class KarmachainService extends ChainApiProvider
         rawData: rawData,
       );
 
-      await unbondCallback!(unbondTx);
+      await unbondPoolCallback!(unbondTx);
     } catch (e) {
       debugPrint('error processing new user tx: $e');
       rethrow;
@@ -1150,7 +1150,7 @@ class KarmachainService extends ChainApiProvider
         rawData: rawData,
       );
 
-      await withdrawUnbondedCallback!(withdrawUnbondTx);
+      await withdrawUnbondedPoolCallback!(withdrawUnbondTx);
     } catch (e) {
       debugPrint('error processing new user tx: $e');
       rethrow;
@@ -1198,7 +1198,7 @@ class KarmachainService extends ChainApiProvider
         rawData: rawData,
       );
 
-      await createCallback!(createTx);
+      await createPoolCallback!(createTx);
     } catch (e) {
       debugPrint('error processing new user tx: $e');
       rethrow;
@@ -1245,7 +1245,7 @@ class KarmachainService extends ChainApiProvider
         rawData: rawData,
       );
 
-      await nominateCallback!(nominateTx);
+      await nominatePoolValidatorCallback!(nominateTx);
     } catch (e) {
       debugPrint('error processing new user tx: $e');
       rethrow;
@@ -1287,7 +1287,7 @@ class KarmachainService extends ChainApiProvider
         rawData: rawData,
       );
 
-      await chillCallback!(chillTx);
+      await chillPoolCallback!(chillTx);
     } catch (e) {
       debugPrint('error processing new user tx: $e');
       rethrow;
@@ -1356,7 +1356,7 @@ class KarmachainService extends ChainApiProvider
         rawData: rawData,
       );
 
-      await updateRolesCallback!(updateRolesTx);
+      await updatePoolRolesCallback!(updateRolesTx);
     } catch (e) {
       debugPrint('error processing new user tx: $e');
       rethrow;
@@ -1409,7 +1409,7 @@ class KarmachainService extends ChainApiProvider
         rawData: rawData,
       );
 
-      await setCommissionCallback!(setCommissionTx);
+      await setPoolCommissionCallback!(setCommissionTx);
     } catch (e) {
       debugPrint('error processing new user tx: $e');
       rethrow;
@@ -1453,7 +1453,7 @@ class KarmachainService extends ChainApiProvider
         rawData: rawData,
       );
 
-      await setCommissionMaxCallback!(setCommissionMaxTx);
+      await setPoolCommissionMaxCallback!(setCommissionMaxTx);
     } catch (e) {
       debugPrint('error processing new user tx: $e');
       rethrow;
@@ -1497,7 +1497,7 @@ class KarmachainService extends ChainApiProvider
         rawData: rawData,
       );
 
-      await setCommissionChangeRateCallback!(setCommissionChangeRateTx);
+      await setPoolCommissionChangeRateCallback!(setCommissionChangeRateTx);
     } catch (e) {
       debugPrint('error processing new user tx: $e');
       rethrow;
@@ -1539,7 +1539,7 @@ class KarmachainService extends ChainApiProvider
         rawData: rawData,
       );
 
-      await claimCommissionCallback!(claimCommissionTx);
+      await claimPoolCommissionCallback!(claimCommissionTx);
     } catch (e) {
       debugPrint('error processing new user tx: $e');
       rethrow;

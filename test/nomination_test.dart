@@ -30,6 +30,8 @@ void main() {
     test(
       'create a pool',
       () async {
+        // TODO: delete all pools so a pool can be created w/o an error on any chain, and add a test for creating a pool when pools are maxed out and verify create fails
+
         KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
         // Connect to the chain
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
@@ -51,7 +53,7 @@ void main() {
         String txHash = "";
 
         // Create pool callback
-        kc2Service.createCallback = (tx) async {
+        kc2Service.createPoolCallback = (tx) async {
           // Check if the tx failed
           if (tx.failedReason != null) {
             completer.complete(false);
@@ -67,8 +69,11 @@ void main() {
 
           // Check if the pool is created
           final pools = await kc2Service.getPools();
-          final pool = pools
-              .firstWhere((pool) => pool.roles.depositor == katya.accountId);
+          expect(pools.isNotEmpty, isTrue);
+
+          final pool = pools.firstWhere(
+              (pool) => pool.roles.depositor == katya.accountId,
+              orElse: () => fail('pool not found'));
           expect(pool.commission.beneficiary, null);
           expect(pool.commission.current, null);
           expect(pool.commission.max, null);
@@ -76,7 +81,10 @@ void main() {
           expect(pool.commission.throttleFrom, null);
           expect(pool.memberCounter, 1);
           expect(pool.points, BigInt.from(1000000));
-          expect(pool.roles.depositor, katya.accountId);
+
+          // we already test this when getting the pull from pools
+          //expect(pool.roles.depositor, katya.accountId);
+
           expect(pool.roles.root, katya.accountId);
           expect(pool.roles.nominator, katya.accountId);
           expect(pool.roles.bouncer, katya.accountId);
@@ -85,6 +93,7 @@ void main() {
           // Check if the pool member is created correctly
           final poolMember =
               await kc2Service.getMembershipPool(katya.accountId);
+          expect(poolMember, isNotNull);
           expect(poolMember!.id, pool.id);
           expect(poolMember.points, BigInt.from(1000000));
 
@@ -148,7 +157,7 @@ void main() {
         String txHash = "";
 
         // Create pool callback
-        kc2Service.createCallback = (tx) async {
+        kc2Service.createPoolCallback = (tx) async {
           // Check if the tx failed
           if (tx.failedReason != null) {
             completer.complete(false);
@@ -175,7 +184,7 @@ void main() {
           kc2Service.subscribeToAccount(punch.accountId);
         };
 
-        kc2Service.joinCallback = (tx) async {
+        kc2Service.joinPoolCallback = (tx) async {
           // Check if the tx failed
           if (tx.failedReason != null) {
             completer.complete(false);
@@ -247,7 +256,7 @@ void main() {
         String txHash = "";
 
         // Create pool callback
-        kc2Service.createCallback = (tx) async {
+        kc2Service.createPoolCallback = (tx) async {
           // Check if the tx failed
           if (tx.failedReason != null) {
             completer.complete(false);
@@ -272,7 +281,7 @@ void main() {
               poolId, 20000000, katya.accountId);
         };
 
-        kc2Service.setCommissionCallback = (tx) async {
+        kc2Service.setPoolCommissionCallback = (tx) async {
           // Check if the tx failed
           if (tx.failedReason != null) {
             completer.complete(false);
@@ -343,7 +352,7 @@ void main() {
         String txHash = "";
 
         // Create pool callback
-        kc2Service.createCallback = (tx) async {
+        kc2Service.createPoolCallback = (tx) async {
           // Check if the tx failed
           if (tx.failedReason != null) {
             completer.complete(false);
@@ -367,7 +376,7 @@ void main() {
           txHash = await kc2Service.setPoolCommissionMax(poolId, 200000000);
         };
 
-        kc2Service.setCommissionMaxCallback = (tx) async {
+        kc2Service.setPoolCommissionMaxCallback = (tx) async {
           // Check if the tx failed
           if (tx.failedReason != null) {
             completer.complete(false);
@@ -437,7 +446,7 @@ void main() {
         String txHash = "";
 
         // Create pool callback
-        kc2Service.createCallback = (tx) async {
+        kc2Service.createPoolCallback = (tx) async {
           // Check if the tx failed
           if (tx.failedReason != null) {
             completer.complete(false);
@@ -466,7 +475,7 @@ void main() {
               poolId, commissionChangeRate);
         };
 
-        kc2Service.setCommissionChangeRateCallback = (tx) async {
+        kc2Service.setPoolCommissionChangeRateCallback = (tx) async {
           // Check if the tx failed
           if (tx.failedReason != null) {
             completer.complete(false);
@@ -549,7 +558,7 @@ void main() {
         String txHash = "";
 
         // Create pool callback
-        kc2Service.createCallback = (tx) async {
+        kc2Service.createPoolCallback = (tx) async {
           // Check if the tx failed
           if (tx.failedReason != null) {
             completer.complete(false);
@@ -581,7 +590,7 @@ void main() {
           );
         };
 
-        kc2Service.updateRolesCallback = (tx) async {
+        kc2Service.updatePoolRolesCallback = (tx) async {
           // Check if the tx failed
           if (tx.failedReason != null) {
             completer.complete(false);
@@ -664,7 +673,7 @@ void main() {
         String txHash = "";
 
         // Create pool callback
-        kc2Service.createCallback = (tx) async {
+        kc2Service.createPoolCallback = (tx) async {
           // Check if the tx failed
           if (tx.failedReason != null) {
             completer.complete(false);
@@ -696,7 +705,7 @@ void main() {
           );
         };
 
-        kc2Service.nominateCallback = (tx) async {
+        kc2Service.nominatePoolValidatorCallback = (tx) async {
           // Check if the tx failed
           if (tx.failedReason != null) {
             completer.complete(false);

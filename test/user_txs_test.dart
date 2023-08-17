@@ -155,64 +155,64 @@ void main() {
 
     test(
       'Get transaction by hash',
-          () async {
-            K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
+      () async {
+        K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
-            // Create a new identity for local user
-            IdentityInterface katya = Identity();
-            await katya.initNoStorage();
-            String katyaUserName =
+        // Create a new identity for local user
+        IdentityInterface katya = Identity();
+        await katya.initNoStorage();
+        String katyaUserName =
             "katya${katya.accountId.substring(0, 5)}".toLowerCase();
 
-            String katyaPhoneNumber = randomPhoneNumber;
+        String katyaPhoneNumber = randomPhoneNumber;
 
-            // Set katya as signer
-            kc2Service.setKeyring(katya.keyring);
-            debugPrint('Local user katya public address: ${katya.accountId}');
+        // Set katya as signer
+        kc2Service.setKeyring(katya.keyring);
+        debugPrint('Local user katya public address: ${katya.accountId}');
 
-            final completer = Completer<bool>();
-            String? txHash;
+        final completer = Completer<bool>();
+        String? txHash;
 
-            kc2Service.newUserCallback = (tx) async {
-              debugPrint('>> new user callback called');
-              if (tx.failedReason != null) {
-                completer.complete(false);
-                return;
-              }
+        kc2Service.newUserCallback = (tx) async {
+          debugPrint('>> new user callback called');
+          if (tx.failedReason != null) {
+            completer.complete(false);
+            return;
+          }
 
-              if (tx.hash != txHash) {
-                debugPrint('unexpected tx hash: ${tx.hash} ');
-                completer.complete(false);
-                return;
-              }
+          if (tx.hash != txHash) {
+            debugPrint('unexpected tx hash: ${tx.hash} ');
+            completer.complete(false);
+            return;
+          }
 
-              Transaction transaction = await kc2Service.getTransactionByHash(tx.hash);
+          Transaction transaction =
+              await kc2Service.getTransactionByHash(tx.hash);
 
-              expect(transaction.timestamp, tx.timestamp);
-              expect(transaction.from?.accountId, tx.accountId);
-              expect(transaction.blockNumber, tx.blockNumber.toInt());
-              expect(transaction.transactionIndex, tx.blockIndex);
+          expect(transaction.timestamp, tx.timestamp);
+          expect(transaction.from?.accountId, tx.accountId);
+          expect(transaction.blockNumber, tx.blockNumber.toInt());
+          expect(transaction.transactionIndex, tx.blockIndex);
 
-              completer.complete(true);
-            };
+          completer.complete(true);
+        };
 
-            await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
-            // subscribe to new account txs
-            kc2Service.subscribeToAccount(katya.accountId);
+        // subscribe to new account txs
+        kc2Service.subscribeToAccount(katya.accountId);
 
-            String? err;
-            // signup katya
-            (txHash, err) = await kc2Service.newUser(
-                katya.accountId, katyaUserName, katyaPhoneNumber);
+        String? err;
+        // signup katya
+        (txHash, err) = await kc2Service.newUser(
+            katya.accountId, katyaUserName, katyaPhoneNumber);
 
-            expect(txHash, isNotNull);
-            expect(err, isNull);
+        expect(txHash, isNotNull);
+        expect(err, isNull);
 
-            // wait for completer and verify test success
-            expect(await completer.future, equals(true));
-            expect(completer.isCompleted, isTrue);
-
+        // wait for completer and verify test success
+        expect(await completer.future, equals(true));
+        expect(completer.isCompleted, isTrue);
       },
       timeout: const Timeout(Duration(seconds: 280)),
     );
