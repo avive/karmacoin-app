@@ -44,7 +44,7 @@ class _KarmachainState extends State<Karmachain> {
     super.initState();
     Future.delayed(Duration.zero, () async {
       try {
-        String netName = await kc2Service.getNetId();
+        String netName = await kc2Service.getNetName();
         int genesisTime = await kc2Service.getGenesisTimestamp();
         BlockchainStats blockchainStats = await kc2Service.getBlockchainStats();
         String nodeInfo = await kc2Service.getNodeVersion();
