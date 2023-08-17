@@ -169,6 +169,9 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
     }
   }
 
+  /// @HolyGrease - is there an api to get the min pool amount to create one?
+  /// If not please add one... we need to check amount is above this min whnen creating...
+
   /// Create a new delegation pool.
   ///
   /// # Arguments
@@ -204,6 +207,9 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
       rethrow;
     }
   }
+
+  /// @HolyGrease - is there an api got info of all bonded validators that can be nominated?
+  /// if no - we need to have it so user sees options to nominate...
 
   /// Nominate on behalf of the pool.
   ///

@@ -143,12 +143,14 @@ class ConfigLogic {
       }
     }
 
+    // todo: fix me
+
     // Read last known fcm token for device
-    String? token =
-        await secureStorage.read(key: _pushTokenKey, aOptions: _aOptions);
-    if (token != null) {
-      fcmToken.value = token;
-    }
+    // String? token =
+    //     await secureStorage.read(key: _pushTokenKey, aOptions: _aOptions);
+    // if (token != null) {
+    //  fcmToken.value = token;
+    // }
 
     var displayKarmaMiningScreenData = await secureStorage.read(
         key: _karmaMiningScreenDisplayedKey, aOptions: _aOptions);

@@ -74,10 +74,10 @@ class KarmachainService extends ChainApiProvider
               42;
 
       // check network id from node matches the client network type intent
-      if (netId != configLogic.networkId.value) {
-        // TODO: deal with it so client knows about issue
-        throw 'Invalid network id returned by node. Expected ${configLogic.networkId.value}, got $netId';
-      }
+      //if (netId != configLogic.networkId.value) {
+      // TODO: deal with it so client knows about issue
+      //  throw 'Invalid network id returned by node. Expected ${configLogic.networkId.value}, got $netId';
+      //}
 
       decodedMetadata =
           MetadataDecoder.instance.decode(metadata.result.toString());

@@ -14,6 +14,10 @@ const Border kcOrangeBorder = Border(
   bottom: BorderSide(color: kcOrange, width: 2),
 );
 
+Text standardTextWidget(String text, BuildContext context) {
+  return Text(text, style: CupertinoTheme.of(context).textTheme.textStyle);
+}
+
 CupertinoSliverNavigationBar kcNavBar(context, String title) {
   return CupertinoSliverNavigationBar(
     largeTitle: Text(
