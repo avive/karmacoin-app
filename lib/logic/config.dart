@@ -44,7 +44,7 @@ class ConfigLogic {
     encryptedSharedPreferences: true,
   );
 
-  final String _pushTokenKey = "pushTokenKey";
+  // final String _pushTokenKey = "pushTokenKey";
   final String _karmaMiningScreenDisplayedKey = "karmaMiningScreenDisplayedKey";
 
   late final currentLocale = ValueNotifier<String?>(null);

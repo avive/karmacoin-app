@@ -67,6 +67,12 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
 
     phoneController =
         PhoneController(PhoneNumber(isoCode: code, nsn: defaultNumber));
+
+    if (defaultNumber.isNotEmpty) {
+      // set hash as default when we have set default number
+      appState.sendDestinationPhoneNumberHash.value =
+          kc2Service.getPhoneNumberHash(defaultNumber);
+    }
   }
 
   @override
