@@ -36,8 +36,7 @@ void _displayDeleteDataWarning(BuildContext context) {
     context: context,
     builder: (BuildContext context) => CupertinoAlertDialog(
       title: const Text('Delete App Data'),
-      content: const Text(
-          '\nAre you sure that you backed up your account, you want to delete all local account data and sign out?'),
+      content: const Text('\nDelete all local account data and sign out?'),
       actions: <CupertinoDialogAction>[
         CupertinoDialogAction(
           isDefaultAction: true,
@@ -92,9 +91,14 @@ void _displayDeleteAccountWarning(BuildContext context) {
               context.go(ScreenPaths.welcome);
             }
 
-            await kc2Service.deleteUser();
-            await kc2User.signout();
-            await kc2User.init();
+            try {
+              // submit delete account tx
+              await kc2Service.deleteUser();
+              await kc2User.signout();
+              await kc2User.init();
+            } catch (e) {
+              debugPrint('failed to delete account: $e');
+            }
           },
           child: const Text('Yes'),
         ),

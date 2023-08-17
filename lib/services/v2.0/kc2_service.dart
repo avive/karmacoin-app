@@ -354,9 +354,11 @@ mixin K2ServiceInterface implements ChainApiProvider {
       const call =
           MapEntry('Identity', MapEntry('delete_user', <String, dynamic>{}));
 
-      return await signAndSendTransaction(call);
-    } on PlatformException catch (e) {
-      debugPrint('Failed to delete user: ${e.details}');
+      String deleteAccountTxId = await signAndSendTransaction(call);
+      debugPrint('Account deletion tx submitted');
+      return deleteAccountTxId;
+    } catch (e) {
+      debugPrint('Failed to delete account: $e}');
       rethrow;
     }
   }
