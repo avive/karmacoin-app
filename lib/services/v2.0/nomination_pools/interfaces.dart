@@ -189,8 +189,11 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   /// so the caller needs at have at least `amount + existential_deposit`
   /// transferrable.
   ///
-  Future<String> create(
-      BigInt amount, String root, String nominator, String bouncer) async {
+  Future<String> createPool(
+      {required BigInt amount,
+      required String root,
+      required String nominator,
+      required String bouncer}) async {
     try {
       final call = MapEntry(
           'NominationPools',
@@ -218,7 +221,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   ///
   /// This directly forward the call to the staking pallet, on behalf of the
   /// pool bonded account.
-  Future<String> nominate(
+  Future<String> nominateForPool(
       PoolId poolId, List<String> validatorsAccountIds) async {
     try {
       final validators =
@@ -245,7 +248,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   ///
   /// This directly forward the call to the staking pallet, on behalf of the
   /// pool bonded account.
-  Future<String> chill(PoolId poolId) async {
+  Future<String> chillPool(PoolId poolId) async {
     try {
       final call = MapEntry(
           'NominationPools',
@@ -268,7 +271,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   /// It emits an event, notifying UIs of the role change. This event is quite
   /// relevant to most pool members and they should be informed of changes to
   /// pool roles.
-  Future<String> updateRoles(
+  Future<String> updatePoolRoles(
     PoolId poolId,
     MapEntry<ConfigOption, String?> root,
     MapEntry<ConfigOption, String?> nominator,
@@ -336,7 +339,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   /// - If a `null` is supplied to `commission` and `beneficiary`, existing
   ///   commission will be removed.
   /// - Both `commission` and `beneficiary` must be supplied or be `null`
-  Future<String> setCommission(
+  Future<String> setPoolCommission(
       PoolId poolId, int? commission, String? beneficiary) async {
     try {
       Option newCommission;
@@ -366,7 +369,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   /// - Initial max can be set to any `Perbill`, and only smaller values thereafter.
   /// - Current commission will be lowered in the event it is higher than a new max
   ///   commission.
-  Future<String> setCommissionMax(PoolId poolId, int maxCommission) async {
+  Future<String> setPoolCommissionMax(PoolId poolId, int maxCommission) async {
     try {
       final call = MapEntry(
           'NominationPools',
@@ -386,7 +389,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   ///
   /// Initial change rate is not bounded, whereas subsequent updates can only be more
   /// restrictive than the current.
-  Future<String> setCommissionChangeRate(
+  Future<String> setPoolCommissionChangeRate(
       PoolId poolId, CommissionChangeRate commissionChangeRate) async {
     try {
       final call = MapEntry(
@@ -411,7 +414,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   /// The dispatch origin of this call must be signed by the `root` role of the pool. Pending
   /// commission is paid out and added to total claimed commission`. Total pending commission
   /// is reset to zero. the current.
-  Future<String> claimCommission(PoolId poolId) async {
+  Future<String> claimPoolCommission(PoolId poolId) async {
     try {
       final call = MapEntry(
           'NominationPools',
@@ -429,7 +432,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   // RPC
 
   /// Returns the pending rewards for the member that the AccountId was given for.
-  Future<BigInt> pendingPayouts(String accountId) async {
+  Future<BigInt> pendingPoolPayouts(String accountId) async {
     try {
       return await callRpc('nominationPools_pendingPayouts', [accountId])
           .then((payout) => BigInt.parse(payout));
@@ -439,8 +442,9 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
     }
   }
 
-  /// Returns the equivalent balance of `points` for a given pool.
-  Future<BigInt> pointsToBalance(BigInt points) async {
+  /// Returns the equivalent balance of `points` for pools
+  /// @HolyGrease - it is for any pool not for a specific one - correct?
+  Future<BigInt> getPoolsPointsToBalance(BigInt points) async {
     try {
       return await callRpc(
               'nominationPools_pointsToBalance', [points.toString()])
@@ -452,7 +456,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   }
 
   /// Returns the equivalent points of `new_funds` for a given pool.
-  Future<BigInt> balanceToPoints(BigInt balance) async {
+  /// @HolyGrease - it is for any pool not for a specific one - correct?
+  Future<BigInt> getPoolsBalanceToPoints(BigInt balance) async {
     try {
       return await callRpc(
               'nominationPools_balanceToPoints', [balance.toString()])
@@ -478,7 +483,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   }
 
   /// Return nomination pallet configuration.
-  Future<NominationPoolsConfiguration> getConfiguration() async {
+  Future<NominationPoolsConfiguration> getPoolsConfiguration() async {
     try {
       return await callRpc('nominationPools_getConfiguration', [])
           .then((config) => NominationPoolsConfiguration.fromJson(config));
@@ -490,7 +495,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
 
   /// If account id is a member of any nomination pool returns pool id of this pool
   /// otherwise `null`
-  Future<PoolMember?> memberOf(String accountId) async {
+  Future<PoolMember?> getMembershipPool(String accountId) async {
     try {
       return await callRpc('nominationPools_memberOf', [accountId])
           .then((v) => PoolMember.fromJson(v));

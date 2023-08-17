@@ -28,7 +28,7 @@ void main() {
     // 3. Check that callback is called and pool is created
     // 4. Check that pool Katya is a member of the pool
     test(
-      'create a pool works',
+      'create a pool',
       () async {
         KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
         // Connect to the chain
@@ -83,7 +83,8 @@ void main() {
           expect(pool.state, PoolState.open);
 
           // Check if the pool member is created correctly
-          final poolMember = await kc2Service.memberOf(katya.accountId);
+          final poolMember =
+              await kc2Service.getMembershipPool(katya.accountId);
           expect(poolMember!.id, pool.id);
           expect(poolMember.points, BigInt.from(1000000));
 
@@ -93,11 +94,11 @@ void main() {
         kc2Service.subscribeToAccount(katya.accountId);
 
         // Create a pool
-        txHash = await kc2Service.create(
-          BigInt.from(1000000),
-          katya.accountId,
-          katya.accountId,
-          katya.accountId,
+        txHash = await kc2Service.createPool(
+          amount: BigInt.from(1000000),
+          root: katya.accountId,
+          nominator: katya.accountId,
+          bouncer: katya.accountId,
         );
 
         // Wait for completer and verify test success
@@ -113,7 +114,7 @@ void main() {
     // 3. Join the pool using Punch account
     // 4. Check that both Alice and Bob are members of the pool
     test(
-      'join to the pool works',
+      'join pool',
       () async {
         KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
         // Connect to the chain
@@ -189,10 +190,12 @@ void main() {
           }
 
           // Check if the pool member is created correctly
-          final alicePoolMember = await kc2Service.memberOf(katya.accountId);
+          final alicePoolMember =
+              await kc2Service.getMembershipPool(katya.accountId);
           expect(alicePoolMember!.id, tx.poolId);
           expect(alicePoolMember.points, BigInt.from(1000000));
-          final bobPoolMember = await kc2Service.memberOf(punch.accountId);
+          final bobPoolMember =
+              await kc2Service.getMembershipPool(punch.accountId);
           expect(bobPoolMember!.id, tx.poolId);
           expect(bobPoolMember.points, BigInt.from(1000000));
 
@@ -202,8 +205,11 @@ void main() {
         kc2Service.subscribeToAccount(katya.accountId);
 
         // Create a pool
-        txHash = await kc2Service.create(BigInt.from(1000000), katya.accountId,
-            katya.accountId, katya.accountId);
+        txHash = await kc2Service.createPool(
+            amount: BigInt.from(1000000),
+            root: katya.accountId,
+            nominator: katya.accountId,
+            bouncer: katya.accountId);
 
         // Wait for completer and verify test success
         expect(await completer.future, equals(true));
@@ -218,7 +224,7 @@ void main() {
     // 3. Set pool commission
     // 4. Check that commission is set correctly
     test(
-      'set commission for the pool works',
+      'set pool commission',
       () async {
         KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
         // Connect to the chain
@@ -262,8 +268,8 @@ void main() {
           final poolId = pool.id;
 
           // Set commission equal to 2%
-          txHash =
-              await kc2Service.setCommission(poolId, 20000000, katya.accountId);
+          txHash = await kc2Service.setPoolCommission(
+              poolId, 20000000, katya.accountId);
         };
 
         kc2Service.setCommissionCallback = (tx) async {
@@ -294,11 +300,11 @@ void main() {
         kc2Service.subscribeToAccount(katya.accountId);
 
         // Create a pool
-        txHash = await kc2Service.create(
-          BigInt.from(1000000),
-          katya.accountId,
-          katya.accountId,
-          katya.accountId,
+        txHash = await kc2Service.createPool(
+          amount: BigInt.from(1000000),
+          root: katya.accountId,
+          nominator: katya.accountId,
+          bouncer: katya.accountId,
         );
 
         // Wait for completer and verify test success
@@ -314,7 +320,7 @@ void main() {
     // 3. Set pool max commission
     // 4. Check that max commission is set correctly
     test(
-      'set commission max for the pool works',
+      'set pool max commission',
       () async {
         KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
         // Connect to the chain
@@ -358,7 +364,7 @@ void main() {
           final poolId = pool.id;
 
           // Set commission equal to 20%
-          txHash = await kc2Service.setCommissionMax(poolId, 200000000);
+          txHash = await kc2Service.setPoolCommissionMax(poolId, 200000000);
         };
 
         kc2Service.setCommissionMaxCallback = (tx) async {
@@ -388,11 +394,11 @@ void main() {
         kc2Service.subscribeToAccount(katya.accountId);
 
         // Create a pool
-        txHash = await kc2Service.create(
-          BigInt.from(1000000),
-          katya.accountId,
-          katya.accountId,
-          katya.accountId,
+        txHash = await kc2Service.createPool(
+          amount: BigInt.from(1000000),
+          root: katya.accountId,
+          nominator: katya.accountId,
+          bouncer: katya.accountId,
         );
 
         // Wait for completer and verify test success
@@ -408,7 +414,7 @@ void main() {
     // 3. Set pool commission change rate
     // 4. Check that commission change rate is set correctly
     test(
-      'set commission change rate for the pool works',
+      'set commission change rate',
       () async {
         KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
         // Connect to the chain
@@ -456,7 +462,7 @@ void main() {
             10000000,
             100,
           );
-          txHash = await kc2Service.setCommissionChangeRate(
+          txHash = await kc2Service.setPoolCommissionChangeRate(
               poolId, commissionChangeRate);
         };
 
@@ -488,11 +494,11 @@ void main() {
         kc2Service.subscribeToAccount(katya.accountId);
 
         // Create a pool
-        txHash = await kc2Service.create(
-          BigInt.from(1000000),
-          katya.accountId,
-          katya.accountId,
-          katya.accountId,
+        txHash = await kc2Service.createPool(
+          amount: BigInt.from(1000000),
+          root: katya.accountId,
+          nominator: katya.accountId,
+          bouncer: katya.accountId,
         );
 
         // Wait for completer and verify test success
@@ -509,7 +515,7 @@ void main() {
     //    nominator changed to Punch, bouncer removed
     // 4. Check that roles updated correctly
     test(
-      'update roles for the pool works',
+      'update roles',
       () async {
         KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
         // Connect to the chain
@@ -567,7 +573,7 @@ void main() {
           // root: stays the same (Katya)
           // nominator: changed to Punch
           // bouncer: removed
-          txHash = await kc2Service.updateRoles(
+          txHash = await kc2Service.updatePoolRoles(
             poolId,
             const MapEntry(ConfigOption.noop, null),
             MapEntry(ConfigOption.set, punch.accountId),
@@ -605,11 +611,11 @@ void main() {
         kc2Service.subscribeToAccount(katya.accountId);
 
         // Create a pool
-        txHash = await kc2Service.create(
-          BigInt.from(1000000),
-          katya.accountId,
-          katya.accountId,
-          katya.accountId,
+        txHash = await kc2Service.createPool(
+          amount: BigInt.from(1000000),
+          root: katya.accountId,
+          nominator: katya.accountId,
+          bouncer: katya.accountId,
         );
 
         // Wait for completer and verify test success
@@ -624,7 +630,7 @@ void main() {
     // 2. Create pool using Katya account
     // 3. Nominate validators using pool
     test(
-      'nominates works',
+      'nomination',
       () async {
         KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
         // Connect to the chain
@@ -684,7 +690,7 @@ void main() {
           // root: stays the same (Katya)
           // nominator: changed to Punch
           // bouncer: removed
-          txHash = await kc2Service.nominate(
+          txHash = await kc2Service.nominateForPool(
             poolId,
             validators.map((validator) => validator.accountId).toList(),
           );
@@ -719,11 +725,11 @@ void main() {
         kc2Service.subscribeToAccount(katya.accountId);
 
         // Create a pool
-        txHash = await kc2Service.create(
-          BigInt.from(1000000),
-          katya.accountId,
-          katya.accountId,
-          katya.accountId,
+        txHash = await kc2Service.createPool(
+          amount: BigInt.from(1000000),
+          root: katya.accountId,
+          nominator: katya.accountId,
+          bouncer: katya.accountId,
         );
 
         // Wait for completer and verify test success
