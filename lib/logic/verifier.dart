@@ -3,7 +3,6 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:grpc/grpc_or_grpcweb.dart';
 
 class Verifier {
-  // ignore: unused_field
   late VerifierServiceClient verifierServiceClient;
 
   Verifier() {

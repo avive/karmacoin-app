@@ -22,6 +22,9 @@ void main() {
       () => GetIt.I.get<KarmachainService>());
 
   group('nomination tests', () {
+    // TODO: add test when user joins a pool and pools nominates the devnet validator
+    // wait an era and verify pool gets rewarded and verify user can withdraw their reward
+
     // This test:
     // 1. Connects to the chain
     // 2. Create pool using Katya account
@@ -83,7 +86,7 @@ void main() {
           expect(pool.points, BigInt.from(1000000));
 
           // we already test this when getting the pull from pools
-          //expect(pool.roles.depositor, katya.accountId);
+          // expect(pool.roles.depositor, katya.accountId);
 
           expect(pool.roles.root, katya.accountId);
           expect(pool.roles.nominator, katya.accountId);
@@ -140,8 +143,6 @@ void main() {
         String punchUserName = "Punch${katya.accountId.substring(0, 5)}";
         String punchPhoneNumber = randomPhoneNumber;
 
-        // Assume sign up flow works successfully, just wait to tx complete,
-        // sign up both Katya and Punch
         kc2Service.setKeyring(katya.keyring);
         await kc2Service.newUser(
             katya.accountId, katyaUserName, katyaPhoneNumber);
@@ -152,7 +153,6 @@ void main() {
 
         kc2Service.setKeyring(katya.keyring);
 
-        // Test utils
         final completer = Completer<bool>();
         String txHash = "";
 

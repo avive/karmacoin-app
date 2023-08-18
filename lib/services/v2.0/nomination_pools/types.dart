@@ -17,7 +17,7 @@ class PoolMember {
   /// The identifier of the pool to which `who` belongs.
   PoolId id;
 
-  /// The quantity of points this member has in the bonded pool or in a sub pool if
+  /// The number of points this member has in the bonded pool or in a sub pool if
   /// `Self::unbonding_era` is some.
   BigInt points;
 
@@ -91,6 +91,19 @@ enum PoolState {
   destroying,
 }
 
+extension StringValue on PoolState {
+  String get value {
+    switch (this) {
+      case PoolState.open:
+        return "open";
+      case PoolState.blocked:
+        return "blocked";
+      case PoolState.destroying:
+        return "destroying";
+    }
+  }
+}
+
 /// Pool administration roles.
 ///
 /// Any pool has a depositor, which can never change. But, all the other roles are optional, and
@@ -122,7 +135,7 @@ class PoolRoles {
 
 /// Pool commission change rate preferences.
 ///
-/// The pool root is able to set a commission change rate for their pool. A commission change rate consists of 2 values; (1) the maximum allowed commission change, and (2) the minimum amount of blocks that must elapse before commission updates are allowed again.
+/// The pool root is able to set a commission change rate for their pool. A commission change rate consists of 2 values; (1) the maximum allowed commission change, and (2) the minimum number of blocks that must elapse before commission updates are allowed again.
 ///
 /// Commission change rates are not applied to decreases in commission.
 class CommissionChangeRate {
