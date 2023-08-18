@@ -342,6 +342,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   /// - If a `null` is supplied to `commission` and `beneficiary`, existing
   ///   commission will be removed.
   /// - Both `commission` and `beneficiary` must be supplied or be `null`
+  /// - commision - [0,...,1B]
   Future<String> setPoolCommission(
       PoolId poolId, int? commission, String? beneficiary) async {
     try {

@@ -165,11 +165,11 @@ class Commission {
   /// The account commission is paid to
   String? beneficiary;
 
-  /// Optional commission rate of the pool.
+  /// Optional commission rate of the pool. [0,...,1B]
   int? current;
 
   /// Optional maximum commission that can be set by the pool `root`. Once set, this value can
-  /// only be updated to a decreased value.
+  /// only be updated to a decreased value. [0,...,1B]
   int? max;
 
   /// Optional configuration around how often commission can be updated, and when the last
