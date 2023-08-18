@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/logic/identity.dart';
 import 'package:karma_coin/logic/identity_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2.dart';
@@ -83,7 +84,7 @@ void main() {
           expect(pool.commission.changeRate, null);
           expect(pool.commission.throttleFrom, null);
           expect(pool.memberCounter, 1);
-          expect(pool.points, BigInt.from(1000000));
+          expect(pool.points, GenesisConfig.kCentsPerCoinBigInt);
 
           // we already test this when getting the pull from pools
           // expect(pool.roles.depositor, katya.accountId);
@@ -107,7 +108,7 @@ void main() {
 
         // Create a pool
         txHash = await kc2Service.createPool(
-          amount: BigInt.from(1000000),
+          amount: GenesisConfig.kCentsPerCoinBigInt,
           root: katya.accountId,
           nominator: katya.accountId,
           bouncer: katya.accountId,
@@ -202,7 +203,7 @@ void main() {
           final alicePoolMember =
               await kc2Service.getMembershipPool(katya.accountId);
           expect(alicePoolMember!.id, tx.poolId);
-          expect(alicePoolMember.points, BigInt.from(1000000));
+          expect(alicePoolMember.points, GenesisConfig.kCentsPerCoinBigInt);
           final bobPoolMember =
               await kc2Service.getMembershipPool(punch.accountId);
           expect(bobPoolMember!.id, tx.poolId);
@@ -219,7 +220,7 @@ void main() {
 
         // Create a pool
         txHash = await kc2Service.createPool(
-            amount: BigInt.from(1000000),
+            amount: GenesisConfig.kCentsPerCoinBigInt,
             root: katya.accountId,
             nominator: katya.accountId,
             bouncer: katya.accountId);
@@ -314,7 +315,7 @@ void main() {
 
         // Create a pool
         txHash = await kc2Service.createPool(
-          amount: BigInt.from(1000000),
+          amount: GenesisConfig.kCentsPerCoinBigInt,
           root: katya.accountId,
           nominator: katya.accountId,
           bouncer: katya.accountId,
@@ -408,7 +409,7 @@ void main() {
 
         // Create a pool
         txHash = await kc2Service.createPool(
-          amount: BigInt.from(1000000),
+          amount: GenesisConfig.kCentsPerCoinBigInt,
           root: katya.accountId,
           nominator: katya.accountId,
           bouncer: katya.accountId,
@@ -508,7 +509,7 @@ void main() {
 
         // Create a pool
         txHash = await kc2Service.createPool(
-          amount: BigInt.from(1000000),
+          amount: GenesisConfig.kCentsPerCoinBigInt,
           root: katya.accountId,
           nominator: katya.accountId,
           bouncer: katya.accountId,
@@ -625,7 +626,7 @@ void main() {
 
         // Create a pool
         txHash = await kc2Service.createPool(
-          amount: BigInt.from(1000000),
+          amount: GenesisConfig.kCentsPerCoinBigInt,
           root: katya.accountId,
           nominator: katya.accountId,
           bouncer: katya.accountId,

@@ -8,8 +8,11 @@ class CommunityDesignTheme {
   CommunityDesignTheme(this.backgroundColor, this.textColor);
 }
 
+
 class GenesisConfig {
   static const kCentsPerCoin = 1000000;
+
+  static final kCentsPerCoinBigInt = BigInt.from(kCentsPerCoin);
 
   /// Karmachain netId. 1 is testnet 1
   static const netId = 1;

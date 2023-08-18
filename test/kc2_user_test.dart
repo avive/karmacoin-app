@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/logic/user.dart';
 import 'package:karma_coin/logic/user_interface.dart';
@@ -72,7 +73,7 @@ void main() {
               expect(userInfo.getScore(0, 1), 1);
 
               // signup reward
-              expect(userInfo.balance, BigInt.from(10000000));
+              expect(userInfo.balance, GenesisConfig.kCentsPerCoinBigInt);
 
               await katya.signout();
               completer.complete(true);
@@ -479,7 +480,7 @@ void main() {
                   .getUserInfoByAccountId(katya.identity.accountId);
 
               // katya's signup reward
-              expect(katyaInfo!.balance, BigInt.from(10000000));
+              expect(katyaInfo!.balance, GenesisConfig.kCentsPerCoinBigInt);
 
               debugPrint('Deleting katya user and waiting for 1 block...');
               await kc2Service.deleteUser();

@@ -1,4 +1,5 @@
 import 'package:countup/countup.dart';
+import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
@@ -23,8 +24,6 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
   late int referralReward;
   late int karmaReward;
 
-  static final _oneKcInCents = BigInt.from(1000000);
-
   @override
   initState() {
     super.initState();
@@ -37,16 +36,16 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
         setState(() {
           blockchainStats = stats;
           signupReward = (blockchainStats!.signupRewardsCurrentRewardAmount ~/
-                  _oneKcInCents)
+                  GenesisConfig.kCentsPerCoinBigInt)
               .toInt();
 
           referralReward =
               (blockchainStats!.referralRewardsCurrentRewardAmount ~/
-                      _oneKcInCents)
+                      GenesisConfig.kCentsPerCoinBigInt)
                   .toInt();
 
           karmaReward = (blockchainStats!.karmaRewardsCurrentRewardAmount ~/
-                  _oneKcInCents)
+                  GenesisConfig.kCentsPerCoinBigInt)
               .toInt();
         });
       } catch (e) {

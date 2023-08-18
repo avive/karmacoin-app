@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:karma_coin/ui/widgets/animated_background.dart';
@@ -275,7 +276,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     // TODO: properly handle a very large balance
     double dispValue = balance.toDouble();
     String labelText = 'KARMA CENTS';
-    if (balance >= BigInt.from(1000000)) {
+    if (balance >= GenesisConfig.kCentsPerCoinBigInt) {
       dispValue /= 1000000.0;
       labelText = 'KARMA COINS';
     }
