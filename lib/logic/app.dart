@@ -68,8 +68,6 @@ class KC2AppLogic with KC2AppLogicInterface {
     GetIt.I.registerLazySingleton<KC2AppLogic>(() => KC2AppLogic());
     GetIt.I.registerLazySingleton<ConfigLogic>(() => ConfigLogic());
 
-    //GetIt.I.registerLazySingleton<AccountLogicInterface>(() => AccountLogic());
-
     GetIt.I.registerLazySingleton<AuthLogicInterface>(() => AuthLogic());
     GetIt.I.registerLazySingleton<KC2UserInteface>(() => KC2User());
     
