@@ -27,16 +27,17 @@ class ConfigLogic {
   /// Set to true to work against localhost servers. Otherwise production servers are used
   final bool apiLocalMode = true;
 
-  // dev mode has some text field input shortcuts to save time in dev
+  /// dev mode has some text field input shortcuts to save time in dev
   final bool devMode = true;
 
-  // Defaults to testnet. Change this if user specifies to change between testnet and mainnet. and call init() again to configure connection to mainnet and vice versa when moving from mainnet to testnet...
+  /// Defaults to testnet. Change this if user specifies to change between testnet and mainnet. and call init() again to configure connection to mainnet and vice versa when moving from mainnet to testnet... In production app once mainnent is live, the default should be mainnet
   KCNetworkType networkId = KCNetworkType.testnet;
 
-  // Skip whatsapp verification for local testing
+  /// Skip whatsapp verification for local testing. kc2Api should use the bypass token
+  /// obtain from local config file to bypass whatsapp verification.
   final bool skipWhatsappVerification = true;
 
-  // check internet connections and show error messages
+  /// check internet connections and show error messages
   final bool enableInternetConnectionChecking = false;
 
   final secureStorage = const FlutterSecureStorage();
@@ -44,7 +45,6 @@ class ConfigLogic {
     encryptedSharedPreferences: true,
   );
 
-  // final String _pushTokenKey = "pushTokenKey";
   final String _karmaMiningScreenDisplayedKey = "karmaMiningScreenDisplayedKey";
 
   late final currentLocale = ValueNotifier<String?>(null);
@@ -93,7 +93,7 @@ class ConfigLogic {
     karmaMiningScreenDisplayed.value = value;
   }
 
-  /// Call this everytime network is changed from the ui. e.g. switch between mainnet to testnet...
+  /// Call this everytime network is changed from the ui. e.g. a switch between mainnet to testnet...
   Future<void> init() async {
     if (apiLocalMode) {
       // note: we default to testnet in local mode.
@@ -111,7 +111,7 @@ class ConfigLogic {
       }
 
       apiHostPort.value = 9944;
-      verifierHostPort.value = 9944;
+      verifierHostPort.value = 8080;
       apiProtocol.value = 'ws';
 
       verifierSecureConnection.value = false;
