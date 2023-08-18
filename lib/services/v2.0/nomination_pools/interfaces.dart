@@ -472,6 +472,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   }
 
   /// Returns list of nomination pools.
+  /// @holyGrease - are only open pools returned or all of them?
   Future<List<Pool>> getPools() async {
     try {
       final pools = await callRpc('nominationPools_getPools', []).then(
