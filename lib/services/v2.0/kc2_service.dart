@@ -177,6 +177,8 @@ mixin K2ServiceInterface implements ChainApiProvider {
   }
 
   /// Fetch transaction by transaction hash
+  /// TODO: @holygrease this should return a typed KC2Tx and not just a raw
+  /// Transaction which is useless for client.
   Future<Transaction> getTransactionByHash(String txHash) async {
     try {
       Map<String, dynamic> result =

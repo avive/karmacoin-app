@@ -403,7 +403,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
       FontWeight titleWeight = FontWeight.w400;
       String detailsLabel =
           incoming ? 'From · ${tx.fromUserName}' : 'To · ${tx.toUserName}';
-      detailsLabel += '· ${tx.timeAgo}';
+      detailsLabel += ' · ${tx.timeAgo}';
 
       return CupertinoListTile(
         onTap: () {

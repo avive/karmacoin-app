@@ -30,6 +30,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
   void initState() {
     super.initState();
     // TODO: if tx is null - fetch it from kc2 api once it is available
+    // we need kc2Service.getTransactionByHash() to return typed txs
     if (widget.tx == null) {
       throw 'For now - tx must be passed in via router to widget';
     }
