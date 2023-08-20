@@ -21,7 +21,7 @@ class UserDetailsScreen extends StatefulWidget {
 }
 
 class _UserDetailsScreenState extends State<UserDetailsScreen> {
-  late KC2UserInfo? user  ;
+  late KC2UserInfo? user;
   late bool isLocal = false;
   late final String? phoneNumber = null;
   late bool userNotFound = false;
@@ -192,6 +192,33 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
         trailing: const Icon(CupertinoIcons.share),
         onTap: () async {
           await Clipboard.setData(ClipboardData(text: u.accountId));
+        },
+      ),
+    );
+
+    techSectionTiles.add(
+      CupertinoListTile.notched(
+        padding:
+            const EdgeInsets.only(top: 12, bottom: 12, left: 12, right: 14),
+        title: Text('Account Id',
+            style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 6, right: 12),
+          child: Text(
+            maxLines: 3,
+            u.phoneNumberHash,
+            style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                  TextStyle(
+                      fontSize: 16,
+                      color:
+                          CupertinoTheme.of(context).textTheme.textStyle.color),
+                ),
+          ),
+        ),
+        leading: const Icon(CupertinoIcons.creditcard, size: 28),
+        trailing: const Icon(CupertinoIcons.share),
+        onTap: () async {
+          await Clipboard.setData(ClipboardData(text: u.phoneNumberHash));
         },
       ),
     );
