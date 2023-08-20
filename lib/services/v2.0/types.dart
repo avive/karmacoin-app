@@ -148,7 +148,15 @@ enum VerificationResult {
   unverified,
   missingData,
   invalidSignature,
-  accountMismatch,
+  accountMismatch;
+
+  const VerificationResult();
+
+  factory VerificationResult.fromProto(String result) {
+    return values.firstWhere(
+        (e) => e.toString().replaceFirst('VerificationResult.', '').toLowerCase() == result
+            .replaceFirst('VERIFICATION_RESULT_', '').toLowerCase());
+  }
 }
 
 class VerificationEvidence {
@@ -159,8 +167,14 @@ class VerificationEvidence {
   String? username;
   String? phoneNumberHash;
 
-  VerificationEvidence(this.verificationResult, this.verifierAccountId,
-      this.signature, this.accountId, this.username, this.phoneNumberHash);
+  VerificationEvidence({
+    required this.verificationResult,
+    this.verifierAccountId,
+    this.signature,
+    this.accountId,
+    this.username,
+    this.phoneNumberHash,
+  });
 
   VerificationEvidence.fromJson(Map<String, dynamic> v)
     : verificationResult = VerificationResult.values.firstWhere((e) => e.toString().toLowerCase() == 'VerificationResult.${v['verification_result']}'.toLowerCase()),

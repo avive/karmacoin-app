@@ -1,21 +1,22 @@
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/logic/keyring.dart';
 import 'package:karma_coin/services/api/verifier.pb.dart' as vt;
 import 'package:karma_coin/services/api/types.pb.dart';
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 
 /// An extension class over vt.VerifyNumberRequest to support signing and verification
 class VerifyNumberRequest {
-  late final vt.VerifyNumberRequestEx request;
-  final vt.VerifyNumberRequestDataEx data;
+  late final vt.VerifyNumberRequest request;
+  final vt.VerifyNumberRequestData data;
 
   VerifyNumberRequest(this.data) {
-    request = vt.VerifyNumberRequestEx();
+    request = vt.VerifyNumberRequest();
     request.data = data.writeToBuffer();
   }
 
-  void sign(ed.PrivateKey privateKey,
+  void sign(KC2KeyRing keyring,
       {keyScheme = KeyScheme.KEY_SCHEME_ED25519}) {
-    Uint8List signature = ed.sign(privateKey, Uint8List.fromList(request.data));
+    Uint8List signature = keyring.sign(Uint8List.fromList(request.data));
     request.signature = signature.toList();
   }
 
