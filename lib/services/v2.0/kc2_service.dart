@@ -140,8 +140,7 @@ mixin K2ServiceInterface implements ChainApiProvider {
     }
   }
 
-  /// Fetch chain network id like ('testnet', 'mainnet', etc)
-  Future<String> getNetId() async {
+  Future<String> getNetName() async {
     try {
       return await callRpc('chain_getNetworkId', []);
     } on PlatformException catch (e) {

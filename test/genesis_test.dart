@@ -25,7 +25,7 @@ void main() {
         // Connect to the chain
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
-        String netId = await kc2Service.getNetId();
+        String netId = await kc2Service.getNetName();
 
         expect(netId, 'dev');
       },
