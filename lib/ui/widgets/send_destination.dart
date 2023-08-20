@@ -35,7 +35,6 @@ class _SendDestinationState extends State<SendDestination> {
     _accountTextController = TextEditingController();
 
     appState.sendDestination.value = Destination.phoneNumber;
-    appState.sendDestinationPhoneNumberHash.value = '';
 
     // appreciate from a user profile page
     if (appState.sendDestinationUser.value != null) {

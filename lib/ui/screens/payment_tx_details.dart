@@ -143,6 +143,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
     return tiles;
   }
 
+  /// Get tile for a simple count transfer tx
   List<CupertinoListTile> _getTransferTiles(
       BuildContext context, KC2TransferTxV1 tx) {
     List<CupertinoListTile> tiles = [];
