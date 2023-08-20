@@ -38,6 +38,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
 
+    debugPrint('Profile page init...');
+
     Future.delayed(Duration.zero, () async {
       bool isConnected = await PlatformInfo.isConnected();
       if (!isConnected) {
@@ -66,6 +68,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         setState(() {
           if (info != null) {
             userInfo = info;
+            userNotFound = false;
           } else {
             userNotFound = true;
           }
@@ -125,7 +128,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 20),
             Text('User not found.',
                 style: CupertinoTheme.of(context).textTheme.textStyle),
-            const TraitsScoresWheel(null, 0),
           ]);
     }
 
