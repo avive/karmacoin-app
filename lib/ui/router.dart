@@ -1,6 +1,5 @@
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
-import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:karma_coin/ui/screens/about.dart';
 import 'package:karma_coin/ui/screens/backup_account.dart';
 import 'package:karma_coin/ui/screens/community_home.dart';
@@ -70,7 +69,7 @@ class ScreenPaths {
   static String actions = '/actions';
 
   /// an account screen
-  static String account = '/account';
+  static String account = '/account/:accountId';
 
   /// User's appreciation (sent and received)
   static String appreciations = '/appreciations';
@@ -270,13 +269,8 @@ final GoRouter appRouter = GoRouter(
         name: ScreenNames.account,
         path: ScreenPaths.account,
         builder: (BuildContext context, GoRouterState state) {
-          if (state.extra != null) {
-            KC2UserInfo user = state.extra as KC2UserInfo;
-            return UserDetailsScreen(Key(user.userName), user);
-          }
-
-          // local user
-          return UserDetailsScreen(Key(kc2User.userInfo.value!.userName), null);
+          String? accountId = state.params['accountId'];
+          return UserDetailsScreen(accountId: accountId!);
         }),
     GoRoute(
         name: ScreenNames.securityWords,

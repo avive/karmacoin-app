@@ -62,9 +62,9 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
             Text(title, style: CupertinoTheme.of(context).textTheme.textStyle),
         subtitle: Text(address),
         leading: icon,
-        trailing: const Icon(CupertinoIcons.share, size: 28),
         onTap: () {
-          context.push(ScreenPaths.account, extra: address);
+          context
+              .pushNamed(ScreenNames.account, params: {'accountId': address});
         });
   }
 

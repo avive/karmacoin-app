@@ -132,7 +132,8 @@ class _ActionsScreenState extends State<ActionsScreen> {
             title: const Text('Account Details'),
             leading: const Icon(CupertinoIcons.person, size: 28),
             trailing: const CupertinoListTileChevron(),
-            onTap: () => context.push(ScreenPaths.account),
+            onTap: () => context.pushNamed(ScreenNames.account,
+                params: {'accountId': kc2User.identity.accountId}),
           ),
           CupertinoListTile.notched(
             title: const Text('Public Profile'),

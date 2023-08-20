@@ -285,7 +285,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       onTap: () async {
         debugPrint('Tapped karma coin');
         if (!context.mounted) return;
-        context.push(ScreenPaths.account);
+        context.pushNamed(ScreenNames.account, params: {
+          'accountId': kc2User.identity.accountId,
+        });
       },
       child: Container(
         height: coinWidth,

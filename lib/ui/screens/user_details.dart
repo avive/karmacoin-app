@@ -11,35 +11,86 @@ import 'package:random_avatar/random_avatar.dart';
 /// Display user details for provided user or for local user
 class UserDetailsScreen extends StatefulWidget {
   // 0x212...
-  late final KC2UserInfo user;
-  late final bool isLocal;
-  late final String? phoneNumber;
+  final String accountId;
 
   /// Set user to display details for or null for local user
-  UserDetailsScreen(Key? key, KC2UserInfo? aUser) : super(key: key) {
-    if (aUser == null) {
-      user = kc2User.userInfo.value!;
-      phoneNumber = kc2User.identity.phoneNumber;
-      isLocal = true;
-    } else {
-      user = aUser;
-      isLocal = false;
-    }
-  }
+  const UserDetailsScreen({super.key, required this.accountId});
 
   @override
   State<UserDetailsScreen> createState() => _UserDetailsScreenState();
 }
 
 class _UserDetailsScreenState extends State<UserDetailsScreen> {
+  late KC2UserInfo? user = null;
+  late bool isLocal = false;
+  late final String? phoneNumber = null;
+  late bool userNotFound = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Create anonymous function:
+    () async {
+      KC2UserInfo? u;
+      String? phoneNumber;
+      bool notFound = false;
+      bool local = true;
+
+      if (kc2User.identity.accountId != widget.accountId) {
+        u = await kc2Service.getUserInfoByAccountId(widget.accountId);
+        if (u == null) {
+          notFound = true;
+        }
+        local = false;
+      } else {
+        u = kc2User.userInfo.value;
+        phoneNumber = kc2User.identity.phoneNumber;
+        if (u == null) {
+          notFound = true;
+        }
+        local = true;
+      }
+      setState(() {
+        user = u;
+        isLocal = local;
+        notFound = notFound;
+        phoneNumber = phoneNumber;
+      });
+    }();
+  }
+
+  Widget _getBody(BuildContext context) {
+    if (user == null) {
+      if (userNotFound) {
+        return Padding(
+            padding: const EdgeInsets.only(top: 12, left: 12),
+            child: Text('User not found',
+                style: CupertinoTheme.of(context).textTheme.textStyle));
+      } else {
+        return const Padding(
+            padding: EdgeInsets.only(top: 12, left: 12),
+            child: CupertinoActivityIndicator());
+      }
+    }
+
+    return ListView(
+      padding: EdgeInsets.zero,
+      shrinkWrap: true,
+      primary: true,
+      children: _getUserSections(context, user!),
+    );
+  }
+
   /// Return the list secionts
-  List<CupertinoListSection> _getSections(BuildContext context) {
+  List<CupertinoListSection> _getUserSections(
+      BuildContext context, KC2UserInfo u) {
     List<CupertinoListTile> tiles = [];
     List<CupertinoListTile> techSectionTiles = [];
 
     Widget pict = Padding(
       padding: const EdgeInsets.only(),
-      child: RandomAvatar(widget.user.userName, height: 30, width: 30),
+      child: RandomAvatar(u.userName, height: 30, width: 30),
     );
 
     tiles.add(
@@ -55,7 +106,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
         title: Text('Karma Score',
             style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
         leading: const Icon(CupertinoIcons.circle, size: 28),
-        trailing: Text(widget.user.karmaScore.format(),
+        trailing: Text(u.karmaScore.format(),
             style: CupertinoTheme.of(context).textTheme.textStyle),
       ),
     );
@@ -65,13 +116,12 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
         padding: const EdgeInsets.only(top: 12, bottom: 12, left: 12),
         title: Text('Balance',
             style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
-
         leading: const Icon(CupertinoIcons.money_dollar, size: 28),
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 2),
           child: Text(
               KarmaCoinAmountFormatter.format(
-                widget.user.balance,
+                u.balance,
               ),
               maxLines: 3,
               style: CupertinoTheme.of(context).textTheme.textStyle),
@@ -79,8 +129,8 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
       ),
     );
 
-    if (widget.phoneNumber != null) {
-      String numberDisplay = '+${widget.phoneNumber!.formatPhoneNumber()}';
+    if (phoneNumber != null) {
+      String numberDisplay = '+${phoneNumber!.formatPhoneNumber()}';
 
       tiles.add(
         CupertinoListTile.notched(
@@ -97,8 +147,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
       );
     }
 
-    String uri =
-        Uri.encodeFull('https://app.karmaco.in/#/p/${widget.user.userName}');
+    String uri = Uri.encodeFull('https://app.karmaco.in/#/p/${u.userName}');
 
     tiles.add(
       CupertinoListTile.notched(
@@ -118,7 +167,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
       ),
     );
 
-    debugPrint('Address: ${widget.user.accountId}');
+    debugPrint('Address: ${u.accountId}');
 
     techSectionTiles.add(
       CupertinoListTile.notched(
@@ -130,7 +179,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
           padding: const EdgeInsets.only(top: 6, right: 12),
           child: Text(
             maxLines: 3,
-            widget.user.accountId,
+            u.accountId,
             style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                   TextStyle(
                       fontSize: 16,
@@ -142,7 +191,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
         leading: const Icon(CupertinoIcons.checkmark_seal, size: 28),
         trailing: const Icon(CupertinoIcons.share),
         onTap: () async {
-          await Clipboard.setData(ClipboardData(text: widget.user.accountId));
+          await Clipboard.setData(ClipboardData(text: u.accountId));
         },
       ),
     );
@@ -156,7 +205,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 3),
           child: Text(
-            KarmaCoinAmountFormatter.formatKCents(widget.user.balance),
+            KarmaCoinAmountFormatter.formatKCents(u.balance),
             maxLines: 2,
             style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                   TextStyle(
@@ -176,14 +225,14 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
               const EdgeInsets.only(top: 12, bottom: 12, left: 12, right: 14),
           title: Text('Transactions',
               style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
-          trailing: Text(widget.user.nonce.format(),
+          trailing: Text(u.nonce.format(),
               style: CupertinoTheme.of(context).textTheme.textStyle),
           leading: const Icon(CupertinoIcons.number, size: 28)),
     );
 
     List<CupertinoListTile> karmaTiles = [];
 
-    for (TraitScore score in widget.user.getScores(0)) {
+    for (TraitScore score in u.getScores(0)) {
       PersonalityTrait trait = GenesisConfig.personalityTraits[score.traitId];
 
       karmaTiles.add(
@@ -250,15 +299,26 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
 
   @override
   build(BuildContext context) {
-    Row row = Row(children: [
-      RandomAvatar(widget.user.userName, height: 30, width: 30),
-      const SizedBox(width: 8),
-      Text(
-        widget.user.userName,
+    List<Widget> children = [];
+    if (user != null) {
+      children.add((RandomAvatar(user!.userName, height: 30, width: 30)));
+      children.add(const SizedBox(width: 8));
+      children.add(Text(
+        user!.userName,
         style: getNavBarTitleTextStyle(context),
         textAlign: TextAlign.left,
-      ),
-    ]);
+      ));
+    } else {
+      children.add(Text(
+        '',
+        style: getNavBarTitleTextStyle(context),
+        textAlign: TextAlign.left,
+      ));
+    }
+
+    Row titleWidget = Row(
+      children: children,
+    );
 
     /*
     Widget trailingWidget = Container();
@@ -278,16 +338,12 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
       child: CupertinoPageScaffold(
         child: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-            return <Widget>[kcNavBarWidget(context, row)];
+            return <Widget>[kcNavBarWidget(context, titleWidget)];
           },
           body: MediaQuery.removePadding(
             context: context,
             removeTop: false,
-            child: ListView(
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                primary: true,
-                children: _getSections(context)),
+            child: _getBody(context),
           ),
         ),
       ),
