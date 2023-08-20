@@ -4,6 +4,7 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
+import 'package:karma_coin/ui/widgets/users_browser.dart';
 import 'package:status_alert/status_alert.dart';
 import 'package:substrate_metadata_fixed/models/models.dart';
 import 'package:time_ago_provider/time_ago_provider.dart' as time_ago;
@@ -83,7 +84,7 @@ class _KarmachainState extends State<Karmachain> {
         child: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
-              kcNavBar(context, 'Karmachain'),
+              kcNavBar(context, 'Karmachain', enableBackButton: false),
             ];
           },
           body: MediaQuery.removePadding(
@@ -142,7 +143,11 @@ class _KarmachainState extends State<Karmachain> {
     tiles.add(
       CupertinoListTile.notched(
           title: const Text('Network'),
-          leading: const FaIcon(FontAwesomeIcons.networkWired, size: 20),
+          leading: const Icon(
+            CupertinoIcons.circle_fill,
+            color: CupertinoColors.activeGreen,
+            size: 20,
+          ),
           trailing:
               Text('Karmachain 2.0 ${networkType.name}', style: textStyle)),
     );
@@ -157,11 +162,13 @@ class _KarmachainState extends State<Karmachain> {
       ),
     );
 
+    final String blocks = stats!.tipHeight.format();
+
     tiles.add(
       CupertinoListTile.notched(
         title: const Text('Blocks'),
         leading: const FaIcon(FontAwesomeIcons.link, size: 20),
-        trailing: Text(stats!.tipHeight.format(), style: textStyle),
+        trailing: Text(blocks, style: textStyle),
       ),
     );
 
@@ -181,10 +188,14 @@ class _KarmachainState extends State<Karmachain> {
 
     tiles.add(
       CupertinoListTile.notched(
-        title: const Text('Users'),
-        leading: const FaIcon(FontAwesomeIcons.users, size: 20),
-        trailing: Text(stats!.usersCount.format(), style: textStyle),
-      ),
+          title: const Text('Users'),
+          leading: const FaIcon(FontAwesomeIcons.users, size: 20),
+          trailing: Text(stats!.usersCount.format(), style: textStyle),
+          onTap: () => Navigator.of(context).push(CupertinoPageRoute(
+              fullscreenDialog: true,
+              builder: ((context) => KarmaCoinUserSelector(
+                  communityId: 0,
+                  contactSelectedCallback: contactSelectedCallback))))),
     );
 
     tiles.add(
@@ -324,5 +335,11 @@ class _KarmachainState extends State<Karmachain> {
             children: tiles,
           ),
         ]);
+  }
+
+  void contactSelectedCallback(Contact contact) {
+    // todo: push user account page...
+    context.pushNamed(ScreenNames.account,
+        params: {'accountId': contact.accountId});
   }
 }

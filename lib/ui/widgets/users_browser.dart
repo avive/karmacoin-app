@@ -38,8 +38,8 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
   late TextEditingController textController;
   // limit per request
   final limit = 30;
-  final localUserName = kc2User.userInfo.value!.userName;
-  final localUserPhoneNumberHash = kc2User.userInfo.value!.phoneNumberHash;
+  final localUserName = kc2User.userInfo.value?.userName;
+  final localUserPhoneNumberHash = kc2User.userInfo.value?.phoneNumberHash;
   FetchStatus featchStatus = FetchStatus.idle;
   late String? lastPrefix;
   final ScrollController scrollController = ScrollController();
@@ -350,7 +350,7 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
       ),
       leading: RandomAvatar(displayName, height: 50, width: 50),
       subtitle: _getAppreciationsStrip(context, contact),
-      onTap: widget.enableSelection
+      onTap: widget.enableSelection && widget.contactSelectedCallback != null
           ? () {
               widget.contactSelectedCallback?.call(contact);
               context.pop();

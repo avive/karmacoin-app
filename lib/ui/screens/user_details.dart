@@ -21,7 +21,7 @@ class UserDetailsScreen extends StatefulWidget {
 }
 
 class _UserDetailsScreenState extends State<UserDetailsScreen> {
-  late KC2UserInfo? user = null;
+  late KC2UserInfo? user  ;
   late bool isLocal = false;
   late final String? phoneNumber = null;
   late bool userNotFound = false;

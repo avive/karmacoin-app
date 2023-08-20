@@ -30,6 +30,9 @@ class ConfigLogic {
   /// dev mode has some text field input shortcuts to save time in dev
   final bool devMode = true;
 
+  /// in dash mode app displayes public chain data and doesn't require user to sign-in
+  final bool dashMode = true;
+
   /// Defaults to testnet. Change this if user specifies to change between testnet and mainnet. and call init() again to configure connection to mainnet and vice versa when moving from mainnet to testnet... In production app once mainnent is live, the default should be mainnet
   KCNetworkType networkId = KCNetworkType.testnet;
 

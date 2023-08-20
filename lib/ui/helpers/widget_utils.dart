@@ -18,7 +18,8 @@ Text standardTextWidget(String text, BuildContext context) {
   return Text(text, style: CupertinoTheme.of(context).textTheme.textStyle);
 }
 
-CupertinoSliverNavigationBar kcNavBar(context, String title) {
+CupertinoSliverNavigationBar kcNavBar(context, String title,
+    {bool enableBackButton = true}) {
   return CupertinoSliverNavigationBar(
     largeTitle: Text(
       title,
@@ -27,15 +28,16 @@ CupertinoSliverNavigationBar kcNavBar(context, String title) {
     ),
     backgroundColor: kcPurple,
     border: kcOrangeBorder,
-    leading: CupertinoNavigationBarBackButton(
-      color: CupertinoTheme.of(context).primaryColor,
-      // must be added as default implementation throws assert
-      onPressed: () {
-        if (Navigator.of(context).canPop()) {
-          Navigator.of(context).pop();
-        }
-      },
-    ),
+    leading: enableBackButton
+        ? CupertinoNavigationBarBackButton(
+            color: CupertinoTheme.of(context).primaryColor,
+            // must be added as default implementation throws assert
+            onPressed: () {
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              }
+            })
+        : Container(),
     trailing: adjustNavigationBarButtonPosition(
         CupertinoButton(
           onPressed: () async {

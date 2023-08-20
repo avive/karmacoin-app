@@ -157,6 +157,10 @@ void pushNamedAndRemoveUntil(String path) {
 }
 
 String _getInitialLocation() {
+  if (configLogic.dashMode) {
+    return ScreenPaths.karmaChain;
+  }
+
   if (kc2User.previouslySignedUp) {
     debugPrint('Router: Previously signed up - go to home..');
     return ScreenPaths.home;
