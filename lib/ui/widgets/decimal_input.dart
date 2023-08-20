@@ -1,4 +1,3 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:intl/intl.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/genesis_config.dart';
@@ -51,7 +50,7 @@ class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
 
     feeType = widget.feeType;
 
-    Int64 val = feeType == FeeType.payment
+    BigInt val = feeType == FeeType.payment
         ? appState.kCentsAmount.value
         : appState.kCentsFeeAmount.value;
 
@@ -94,10 +93,10 @@ class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
     setState(() => _kAmountCoins = kAmountCoins);
     if (feeType == FeeType.payment) {
       appState.kCentsAmount.value =
-          Int64((kAmountCoins * GenesisConfig.kCentsPerCoin).round());
+          BigInt.from((kAmountCoins * GenesisConfig.kCentsPerCoin).round());
     } else {
       appState.kCentsFeeAmount.value =
-          Int64((kAmountCoins * GenesisConfig.kCentsPerCoin).round());
+          BigInt.from((kAmountCoins * GenesisConfig.kCentsPerCoin).round());
     }
   }
 
@@ -107,8 +106,8 @@ class _DecimalAmountInputWidgetState extends State<DecimalAmountInputWidget> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(
-            KarmaCoinAmountFormatter.format(
-                Int64((_kAmountCoins * GenesisConfig.kCentsPerCoin).round())),
+            KarmaCoinAmountFormatter.format(BigInt.from(
+                (_kAmountCoins * GenesisConfig.kCentsPerCoin).round())),
             style: CupertinoTheme.of(context).textTheme.pickerTextStyle),
         SizedBox(
           height: 300,

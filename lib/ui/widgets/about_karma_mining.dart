@@ -1,6 +1,6 @@
 import 'package:countup/countup.dart';
-import 'package:karma_coin/services/api/api.pb.dart';
-import 'package:karma_coin/services/api/types.pb.dart';
+import 'package:karma_coin/data/genesis_config.dart';
+import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:status_alert/status_alert.dart';
@@ -8,10 +8,8 @@ import 'package:status_alert/status_alert.dart';
 const _karmaRewardsInfoUrl = 'https://karmaco.in/karmarewards/';
 
 class AboutKarmaMining extends StatefulWidget {
-  final GenesisData? genesisData;
   final bool enableBackButton;
-  const AboutKarmaMining(
-      {super.key, this.genesisData, this.enableBackButton = false});
+  const AboutKarmaMining({super.key, this.enableBackButton = false});
 
   @override
   State<AboutKarmaMining> createState() => _AboutKarmaMiningState();
@@ -20,9 +18,11 @@ class AboutKarmaMining extends StatefulWidget {
 class _AboutKarmaMiningState extends State<AboutKarmaMining> {
   // we assume api is available until we know otherwise
   bool apiOffline = false;
-
-  GenesisData? genesisData;
   BlockchainStats? blockchainStats;
+  // coin amounts in KC
+  late int signupReward;
+  late int referralReward;
+  late int karmaReward;
 
   @override
   initState() {
@@ -31,22 +31,22 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
 
     Future.delayed(Duration.zero, () async {
       try {
-        GetGenesisDataResponse? genesisDataResponse;
-        if (genesisData == null) {
-          genesisDataResponse = await api.apiServiceClient
-              .getGenesisData(GetGenesisDataRequest());
-        }
-
-        GetBlockchainDataResponse statsResponse = await api.apiServiceClient
-            .getBlockchainData(GetBlockchainDataRequest());
-
-        await accountLogic.setDisplayedKarmaRewardsScreen(true);
-
+        BlockchainStats stats = await kc2Service.getBlockchainStats();
+        await configLogic.setDisplayedKarmaRewardsScreen(true);
         setState(() {
-          blockchainStats = statsResponse.stats;
-          if (genesisDataResponse != null) {
-            genesisData = genesisDataResponse.genesisData;
-          }
+          blockchainStats = stats;
+          signupReward = (blockchainStats!.signupRewardsCurrentRewardAmount ~/
+                  GenesisConfig.kCentsPerCoinBigInt)
+              .toInt();
+
+          referralReward =
+              (blockchainStats!.referralRewardsCurrentRewardAmount ~/
+                      GenesisConfig.kCentsPerCoinBigInt)
+                  .toInt();
+
+          karmaReward = (blockchainStats!.karmaRewardsCurrentRewardAmount ~/
+                  GenesisConfig.kCentsPerCoinBigInt)
+              .toInt();
         });
       } catch (e) {
         setState(() {
@@ -79,11 +79,15 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
       );
     }
 
-    if (genesisData == null) {
+    // TODO: enable back when api doesn't throw an exception
+    /*
+    if (blockchainStats == null) {
       return const Center(
-        child: CupertinoActivityIndicator(),
+        child: CupertinoActivityIndicator(
+          radius: 20,
+        ),
       );
-    }
+    }*/
 
     return Padding(
       padding: const EdgeInsets.only(left: 0, right: 12, top: 0, bottom: 24),
@@ -152,18 +156,12 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
         child: Text(
           'The more you give, the more you get...',
           style: textTheme.navTitleTextStyle.merge(
-            const TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
+            const TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
           ),
           textAlign: TextAlign.center,
         ),
       ),
     );
-
-    // get data from genesis config
-    int signupReward = genesisData!.signupRewardPhase1Amount.toInt() ~/ 1000000;
-    int referralReward =
-        genesisData!.referralRewardPhase1Amount.toInt() ~/ 1000000;
-    int karmaReward = genesisData!.karmaRewardAmount.toInt() ~/ 1000000;
 
     res.add(Column(
       mainAxisAlignment: MainAxisAlignment.start,

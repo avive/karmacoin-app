@@ -17,6 +17,7 @@ class AppreciationProgress extends StatefulWidget {
 
 class _AppreciationProgressState extends State<AppreciationProgress> {
   bool apiOffline = false;
+  String? txHash;
 
   @override
   initState() {
@@ -27,14 +28,18 @@ class _AppreciationProgressState extends State<AppreciationProgress> {
   }
 
   void _postFrameCallback(BuildContext context) {
-    // submit transaction here
-    appState.txSubmissionStatus.value = TxSubmissionStatus.submitting;
-
     Future.delayed(Duration.zero, () async {
       try {
-        await accountLogic.submitPaymentTransaction(widget.data);
+        String txHash = await kc2Service.sendAppreciation(
+            widget.data.destPhoneNumberHash!,
+            appState.kCentsAmount.value,
+            widget.data.communityId,
+            appState.selectedPersonalityTrait.value.index);
+        setState(() {
+          this.txHash = txHash;
+        });
       } catch (e) {
-        // ignore
+        debugPrint('failed to send appreciation: $e');
       }
     });
   }

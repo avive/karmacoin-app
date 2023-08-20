@@ -1,10 +1,12 @@
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/ui/widgets/about_karma_mining.dart';
 import 'package:karma_coin/ui/widgets/communities_list.dart';
 import 'package:karma_coin/ui/widgets/delete_account_tile.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:karma_coin/ui/widgets/leaderboard.dart';
 
 const _privacyUrl = 'https://karmaco.in/docs/privacy';
 const _supportUrl = 'https://karmaco.in/docs/support';
@@ -24,14 +26,15 @@ class ActionsScreen extends StatefulWidget {
 
 class _ActionsScreenState extends State<ActionsScreen> {
   Widget _getAppreciationsIcon(BuildContext context) {
-    return ValueListenableBuilder<int>(
-        valueListenable: txsBoss.incomingAppreciationsNotOpenedCount,
+    return ValueListenableBuilder<Map<String, KC2Tx>>(
+        valueListenable: kc2User.incomingAppreciations,
         builder: (context, value, child) {
-          return ValueListenableBuilder<int>(
-              valueListenable: txsBoss.outcomingAppreciationsNotOpenedCount,
+          return ValueListenableBuilder<Map<String, KC2Tx>>(
+              valueListenable: kc2User.outgoingAppreciations,
               builder: (context, value1, child) {
-                if (value + value1 > 0) {
-                  final label = (value + value1).toString();
+                final total = value.length + value1.length;
+                if (total > 0) {
+                  final label = total.toString();
                   return badges.Badge(
                       badgeStyle: const badges.BadgeStyle(
                           badgeColor: CupertinoColors.systemBlue),
@@ -42,9 +45,10 @@ class _ActionsScreenState extends State<ActionsScreen> {
                               .tabLabelTextStyle
                               .merge(const TextStyle(
                                   fontSize: 12, color: CupertinoColors.white))),
-                      child: const Icon(CupertinoIcons.square_list, size: 28));
+                      child: const FaIcon(FontAwesomeIcons.handsPraying,
+                          size: 24));
                 } else {
-                  return const Icon(CupertinoIcons.square_list, size: 28);
+                  return const FaIcon(FontAwesomeIcons.handsPraying, size: 24);
                 }
               });
         });
@@ -63,8 +67,9 @@ class _ActionsScreenState extends State<ActionsScreen> {
           ),
           children: <CupertinoListTile>[
             CupertinoListTile.notched(
-              title: const Text('Send Karma Coins'),
-              leading: const Icon(CupertinoIcons.money_dollar_circle, size: 28),
+              title: const Text('Send Karma Coin'),
+              leading:
+                  const FaIcon(FontAwesomeIcons.moneyBillTransfer, size: 24),
               trailing: const CupertinoListTileChevron(),
               onTap: () => context.push(ScreenPaths.send),
             ),
@@ -75,7 +80,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
                 onTap: () => context.push(ScreenPaths.appreciations)),
             CupertinoListTile.notched(
                 title: const Text('Karma Rewards'),
-                leading: const Icon(CupertinoIcons.wand_rays, size: 28),
+                leading: const FaIcon(FontAwesomeIcons.medal, size: 24),
                 onTap: () {
                   if (!context.mounted) return;
                   Navigator.of(context).push(
@@ -86,10 +91,22 @@ class _ActionsScreenState extends State<ActionsScreen> {
                   );
                 }),
             CupertinoListTile.notched(
+                title: const Text('Leaderboard'),
+                leading: const FaIcon(FontAwesomeIcons.trophy, size: 24),
+                onTap: () {
+                  if (!context.mounted) return;
+                  Navigator.of(context).push(
+                    CupertinoPageRoute(
+                      fullscreenDialog: true,
+                      builder: ((context) => const LeaderboardWidget()),
+                    ),
+                  );
+                }),
+            CupertinoListTile.notched(
                 title: const Text('Learn More'),
-                leading: const Icon(CupertinoIcons.question_circle, size: 28),
+                leading: const FaIcon(FontAwesomeIcons.circleInfo, size: 24),
                 onTap: () async {
-                  await openUrl(settingsLogic.learnYoutubePlaylistUrl);
+                  await openUrl(configLogic.learnYoutubePlaylistUrl);
                 }),
           ]),
       CupertinoListSection.insetGrouped(
@@ -115,17 +132,16 @@ class _ActionsScreenState extends State<ActionsScreen> {
             title: const Text('Account Details'),
             leading: const Icon(CupertinoIcons.person, size: 28),
             trailing: const CupertinoListTileChevron(),
-            onTap: () => context.push(ScreenPaths.account),
+            onTap: () => context.pushNamed(ScreenNames.account,
+                params: {'accountId': kc2User.identity.accountId}),
           ),
           CupertinoListTile.notched(
             title: const Text('Public Profile'),
             leading: const Icon(CupertinoIcons.bookmark, size: 28),
             trailing: const CupertinoListTileChevron(),
             onTap: () {
-              String userName =
-                  accountLogic.karmaCoinUser.value!.userName.value;
               context.pushNamed(ScreenNames.profile,
-                  params: {'username': userName});
+                  params: {'username': kc2User.userInfo.value!.userName});
             },
           ),
           CupertinoListTile.notched(
@@ -141,12 +157,15 @@ class _ActionsScreenState extends State<ActionsScreen> {
             trailing: const CupertinoListTileChevron(),
             onTap: () => context.push(ScreenPaths.updateUserName),
           ),
+          /*
           CupertinoListTile.notched(
             title: const Text('Change Phone Number'),
             leading: const Icon(CupertinoIcons.phone, size: 28),
             trailing: const CupertinoListTileChevron(),
-            onTap: () => {},
-          ),
+            onTap: () => {
+              
+            },
+          ),*/
           const DeleteDataTile().build(context) as CupertinoListTile,
           const DeleteAccountTile().build(context) as CupertinoListTile,
         ],

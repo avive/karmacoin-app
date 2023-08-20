@@ -1,9 +1,12 @@
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/services/api/types.pb.dart';
+import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/ui/screens/about.dart';
 import 'package:karma_coin/ui/screens/backup_account.dart';
 import 'package:karma_coin/ui/screens/community_home.dart';
 import 'package:karma_coin/ui/screens/karmachain.dart';
+import 'package:karma_coin/ui/screens/payment_tx_details.dart';
+import 'package:karma_coin/ui/screens/signup_progress.dart';
+import 'package:karma_coin/ui/screens/welcome.dart';
 import 'package:karma_coin/ui/screens/profile.dart';
 import 'package:karma_coin/ui/screens/restore_account.dart';
 import 'package:karma_coin/ui/screens/restore_account_intro.dart';
@@ -11,10 +14,8 @@ import 'package:karma_coin/ui/screens/actions.dart';
 import 'package:karma_coin/ui/screens/appreciations.dart';
 import 'package:karma_coin/ui/screens/phone_number_input.dart';
 import 'package:karma_coin/ui/screens/sms_code_input.dart';
-import 'package:karma_coin/ui/screens/payment_tx_details.dart';
 import 'package:karma_coin/ui/screens/user_details.dart';
-import 'package:karma_coin/ui/screens/home.dart';
-import 'package:karma_coin/ui/screens/welcome.dart';
+import 'package:karma_coin/ui/screens/user_home.dart';
 import 'package:karma_coin/ui/screens/user_name.dart';
 import 'package:karma_coin/ui/widgets/send.dart';
 
@@ -28,6 +29,8 @@ class ScreenPaths {
 
   /// New user name input screen
   static String newUserName = '/username';
+
+  static String signupProgress = '/signup-progress';
 
   /// Update user name input screen
   static String updateUserName = '/update-user-name';
@@ -66,7 +69,7 @@ class ScreenPaths {
   static String actions = '/actions';
 
   /// an account screen
-  static String account = '/account';
+  static String account = '/account/:accountId';
 
   /// User's appreciation (sent and received)
   static String appreciations = '/appreciations';
@@ -79,6 +82,8 @@ class ScreenPaths {
 class ScreenNames {
   /// Signup with phone number flow first screen
   static String signup = 'signup';
+
+  static String signupProgress = 'signup-progress';
 
   /// Signup with phone number flow first screen
   static String verify = 'verify';
@@ -152,12 +157,11 @@ void pushNamedAndRemoveUntil(String path) {
 }
 
 String _getInitialLocation() {
-  if (accountLogic.karmaCoinUser.value != null &&
-      (accountLogic.signedUpOnChain.value || accountLogic.localMode.value)) {
-    debugPrint('Signup or local mode - go to user home..');
+  if (kc2User.previouslySignedUp) {
+    debugPrint('Router: Previously signed up - go to home..');
     return ScreenPaths.home;
   } else {
-    debugPrint('Show welcome screen..');
+    debugPrint('Router: No exisiting user - go to welcome..');
     return ScreenPaths.welcome;
   }
 }
@@ -202,8 +206,6 @@ final GoRouter appRouter = GoRouter(
         name: ScreenNames.profile,
         builder: (BuildContext context, GoRouterState state) {
           final String userName = Uri.decodeFull(state.params['username']!);
-
-          // todo: show public profile screen of username
           return ProfileScreen(ValueKey(userName), userName);
         }),
     GoRoute(
@@ -214,6 +216,15 @@ final GoRouter appRouter = GoRouter(
           debugPrint('**** userName route builder called');
           return const SetUserNameScreen(
               title: 'YOUR USER NAME', operation: Operation.signUp);
+        }),
+    GoRoute(
+        // kc2 signup progress
+        name: ScreenNames.signupProgress,
+        path: ScreenPaths.signupProgress,
+        builder: (BuildContext context, GoRouterState state) {
+          debugPrint('**** signup progress route builder called');
+          return const SignupProgressScreeen(
+              title: 'Signing Up', operation: Operation.signUp);
         }),
     GoRoute(
         // New User name input screen
@@ -228,7 +239,7 @@ final GoRouter appRouter = GoRouter(
         name: ScreenNames.welcome,
         path: ScreenPaths.welcome,
         builder: (BuildContext context, GoRouterState state) {
-          return const WelcomeScreen(title: 'KARMA COIN');
+          return const KC2WelcomeScreen(title: 'KARMA COIN');
         }),
     GoRoute(
         name: ScreenNames.actions,
@@ -248,23 +259,18 @@ final GoRouter appRouter = GoRouter(
         builder: (BuildContext context, GoRouterState state) {
           var txId = state.params['txId'];
           if (txId == null) {
-            // todo: redirect to home screen
+            // TODO: redirect to home screen
           }
-
-          return TransactionDetailsScreen(Key(txId!), txId);
+          // optional tx passed from caller
+          KC2Tx? tx = state.extra != null ? state.extra as KC2Tx : null;
+          return TransactionDetailsScreen(Key(txId!), txId: txId, tx: tx);
         }),
     GoRoute(
         name: ScreenNames.account,
         path: ScreenPaths.account,
         builder: (BuildContext context, GoRouterState state) {
-          if (state.extra != null) {
-            User user = state.extra as User;
-            return UserDetailsScreen(Key(user.userName), user);
-          }
-
-          // local user
-          return UserDetailsScreen(
-              Key(accountLogic.karmaCoinUser.value!.userData.userName), null);
+          String? accountId = state.params['accountId'];
+          return UserDetailsScreen(accountId: accountId!);
         }),
     GoRoute(
         name: ScreenNames.securityWords,

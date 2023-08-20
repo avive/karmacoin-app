@@ -1,11 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
-
 import 'auth_interface.dart';
 
-/// User authentication logic
+/// User phone authentication logic
 class AuthLogic extends AuthLogicInterface {
   /// Init auth logic - load prev saved auth data from local secure storage
-
   @override
   Future<void> init() async {}
 
@@ -16,8 +14,7 @@ class AuthLogic extends AuthLogicInterface {
 
   /// Clear auth data
   @override
-  Future<void> signOut() async {
-    // todo: sign out current user
+  Future<void> signOut() async {    
     await FirebaseAuth.instance.signOut();
   }
 

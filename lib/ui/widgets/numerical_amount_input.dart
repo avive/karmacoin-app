@@ -1,4 +1,3 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
@@ -19,7 +18,7 @@ const double _kItemExtent = 32.0;
 class _NumericalAmountInputWidgetState
     extends State<NumericalAmountInputWidget> {
   // picker's currently selected amount in karma cents
-  Int64 _kAmountCents = Int64.ONE;
+  BigInt _kAmountCents = BigInt.one;
   final List<int> _kcMajorDecimalDigits =
       Iterable<int>.generate(100000).toList();
   FixedExtentScrollController? _kcMajorUnitsScrollController;
@@ -37,9 +36,9 @@ class _NumericalAmountInputWidgetState
 
     Future.delayed(Duration.zero, () {
       if (widget.feeType == FeeType.payment) {
-        appState.kCentsAmount.value = Int64.ONE;
+        appState.kCentsAmount.value = BigInt.one;
       } else {
-        appState.kCentsFeeAmount.value = Int64.ONE;
+        appState.kCentsFeeAmount.value = BigInt.one;
       }
     });
   }
@@ -51,7 +50,7 @@ class _NumericalAmountInputWidgetState
       majorIndex = _kcMajorDecimalDigits.length + majorIndex;
     }
 
-    Int64 amountCents = Int64(majorIndex + 1);
+    BigInt amountCents = BigInt.from(majorIndex + 1);
 
     setState(() => _kAmountCents = amountCents);
     if (widget.feeType == FeeType.payment) {

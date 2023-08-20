@@ -1,8 +1,7 @@
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/logic/account_setup_controller.dart';
+import 'package:karma_coin/logic/user_interface.dart';
 import 'package:karma_coin/logic/user_name_availability.dart';
-import 'package:karma_coin/services/api/api.pb.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:status_alert/status_alert.dart';
 
@@ -23,7 +22,7 @@ class SetUserNameScreen extends StatefulWidget {
 }
 
 class _SetUserNameScreenState extends State<SetUserNameScreen> {
-  String deafaultName = settingsLogic.devMode ? "avive" : "";
+  String deafaultName = configLogic.devMode ? "avive" : "";
   late final _textController = TextEditingController(text: deafaultName);
   bool isSubmitInProgress = false;
 
@@ -92,7 +91,9 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
                               },
                         child: submitButtonText,
                       ),
-                      _getSignupStatusRow(context),
+                      widget.operation == Operation.updateUserName
+                          ? _getUpdateNameStatus(context)
+                          : Container(),
                     ]),
               ),
             ),
@@ -143,68 +144,85 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
     );
   }
 
-  // todo: add signup status widget with status of signup
-  Widget _getSignupStatusRow(BuildContext context) {
-    if (!mounted) return Container();
-
-    return ValueListenableBuilder<AccountSetupStatus>(
-        valueListenable: accountSetupController.status,
+  Widget _getUpdateNameStatus(BuildContext context) {
+    return ValueListenableBuilder<UpdateResult>(
+        valueListenable: kc2User.updateResult,
         builder: (context, value, child) {
-          bool showIndicator = false;
           String text = '';
-          debugPrint(">>> status: $value");
+          Color? color = CupertinoColors.systemRed;
           switch (value) {
-            case AccountSetupStatus.signingUp:
-              text = 'Signing up...';
-              showIndicator = true;
-              break;
-            case AccountSetupStatus.incorrectVerificationCode:
-              text =
-                  'Incorrect verification code. Please go back and enter the correct code.';
-              break;
-            case AccountSetupStatus.transactionSubmitted:
-              text = 'Transaction submitted!';
-              showIndicator = true;
-              break;
-            case AccountSetupStatus.submittingTransaction:
-              text = 'Submitting transaction...';
-              showIndicator = true;
-              break;
-            case AccountSetupStatus.signedUp:
-              text = 'Signed up!';
-              break;
-            case AccountSetupStatus.accountAlreadyExists:
-              text = 'Account already exists';
-              break;
-            case AccountSetupStatus.missingData:
-              text = 'Missing data';
-              break;
-            default:
+            case UpdateResult.unknown:
               text = '';
               break;
+            case UpdateResult.updating:
+              text = 'Updating. Please wait...';
+              color = CupertinoTheme.of(context).textTheme.textStyle.color;
+              break;
+            case UpdateResult.updated:
+              text = 'Your user name was updated!';
+              color = CupertinoColors.activeGreen;
+              kc2User.updateResult.value = UpdateResult.unknown;
+              Future.delayed(Duration.zero, () {
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                }
+              });
+              break;
+            case UpdateResult.usernameTaken:
+              text = 'User name taken. Please try another one';
+              break;
+            case UpdateResult.invalidData:
+              text = 'Server error. Please try again later.';
+              break;
+            case UpdateResult.invalidSignature:
+              text = 'Invalid signature. Please try again later.';
+              break;
+            case UpdateResult.serverError:
+              text = 'Server error. Please try again later.';
+
+              break;
+            case UpdateResult.accountMismatch:
+              text = 'Account mismatch error.';
+              break;
+            case UpdateResult.connectionTimeOut:
+              text = 'Connection timeout. Please try again later.';
+              break;
           }
 
-          List<Widget> children = [];
-          if (text != '') {
-            children.add(const SizedBox(height: 14));
-            children.add(Text(text,
-                style: CupertinoTheme.of(context).textTheme.textStyle));
+          Text textWidget = Text(
+            text,
+            textAlign: TextAlign.center,
+            style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                  TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w400, color: color),
+                ),
+          );
+
+          if (value == UpdateResult.updating) {
+            return Column(
+              children: [
+                const SizedBox(height: 14),
+                textWidget,
+                const SizedBox(height: 14),
+                const CupertinoActivityIndicator(
+                  radius: 20,
+                ),
+              ],
+            );
           }
 
-          if (showIndicator) {
-            children.add(const SizedBox(height: 14));
-            children.add(const CupertinoActivityIndicator(
-              radius: 20,
-            ));
-          }
-
-          return Column(children: children);
+          return Column(
+            children: [
+              const SizedBox(height: 14),
+              textWidget,
+            ],
+          );
         });
   }
 
   Future<void> _submitName(BuildContext context) async {
     if (!mounted) return;
-    if (_textController.text.isEmpty) {
+    if (_textController.text.trim().isEmpty) {
       StatusAlert.show(
         context,
         duration: const Duration(seconds: 2),
@@ -231,7 +249,6 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
       return;
     }
 
-    /*
     if (userNameAvailabilityLogic.status !=
         UserNameAvailabilityStatus.available) {
       debugPrint('Name not available - show warning');
@@ -249,77 +266,27 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
           isSubmitInProgress = false;
         });
         return;
-      }*/
+      }
+    }
 
     setState(() {
       isSubmitInProgress = true;
     });
 
-    // store the user's reuqested name in account logic
-    await accountLogic.setRequestedUserName(_textController.text);
+    appState.requestedUserName = _textController.text;
 
     switch (widget.operation) {
       case Operation.signUp:
-        debugPrint('*** starting signup flow...');
-        await accountSetupController.signUpUser();
+        debugPrint('*** Navigating to signup progress screen');
+        setState(() {
+          isSubmitInProgress = false;
+        });
+        if (context.mounted) {
+          context.push(ScreenPaths.signupProgress);
+        }
         break;
       case Operation.updateUserName:
-        debugPrint('starting update user name flow...');
-        try {
-          SubmitTransactionResponse resp = await accountLogic
-              .submitUpdateUserNameTransacation(_textController.text);
-
-          switch (resp.submitTransactionResult) {
-            case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_SUBMITTED:
-              if (context.mounted) {
-                StatusAlert.show(
-                  context,
-                  duration: const Duration(seconds: 2),
-                  title: 'Name updated',
-                  configuration:
-                      const IconConfiguration(icon: CupertinoIcons.wand_rays),
-                  maxWidth: statusAlertWidth,
-                );
-                setState(() {
-                  isSubmitInProgress = false;
-                });
-                context.pop();
-              }
-              debugPrint('Update user name transaction submitted and accepted');
-              break;
-            case SubmitTransactionResult.SUBMIT_TRANSACTION_RESULT_REJECTED:
-              if (context.mounted) {
-                StatusAlert.show(
-                  context,
-                  duration: const Duration(seconds: 2),
-                  title: 'Server Error',
-                  subtitle: 'Operation failed. Try again later.',
-                  configuration: const IconConfiguration(
-                      icon: CupertinoIcons.exclamationmark_triangle),
-                  maxWidth: statusAlertWidth,
-                );
-                setState(() {
-                  isSubmitInProgress = false;
-                });
-              }
-              break;
-          }
-        } catch (e) {
-          if (context.mounted) {
-            StatusAlert.show(
-              context,
-              duration: const Duration(seconds: 2),
-              title: 'Oops',
-              subtitle: 'Operation failed. Try again later.',
-              configuration: const IconConfiguration(
-                  icon: CupertinoIcons.exclamationmark_triangle),
-              maxWidth: statusAlertWidth,
-            );
-            setState(() {
-              isSubmitInProgress = false;
-            });
-          }
-        }
+        await kc2User.updateUserInfo(appState.requestedUserName, null);
         break;
     }
   }
@@ -346,9 +313,8 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
             decoration: const BoxDecoration(
               border: Border(
                 bottom: BorderSide(
-                  width: 0,
-                  // todo: from theme
-                  color: CupertinoColors.inactiveGray,
+                  width: 2.0,
+                  color: CupertinoColors.activeBlue,
                 ),
               ),
             ),

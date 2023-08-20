@@ -1,33 +1,24 @@
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:fixnum/fixnum.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/data/genesis_config.dart';
-import 'package:karma_coin/data/phone_number_formatter.dart';
-import 'package:karma_coin/services/api/types.pb.dart' as api_types;
+import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:flutter/material.dart';
-import 'package:karma_coin/data/kc_user.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/ui/widgets/amount_input.dart';
-import 'package:karma_coin/ui/widgets/contacts_importer.dart';
-import 'package:karma_coin/ui/widgets/users_selector.dart';
+import 'package:karma_coin/ui/widgets/send_destination.dart';
 import 'package:karma_coin/ui/widgets/traits_picker.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:status_alert/status_alert.dart';
-import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart'
-    as contact_picker;
 
 class AppreciateWidget extends StatefulWidget {
   final int communityId;
-  final api_types.Contact? contact;
 
   const AppreciateWidget({
     super.key,
     this.communityId = 0,
-    this.contact,
   });
 
   @override
@@ -44,13 +35,6 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   bool withLabel = true;
   bool useRtl = false;
   bool isUsercommunityAdmin = false;
-  api_types.Contact? contact;
-
-  // country selector ux
-  late CountrySelectorNavigator selectorNavigator;
-
-  // ignore: unused_field
-  contact_picker.FlutterContactPicker? _contactPicker;
 
   //final formKey = GlobalKey<FormState>();
   //final phoneKey = GlobalKey<FormFieldState<PhoneNumber>>();
@@ -59,17 +43,18 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   initState() {
     super.initState();
 
-    String defaultNumber = settingsLogic.devMode ? "549805380" : "";
-    IsoCode code = settingsLogic.devMode ? IsoCode.IL : IsoCode.US;
+    String defaultNumber = configLogic.devMode ? "549805380" : "";
+    IsoCode code = configLogic.devMode ? IsoCode.IL : IsoCode.US;
+    String? phoneNumber = kc2User.identity.phoneNumber;
 
     // set default country code from user's mobile number's country code
-    try {
-      PhoneNumber userNumber = PhoneNumber.parse(
-          accountLogic.karmaCoinUser.value!.mobileNumber.value.number);
-
-      code = userNumber.isoCode;
-    } catch (e) {
-      debugPrint('error parsing user mobile number: $e');
+    if (phoneNumber != null) {
+      try {
+        PhoneNumber userNumber = PhoneNumber.parse(phoneNumber);
+        code = userNumber.isoCode;
+      } catch (e) {
+        debugPrint('error parsing user mobile number: $e');
+      }
     }
 
     if (widget.communityId == 0) {
@@ -78,32 +63,15 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     } else {
       traitsPicker = TraitsPickerWidget(null,
           GenesisConfig.communityPersonalityTraits[widget.communityId]!, 6);
-
-      isUsercommunityAdmin = accountLogic.karmaCoinUser.value!
-          .isCommunityAdmin(widget.communityId);
     }
-
-    selectorNavigator = const CountrySelectorNavigator.draggableBottomSheet();
 
     phoneController =
         PhoneController(PhoneNumber(isoCode: code, nsn: defaultNumber));
 
-    // use phone number from state if available
-    if (appState.sendDestinationPhoneNumber.value.isNotEmpty) {
-      phoneController.value =
-          PhoneNumber.parse(appState.sendDestinationPhoneNumber.value);
-    }
-
-    if (PlatformInfo.isMobile) {
-      // contact picker only available in native mobile iOs or Android
-      _contactPicker = contact_picker.FlutterContactPicker();
-    } else {
-      _contactPicker = null;
-    }
-
-    if (widget.contact != null) {
-      contact = widget.contact;
-      phoneController.value = PhoneNumber.parse(contact!.mobileNumber.number);
+    if (phoneNumber != null) {
+      // set hash as default when we have set default number
+      appState.sendDestinationPhoneNumberHash.value =
+          kc2Service.getPhoneNumberHash(phoneNumber);
     }
   }
 
@@ -113,20 +81,8 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     super.dispose();
   }
 
-  PhoneNumberInputValidator? _getValidator() {
-    List<PhoneNumberInputValidator> validators = [];
-    if (mobileOnly) {
-      validators.add(PhoneValidator.validMobile());
-    } else {
-      validators.add(PhoneValidator.valid());
-    }
-    return validators.isNotEmpty ? PhoneValidator.compose(validators) : null;
-  }
-
-  // validate input data and show alert if invalid
+  /// validate all appreciation input data
   Future<bool> _validateData() async {
-    debugPrint('validate data... ${phoneController.value}');
-
     bool isConnected = await PlatformInfo.isConnected();
 
     if (!isConnected && context.mounted) {
@@ -140,15 +96,32 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
           maxWidth: statusAlertWidth);
     }
 
-    if (phoneController.value == null ||
-        phoneController.value!.countryCode.isEmpty ||
-        phoneController.value!.nsn.isEmpty) {
+    if (kc2User.userInfo.value == null) {
+      if (context.mounted) {
+        StatusAlert.show(
+          context,
+          duration: const Duration(seconds: 2),
+          title: 'Ooops',
+          subtitle: 'Please sign up to the app first.',
+          configuration:
+              const IconConfiguration(icon: CupertinoIcons.xmark_circle),
+          maxWidth: statusAlertWidth,
+        );
+      }
+      return false;
+    }
+
+    KC2UserInfo userInfo = kc2User.userInfo.value!;
+
+    // in all cases we expected appState phone number hash to be non-empty
+    // with receiver's phoneNumber hash
+    if (appState.sendDestinationPhoneNumberHash.value.isEmpty) {
       if (context.mounted) {
         StatusAlert.show(
           context,
           duration: const Duration(seconds: 2),
           title: 'Oops...',
-          subtitle: 'Please enter receiver\'s mobile phone number.',
+          subtitle: 'Please specify a recipient.',
           configuration: const IconConfiguration(
               icon: CupertinoIcons.exclamationmark_triangle),
           maxWidth: statusAlertWidth,
@@ -157,42 +130,8 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
       return false;
     }
 
-    if (appState.kCentsAmount.value == Int64.ZERO) {
-      if (context.mounted) {
-        StatusAlert.show(
-          context,
-          duration: const Duration(seconds: 2),
-          title: 'Oops...',
-          subtitle: 'Please enter a non-zero Karma Coin amount',
-          configuration: const IconConfiguration(
-              icon: CupertinoIcons.exclamationmark_triangle),
-          maxWidth: statusAlertWidth,
-        );
-      }
-      return false;
-    }
-
-    KarmaCoinUser? user = accountLogic.karmaCoinUser.value;
-
-    if (user == null) {
-      if (context.mounted) {
-        StatusAlert.show(
-          context,
-          duration: const Duration(seconds: 2),
-          title: 'Oops...',
-          subtitle: 'Please login to your account.',
-          configuration: const IconConfiguration(
-              icon: CupertinoIcons.exclamationmark_triangle),
-          maxWidth: statusAlertWidth,
-        );
-      }
-      return false;
-    }
-
-    String number =
-        '+${phoneController.value!.countryCode}${phoneController.value!.nsn}';
-
-    if (user.mobileNumber.value.number == number) {
+    if (userInfo.phoneNumberHash ==
+        appState.sendDestinationPhoneNumberHash.value) {
       if (context.mounted) {
         StatusAlert.show(
           context,
@@ -207,9 +146,24 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
       return false;
     }
 
-    debugPrint('user balance: ${user.balance.value}');
+    if (appState.kCentsAmount.value == BigInt.zero) {
+      if (context.mounted) {
+        StatusAlert.show(
+          context,
+          duration: const Duration(seconds: 2),
+          title: 'Oops...',
+          subtitle: 'Please enter a non-zero Karma Coin amount',
+          configuration: const IconConfiguration(
+              icon: CupertinoIcons.exclamationmark_triangle),
+          maxWidth: statusAlertWidth,
+        );
+      }
+      return false;
+    }
 
-    if (user.balance.value < appState.kCentsAmount.value) {
+    debugPrint('user balance: ${userInfo.balance.toString()}');
+
+    if (userInfo.balance < appState.kCentsAmount.value) {
       if (context.mounted) {
         StatusAlert.show(
           context,
@@ -228,20 +182,13 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
   }
 
   Future<void> _sendAppreciation() async {
-    // todo: validate data and show alerts if invalid
-
-    String number =
-        '+${phoneController.value!.countryCode}${phoneController.value!.nsn}';
-
-    // store data in app state - will be handeled in user's home screen dispatcher....
+    // create payment tx data and store it in app state
     appState.paymentTransactionData.value = PaymentTransactionData(
-        appState.kCentsAmount.value,
-        appState.kCentsFeeAmount.value,
-        appState.selectedPersonalityTrait.value,
-        widget.communityId,
-        number,
-        '',
-        '');
+      kCentsAmount: appState.kCentsAmount.value,
+      personalityTrait: appState.selectedPersonalityTrait.value,
+      communityId: widget.communityId,
+      destPhoneNumberHash: appState.sendDestinationPhoneNumberHash.value,
+    );
 
     debugPrint(
         'payment transaction data: ${appState.paymentTransactionData.value}');
@@ -286,97 +233,9 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
     }
   }
 
-  Widget _getCommunityMemberInfo() {
-    String phoneNumber = '+${contact!.mobileNumber.number.formatPhoneNumber()}';
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Icon(CupertinoIcons.person, size: 28),
-        const SizedBox(
-          width: 6,
-        ),
-        Text(
-          '${contact!.userName} $phoneNumber',
-          style: CupertinoTheme.of(context).textTheme.pickerTextStyle.merge(
-                const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w300,
-                ),
-              ),
-        ),
-      ],
-    );
-  }
-
   List<Widget> _getBodyWidget(BuildContext context) {
     List<Widget> widgets = [];
-
-    if (widget.communityId == 0) {
-      widgets.add(Text('Send to',
-          style: CupertinoTheme.of(context).textTheme.pickerTextStyle));
-    }
-
-    if (widget.communityId == 0 || isUsercommunityAdmin) {
-      // Dispaly phone picker in context of community only if user is an admin
-      // so he can ony invite non-members
-      widgets.add(Padding(
-        padding: const EdgeInsets.only(left: 16, right: 16),
-        child: Material(
-          child: PhoneFormField(
-            controller: phoneController,
-            flagSize: 32,
-            shouldFormat: shouldFormat && !useRtl,
-            autofocus: false,
-            autofillHints: const [AutofillHints.telephoneNumber],
-            countrySelectorNavigator: selectorNavigator,
-            defaultCountry: IsoCode.US,
-            validator: _getValidator(),
-            decoration: InputDecoration(
-              // fillColor: CupertinoColors.white,
-              label: null,
-              border: outlineBorder
-                  ? const OutlineInputBorder()
-                  : const UnderlineInputBorder(),
-              hintText: withLabel ? '' : 'Phone',
-            ),
-          ),
-        ),
-      ));
-      widgets.add(_getContactsRow(context));
-    } else {
-      // community member picker for a community member
-      // community members can only appreicate other members
-      if (contact != null) {
-        widgets.add(_getCommunityMemberInfo());
-      }
-
-      widgets.add(
-        Column(children: [
-          // karma coin contacts
-          CupertinoButton(
-            padding: const EdgeInsets.only(),
-            onPressed: () {
-              // only show contacts in a community
-              int communityId = widget.communityId;
-
-              Navigator.of(context).push(CupertinoPageRoute(
-                  fullscreenDialog: true,
-                  builder: ((context) => KarmaCoinUserSelector(
-                      title: 'Members',
-                      communityId: communityId,
-                      setPhoneNumberCallback: setPhoneNumberCallback))));
-            },
-            child: Text(
-              'A community Member',
-              style: CupertinoTheme.of(context).textTheme.actionTextStyle.merge(
-                    const TextStyle(fontSize: 20),
-                  ),
-            ),
-          )
-        ]),
-      );
-    }
-
+    widgets.add(SendDestination(null, phoneController));
     widgets.add(traitsPicker);
 
     widgets.add(Column(
@@ -393,32 +252,8 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
                     feeType: FeeType.payment,
                     title: 'AMOUNT'))));
           },
-          child: ValueListenableBuilder<Int64>(
+          child: ValueListenableBuilder<BigInt>(
               valueListenable: appState.kCentsAmount,
-              builder: (context, value, child) => Text(
-                    KarmaCoinAmountFormatter.format(value),
-                    style: CupertinoTheme.of(context)
-                        .textTheme
-                        .actionTextStyle
-                        .merge(
-                          const TextStyle(fontSize: 15),
-                        ),
-                  )),
-        ),
-        const SizedBox(height: 12),
-        Text('Network Fee',
-            style: CupertinoTheme.of(context).textTheme.pickerTextStyle),
-        CupertinoButton(
-          onPressed: () {
-            Navigator.of(context).push(CupertinoPageRoute(
-                fullscreenDialog: true,
-                builder: ((context) => const AmountInputWidget(
-                    coinKind: CoinKind.kCents,
-                    feeType: FeeType.fee,
-                    title: 'NETWORK FEE'))));
-          },
-          child: ValueListenableBuilder<Int64>(
-              valueListenable: appState.kCentsFeeAmount,
               builder: (context, value, child) => Text(
                     KarmaCoinAmountFormatter.format(value),
                     style: CupertinoTheme.of(context)
@@ -434,7 +269,6 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
 
     widgets.add(_getAppreciateButton(context));
     widgets.add(const SizedBox(height: 1));
-
     return widgets;
   }
 
@@ -476,72 +310,6 @@ class _AppreciateWidgetState extends State<AppreciateWidget> {
         ],
       ),
     );
-  }
-
-  Widget _getContactsRow(BuildContext context) {
-    List<Widget> widgets = [];
-
-    if (PlatformInfo.isMobile) {
-      // mobile phone contacts integration
-      widgets.add(ContactsImporter(null, phoneController));
-      widgets.add(const SizedBox(width: 34));
-    }
-
-    // karma coin users
-    widgets.add(CupertinoButton(
-      padding: const EdgeInsets.only(left: 0),
-      onPressed: () {
-        // only show contacts in a community
-        int communityId = widget.communityId;
-
-        if (accountLogic.karmaCoinUser.value!.isCommunityAdmin(communityId)) {
-          // let admin see non-community members users
-          communityId = 0;
-        }
-
-        Navigator.of(context).push(CupertinoPageRoute(
-            fullscreenDialog: true,
-            builder: ((context) => KarmaCoinUserSelector(
-                communityId: communityId,
-                setPhoneNumberCallback: setPhoneNumberCallback))));
-      },
-      child: Text(
-        'User',
-        style: CupertinoTheme.of(context).textTheme.actionTextStyle.merge(
-              const TextStyle(fontSize: 15),
-            ),
-      ),
-    ));
-
-    return Row(mainAxisAlignment: MainAxisAlignment.center, children: widgets);
-  }
-
-  void setPhoneNumberCallback(api_types.Contact selectedContact) {
-    debugPrint('setPhoneNumberCallback: $selectedContact');
-    setState(() {
-      phoneController.value = PhoneNumber.parse(contact!.mobileNumber.number);
-      /* 
-      contact = selectedContact;
-      PhoneNumber pn = PhoneNumber.parse(contact!.mobileNumber.number);
-      String iso = pn.countryCode;
-      String nsn = pn.nsn;
-      if (nsn.startsWith(iso)) {
-        nsn = nsn.substring(iso.length);
-      }
-      if (nsn.startsWith('0')) {
-        nsn = nsn.substring(1);
-      }
-
-      phoneController.value = PhoneNumber(isoCode: pn.isoCode, nsn: nsn);*/
-    });
-
-    // call without awaiting but log any errors
-    FirebaseAnalytics.instance
-        .logEvent(name: "kc_user_phone_selected", parameters: {
-      "number": contact!.mobileNumber.number,
-    }).catchError((e) {
-      debugPrint(e.toString());
-    });
   }
 
   Widget _getAppreciateButton(BuildContext context) {

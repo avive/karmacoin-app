@@ -15,15 +15,10 @@ class _BackupAccountScreenState extends State<BackupAccountScreen> {
 
   /// Return the list secionts
   List<CupertinoListSection> _getSections(BuildContext context) {
-    if (accountLogic.accountSecurityWords.value == null) {
-      return [];
-    }
-
     List<CupertinoListTile> introTiles = [];
     List<CupertinoListTile> tiles = [];
 
-    String accountId = accountLogic.karmaCoinUser.value!.userData.accountId.data
-        .toShortHexString();
+    String accountId = kc2User.userInfo.value!.accountId;
 
     introTiles.add(
       CupertinoListTile.notched(
@@ -56,16 +51,14 @@ class _BackupAccountScreenState extends State<BackupAccountScreen> {
           ),
         ),
         leading: const Icon(CupertinoIcons.archivebox, size: 28),
-        // todo: number format
       ),
     );
 
-    debugPrint('Security words: ${accountLogic.accountSecurityWords.value!}');
+    final String securityWords = kc2User.identity.mnemonic;
 
-    accountLogic.accountSecurityWords.value!
-        .split(' ')
-        .asMap()
-        .forEach((index, value) {
+    debugPrint('Security words: $securityWords');
+
+    securityWords.split(' ').asMap().forEach((index, value) {
       tiles.add(
         CupertinoListTile.notched(
           title: Text(value,
@@ -78,7 +71,6 @@ class _BackupAccountScreenState extends State<BackupAccountScreen> {
                   .textTheme
                   .navTitleTextStyle
                   .merge(const TextStyle(fontSize: 18))),
-          // todo: number format
         ),
       );
     });
@@ -95,7 +87,7 @@ class _BackupAccountScreenState extends State<BackupAccountScreen> {
     return [
       CupertinoListSection.insetGrouped(
           header: Text(
-            'About',
+            'Instructions',
             style: CupertinoTheme.of(context).textTheme.tabLabelTextStyle.merge(
                   TextStyle(
                       fontSize: 14,

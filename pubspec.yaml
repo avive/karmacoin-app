@@ -16,7 +16,8 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.3.0+45
+
+version: 2.0.0+1
 
 environment:
   sdk: '>=3.0.6 <4.0.0'
@@ -33,19 +34,19 @@ dependencies:
 
   cupertino_icons: ^1.0.2
   fixnum: ^1.0.1
-  protobuf: ^2.1.0
+  protobuf: ^3.1.0
   grpc: ^3.1.0
   crypto: ^3.0.2
   get_it: ^7.2.0
-  get_it_mixin: ^3.1.4
+  get_it_mixin: ^4.2.0
   go_router: ^6.0.1
   flutter_native_splash: ^2.2.16
   internet_connection_checker: ^1.0.0+1
-  flutter_displaymode: ^0.5.0   
+  flutter_displaymode: ^0.6.0   
   desktop_window: ^0.4.0
   shared_preferences: ^2.0.15
   provider: ^6.0.2
-  flutter_secure_storage: ^7.0.1
+  flutter_secure_storage: ^8.0.0
   ed25519_edwards: ^0.3.1
   bip39: ^1.0.6
  
@@ -70,23 +71,15 @@ dependencies:
   status_alert: ^1.0.1
   font_awesome_flutter: ^10.4.0
   badges: ^3.0.2
-  device_info_plus: ^8.1.0
+  device_info_plus: ^9.0.3
   url_launcher: ^6.1.10
-  pull_down_button: ^0.7.0
-  package_info_plus: ^3.0.3
+  pull_down_button: ^0.9.3
+  package_info_plus: ^4.1.0
   time_ago_provider: ^4.2.0
   countup: ^0.1.4
   simple_animations: ^5.0.0+3
-  # enable3 when 0.0.4 is in pubdev
-  # flutter_native_contact_picker: ^0.0.3
-  # we use this for with updated kotlin version
-  flutter_native_contact_picker:
-     git:
-      url: https://github.com/avive/flutter_native_contact_picker
-      ref: master # branch name
-  pinput: ^2.2.31
-  javascript: ^0.0.2
-  flutter_js: ^0.7.0
+  flutter_native_contact_picker: ^0.0.4
+  pinput: ^3.0.0
   polkadart: ^0.1.0
   polkadart_scale_codec: ^1.1.0
   substrate_metadata_fixed: ^1.1.0
@@ -120,7 +113,6 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets: 
-    - assets/js/kc2.js
     - assets/images/
     - assets/images/giraffes_tile.png
     - assets/images/giraffes_banner.png

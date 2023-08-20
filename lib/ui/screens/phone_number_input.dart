@@ -46,17 +46,19 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
     super.initState();
     isSigninIn = false;
 
-    String defaultNumber = settingsLogic.devMode ? "549805381" : "";
-    IsoCode code = settingsLogic.devMode ? IsoCode.IL : IsoCode.US;
+    String defaultNumber = configLogic.devMode ? "549805381" : "";
+    IsoCode code = configLogic.devMode ? IsoCode.IL : IsoCode.US;
 
-    try {
-      // ignore: deprecated_member_use
-      String? countryCode = WidgetsBinding.instance.window.locale.countryCode;
-      if (countryCode != null) {
-        code = IsoCode.fromJson(countryCode.toUpperCase());
+    if (!configLogic.devMode) {
+      try {
+        // ignore: deprecated_member_use
+        String? countryCode = WidgetsBinding.instance.window.locale.countryCode;
+        if (countryCode != null) {
+          code = IsoCode.fromJson(countryCode.toUpperCase());
+        }
+      } catch (e) {
+        debugPrint('failed to get country code from locale: $e');
       }
-    } catch (e) {
-      debugPrint('failed to get country code from locale: $e');
     }
 
     phoneController =
@@ -152,40 +154,51 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
       isSigninIn = true;
     });
 
-    await accountLogic.setUserPhoneNumber(number);
+    appState.verifiedPhoneNumber = number;
+    // store as part of local user's identity
+    await kc2User.identity.setPhoneNumber(number);
 
-    // send whatsapp verification code to user and go to code screen if
-    // it was sent successfully
-
-    try {
-      SendVerificationCodeResponse resp = await verifier.verifierServiceClient
-          .sendVerificationCode(
-              SendVerificationCodeRequest(mobileNumber: number));
-
-      appState.twilloVerificationSid = resp.sessionId;
-
+    if (configLogic.skipWhatsappVerification) {
+      // skip whatsapp verificaion and go straight to user name
       setState(() {
         isSigninIn = false;
       });
 
       if (context.mounted) {
-        context.push(ScreenPaths.verify);
+        context.push(ScreenPaths.newUserName);
       }
-    } catch (e) {
-      debugPrint('error: $e');
-      if (context.mounted) {
-        StatusAlert.show(context,
-            duration: const Duration(seconds: 4),
-            title: 'Server error',
-            subtitle: 'Please try again later.',
-            configuration: const IconConfiguration(
-                icon: CupertinoIcons.exclamationmark_triangle),
-            dismissOnBackgroundTap: true,
-            maxWidth: statusAlertWidth);
+      return;
+    } else {
+      try {
+        SendVerificationCodeResponse resp = await verifier.verifierServiceClient
+            .sendVerificationCode(
+                SendVerificationCodeRequest(mobileNumber: number));
+
+        appState.twilloVerificationSid = resp.sessionId;
+
+        setState(() {
+          isSigninIn = false;
+        });
+
+        if (context.mounted) {
+          context.push(ScreenPaths.verify);
+        }
+      } catch (e) {
+        debugPrint('error: $e');
+        if (context.mounted) {
+          StatusAlert.show(context,
+              duration: const Duration(seconds: 4),
+              title: 'Server error',
+              subtitle: 'Please try again later.',
+              configuration: const IconConfiguration(
+                  icon: CupertinoIcons.exclamationmark_triangle),
+              dismissOnBackgroundTap: true,
+              maxWidth: statusAlertWidth);
+        }
+        setState(() {
+          isSigninIn = false;
+        });
       }
-      setState(() {
-        isSigninIn = false;
-      });
     }
   }
 
@@ -280,8 +293,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                         ),
                         CupertinoButton(
                           onPressed: () async {
-                            await openUrl(
-                                settingsLogic.learnYoutubePlaylistUrl);
+                            await openUrl(configLogic.learnYoutubePlaylistUrl);
                           },
                           child: Text(
                             'Learn more',
@@ -417,7 +429,6 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
     if (isSigninIn) {
       return const CupertinoActivityIndicator(
         radius: 20,
-        animating: true,
       );
     } else {
       return Container();

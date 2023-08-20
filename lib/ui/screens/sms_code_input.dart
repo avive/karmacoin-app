@@ -33,21 +33,14 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
   Future<void> _submitCode(BuildContext context, String currCode) async {
     // store for later
     appState.twilloVerificationCode = currCode;
-
     pinController.clear();
     context.push(ScreenPaths.newUserName);
-
-    /*
-    setState(() {
-      submitInProgress = true;
-    });*/
   }
 
   Widget _getIndicator(BuildContext context) {
     if (submitInProgress) {
       return const CupertinoActivityIndicator(
         radius: 20,
-        animating: true,
       );
     } else {
       return Container();

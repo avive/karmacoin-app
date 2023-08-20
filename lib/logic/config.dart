@@ -1,31 +1,56 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/common/platform_info.dart';
-import 'package:karma_coin/data/kc_user.dart';
 
-// todo: add settings interface
+// TODO: add ConfigLogic public interface
 
-// todo: migrate from json file to a hive box
+enum KCNetworkType {
+  testnet(42),
+  mainnet(21);
+
+  const KCNetworkType(this.value);
+  final num value;
+
+  String get name {
+    switch (this) {
+      case KCNetworkType.testnet:
+        return 'Testnet';
+      case KCNetworkType.mainnet:
+        return 'Mainnet';
+    }
+  }
+}
 
 /// App config logic
 class ConfigLogic {
   /// Set to true to work against localhost servers. Otherwise production servers are used
-  final bool apiLocalMode = false;
+  final bool apiLocalMode = true;
 
-  // dev mode has some text field input shortcuts to save time in dev
-  final bool devMode = false;
+  /// dev mode has some text field input shortcuts to save time in dev
+  final bool devMode = true;
 
-  // check internet connections and show error messages
+  /// Defaults to testnet. Change this if user specifies to change between testnet and mainnet. and call init() again to configure connection to mainnet and vice versa when moving from mainnet to testnet... In production app once mainnent is live, the default should be mainnet
+  KCNetworkType networkId = KCNetworkType.testnet;
+
+  /// Skip whatsapp verification for local testing. kc2Api should use the bypass token
+  /// obtain from local config file to bypass whatsapp verification.
+  final bool skipWhatsappVerification = true;
+
+  /// check internet connections and show error messages
   final bool enableInternetConnectionChecking = false;
+
+  final secureStorage = const FlutterSecureStorage();
+  static const _aOptions = AndroidOptions(
+    encryptedSharedPreferences: true,
+  );
+
+  final String _karmaMiningScreenDisplayedKey = "karmaMiningScreenDisplayedKey";
 
   late final currentLocale = ValueNotifier<String?>(null);
   late final apiHostName = ValueNotifier<String>('127.0.0.1');
   late final apiHostPort = ValueNotifier<int>(9080);
-  late final apiSecureConnection = ValueNotifier<bool>(false);
+  late final apiProtocol = ValueNotifier<String>('ws');
   late final verifierHostName = ValueNotifier<String>('127.0.0.1');
   late final verifierHostPort = ValueNotifier<int>(9080);
   late final verifierSecureConnection = ValueNotifier<bool>(false);
@@ -41,12 +66,40 @@ class ConfigLogic {
   late final firebaseWebPushPubKey =
       "BPCf2pl7oLrgSWJJjEXzKfTIe4atfDay5-Aw9u0Ge8IgtfozLq1jkYPfJ0ccEY9D9cdqoAgxcbx4rGEhQC5nMN4";
 
-  // requested user name entered by the user. For the canonical user-name, check AccountLogic
+  // requested user name entered by the user.
   late final requestedUserName = ValueNotifier<String>('');
 
+// Set received FCM push note token
+/*
+  Future<void> _setFCMPushNoteToken(String token) async {
+    await secureStorage.write(
+        key: _pushTokenKey, value: token, aOptions: _aOptions);
+
+    fcmToken.value = token;
+  }*/
+
+  // Get known FCM push note token
+  final ValueNotifier<String?> fcmToken = ValueNotifier<String?>(null);
+
+  /// set to true after karma mining screen is displayed once
+  final ValueNotifier<bool> karmaMiningScreenDisplayed = ValueNotifier(false);
+
+  Future<void> setDisplayedKarmaRewardsScreen(bool value) async {
+    await secureStorage.write(
+        key: _karmaMiningScreenDisplayedKey,
+        value: value.toString(),
+        aOptions: _aOptions);
+
+    karmaMiningScreenDisplayed.value = value;
+  }
+
+  /// Call this everytime network is changed from the ui. e.g. a switch between mainnet to testnet...
   Future<void> init() async {
     if (apiLocalMode) {
-      debugPrint("Wroking against local servers");
+      // note: we default to testnet in local mode.
+      // to connect to a local mainnet mode. set networkId to mainnet and call init()
+      debugPrint(
+          "Wroking against local kc2 api provider. Expected net id $networkId");
       if (await PlatformInfo.isRunningOnAndroidEmulator()) {
         debugPrint('Running in Android emulator');
         // on android emulator, use the host machine ip address
@@ -56,20 +109,63 @@ class ConfigLogic {
         apiHostName.value = '127.0.0.1';
         verifierHostName.value = '127.0.0.1';
       }
-      apiHostPort.value = 9080;
-      verifierHostPort.value = 9080;
-      apiSecureConnection.value = false;
+
+      apiHostPort.value = 9944;
+      verifierHostPort.value = 8080;
+      apiProtocol.value = 'ws';
+
       verifierSecureConnection.value = false;
     } else {
-      debugPrint('Working against production servers');
-      apiHostName.value = 'api.karmaco.in';
-      apiHostPort.value = 443;
-      apiSecureConnection.value = true;
-      verifierHostName.value = 'api.karmaco.in';
-      verifierHostPort.value = 443;
-      verifierSecureConnection.value = true;
+      switch (networkId) {
+        case KCNetworkType.testnet:
+          debugPrint('Working against a remote kc2 testnet api provider');
+          apiHostName.value = 'testnet.karmaco.in/testnet/ws';
+          apiHostPort.value = 80;
+          apiProtocol.value = 'wss';
+          //
+          // verifier info for testnet
+          verifierHostName.value = 'api.karmaco.in';
+          verifierHostPort.value = 443;
+          verifierSecureConnection.value = true;
+          break;
+        case KCNetworkType.mainnet:
+          debugPrint('Working against a remote kc2 mainnet api provider');
+          // TODO: add mainnet api node here
+          apiHostName.value = '[add mainnent public api node here]';
+          apiHostPort.value = 80;
+          apiProtocol.value = 'wss';
+          //
+          // verifier info for mainnet
+          verifierHostName.value = 'api.karmaco.in';
+          verifierHostPort.value = 443;
+          verifierSecureConnection.value = true;
+          break;
+      }
+    }
+
+    // todo: fix me
+
+    // Read last known fcm token for device
+    // String? token =
+    //     await secureStorage.read(key: _pushTokenKey, aOptions: _aOptions);
+    // if (token != null) {
+    //  fcmToken.value = token;
+    // }
+
+    var displayKarmaMiningScreenData = await secureStorage.read(
+        key: _karmaMiningScreenDisplayedKey, aOptions: _aOptions);
+
+    if (displayKarmaMiningScreenData != null) {
+      karmaMiningScreenDisplayed.value =
+          displayKarmaMiningScreenData.toLowerCase() == 'true';
     }
   }
+
+  /// Returns connection url for kc2 api
+  String get kc2ApiUrl =>
+      '${apiProtocol.value}://${apiHostName.value}:${apiHostPort.value}';
+
+  // TODO: completely revamp push notes to new auth scheme
 
   // push notificaiton handling
   ////////////////////
@@ -77,6 +173,7 @@ class ConfigLogic {
   /// Handle push token change
   /// Note: This callback is fired at each app startup and whenever a new
   /// token is generated.
+  /*
   Future<void> setupPushNotifications() async {
     debugPrint('Setting up push notes...');
     FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
@@ -115,8 +212,7 @@ class ConfigLogic {
       return;
     }
 
-    KarmaCoinUser? karmaUser = accountLogic.karmaCoinUser.value;
-    if (karmaUser == null) {
+    if (!kc2User.previouslySignedUp) {
       debugPrint('No local karma coin user. Cannot send token to server.');
       return;
     }
@@ -124,6 +220,12 @@ class ConfigLogic {
     final fireStore = FirebaseFirestore.instance;
     String userId = firebaseAuth.currentUser!.uid;
     debugPrint('Firebase auth user id: $userId');
+
+    if (kc2User.identity.phoneNumber == null) {
+      debugPrint('No phone number. Cannot send token to server.');
+      return;
+    }
+
     final data = <String, String>{
       'token': token,
       'timeStamp': DateTime.now().millisecondsSinceEpoch.toString(),
@@ -135,9 +237,9 @@ class ConfigLogic {
 
         await fireStore.collection('users').doc(userId).set({
           'tokens': [data],
-          'accountId': karmaUser.userData.accountId.data.toBase64(),
-          'phoneNumber': karmaUser.userData.mobileNumber.number,
-          'userName': karmaUser.userData.userName,
+          'accountId': kc2User.identity.accountId,
+          'phoneNumber': kc2User.identity.phoneNumber,
+          'userName': kc2User.userInfo.value!.userName,
         });
 
         debugPrint("Stored token in firestore");
@@ -169,7 +271,7 @@ class ConfigLogic {
     });
 
     // store locally in account logic
-    await accountLogic.setFCMPushNoteToken(token);
+    await _setFCMPushNoteToken(token);
   }
 
   /// Register for push notes - may show dialog box to allow notifications
@@ -196,7 +298,7 @@ class ConfigLogic {
         }
       } else if (kIsWeb) {
         final fcmToken = await FirebaseMessaging.instance
-            .getToken(vapidKey: settingsLogic.firebaseWebPushPubKey);
+            .getToken(vapidKey: configLogic.firebaseWebPushPubKey);
         debugPrint('Got FCM Token: $fcmToken');
         if (fcmToken != null) {
           await _processPushNoteToken(fcmToken);
@@ -210,6 +312,9 @@ class ConfigLogic {
   /// Handle a received push note
   void _handleMessage(RemoteMessage message) {
     debugPrint('Got push notification: $message');
+
+    // TODO: get all transactions and show appreciations screen
+
     Future.delayed(Duration.zero, () async {
       await FirebaseAnalytics.instance.logEvent(name: "push_note_received");
 
@@ -223,5 +328,5 @@ class ConfigLogic {
         }
       }
     });
-  }
+  }*/
 }
