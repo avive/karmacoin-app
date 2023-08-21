@@ -439,12 +439,12 @@ mixin K2ServiceInterface implements ChainApiProvider {
   /// Subscribe to account-related transactions
   /// accountId - ss58 encoded address
   /// Events will be delivered to registered event handlers
-  Timer subscribeToAccount(String accountId);
+  Timer subscribeToAccount(KC2UserInfo userInfo);
 
   /// Get all transactions from chain to, or from an account
   /// Transactions will be sent to registered event handlers based on their type
   /// accountId - ss58 encoded address
-  Future<FetchAppreciationsStatus> processTransactions(String accountId);
+  Future<FetchAppreciationsStatus> getTransactions(KC2UserInfo userInfo);
 
   // helpers
 

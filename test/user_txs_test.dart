@@ -11,6 +11,7 @@ import 'package:karma_coin/logic/user_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2.dart';
 import 'package:karma_coin/services/v2.0/kc2_interface.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
+import 'package:karma_coin/services/v2.0/user_info.dart';
 
 final random = Random.secure();
 String get randomPhoneNumber => (random.nextInt(900000) + 100000).toString();
@@ -166,6 +167,12 @@ void main() {
 
         String katyaPhoneNumber = randomPhoneNumber;
 
+        KC2UserInfo katyaInfo = KC2UserInfo(
+            accountId: katya.accountId,
+            userName: katyaUserName,
+            balance: BigInt.zero,
+            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
+
         // Set katya as signer
         kc2Service.setKeyring(katya.keyring);
         debugPrint('Local user katya public address: ${katya.accountId}');
@@ -200,7 +207,7 @@ void main() {
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         // subscribe to new account txs
-        kc2Service.subscribeToAccount(katya.accountId);
+        kc2Service.subscribeToAccount(katyaInfo);
 
         String? err;
         // signup katya

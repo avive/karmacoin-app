@@ -42,6 +42,13 @@ void main() {
             "katya${katya.accountId.substring(0, 5)}".toLowerCase();
 
         String katyaPhoneNumber = randomPhoneNumber;
+
+        KC2UserInfo katyaInfo = KC2UserInfo(
+            accountId: katya.accountId,
+            userName: katyaUserName,
+            balance: BigInt.zero,
+            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
+
         String phoneNumberHash =
             kc2Service.getPhoneNumberHash(katyaPhoneNumber);
 
@@ -147,7 +154,7 @@ void main() {
         );
 
         // subscribe to new account txs
-        kc2Service.subscribeToAccount(katya.accountId);
+        kc2Service.subscribeToAccount(katyaInfo);
 
         String? err;
         // signup katya

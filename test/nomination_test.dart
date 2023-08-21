@@ -9,6 +9,7 @@ import 'package:karma_coin/logic/identity_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2.dart';
 import 'package:karma_coin/services/v2.0/kc2_interface.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/types.dart';
+import 'package:karma_coin/services/v2.0/user_info.dart';
 
 final random = Random.secure();
 String get randomPhoneNumber => (random.nextInt(900000) + 100000).toString();
@@ -46,6 +47,12 @@ void main() {
         String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
         String katyaPhoneNumber = randomPhoneNumber;
         kc2Service.setKeyring(katya.keyring);
+
+        KC2UserInfo katyaInfo = KC2UserInfo(
+            accountId: katya.accountId,
+            userName: katyaUserName,
+            balance: BigInt.zero,
+            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
 
         // Assume sign up flow works successfully, just wait to tx complete
         await kc2Service.newUser(
@@ -104,7 +111,7 @@ void main() {
           completer.complete(true);
         };
 
-        kc2Service.subscribeToAccount(katya.accountId);
+        kc2Service.subscribeToAccount(katyaInfo);
 
         // Create a pool
         txHash = await kc2Service.createPool(
@@ -154,6 +161,18 @@ void main() {
 
         kc2Service.setKeyring(katya.keyring);
 
+        KC2UserInfo punchInfo = KC2UserInfo(
+            accountId: punch.accountId,
+            userName: punchUserName,
+            balance: BigInt.zero,
+            phoneNumberHash: kc2Service.getPhoneNumberHash(punchPhoneNumber));
+
+        KC2UserInfo katyaInfo = KC2UserInfo(
+            accountId: katya.accountId,
+            userName: katyaUserName,
+            balance: BigInt.zero,
+            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
+
         final completer = Completer<bool>();
         String txHash = "";
 
@@ -182,7 +201,7 @@ void main() {
           kc2Service.setKeyring(punch.keyring);
           txHash = await kc2Service.join(BigInt.from(1000000), poolId);
           // Listen to Punch transactions
-          kc2Service.subscribeToAccount(punch.accountId);
+          kc2Service.subscribeToAccount(punchInfo);
         };
 
         kc2Service.joinPoolCallback = (tx) async {
@@ -216,7 +235,7 @@ void main() {
           completer.complete(true);
         };
 
-        kc2Service.subscribeToAccount(katya.accountId);
+        kc2Service.subscribeToAccount(katyaInfo);
 
         // Create a pool
         txHash = await kc2Service.createPool(
@@ -250,6 +269,12 @@ void main() {
         String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
         String katyaPhoneNumber = randomPhoneNumber;
         kc2Service.setKeyring(katya.keyring);
+
+        KC2UserInfo katyaInfo = KC2UserInfo(
+            accountId: katya.accountId,
+            userName: katyaUserName,
+            balance: BigInt.zero,
+            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
 
         // Assume sign up flow works successfully, just wait to tx complete
         await kc2Service.newUser(
@@ -311,7 +336,7 @@ void main() {
           completer.complete(true);
         };
 
-        kc2Service.subscribeToAccount(katya.accountId);
+        kc2Service.subscribeToAccount(katyaInfo);
 
         // Create a pool
         txHash = await kc2Service.createPool(
@@ -346,6 +371,12 @@ void main() {
         String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
         String katyaPhoneNumber = randomPhoneNumber;
         kc2Service.setKeyring(katya.keyring);
+
+        KC2UserInfo katyaInfo = KC2UserInfo(
+            accountId: katya.accountId,
+            userName: katyaUserName,
+            balance: BigInt.zero,
+            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
 
         // Assume sign up flow works successfully, just wait to tx complete
         await kc2Service.newUser(
@@ -405,7 +436,7 @@ void main() {
           completer.complete(true);
         };
 
-        kc2Service.subscribeToAccount(katya.accountId);
+        kc2Service.subscribeToAccount(katyaInfo);
 
         // Create a pool
         txHash = await kc2Service.createPool(
@@ -440,6 +471,12 @@ void main() {
         String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
         String katyaPhoneNumber = randomPhoneNumber;
         kc2Service.setKeyring(katya.keyring);
+
+        KC2UserInfo katyaInfo = KC2UserInfo(
+            accountId: katya.accountId,
+            userName: katyaUserName,
+            balance: BigInt.zero,
+            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
 
         // Assume sign up flow works successfully, just wait to tx complete
         await kc2Service.newUser(
@@ -505,7 +542,7 @@ void main() {
           completer.complete(true);
         };
 
-        kc2Service.subscribeToAccount(katya.accountId);
+        kc2Service.subscribeToAccount(katyaInfo);
 
         // Create a pool
         txHash = await kc2Service.createPool(
@@ -540,6 +577,7 @@ void main() {
         await katya.initNoStorage();
         String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
         String katyaPhoneNumber = randomPhoneNumber;
+
         // Create a new identity for local user Punch
         IdentityInterface punch = Identity();
         await punch.initNoStorage();
@@ -557,6 +595,12 @@ void main() {
         await Future.delayed(const Duration(seconds: 12));
 
         kc2Service.setKeyring(katya.keyring);
+
+        KC2UserInfo katyaInfo = KC2UserInfo(
+            accountId: katya.accountId,
+            userName: katyaUserName,
+            balance: BigInt.zero,
+            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
 
         // Test utils
         final completer = Completer<bool>();
@@ -622,7 +666,7 @@ void main() {
           completer.complete(true);
         };
 
-        kc2Service.subscribeToAccount(katya.accountId);
+        kc2Service.subscribeToAccount(katyaInfo);
 
         // Create a pool
         txHash = await kc2Service.createPool(
@@ -672,6 +716,12 @@ void main() {
         await Future.delayed(const Duration(seconds: 12));
 
         kc2Service.setKeyring(katya.keyring);
+
+        KC2UserInfo katyaInfo = KC2UserInfo(
+            accountId: katya.accountId,
+            userName: katyaUserName,
+            balance: BigInt.zero,
+            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
 
         // Test utils
         final completer = Completer<bool>();
@@ -736,7 +786,7 @@ void main() {
           completer.complete(true);
         };
 
-        kc2Service.subscribeToAccount(katya.accountId);
+        kc2Service.subscribeToAccount(katyaInfo);
 
         // Create a pool
         txHash = await kc2Service.createPool(

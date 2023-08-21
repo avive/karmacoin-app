@@ -37,18 +37,23 @@ void main() {
         kc2Service.setKeyring(katya.keyring);
         debugPrint('Local user katya public address: ${katya.accountId}');
 
+        KC2UserInfo katyaInfo = KC2UserInfo(
+            accountId: katya.accountId,
+            userName: katyaUserName,
+            balance: BigInt.zero,
+            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
+
         final completer = Completer<bool>();
         String? txHash;
 
         kc2Service.newUserCallback = (tx) async {
-          debugPrint('>> new user callback called');
-          if (tx.failedReason != null) {
-            completer.complete(false);
+          if (tx.hash != txHash) {
+            debugPrint('ignoring unexpected tx hash: ${tx.hash} ');
             return;
           }
 
-          if (tx.hash != txHash) {
-            debugPrint('unexpected tx hash: ${tx.hash} ');
+          debugPrint('>> new user callback called');
+          if (tx.failedReason != null) {
             completer.complete(false);
             return;
           }
@@ -106,7 +111,7 @@ void main() {
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         // subscribe to new account txs
-        kc2Service.subscribeToAccount(katya.accountId);
+        kc2Service.subscribeToAccount(katyaInfo);
 
         String? err;
         // signup katya
@@ -144,19 +149,24 @@ void main() {
         kc2Service.setKeyring(katya.keyring);
         debugPrint('Local user katya public address: ${katya.accountId}');
 
+        KC2UserInfo katyaInfo = KC2UserInfo(
+            accountId: katya.accountId,
+            userName: katyaUserName,
+            balance: BigInt.zero,
+            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
+
         final completer = Completer<bool>();
         String? txHash;
         String? updateTexHash;
 
         kc2Service.updateUserCallback = (tx) async {
-          debugPrint('>> update user update 1 called');
-          if (tx.failedReason != null) {
-            completer.complete(false);
+          if (tx.hash != updateTexHash) {
+            debugPrint('ignore unexpected tx hash: ${tx.hash} ');
             return;
           }
 
-          if (tx.hash != updateTexHash) {
-            expect(tx.hash, updateTexHash);
+          debugPrint('>> update user update 1 called');
+          if (tx.failedReason != null) {
             completer.complete(false);
             return;
           }
@@ -207,14 +217,13 @@ void main() {
         };
 
         kc2Service.newUserCallback = (tx) async {
-          debugPrint('>> new user callback called');
-          if (tx.failedReason != null) {
-            completer.complete(false);
+          if (tx.hash != txHash) {
+            // ignore - not our tx
             return;
           }
 
-          if (tx.hash != txHash) {
-            debugPrint('unexpected tx hash: ${tx.hash} ');
+          debugPrint('>> new user callback called');
+          if (tx.failedReason != null) {
             completer.complete(false);
             return;
           }
@@ -232,7 +241,7 @@ void main() {
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         // subscribe to new account txs
-        kc2Service.subscribeToAccount(katya.accountId);
+        kc2Service.subscribeToAccount(katyaInfo);
 
         // signup katya
         String? err;
@@ -267,6 +276,12 @@ void main() {
         String katyaNewUserName =
             "Katya${katya.accountId.substring(5, 10)}".toLowerCase();
 
+        KC2UserInfo katyaInfo = KC2UserInfo(
+            accountId: katya.accountId,
+            userName: katyaUserName,
+            balance: BigInt.zero,
+            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
+
         // Set katya as signer
         kc2Service.setKeyring(katya.keyring);
         debugPrint('Local user katya public address: ${katya.accountId}');
@@ -278,14 +293,13 @@ void main() {
             kc2Service.getPhoneNumberHash(katyaPhoneNumber);
 
         kc2Service.updateUserCallback = (tx) async {
-          debugPrint('>> update user update 1 called. tx: ${tx.args}');
-          if (tx.failedReason != null) {
-            completer.complete(false);
+          if (tx.hash != updateTexHash) {
+            // ignore - not our tx
             return;
           }
 
-          if (tx.hash != updateTexHash) {
-            expect(tx.hash, updateTexHash);
+          debugPrint('>> update user update 1 called. tx: ${tx.args}');
+          if (tx.failedReason != null) {
             completer.complete(false);
             return;
           }
@@ -339,14 +353,13 @@ void main() {
         };
 
         kc2Service.newUserCallback = (tx) async {
-          debugPrint('>> new user callback called');
-          if (tx.failedReason != null) {
-            completer.complete(false);
+          if (tx.hash != txHash) {
+            // ignore - not our tx
             return;
           }
 
-          if (tx.hash != txHash) {
-            debugPrint('unexpected tx hash: ${tx.hash} ');
+          debugPrint('>> new user callback called');
+          if (tx.failedReason != null) {
             completer.complete(false);
             return;
           }
@@ -363,7 +376,7 @@ void main() {
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         // subscribe to new account txs
-        kc2Service.subscribeToAccount(katya.accountId);
+        kc2Service.subscribeToAccount(katyaInfo);
 
         // signup katya
         String? err;
@@ -403,6 +416,12 @@ void main() {
         kc2Service.setKeyring(katya.keyring);
         debugPrint('Local user katya public address: ${katya.accountId}');
 
+        KC2UserInfo katyaInfo = KC2UserInfo(
+            accountId: katya.accountId,
+            userName: katyaUserName,
+            balance: BigInt.zero,
+            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
+
         final completer = Completer<bool>();
         String? katyaNewUserTxHash;
         String? punchNewUserTxHash;
@@ -411,14 +430,14 @@ void main() {
         kc2Service.appreciationCallback = null;
 
         kc2Service.newUserCallback = (tx) async {
-          debugPrint('>> Katya new user callback called');
-          if (tx.failedReason != null) {
-            completer.complete(false);
+          // debugPrint('>> Katya new user callback called');
+
+          if (tx.hash != katyaNewUserTxHash) {
+            // ignore - not our tx
             return;
           }
 
-          if (tx.hash != katyaNewUserTxHash) {
-            debugPrint('unexpected tx hash: ${tx.hash} ');
+          if (tx.failedReason != null) {
             completer.complete(false);
             return;
           }
@@ -440,7 +459,7 @@ void main() {
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         // subscribe to new account txs
-        kc2Service.subscribeToAccount(katya.accountId);
+        kc2Service.subscribeToAccount(katyaInfo);
 
         String? err;
         (katyaNewUserTxHash, err) = await kc2Service.newUser(

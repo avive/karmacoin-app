@@ -42,6 +42,12 @@ void main() {
         kc2Service.setKeyring(katya.keyring);
         debugPrint('Local user katya public address: ${katya.accountId}');
 
+        KC2UserInfo katyaInfo = KC2UserInfo(
+            accountId: katya.accountId,
+            userName: katyaUserName,
+            balance: BigInt.zero,
+            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
+
         final completer = Completer<bool>();
         String? txHash;
         String? updateTexHash;
@@ -88,7 +94,7 @@ void main() {
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         // subscribe to new account txs
-        kc2Service.subscribeToAccount(katya.accountId);
+        kc2Service.subscribeToAccount(katyaInfo);
 
         // signup katya
 
@@ -126,6 +132,18 @@ void main() {
             "Punch${punch.accountId.substring(0, 5)}".toLowerCase();
         String punchPhoneNumber = randomPhoneNumber;
 
+        KC2UserInfo katyaInfo = KC2UserInfo(
+            accountId: katya.accountId,
+            userName: katyaUserName,
+            balance: BigInt.zero,
+            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
+
+        KC2UserInfo punchInfo = KC2UserInfo(
+            accountId: punch.accountId,
+            userName: punchUserName,
+            balance: BigInt.zero,
+            phoneNumberHash: kc2Service.getPhoneNumberHash(punchPhoneNumber));
+
         Timer? blockProcessingTimer;
 
         // Set katya as signer
@@ -153,7 +171,7 @@ void main() {
 
           // switch local user to punch
           blockProcessingTimer?.cancel();
-          kc2Service.subscribeToAccount(punch.accountId);
+          kc2Service.subscribeToAccount(punchInfo);
           kc2Service.setKeyring(punch.keyring);
 
           kc2Service.appreciationCallback = (tx) async {
@@ -214,7 +232,7 @@ void main() {
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         // subscribe to new account txs
-        blockProcessingTimer = kc2Service.subscribeToAccount(katya.accountId);
+        blockProcessingTimer = kc2Service.subscribeToAccount(katyaInfo);
 
         (katyaNewUserTxHash, err) = await kc2Service.newUser(
             katya.accountId, katyaUserName, katyaPhoneNumber);

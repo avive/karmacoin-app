@@ -73,9 +73,11 @@ class KC2User extends KC2UserInteface {
     kc2Service.newUserCallback = _signupUserCallback;
     kc2Service.updateUserCallback = _updateUserCallback;
 
-    // subscribe to account transactions
-    _subscribeToAccountTimer =
-        kc2Service.subscribeToAccount(_identity.accountId);
+    // subscribe to account transactions if we have user info in this session
+    // otherwise we'll subscribe o n signup()
+    if (userInfo.value != null) {
+      _subscribeToAccountTimer = kc2Service.subscribeToAccount(userInfo.value!);
+    }
 
     // register on firebase auth state changes
     /*
@@ -139,7 +141,7 @@ class KC2User extends KC2UserInteface {
   Future<FetchAppreciationsStatus> fetchAppreciations() async {
     fetchAppreciationStatus.value = FetchAppreciationsStatus.fetching;
     fetchAppreciationStatus.value =
-        await kc2Service.processTransactions(_identity.accountId);
+        await kc2Service.getTransactions(userInfo.value!);
 
     return fetchAppreciationStatus.value;
   }
@@ -150,6 +152,7 @@ class KC2User extends KC2UserInteface {
   Future<void> signout() async {
     if (userInfo.value != null) {
       await userInfo.value?.deleteFromSecureStorage(_secureStorage);
+      userInfo.value == null;
     }
 
     // unsubscribe from kc2 callbacks
@@ -200,6 +203,21 @@ class KC2User extends KC2UserInteface {
       }
     });
 
+    // create userInfo and subscribe if needed
+    if (userInfo.value == null) {
+      userInfo.value = KC2UserInfo(
+          accountId: _identity.accountId,
+          userName: requestedUserName,
+          balance: BigInt.zero,
+          phoneNumberHash: kc2Service.getPhoneNumberHash(requestedPhoneNumber));
+
+      if (_subscribeToAccountTimer.isActive) {
+        _subscribeToAccountTimer.cancel();
+      }
+
+      _subscribeToAccountTimer = kc2Service.subscribeToAccount(userInfo.value!);
+    }
+
     String? err;
     String? txHash;
     (txHash, err) = await kc2Service.newUser(
@@ -236,7 +254,7 @@ class KC2User extends KC2UserInteface {
       return;
     }
     if (txHash != null) {
-      // store the tx hash so we can match on it
+      // store the tx hash so we can match on it on callback
       _signupTxHash = txHash;
     }
   }

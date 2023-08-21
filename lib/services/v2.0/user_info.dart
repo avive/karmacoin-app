@@ -24,10 +24,10 @@ class KC2UserInfo {
     required this.phoneNumberHash,
     required this.userName,
     required this.balance,
-    required this.nonce,
-    required this.karmaScore,
-    required this.traitScores,
-    required this.communityMemberships,
+    this.nonce = 0,
+    this.karmaScore = 0,
+    this.traitScores = const {},
+    this.communityMemberships = const [],
   });
 
   /// Returns the list of trait scores for a given communityId
