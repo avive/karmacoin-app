@@ -3,7 +3,7 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/data/personality_traits.dart';
-import 'package:karma_coin/services/v2.0/kc2_interface.dart';
+import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/ui/helpers/transactions.dart';

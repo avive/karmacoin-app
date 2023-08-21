@@ -4,7 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/v2.0/error.dart';
 import 'package:karma_coin/services/v2.0/interfaces.dart';
-import 'package:karma_coin/services/v2.0/kc2_interface.dart';
+import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/event.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/claim_commission.dart';
@@ -147,7 +147,8 @@ class KarmachainService extends ChainApiProvider
   /// Get all on-chain txs to or form an account
   /// accou
   @override
-  Future<FetchAppreciationsStatus> getTransactions(KC2UserInfo userInfo) async {
+  Future<FetchAppreciationsStatus> getAccountTransactions(
+      KC2UserInfo userInfo) async {
     try {
       debugPrint('Getting all txs for account: $userInfo.accountId');
       final txs = await getTransactionsByAccountId(userInfo.accountId);
@@ -190,7 +191,7 @@ class KarmachainService extends ChainApiProvider
 
   /// Subscribe to account transactions and events
   @override
-  Timer subscribeToAccount(KC2UserInfo userInfo) {
+  Timer subscribeToAccountTransactions(KC2UserInfo userInfo) {
     BigInt blockNumber = BigInt.zero;
     return Timer.periodic(const Duration(seconds: 12), (Timer t) async {
       try {
@@ -217,8 +218,7 @@ class KarmachainService extends ChainApiProvider
   // Tx processing
 
   /// Create a KC2Tx object from raw tx data
-  /// todo: add to interface
-  KC2Tx? createKC2Trnsaction(
+  KC2Tx? _createKC2Trnsaction(
       Map<String, dynamic> tx,
       String? hash,
       List<KC2Event> txEvents,
@@ -452,7 +452,7 @@ class KarmachainService extends ChainApiProvider
           newUserCallback != null) {
         final txAccountId = encodeAccountId(args['account_id'].cast<int>());
         if (signer == userInfo.accountId || userInfo.accountId == txAccountId) {
-          KC2Tx? newUserTx = createKC2Trnsaction(
+          KC2Tx? newUserTx = _createKC2Trnsaction(
               tx, hash, txEvents, timestamp, blockNumber, blockIndex, signer);
           if (newUserCallback != null &&
               newUserTx != null &&
@@ -467,7 +467,7 @@ class KarmachainService extends ChainApiProvider
           pallet == 'Identity' &&
           method == 'update_user' &&
           signer == userInfo.accountId) {
-        KC2Tx? updateUserTx = createKC2Trnsaction(
+        KC2Tx? updateUserTx = _createKC2Trnsaction(
             tx, hash, txEvents, timestamp, blockNumber, blockIndex, signer);
         if (updateUserCallback != null &&
             updateUserTx != null &&

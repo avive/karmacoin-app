@@ -3,8 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/identity.dart';
 import 'package:karma_coin/logic/identity_interface.dart';
-import 'package:karma_coin/services/v2.0/kc2.dart';
-import 'package:karma_coin/services/v2.0/kc2_interface.dart';
+import 'package:karma_coin/services/v2.0/kc2_service.dart';
+import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
@@ -91,17 +91,17 @@ void main() {
             switch (counter) {
               case 1:
                 kc2Service.setKeyring(tomas.keyring);
-                kc2Service.subscribeToAccount(tomasInfo);
+                kc2Service.subscribeToAccountTransactions(tomasInfo);
                 await kc2Service.newUser(
                     tomas.accountId, tomasUserName, tomasPhoneNumber);
               case 2:
                 kc2Service.setKeyring(tor.keyring);
-                kc2Service.subscribeToAccount(torInfo);
+                kc2Service.subscribeToAccountTransactions(torInfo);
                 await kc2Service.newUser(
                     tor.accountId, torUserName, torPhoneNumber);
               case 3:
                 kc2Service.setKeyring(platon.keyring);
-                kc2Service.subscribeToAccount(platonInfo);
+                kc2Service.subscribeToAccountTransactions(platonInfo);
                 await kc2Service.newUser(
                     platon.accountId, platonUserName, platonPhoneNumber);
               // When all users created
@@ -134,7 +134,7 @@ void main() {
           };
 
           kc2Service.setKeyring(tom.keyring);
-          kc2Service.subscribeToAccount(tomInfo);
+          kc2Service.subscribeToAccountTransactions(tomInfo);
           await kc2Service.newUser(tom.accountId, tomUserName, tomPhoneNumber);
 
           // wait for completer and verify test success
@@ -214,17 +214,17 @@ void main() {
             switch (counter) {
               case 1:
                 kc2Service.setKeyring(tomas.keyring);
-                kc2Service.subscribeToAccount(tomasInfo);
+                kc2Service.subscribeToAccountTransactions(tomasInfo);
                 await kc2Service.newUser(
                     tomas.accountId, tomasUserName, tomasPhoneNumber);
               case 2:
                 kc2Service.setKeyring(tor.keyring);
-                kc2Service.subscribeToAccount(torInfo);
+                kc2Service.subscribeToAccountTransactions(torInfo);
                 await kc2Service.newUser(
                     tor.accountId, torUserName, torPhoneNumber);
               case 3:
                 kc2Service.setKeyring(platon.keyring);
-                kc2Service.subscribeToAccount(platonInfo);
+                kc2Service.subscribeToAccountTransactions(platonInfo);
                 await kc2Service.newUser(
                     platon.accountId, platonUserName, platonPhoneNumber);
               // When all users created
@@ -240,7 +240,7 @@ void main() {
           };
 
           kc2Service.setKeyring(tom.keyring);
-          kc2Service.subscribeToAccount(tomInfo);
+          kc2Service.subscribeToAccountTransactions(tomInfo);
           await kc2Service.newUser(tom.accountId, tomUserName, tomPhoneNumber);
 
           // wait for completer and verify test success

@@ -6,8 +6,8 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/logic/identity.dart';
 import 'package:karma_coin/logic/identity_interface.dart';
-import 'package:karma_coin/services/v2.0/kc2.dart';
-import 'package:karma_coin/services/v2.0/kc2_interface.dart';
+import 'package:karma_coin/services/v2.0/kc2_service.dart';
+import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/types.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
@@ -111,7 +111,7 @@ void main() {
           completer.complete(true);
         };
 
-        kc2Service.subscribeToAccount(katyaInfo);
+        kc2Service.subscribeToAccountTransactions(katyaInfo);
 
         // Create a pool
         txHash = await kc2Service.createPool(
@@ -201,7 +201,7 @@ void main() {
           kc2Service.setKeyring(punch.keyring);
           txHash = await kc2Service.join(BigInt.from(1000000), poolId);
           // Listen to Punch transactions
-          kc2Service.subscribeToAccount(punchInfo);
+          kc2Service.subscribeToAccountTransactions(punchInfo);
         };
 
         kc2Service.joinPoolCallback = (tx) async {
@@ -235,7 +235,7 @@ void main() {
           completer.complete(true);
         };
 
-        kc2Service.subscribeToAccount(katyaInfo);
+        kc2Service.subscribeToAccountTransactions(katyaInfo);
 
         // Create a pool
         txHash = await kc2Service.createPool(
@@ -336,7 +336,7 @@ void main() {
           completer.complete(true);
         };
 
-        kc2Service.subscribeToAccount(katyaInfo);
+        kc2Service.subscribeToAccountTransactions(katyaInfo);
 
         // Create a pool
         txHash = await kc2Service.createPool(
@@ -436,7 +436,7 @@ void main() {
           completer.complete(true);
         };
 
-        kc2Service.subscribeToAccount(katyaInfo);
+        kc2Service.subscribeToAccountTransactions(katyaInfo);
 
         // Create a pool
         txHash = await kc2Service.createPool(
@@ -542,7 +542,7 @@ void main() {
           completer.complete(true);
         };
 
-        kc2Service.subscribeToAccount(katyaInfo);
+        kc2Service.subscribeToAccountTransactions(katyaInfo);
 
         // Create a pool
         txHash = await kc2Service.createPool(
@@ -666,7 +666,7 @@ void main() {
           completer.complete(true);
         };
 
-        kc2Service.subscribeToAccount(katyaInfo);
+        kc2Service.subscribeToAccountTransactions(katyaInfo);
 
         // Create a pool
         txHash = await kc2Service.createPool(
@@ -786,7 +786,7 @@ void main() {
           completer.complete(true);
         };
 
-        kc2Service.subscribeToAccount(katyaInfo);
+        kc2Service.subscribeToAccountTransactions(katyaInfo);
 
         // Create a pool
         txHash = await kc2Service.createPool(

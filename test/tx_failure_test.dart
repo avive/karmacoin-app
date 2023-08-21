@@ -7,8 +7,8 @@ import 'package:karma_coin/logic/identity.dart';
 import 'package:karma_coin/logic/identity_interface.dart';
 import 'package:karma_coin/logic/user.dart';
 import 'package:karma_coin/logic/user_interface.dart';
-import 'package:karma_coin/services/v2.0/kc2.dart';
-import 'package:karma_coin/services/v2.0/kc2_interface.dart';
+import 'package:karma_coin/services/v2.0/kc2_service.dart';
+import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
 final random = Random.secure();
@@ -94,7 +94,7 @@ void main() {
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         // subscribe to new account txs
-        kc2Service.subscribeToAccount(katyaInfo);
+        kc2Service.subscribeToAccountTransactions(katyaInfo);
 
         // signup katya
 
@@ -171,7 +171,7 @@ void main() {
 
           // switch local user to punch
           blockProcessingTimer?.cancel();
-          kc2Service.subscribeToAccount(punchInfo);
+          kc2Service.subscribeToAccountTransactions(punchInfo);
           kc2Service.setKeyring(punch.keyring);
 
           kc2Service.appreciationCallback = (tx) async {
@@ -232,7 +232,8 @@ void main() {
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         // subscribe to new account txs
-        blockProcessingTimer = kc2Service.subscribeToAccount(katyaInfo);
+        blockProcessingTimer =
+            kc2Service.subscribeToAccountTransactions(katyaInfo);
 
         (katyaNewUserTxHash, err) = await kc2Service.newUser(
             katya.accountId, katyaUserName, katyaPhoneNumber);

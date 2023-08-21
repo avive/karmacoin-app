@@ -111,7 +111,7 @@ Future<void> startKC2Playground() async {
         phoneNumberHash: kc2Service.getPhoneNumberHash("972549805380"));
 
     // subscribe to new account txs
-    kc2Service.subscribeToAccount(katyaInfo);
+    kc2Service.subscribeToAccountTransactions(katyaInfo);
 
     // signup katya
     await kc2Service.newUser(katya.accountId, "katya", "972549805380");

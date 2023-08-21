@@ -6,7 +6,7 @@ import 'package:karma_coin/logic/identity_interface.dart';
 import 'package:karma_coin/logic/txs_boss2.dart';
 import 'package:karma_coin/logic/txs_boss2_interface.dart';
 import 'package:karma_coin/logic/user_interface.dart';
-import 'package:karma_coin/services/v2.0/kc2_interface.dart';
+import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
@@ -76,7 +76,8 @@ class KC2User extends KC2UserInteface {
     // subscribe to account transactions if we have user info in this session
     // otherwise we'll subscribe o n signup()
     if (userInfo.value != null) {
-      _subscribeToAccountTimer = kc2Service.subscribeToAccount(userInfo.value!);
+      _subscribeToAccountTimer =
+          kc2Service.subscribeToAccountTransactions(userInfo.value!);
     }
 
     // register on firebase auth state changes
@@ -141,7 +142,7 @@ class KC2User extends KC2UserInteface {
   Future<FetchAppreciationsStatus> fetchAppreciations() async {
     fetchAppreciationStatus.value = FetchAppreciationsStatus.fetching;
     fetchAppreciationStatus.value =
-        await kc2Service.getTransactions(userInfo.value!);
+        await kc2Service.getAccountTransactions(userInfo.value!);
 
     return fetchAppreciationStatus.value;
   }
@@ -215,7 +216,8 @@ class KC2User extends KC2UserInteface {
         _subscribeToAccountTimer.cancel();
       }
 
-      _subscribeToAccountTimer = kc2Service.subscribeToAccount(userInfo.value!);
+      _subscribeToAccountTimer =
+          kc2Service.subscribeToAccountTransactions(userInfo.value!);
     }
 
     String? err;

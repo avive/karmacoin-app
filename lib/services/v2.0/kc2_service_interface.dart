@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:convert/convert.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/app_state.dart';
+import 'package:karma_coin/services/v2.0/event.dart';
 import 'package:karma_coin/services/v2.0/interfaces.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
@@ -439,12 +440,12 @@ mixin K2ServiceInterface implements ChainApiProvider {
   /// Subscribe to account-related transactions
   /// accountId - ss58 encoded address
   /// Events will be delivered to registered event handlers
-  Timer subscribeToAccount(KC2UserInfo userInfo);
+  Timer subscribeToAccountTransactions(KC2UserInfo userInfo);
 
   /// Get all transactions from chain to, or from an account
   /// Transactions will be sent to registered event handlers based on their type
   /// accountId - ss58 encoded address
-  Future<FetchAppreciationsStatus> getTransactions(KC2UserInfo userInfo);
+  Future<FetchAppreciationsStatus> getAccountTransactions(KC2UserInfo userInfo);
 
   // helpers
 

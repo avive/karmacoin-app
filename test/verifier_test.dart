@@ -9,8 +9,8 @@ import 'package:karma_coin/logic/identity_interface.dart';
 import 'package:karma_coin/logic/verifier.dart';
 import 'package:karma_coin/data/verify_number_request.dart';
 import 'package:karma_coin/services/api/verifier.pb.dart' as proto;
-import 'package:karma_coin/services/v2.0/kc2.dart';
-import 'package:karma_coin/services/v2.0/kc2_interface.dart';
+import 'package:karma_coin/services/v2.0/kc2_service.dart';
+import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
@@ -154,7 +154,7 @@ void main() {
         );
 
         // subscribe to new account txs
-        kc2Service.subscribeToAccount(katyaInfo);
+        kc2Service.subscribeToAccountTransactions(katyaInfo);
 
         String? err;
         // signup katya
