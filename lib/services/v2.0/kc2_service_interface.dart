@@ -177,8 +177,8 @@ mixin K2ServiceInterface implements ChainApiProvider {
   }
 
   /// Fetch transaction by transaction hash
-  /// todo: @holygrease this should return a typed KC2Tx and not just a raw
-  /// Transaction which is useless for client.
+  /// TODO: @holygrease this should return a typed KC2Tx and not just a raw
+  /// Transaction which is pretty useless for clients
   Future<Transaction> getTransactionByHash(String txHash) async {
     try {
       Map<String, dynamic> result =
@@ -442,9 +442,8 @@ mixin K2ServiceInterface implements ChainApiProvider {
   /// Events will be delivered to registered event handlers
   Timer subscribeToAccountTransactions(KC2UserInfo userInfo);
 
-  /// Get all transactions from chain to, or from an account
+  /// Get all transactions from chain to, or from an account provided via userInfo
   /// Transactions will be sent to registered event handlers based on their type
-  /// accountId - ss58 encoded address
   Future<FetchAppreciationsStatus> getAccountTransactions(KC2UserInfo userInfo);
 
   // helpers

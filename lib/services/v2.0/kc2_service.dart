@@ -144,8 +144,7 @@ class KarmachainService extends ChainApiProvider
     }
   }
 
-  /// Get all on-chain txs to or form an account
-  /// accou
+  /// Get all on-chain txs to or form an account identified by userInfo
   @override
   Future<FetchAppreciationsStatus> getAccountTransactions(
       KC2UserInfo userInfo) async {
@@ -292,6 +291,8 @@ class KarmachainService extends ChainApiProvider
         rawData: tx,
       );
     }
+
+    // TODO: add other types of txs here
 
     return null;
   }
@@ -895,7 +896,7 @@ class KarmachainService extends ChainApiProvider
     }*/
   }*/
 
-  /// Process a coin transfer tx
+  /// Process a coin transfer tx from a block
   Future<void> _processTransferTransaction(
       String hash,
       int timeStamp,
