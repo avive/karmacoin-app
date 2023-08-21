@@ -87,7 +87,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
 
     tiles.add(_getAmountTile(context, tx.amount));
 
-    bool sentToLocalUser = tx.toAddress == kc2User.identity.accountId ||
+    bool sentToLocalUser = tx.toAccountId == kc2User.identity.accountId ||
         tx.toUserName == kc2User.userInfo.value!.userName;
 
     String fromLabel = sentToLocalUser
@@ -95,7 +95,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
         : 'Sent from you to ${tx.toUserName}';
 
     Widget? icon = sentToLocalUser
-        ? RandomAvatar(tx.fromUserName, height: 34, width: 34)
+        ? RandomAvatar(tx.fromUserName!, height: 34, width: 34)
         : RandomAvatar(tx.toUserName!, height: 28, width: 34);
 
     tiles.add(
@@ -137,7 +137,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
       );
     }*/
 
-    tiles.add(_getAddressTile(context, 'To address', tx.toAddress, false));
+    tiles.add(_getAddressTile(context, 'To address', tx.toAccountId!, false));
     tiles.add(_getAddressTile(context, 'From address', tx.fromAddress, true));
 
     return tiles;
@@ -177,7 +177,8 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
     List<CupertinoListTile> tiles = [];
 
     if (widget.tx is KC2AppreciationTxV1) {
-      tiles = _getAppreciationTiles(context, widget.tx as KC2AppreciationTxV1);
+      tiles = _getAppreciationTiles(
+          context, widget.tx as KC2AppreciationTxV1);
     } else if (widget.tx is KC2TransferTxV1) {
       tiles = _getTransferTiles(context, widget.tx as KC2TransferTxV1);
     } else {
@@ -240,7 +241,8 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
 
   @override
   build(BuildContext context) {
-    KC2AppreciationTxV1? appreciation = widget.tx as KC2AppreciationTxV1?;
+    KC2AppreciationTxV1? appreciation =
+        widget.tx as KC2AppreciationTxV1?;
 
     if (appreciation != null) {
       if (appreciation.communityId == 0) {

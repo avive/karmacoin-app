@@ -2,7 +2,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/v2.0/kc2.dart';
-import 'package:karma_coin/services/v2.0/kc2_service.dart';
+import 'package:karma_coin/services/v2.0/kc2_interface.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 
 final random = Random.secure();

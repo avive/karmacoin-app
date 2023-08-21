@@ -11,7 +11,7 @@ class KC2TransactionBoss extends KC2TransactionBossInterface {
     // we need to replace the observeable list for clients to get notified
     debugPrint('Adding appreciation to user txs: ${tx.hash}');
 
-    if (tx.toAddress == accountId) {
+    if (tx.toAccountId == accountId) {
       Map<String, KC2Tx> txs = {};
       txs.addAll(incomingAppreciations.value);
       txs[tx.hash] = tx;

@@ -7,7 +7,7 @@ import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/logic/identity.dart';
 import 'package:karma_coin/logic/identity_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2.dart';
-import 'package:karma_coin/services/v2.0/kc2_service.dart';
+import 'package:karma_coin/services/v2.0/kc2_interface.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/types.dart';
 
 final random = Random.secure();

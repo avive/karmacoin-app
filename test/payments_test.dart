@@ -8,7 +8,7 @@ import 'package:karma_coin/logic/identity_interface.dart';
 import 'package:karma_coin/logic/user.dart';
 import 'package:karma_coin/logic/user_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2.dart';
-import 'package:karma_coin/services/v2.0/kc2_service.dart';
+import 'package:karma_coin/services/v2.0/kc2_interface.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
 final random = Random.secure();
@@ -101,7 +101,7 @@ void main() {
               expect(tx.failedReason, isNull);
               expect(tx.amount, BigInt.from(1000));
               expect(tx.fromAddress, punch.accountId);
-              expect(tx.toAddress, katya.accountId);
+              expect(tx.toAccountId, katya.accountId);
               expect(tx.signer, punch.accountId);
               expect(tx.charTraitId, 0);
 
