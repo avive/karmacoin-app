@@ -352,7 +352,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
     if (widget.isLocal) {
       trailingWidget = CupertinoButton(
         onPressed: () {
-          // TODO: push update username screen
+          // todo: push update username screen
         },
         child: adjustNavigationBarButtonPosition(
             const Icon(CupertinoIcons.pencil, size: 24), 0, -6),

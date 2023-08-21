@@ -119,7 +119,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   ///
   Future<String> unbond(String accountId, BigInt unbondingPoints) async {
     try {
-      // TODO: use balance as argument and convert it to points inside function
+      // todo: use balance as argument and convert it to points inside function
 
       final call = MapEntry(
           'NominationPools',
@@ -157,7 +157,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   ///
   Future<String> withdrawUnbonded(String accountId) async {
     try {
-      // TODO: calculate this value in some way. How???
+      // todo: calculate this value in some way. How???
       const numSlashingSpans = 256;
 
       final call = MapEntry(

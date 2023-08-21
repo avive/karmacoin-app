@@ -468,7 +468,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
     if (tx is KC2AppreciationTxV1) {
       return _getAppreciationWidget(context, tx, incoming, index);
     } else if (tx is KC2TransferTxV1) {
-      // TODO: implement transfer display widget
+      // todo: implement transfer display widget
       return Container();
     } else {
       debugPrint('Unexpected tx type: $tx');

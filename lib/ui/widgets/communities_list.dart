@@ -21,7 +21,7 @@ class CommunitiesListSection extends StatelessWidget {
                     .merge(const TextStyle(fontSize: 14)),
               ),
               onTap: () => {
-                // TODO: show community web page on site
+                // todo: show community web page on site
               },
             );
           }

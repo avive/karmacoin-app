@@ -29,7 +29,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    // TODO: if tx is null - fetch it from kc2 api once it is available
+    // todo: if tx is null - fetch it from kc2 api once it is available
     // we need kc2Service.getTransactionByHash() to return typed txs
     if (widget.tx == null) {
       throw 'For now - tx must be passed in via router to widget';
@@ -76,7 +76,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
       leading: const Icon(CupertinoIcons.checkmark_seal, size: 28),
       trailing: const Icon(CupertinoIcons.share, size: 28),
       onTap: () {
-        // TODO: implement me and copy
+        // todo: implement me and copy
       },
     );
   }
@@ -177,8 +177,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
     List<CupertinoListTile> tiles = [];
 
     if (widget.tx is KC2AppreciationTxV1) {
-      tiles = _getAppreciationTiles(
-          context, widget.tx as KC2AppreciationTxV1);
+      tiles = _getAppreciationTiles(context, widget.tx as KC2AppreciationTxV1);
     } else if (widget.tx is KC2TransferTxV1) {
       tiles = _getTransferTiles(context, widget.tx as KC2TransferTxV1);
     } else {
@@ -241,8 +240,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
 
   @override
   build(BuildContext context) {
-    KC2AppreciationTxV1? appreciation =
-        widget.tx as KC2AppreciationTxV1?;
+    KC2AppreciationTxV1? appreciation = widget.tx as KC2AppreciationTxV1?;
 
     if (appreciation != null) {
       if (appreciation.communityId == 0) {

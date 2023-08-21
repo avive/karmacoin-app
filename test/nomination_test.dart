@@ -23,7 +23,7 @@ void main() {
       () => GetIt.I.get<KarmachainService>());
 
   group('nomination tests', () {
-    // TODO: add test when user joins a pool and pools nominates the devnet validator
+    // todo: add test when user joins a pool and pools nominates the devnet validator
     // wait an era and verify pool gets rewarded and verify user can withdraw their reward
 
     // This test:
@@ -34,7 +34,7 @@ void main() {
     test(
       'create a pool',
       () async {
-        // TODO: delete all pools so a pool can be created w/o an error on any chain, and add a test for creating a pool when pools are maxed out and verify create fails
+        // todo: delete all pools so a pool can be created w/o an error on any chain, and add a test for creating a pool when pools are maxed out and verify create fails
 
         KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
         // Connect to the chain
@@ -209,9 +209,9 @@ void main() {
           expect(bobPoolMember!.id, tx.poolId);
           expect(bobPoolMember.points, BigInt.from(1000000));
 
-          // TODO: add a test when user tries to join same pool twice.
+          // todo: add a test when user tries to join same pool twice.
 
-          // TODO: crate a test when user tries to join a pool when he's already a member of another pool.
+          // todo: crate a test when user tries to join a pool when he's already a member of another pool.
 
           completer.complete(true);
         };

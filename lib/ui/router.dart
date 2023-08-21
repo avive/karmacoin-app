@@ -263,7 +263,7 @@ final GoRouter appRouter = GoRouter(
         builder: (BuildContext context, GoRouterState state) {
           var txId = state.params['txId'];
           if (txId == null) {
-            // TODO: redirect to home screen
+            // todo: redirect to home screen
           }
           // optional tx passed from caller
           KC2Tx? tx = state.extra != null ? state.extra as KC2Tx : null;

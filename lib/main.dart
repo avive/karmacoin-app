@@ -22,7 +22,7 @@ void main() async {
   await appLogic.bootstrap();
 
   // setup push notes (but don't wait on it per docs)
-  // TODO: fix me
+  // todo: fix me
   // settingsLogic.setupPushNotifications();
 
   runApp(KarmaCoinApp());

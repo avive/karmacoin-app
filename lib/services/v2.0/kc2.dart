@@ -75,7 +75,7 @@ class KarmachainService extends ChainApiProvider
 
       // check network id from node matches the client network type intent
       //if (netId != configLogic.networkId.value) {
-      // TODO: deal with it so client knows about issue
+      // todo: deal with it so client knows about issue
       //  throw 'Invalid network id returned by node. Expected ${configLogic.networkId.value}, got $netId';
       //}
 
@@ -216,7 +216,7 @@ class KarmachainService extends ChainApiProvider
   // Tx processing
 
   /// Create a KC2Tx object from raw tx data
-  /// TODO: add to interface
+  /// todo: add to interface
   KC2Tx? createKC2Trnsaction(
       Map<String, dynamic> tx,
       String? hash,

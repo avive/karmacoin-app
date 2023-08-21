@@ -85,7 +85,7 @@ class _SignupProgressScreeenState extends State<SignupProgressScreeen> {
       debugPrint('Signing up ${appState.requestedUserName!}...');
 
       if (!configLogic.skipWhatsappVerification) {
-        throw 'Not implemented yet! TODO: implement whatsapp verification api call';
+        throw 'Not implemented yet! todo: implement whatsapp verification api call';
       }
 
       // signup user on kc2 - for now bypassing verification
@@ -103,7 +103,7 @@ class _SignupProgressScreeenState extends State<SignupProgressScreeen> {
         await FirebaseAnalytics.instance.logEvent(name: "sign_up");
         debugPrint('*** going to user home...');
         pushNamedAndRemoveUntil(ScreenPaths.home);
-        // TODO: navigate to home
+        // todo: navigate to home
         break;
       case SignupStatus.notSignedUp:
         // enable trying again

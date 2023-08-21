@@ -176,7 +176,7 @@ mixin K2ServiceInterface implements ChainApiProvider {
   }
 
   /// Fetch transaction by transaction hash
-  /// TODO: @holygrease this should return a typed KC2Tx and not just a raw
+  /// todo: @holygrease this should return a typed KC2Tx and not just a raw
   /// Transaction which is useless for client.
   Future<Transaction> getTransactionByHash(String txHash) async {
     try {
@@ -461,7 +461,7 @@ mixin K2ServiceInterface implements ChainApiProvider {
   /// Local user's account data update
   UpdateUserCallback? updateUserCallback;
 
-  // TODO: deleteUserCallback
+  // todo: deleteUserCallback
 
   /// A transfer to or from local user
   TransferCallback? transferCallback;
@@ -469,5 +469,5 @@ mixin K2ServiceInterface implements ChainApiProvider {
   /// An appreciation to or from local user
   AppreciationCallback? appreciationCallback;
 
-  // TODO: setAdminCallback
+  // todo: setAdminCallback
 }

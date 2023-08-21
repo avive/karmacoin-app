@@ -59,14 +59,14 @@ class KC2User extends KC2UserInteface {
     kc2Service.transferCallback = (tx) async {
       _txsBoss.addTransferTx(tx);
       // update user balance, etc...
-      // TODO: this will cause update on every tx to/from user's account. Optimize to only call per block for possible multiple txs in a block.
+      // todo: this will cause update on every tx to/from user's account. Optimize to only call per block for possible multiple txs in a block.
       await getUserDataFromChain();
     };
 
     kc2Service.appreciationCallback = (tx) async {
       _txsBoss.addAppreciation(tx);
       // update user balance, etc..
-      // TODO: this will cause update on every tx to/from user's account. Optimize to only call per block for possible multiple txs in a block.
+      // todo: this will cause update on every tx to/from user's account. Optimize to only call per block for possible multiple txs in a block.
       await getUserDataFromChain();
     };
 
@@ -168,7 +168,7 @@ class KC2User extends KC2UserInteface {
   /// returns true if (account id, phone number, user name) exists on chain
   @override
   Future<bool> isAccountOnchain(String userName, String phoneNumber) async {
-    // TODO: implement me
+    // todo: implement me
     return false;
   }
 
@@ -397,11 +397,11 @@ class KC2User extends KC2UserInteface {
     if (tx.failedReason != null) {
       debugPrint('failed to update user: ${tx.failedReason}');
       updateResult.value = UpdateResult.invalidData;
-      // TODO: go deeper into reason and update result
+      // todo: go deeper into reason and update result
       return;
     }
 
-    // TODO: consider just getting user info from chain - it should have the updated information so all the code below is redundant
+    // todo: consider just getting user info from chain - it should have the updated information so all the code below is redundant
 
     // Clone needed here as we want to set a new observable value
     KC2UserInfo u = KC2UserInfo.clone(userInfo.value!);

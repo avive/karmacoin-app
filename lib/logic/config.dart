@@ -3,7 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/common/platform_info.dart';
 
-// TODO: add ConfigLogic public interface
+// todo: add ConfigLogic public interface
 
 enum KCNetworkType {
   testnet(42),
@@ -133,7 +133,7 @@ class ConfigLogic {
           break;
         case KCNetworkType.mainnet:
           debugPrint('Working against a remote kc2 mainnet api provider');
-          // TODO: add mainnet api node here
+          // todo: add mainnet api node here
           apiHostName.value = '[add mainnent public api node here]';
           apiHostPort.value = 80;
           apiProtocol.value = 'wss';
@@ -168,7 +168,7 @@ class ConfigLogic {
   String get kc2ApiUrl =>
       '${apiProtocol.value}://${apiHostName.value}:${apiHostPort.value}';
 
-  // TODO: completely revamp push notes to new auth scheme
+  // todo: completely revamp push notes to new auth scheme
 
   // push notificaiton handling
   ////////////////////
@@ -316,7 +316,7 @@ class ConfigLogic {
   void _handleMessage(RemoteMessage message) {
     debugPrint('Got push notification: $message');
 
-    // TODO: get all transactions and show appreciations screen
+    // todo: get all transactions and show appreciations screen
 
     Future.delayed(Duration.zero, () async {
       await FirebaseAnalytics.instance.logEvent(name: "push_note_received");
