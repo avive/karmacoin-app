@@ -182,7 +182,7 @@ void main() {
 
         kc2Service.newUserCallback = (tx) async {
           debugPrint('>> new user callback called');
-          if (tx.failedReason != null) {
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }

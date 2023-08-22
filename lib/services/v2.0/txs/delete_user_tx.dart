@@ -8,7 +8,7 @@ class KC2DeleteUserTxv1 extends KC2Tx {
     required this.userAddress,
     required super.transactionEvents,
     required super.args,
-    required super.failedReason,
+    required super.chainError,
     required super.timestamp,
     required super.hash,
     required super.blockNumber,

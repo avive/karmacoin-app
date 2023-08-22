@@ -5,17 +5,16 @@ class KC2JoinTxV1 extends KC2Tx {
   BigInt amount;
   PoolId poolId;
 
-  KC2JoinTxV1({
-    required this.amount,
-    required this.poolId,
-    required super.args,
-    required super.failedReason,
-    required super.timestamp,
-    required super.hash,
-    required super.blockNumber,
-    required super.blockIndex,
-    required super.transactionEvents,
-    required super.rawData,
-    required super.signer
-  });
+  KC2JoinTxV1(
+      {required this.amount,
+      required this.poolId,
+      required super.args,
+      required super.chainError,
+      required super.timestamp,
+      required super.hash,
+      required super.blockNumber,
+      required super.blockIndex,
+      required super.transactionEvents,
+      required super.rawData,
+      required super.signer});
 }

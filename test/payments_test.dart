@@ -76,7 +76,7 @@ void main() {
 
           kc2Service.newUserCallback = (tx) async {
             debugPrint('>> Katya new user callback called');
-            if (tx.failedReason != null) {
+            if (tx.chainError != null) {
               completer.complete(false);
               return;
             }
@@ -104,13 +104,13 @@ void main() {
                 return;
               }
 
-              if (tx.failedReason != null) {
+              if (tx.chainError != null) {
                 completer.complete(false);
                 return;
               }
 
               debugPrint('>> appreciation tx: $tx');
-              expect(tx.failedReason, isNull);
+              expect(tx.chainError, isNull);
               expect(tx.amount, BigInt.from(1000));
               expect(tx.fromAddress, punch.accountId);
               expect(tx.toAccountId, katya.accountId);
@@ -124,7 +124,7 @@ void main() {
 
             kc2Service.newUserCallback = (tx) async {
               debugPrint('>> Punch new user callback called');
-              if (tx.failedReason != null) {
+              if (tx.chainError != null) {
                 completer.complete(false);
                 return;
               }
@@ -218,7 +218,7 @@ void main() {
 
           kc2Service.newUserCallback = (tx) async {
             debugPrint('>> Katya new user callback called');
-            if (tx.failedReason != null) {
+            if (tx.chainError != null) {
               completer.complete(false);
               return;
             }
@@ -246,13 +246,13 @@ void main() {
                 return;
               }
 
-              if (tx.failedReason != null) {
+              if (tx.chainError != null) {
                 completer.complete(false);
                 return;
               }
 
               debugPrint('>> transfer tx: $tx');
-              expect(tx.failedReason, isNull);
+              expect(tx.chainError, isNull);
               expect(tx.amount, BigInt.from(999));
               expect(tx.fromAddress, punch.accountId);
               expect(tx.toAddress, katya.accountId);
@@ -265,7 +265,7 @@ void main() {
 
             kc2Service.newUserCallback = (tx) async {
               debugPrint('>> Punch new user callback called');
-              if (tx.failedReason != null) {
+              if (tx.chainError != null) {
                 completer.complete(false);
                 return;
               }
@@ -362,7 +362,7 @@ void main() {
 
           kc2Service.newUserCallback = (tx) async {
             debugPrint('>> Katya new user callback called');
-            if (tx.failedReason != null) {
+            if (tx.chainError != null) {
               completer.complete(false);
               return;
             }
@@ -390,8 +390,8 @@ void main() {
                 return;
               }
 
-              if (tx.failedReason == null) {
-                debugPrint('transfer should have failed with failedReason');
+              if (tx.chainError == null) {
+                debugPrint('transfer should have failed with chainError');
                 completer.complete(false);
                 return;
               }
@@ -403,7 +403,7 @@ void main() {
 
             kc2Service.newUserCallback = (tx) async {
               debugPrint('>> Punch new user callback called');
-              if (tx.failedReason != null) {
+              if (tx.chainError != null) {
                 completer.complete(false);
                 return;
               }

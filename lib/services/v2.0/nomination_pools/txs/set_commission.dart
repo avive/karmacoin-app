@@ -12,7 +12,7 @@ class KC2SetCommissionTxV1 extends KC2Tx {
       this.commission,
       this.beneficiary,
       required super.args,
-      required super.failedReason,
+      required super.chainError,
       required super.timestamp,
       required super.hash,
       required super.blockNumber,

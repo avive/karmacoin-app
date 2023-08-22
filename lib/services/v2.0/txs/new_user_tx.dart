@@ -12,7 +12,7 @@ class KC2NewUserTransactionV1 extends KC2Tx {
     required this.phoneNumberHash,
     required super.transactionEvents,
     required super.args,
-    required super.failedReason,
+    required super.chainError,
     required super.timestamp,
     required super.hash,
     required super.blockNumber,

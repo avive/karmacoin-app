@@ -381,8 +381,8 @@ class KC2User extends KC2UserInteface {
       return;
     }
 
-    if (tx.failedReason != null) {
-      debugPrint('failed to signup user: ${tx.failedReason}');
+    if (tx.chainError != null) {
+      debugPrint('failed to signup user: ${tx.chainError}');
       signupFailureReson = SignupFailureReason.invalidData;
       signupStatus.value = SignupStatus.notSignedUp;
       return;
@@ -414,8 +414,8 @@ class KC2User extends KC2UserInteface {
       return;
     }
 
-    if (tx.failedReason != null) {
-      debugPrint('failed to update user: ${tx.failedReason}');
+    if (tx.chainError != null) {
+      debugPrint('failed to update user: ${tx.chainError}');
       updateResult.value = UpdateResult.invalidData;
       // todo: go deeper into reason and update result
       return;

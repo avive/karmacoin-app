@@ -52,7 +52,7 @@ class KarmachainService extends ChainApiProvider
   BigInt get existentialDeposit =>
       chainInfo.constants['Balances']!['ExistentialDeposit']!.value;
 
-  /// Connect to a karmachain api service. e.g
+  /// Connect to a karmachain api service. e.g.
   /// Local running node - "ws://127.0.0.1:9944"
   /// Testnet - "wss://testnet.karmaco.in/testnet/ws"
   /// Optionally provide a verifier provider url, to allow connecting to api providers which are not verifiers (not yet supported)
@@ -155,18 +155,27 @@ class KarmachainService extends ChainApiProvider
 
       debugPrint('Got ${txs.length} txs for account: $userInfo.accountId');
 
-      int processed = 0;
+      // (blokcNumber, Block)
+      Map<String, Block> blocks = {};
 
+      int processed = 0;
       for (final txData in txs) {
         try {
           debugPrint('Processing tx $processed ...');
           final BigInt blockNumber = BigInt.from(txData.blockNumber);
+          final String blockNumberString = blockNumber.toString();
           final txBodyBytes = txData.transaction.transactionBody;
           final transactionBody =
               _decodeTransaction(Input.fromBytes(txBodyBytes));
 
-          Block block = Block(apiProvider: this, blockNumber: blockNumber);
-          // todo: move processing to block object - provide it callbacks
+          Block? block = blocks[blockNumberString];
+          if (block == null) {
+            // only create a block once
+            block = Block(blockNumber: blockNumber);
+            await block.init();
+            blocks[blockNumberString] = block;
+          }
+
           await _processTransaction(
               hash: null,
               userInfo: userInfo,
@@ -246,7 +255,8 @@ class KarmachainService extends ChainApiProvider
       debugPrint(
           'Processing block $blockNumber. Prev block: $previousBlockNumber');
 
-      final Block block = Block(apiProvider: this, blockNumber: blockNumber);
+      final Block block = Block(blockNumber: blockNumber);
+      await block.init();
 
       final blockData = await karmachain
           .send('chain_getBlock', [block.blockHash]).then((v) => v.result);
@@ -307,6 +317,7 @@ class KarmachainService extends ChainApiProvider
     return ExtrinsicsCodec(chainInfo: chainInfo).decode(input);
   }
 
+  ///
   /// Process a single kc2 tx
   Future<void> _processTransaction({
     // local user we are processing this tx for
@@ -326,8 +337,6 @@ class KarmachainService extends ChainApiProvider
       final String method = tx['calls'].value.key;
       final args = tx['calls'].value.value;
 
-      debugPrint("Processing tx $pallet/$method. hash: $hash");
-
       final String? signer = _getTransactionSigner(tx);
 
       if (signer == null) {
@@ -335,19 +344,21 @@ class KarmachainService extends ChainApiProvider
         return;
       }
 
+      debugPrint("Processing tx $pallet/$method. txHash: $hash");
+
       final failedEventData = txEvents
           .where((event) => event.eventName == 'ExtrinsicFailed')
           .firstOrNull
           ?.data;
 
-      final failedReason = _processFailedEventData(failedEventData);
+      final ChainError? chanError = _getChainError(failedEventData);
 
       if (pallet == 'Identity' &&
           method == 'new_user' &&
           newUserCallback != null) {
         final txAccountId = encodeAccountId(args['account_id'].cast<int>());
         if (signer == userInfo.accountId || userInfo.accountId == txAccountId) {
-          KC2Tx? newUserTx = KC2Tx.createKC2Trnsaction(
+          KC2Tx? newUserTx = KC2Tx.getKC2Trnsaction(
               tx: tx,
               hash: hash,
               txEvents: txEvents,
@@ -356,8 +367,9 @@ class KarmachainService extends ChainApiProvider
               blockIndex: blockIndex,
               signer: signer,
               netId: netId,
-              failedReason: failedReason,
+              chainError: chanError,
               chainInfo: chainInfo);
+
           if (newUserCallback != null &&
               newUserTx != null &&
               newUserTx is KC2NewUserTransactionV1) {
@@ -371,7 +383,7 @@ class KarmachainService extends ChainApiProvider
           pallet == 'Identity' &&
           method == 'update_user' &&
           signer == userInfo.accountId) {
-        KC2Tx? updateUserTx = KC2Tx.createKC2Trnsaction(
+        KC2Tx? updateUserTx = KC2Tx.getKC2Trnsaction(
             tx: tx,
             hash: hash,
             txEvents: txEvents,
@@ -380,7 +392,7 @@ class KarmachainService extends ChainApiProvider
             blockIndex: blockIndex,
             signer: signer,
             netId: netId,
-            failedReason: failedReason,
+            chainError: chanError,
             chainInfo: chainInfo);
         if (updateUserCallback != null &&
             updateUserTx != null &&
@@ -394,7 +406,7 @@ class KarmachainService extends ChainApiProvider
           pallet == 'Appreciation' &&
           method == 'appreciation') {
         await _processAppreciationTransaction(hash, timestamp, userInfo, signer,
-            args, failedReason, blockNumber, blockIndex, tx, txEvents);
+            args, chanError, blockNumber, blockIndex, tx, txEvents);
         return;
       }
 
@@ -421,7 +433,7 @@ class KarmachainService extends ChainApiProvider
             userInfo,
             signer,
             args,
-            failedReason,
+            chanError,
             method,
             pallet,
             blockNumber,
@@ -433,7 +445,7 @@ class KarmachainService extends ChainApiProvider
 
       if (pallet == 'NominationPools' && method == 'join') {
         _processJoinPoolTransaction(hash, timestamp, userInfo, signer, method,
-            pallet, blockNumber, args, blockIndex, failedReason, tx, txEvents);
+            pallet, blockNumber, args, blockIndex, chanError, tx, txEvents);
         return;
       }
 
@@ -448,7 +460,7 @@ class KarmachainService extends ChainApiProvider
             blockNumber,
             args,
             blockIndex,
-            failedReason,
+            chanError,
             tx,
             txEvents);
         return;
@@ -456,7 +468,7 @@ class KarmachainService extends ChainApiProvider
 
       if (pallet == 'NominationPools' && method == 'unbond') {
         _processPoolUnbondTransaction(hash, timestamp, userInfo, signer, method,
-            pallet, blockNumber, args, blockIndex, failedReason, tx, txEvents);
+            pallet, blockNumber, args, blockIndex, chanError, tx, txEvents);
         return;
       }
 
@@ -471,7 +483,7 @@ class KarmachainService extends ChainApiProvider
             blockNumber,
             args,
             blockIndex,
-            failedReason,
+            chanError,
             tx,
             txEvents);
         return;
@@ -479,7 +491,7 @@ class KarmachainService extends ChainApiProvider
 
       if (pallet == 'NominationPools' && method == 'create') {
         _processCreatePoolTransaction(hash, timestamp, userInfo, signer, method,
-            pallet, blockNumber, args, blockIndex, failedReason, tx, txEvents);
+            pallet, blockNumber, args, blockIndex, chanError, tx, txEvents);
         return;
       }
 
@@ -494,7 +506,7 @@ class KarmachainService extends ChainApiProvider
             blockNumber,
             args,
             blockIndex,
-            failedReason,
+            chanError,
             tx,
             txEvents);
         return;
@@ -502,7 +514,7 @@ class KarmachainService extends ChainApiProvider
 
       if (pallet == 'NominationPools' && method == 'chill') {
         _processChillPoolTransaction(hash, timestamp, userInfo, signer, method,
-            pallet, blockNumber, args, blockIndex, failedReason, tx, txEvents);
+            pallet, blockNumber, args, blockIndex, chanError, tx, txEvents);
         return;
       }
 
@@ -517,7 +529,7 @@ class KarmachainService extends ChainApiProvider
             blockNumber,
             args,
             blockIndex,
-            failedReason,
+            chanError,
             tx,
             txEvents);
         return;
@@ -534,7 +546,7 @@ class KarmachainService extends ChainApiProvider
             blockNumber,
             args,
             blockIndex,
-            failedReason,
+            chanError,
             tx,
             txEvents);
         return;
@@ -551,7 +563,7 @@ class KarmachainService extends ChainApiProvider
             blockNumber,
             args,
             blockIndex,
-            failedReason,
+            chanError,
             tx,
             txEvents);
         return;
@@ -569,7 +581,7 @@ class KarmachainService extends ChainApiProvider
             blockNumber,
             args,
             blockIndex,
-            failedReason,
+            chanError,
             tx,
             txEvents);
         return;
@@ -586,7 +598,7 @@ class KarmachainService extends ChainApiProvider
             blockNumber,
             args,
             blockIndex,
-            failedReason,
+            chanError,
             tx,
             txEvents);
         return;
@@ -618,14 +630,14 @@ class KarmachainService extends ChainApiProvider
       KC2UserInfo userInfo,
       String signer,
       Map<String, dynamic> args,
-      ChainError? failedReason,
+      ChainError? chainError,
       BigInt blockNumber,
       int blockIndex,
       Map<String, dynamic> rawData,
       List<KC2Event> txEvents) async {
     try {
       // we preprocess the tx before creating the tx object and enriching it
-      // to avoid doing so for block appreciations which are not to or from user
+      // to avoid doing so for block appreciations which are not to or from local user
 
       final bool txFromUser = signer == userInfo.accountId;
 
@@ -638,28 +650,27 @@ class KarmachainService extends ChainApiProvider
       String? toPhoneNumberHash;
 
       // Extract one of the destination fields from the tx and return early in case
-      // userfInfo is not sender or
+      // userfInfo is not sender or receiver of the tx
       switch (accountIdentityType) {
         case 'AccountId':
           toAccountId = encodeAccountId(accountIdentityValue.cast<int>());
           if (toAccountId != userInfo.accountId && !txFromUser) {
-            // user is not sender or receiver
+            debugPrint('user is not sender or receiver accountId');
             return;
           }
           break;
         case 'Username':
           toUserName = accountIdentityValue;
           if (toUserName != userInfo.userName && !txFromUser) {
-            // user is not sender or receiver
+            debugPrint('user is not sender or receiver userName');
             return;
           }
           break;
+        case "PhoneNumberHash":
         default:
-          toPhoneNumberHash =
-              '0x${hex.encode(accountIdentityValue.cast<int>())}';
-
+          toPhoneNumberHash = hex.encode(accountIdentityValue.cast<int>());
           if (toPhoneNumberHash != userInfo.phoneNumberHash && !txFromUser) {
-            // user is not sender or receiver
+            debugPrint('user is not sender or receiver phoneNumberHash');
             return;
           }
           break;
@@ -671,7 +682,7 @@ class KarmachainService extends ChainApiProvider
               timestamp: timestamp,
               signer: signer,
               args: args,
-              failedReason: failedReason,
+              chainError: chainError,
               blockNumber: blockNumber,
               blockIndex: blockIndex,
               rawData: rawData,
@@ -735,7 +746,7 @@ class KarmachainService extends ChainApiProvider
       KC2UserInfo userInfo,
       String signer,
       Map<String, dynamic> args,
-      ChainError? failedReason,
+      ChainError? chainError,
       String method,
       String pallet,
       BigInt blockNumber,
@@ -779,7 +790,7 @@ class KarmachainService extends ChainApiProvider
               timeStamp: timestamp,
               signer: signer,
               args: args,
-              failedReason: failedReason,
+              chainError: chainError,
               blockNumber: blockNumber,
               blockIndex: blockIndex,
               rawData: rawData,
@@ -797,19 +808,19 @@ class KarmachainService extends ChainApiProvider
     }
   }
 
-  ChainError? _processFailedEventData(Map<String, dynamic>? failedReason) {
-    if (failedReason == null) {
+  ChainError? _getChainError(Map<String, dynamic>? failure) {
+    if (failure == null) {
       return null;
     }
 
     // Default substrate error decoded in other way by polkadart
-    if (failedReason['dispatch_error']?.value.runtimeType == String) {
+    if (failure['dispatch_error']?.value.runtimeType == String) {
       // No way to provide additional description
-      return ChainError(failedReason['dispatch_error']?.value, null);
+      return ChainError(failure['dispatch_error']?.value, null);
     }
 
-    final moduleIndex = failedReason['dispatch_error']?.value['index'];
-    final errorIndex = failedReason['dispatch_error']?.value['error'][0];
+    final moduleIndex = failure['dispatch_error']?.value['index'];
+    final errorIndex = failure['dispatch_error']?.value['error'][0];
     debugPrint('Process error module $moduleIndex error $errorIndex');
 
     final codecTypeId = decodedMetadata
@@ -839,7 +850,7 @@ class KarmachainService extends ChainApiProvider
       BigInt blockNumber,
       Map<String, dynamic> args,
       int blockIndex,
-      ChainError? failedReason,
+      ChainError? chainError,
       Map<String, dynamic> rawData,
       List<KC2Event> txEvents) async {
     try {
@@ -855,7 +866,7 @@ class KarmachainService extends ChainApiProvider
         poolId: poolId,
         args: args,
         signer: signer,
-        failedReason: failedReason,
+        chainError: chainError,
         timestamp: timestamp,
         hash: hash,
         blockNumber: blockNumber,
@@ -881,7 +892,7 @@ class KarmachainService extends ChainApiProvider
       BigInt blockNumber,
       Map<String, dynamic> args,
       int blockIndex,
-      ChainError? failedReason,
+      ChainError? chainError,
       Map<String, dynamic> rawData,
       List<KC2Event> txEvents) async {
     try {
@@ -892,7 +903,7 @@ class KarmachainService extends ChainApiProvider
       final claimPayoutTx = KC2ClaimPayoutTxV1(
         args: args,
         signer: signer,
-        failedReason: failedReason,
+        chainError: chainError,
         timestamp: timestamp,
         hash: hash,
         blockNumber: blockNumber,
@@ -918,7 +929,7 @@ class KarmachainService extends ChainApiProvider
       BigInt blockNumber,
       Map<String, dynamic> args,
       int blockIndex,
-      ChainError? failedReason,
+      ChainError? chainError,
       Map<String, dynamic> rawData,
       List<KC2Event> txEvents) async {
     try {
@@ -934,7 +945,7 @@ class KarmachainService extends ChainApiProvider
         unbondingPoints: unbondingPoints,
         args: args,
         signer: signer,
-        failedReason: failedReason,
+        chainError: chainError,
         timestamp: timestamp,
         hash: hash,
         blockNumber: blockNumber,
@@ -960,7 +971,7 @@ class KarmachainService extends ChainApiProvider
       BigInt blockNumber,
       Map<String, dynamic> args,
       int blockIndex,
-      ChainError? failedReason,
+      ChainError? chainError,
       Map<String, dynamic> rawData,
       List<KC2Event> txEvents) async {
     try {
@@ -974,7 +985,7 @@ class KarmachainService extends ChainApiProvider
         memberAccount: memberAccount,
         args: args,
         signer: signer,
-        failedReason: failedReason,
+        chainError: chainError,
         timestamp: timestamp,
         hash: hash,
         blockNumber: blockNumber,
@@ -1000,7 +1011,7 @@ class KarmachainService extends ChainApiProvider
       BigInt blockNumber,
       Map<String, dynamic> args,
       int blockIndex,
-      ChainError? failedReason,
+      ChainError? chainError,
       Map<String, dynamic> rawData,
       List<KC2Event> txEvents) async {
     try {
@@ -1020,7 +1031,7 @@ class KarmachainService extends ChainApiProvider
         bouncer: bouncer,
         args: args,
         signer: signer,
-        failedReason: failedReason,
+        chainError: chainError,
         timestamp: timestamp,
         hash: hash,
         blockNumber: blockNumber,
@@ -1046,7 +1057,7 @@ class KarmachainService extends ChainApiProvider
       BigInt blockNumber,
       Map<String, dynamic> args,
       int blockIndex,
-      ChainError? failedReason,
+      ChainError? chainError,
       Map<String, dynamic> rawData,
       List<KC2Event> txEvents) async {
     try {
@@ -1065,7 +1076,7 @@ class KarmachainService extends ChainApiProvider
         validatorAccounts: validators,
         args: args,
         signer: signer,
-        failedReason: failedReason,
+        chainError: chainError,
         timestamp: timestamp,
         hash: hash,
         blockNumber: blockNumber,
@@ -1091,7 +1102,7 @@ class KarmachainService extends ChainApiProvider
       BigInt blockNumber,
       Map<String, dynamic> args,
       int blockIndex,
-      ChainError? failedReason,
+      ChainError? chainError,
       Map<String, dynamic> rawData,
       List<KC2Event> txEvents) async {
     try {
@@ -1105,7 +1116,7 @@ class KarmachainService extends ChainApiProvider
         poolId: poolId,
         args: args,
         signer: signer,
-        failedReason: failedReason,
+        chainError: chainError,
         timestamp: timestamp,
         hash: hash,
         blockNumber: blockNumber,
@@ -1131,7 +1142,7 @@ class KarmachainService extends ChainApiProvider
       BigInt blockNumber,
       Map<String, dynamic> args,
       int blockIndex,
-      ChainError? failedReason,
+      ChainError? chainError,
       Map<String, dynamic> rawData,
       List<KC2Event> txEvents) async {
     try {
@@ -1172,7 +1183,7 @@ class KarmachainService extends ChainApiProvider
         bouncer: newBouncer,
         args: args,
         signer: signer,
-        failedReason: failedReason,
+        chainError: chainError,
         timestamp: timestamp,
         hash: hash,
         blockNumber: blockNumber,
@@ -1198,7 +1209,7 @@ class KarmachainService extends ChainApiProvider
       BigInt blockNumber,
       Map<String, dynamic> args,
       int blockIndex,
-      ChainError? failedReason,
+      ChainError? chainError,
       Map<String, dynamic> rawData,
       List<KC2Event> txEvents) async {
     try {
@@ -1223,7 +1234,7 @@ class KarmachainService extends ChainApiProvider
         beneficiary: beneficiary,
         args: args,
         signer: signer,
-        failedReason: failedReason,
+        chainError: chainError,
         timestamp: timestamp,
         hash: hash,
         blockNumber: blockNumber,
@@ -1249,7 +1260,7 @@ class KarmachainService extends ChainApiProvider
       BigInt blockNumber,
       Map<String, dynamic> args,
       int blockIndex,
-      ChainError? failedReason,
+      ChainError? chainError,
       Map<String, dynamic> rawData,
       List<KC2Event> txEvents) async {
     try {
@@ -1265,7 +1276,7 @@ class KarmachainService extends ChainApiProvider
         maxCommission: maxCommission,
         args: args,
         signer: signer,
-        failedReason: failedReason,
+        chainError: chainError,
         timestamp: timestamp,
         hash: hash,
         blockNumber: blockNumber,
@@ -1291,7 +1302,7 @@ class KarmachainService extends ChainApiProvider
       BigInt blockNumber,
       Map<String, dynamic> args,
       int blockIndex,
-      ChainError? failedReason,
+      ChainError? chainError,
       Map<String, dynamic> rawData,
       List<KC2Event> txEvents) async {
     try {
@@ -1307,7 +1318,7 @@ class KarmachainService extends ChainApiProvider
         commissionChangeRate: changeRate,
         args: args,
         signer: signer,
-        failedReason: failedReason,
+        chainError: chainError,
         timestamp: timestamp,
         hash: hash,
         blockNumber: blockNumber,
@@ -1333,7 +1344,7 @@ class KarmachainService extends ChainApiProvider
       BigInt blockNumber,
       Map<String, dynamic> args,
       int blockIndex,
-      ChainError? failedReason,
+      ChainError? chainError,
       Map<String, dynamic> rawData,
       List<KC2Event> txEvents) async {
     try {
@@ -1347,7 +1358,7 @@ class KarmachainService extends ChainApiProvider
         poolId: poolId,
         args: args,
         signer: signer,
-        failedReason: failedReason,
+        chainError: chainError,
         timestamp: timestamp,
         hash: hash,
         blockNumber: blockNumber,

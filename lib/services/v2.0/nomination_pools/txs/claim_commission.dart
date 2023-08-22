@@ -8,7 +8,7 @@ class KC2ClaimCommissionTxV1 extends KC2Tx {
   KC2ClaimCommissionTxV1({
     required this.poolId,
     required super.args,
-    required super.failedReason,
+    required super.chainError,
     required super.timestamp,
     required super.hash,
     required super.blockNumber,

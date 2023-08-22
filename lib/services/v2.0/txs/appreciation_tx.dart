@@ -8,6 +8,8 @@ import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:ss58/ss58.dart' as ss58;
 
+enum DestinationType { unknown, accountId, username, phoneNumberHash }
+
 /// A basic appreciation tx based on on-chain data only
 /// Use KC2EnrichedAppreciationTxV1 for additional on-chain data
 class KC2AppreciationTxV1 extends KC2Tx {
@@ -28,13 +30,15 @@ class KC2AppreciationTxV1 extends KC2Tx {
   int? communityId;
   int? charTraitId;
 
+  DestinationType destinationType = DestinationType.unknown;
+
   /// Create an apprecaition tx from the provided tx data w/o any RPC enrichments
   static Future<KC2AppreciationTxV1> createAppreciationTx(
       {required String hash,
       required int timestamp,
       required String signer,
       required Map<String, dynamic> args,
-      required ChainError? failedReason,
+      required ChainError? chainError,
       required BigInt blockNumber,
       required int blockIndex,
       required Map<String, dynamic> rawData,
@@ -54,40 +58,44 @@ class KC2AppreciationTxV1 extends KC2Tx {
       String? toUserName;
       String? toPhoneNumberHash;
 
+      DestinationType destinationType = DestinationType.unknown;
+
       // Extract one of the destination fields from the tx
       switch (accountIdentityType) {
         case 'AccountId':
           toAccountId =
               ss58.Codec(netId).encode(accountIdentityValue.cast<int>());
-
+          destinationType = DestinationType.accountId;
           break;
         case 'Username':
           toUserName = accountIdentityValue;
+          destinationType = DestinationType.username;
           break;
+        case 'PhoneNumberHash':
         default:
-          toPhoneNumberHash =
-              '0x${hex.encode(accountIdentityValue.cast<int>())}';
+          toPhoneNumberHash = hex.encode(accountIdentityValue.cast<int>());
+          destinationType = DestinationType.phoneNumberHash;
           break;
       }
 
       return KC2AppreciationTxV1(
-        fromAddress: signer,
-        toPhoneNumberHash: toPhoneNumberHash,
-        toUserName: toUserName,
-        toAccountId: toAccountId,
-        amount: amount,
-        communityId: communityId,
-        charTraitId: charTraitId,
-        args: args,
-        signer: signer,
-        failedReason: failedReason,
-        timestamp: timestamp,
-        hash: hash,
-        blockNumber: blockNumber,
-        blockIndex: blockIndex,
-        transactionEvents: txEvents,
-        rawData: rawData,
-      );
+          fromAddress: signer,
+          toPhoneNumberHash: toPhoneNumberHash,
+          toUserName: toUserName,
+          toAccountId: toAccountId,
+          amount: amount,
+          communityId: communityId,
+          charTraitId: charTraitId,
+          args: args,
+          signer: signer,
+          chainError: chainError,
+          timestamp: timestamp,
+          hash: hash,
+          blockNumber: blockNumber,
+          blockIndex: blockIndex,
+          transactionEvents: txEvents,
+          rawData: rawData,
+          destinationType: destinationType);
     } catch (e) {
       debugPrint("Error processing appreciation tx: $e");
       rethrow;
@@ -104,13 +112,14 @@ class KC2AppreciationTxV1 extends KC2Tx {
       this.charTraitId = 0,
       required super.transactionEvents,
       required super.args,
-      required super.failedReason,
+      required super.chainError,
       required super.timestamp,
       required super.hash,
       required super.blockNumber,
       required super.blockIndex,
       required super.rawData,
-      required super.signer});
+      required super.signer,
+      required this.destinationType});
 
   String getTitle() {
     if (charTraitId != null &&
@@ -123,50 +132,82 @@ class KC2AppreciationTxV1 extends KC2Tx {
     }
   }
 
-  /// Enrich the tx with additional data from the chain based on a user's identity
+  /// Enrich the tx with additional data from the chain based on sender and receiver
+  /// and local user identity
+  /// userInfo - local user info
   Future<void> enrichForUser(KC2UserInfo userInfo) async {
-    // enrich from user name
-    if (userInfo.accountId == signer) {
+    // the other user for this tx
+    KC2UserInfo? otherUserInfo;
+
+    // compute fromUserName
+    if (signer == userInfo.accountId) {
       fromUserName = userInfo.userName;
-      return;
     } else {
-      final res = await kc2Service.getUserInfoByAccountId(signer);
-      fromUserName = res?.userName;
-    }
-
-    // enrich reciver's data based on toAccountId info
-    if (toAccountId == signer) {
-      toUserName = userInfo.userName;
-      toPhoneNumberHash = userInfo.phoneNumberHash;
-      return;
-    } else if (toAccountId != null) {
-      // receiver is not the user - obtain info from api
-      final res = await kc2Service.getUserInfoByAccountId(toAccountId!);
-      // complete tx data fields from info
-      toUserName = res?.userName;
-      toPhoneNumberHash = res?.phoneNumberHash;
-      return;
-    }
-
-    // enrich reciver's data based on receiver's user name
-    if (toUserName != null) {
-      if (toUserName != userInfo.userName) {
-        // call api to get missing fields
-        final res = await kc2Service.getUserInfoByUserName(toUserName!);
-        toAccountId = res?.accountId;
-        toPhoneNumberHash = res?.phoneNumberHash;
-        return;
+      otherUserInfo = await kc2Service.getUserInfoByAccountId(signer);
+      if (otherUserInfo != null) {
+        fromUserName = otherUserInfo.userName;
       } else {
-        toAccountId = userInfo.accountId;
-        toPhoneNumberHash = userInfo.phoneNumberHash;
-        return;
+        debugPrint('Warning: account not found on chain for signer: $signer');
       }
     }
 
-    final res =
-        await kc2Service.getUserInfoByPhoneNumberHash(toPhoneNumberHash!);
-    // complete missing fields in tx with data from api
-    toAccountId = res?.accountId;
-    toUserName = res?.userName;
+    switch (destinationType) {
+      case DestinationType.accountId:
+        // tx was for an accountId
+        if (toAccountId == signer) {
+          // appreciation is to local user
+          toUserName = userInfo.userName;
+          toPhoneNumberHash = userInfo.phoneNumberHash;
+        } else {
+          // receiver accintId is not the loca user - obtain data from the api
+          otherUserInfo ??=
+              await kc2Service.getUserInfoByAccountId(toAccountId!);
+          // complete tx data fields from obtained info
+          if (otherUserInfo != null) {
+            toUserName = otherUserInfo.userName;
+            toPhoneNumberHash = otherUserInfo.phoneNumberHash;
+          } else {
+            debugPrint('Warning: account not found on chain for $toAccountId');
+          }
+        }
+        break;
+      case DestinationType.username:
+        if (signer == userInfo.accountId) {
+          // appreciation is from local user
+          // get other user by usernmame and fill info
+          otherUserInfo ??= await kc2Service.getUserInfoByUserName(toUserName!);
+          if (otherUserInfo != null) {
+            toAccountId = otherUserInfo.accountId;
+            toPhoneNumberHash = otherUserInfo.phoneNumberHash;
+          } else {
+            debugPrint('Warning: account not found on chain for $toAccountId');
+          }
+        } else {
+          // apprecaition to local user
+          toAccountId = userInfo.accountId;
+          toPhoneNumberHash = userInfo.phoneNumberHash;
+        }
+        break;
+      case DestinationType.phoneNumberHash:
+        if (signer == userInfo.accountId) {
+          // tx from local user - get other user by phone hash and fill info
+          otherUserInfo ??=
+              await kc2Service.getUserInfoByPhoneNumberHash(toPhoneNumberHash!);
+          // complete missing fields in tx with data from api
+          if (otherUserInfo != null) {
+            toAccountId = otherUserInfo.accountId;
+            toUserName = otherUserInfo.userName;
+          } else {
+            debugPrint('Warning: account not found on chain for $toAccountId');
+          }
+        } else {
+          // tx to local user
+          toAccountId = userInfo.accountId;
+          toUserName = userInfo.userName;
+        }
+        break;
+      default:
+        throw 'Unexpected destination type: $destinationType';
+    }
   }
 }

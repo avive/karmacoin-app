@@ -12,7 +12,7 @@ class KC2CreateTxV1 extends KC2Tx {
       required this.nominator,
       required this.bouncer,
       required super.args,
-      required super.failedReason,
+      required super.chainError,
       required super.timestamp,
       required super.hash,
       required super.blockNumber,

@@ -4,7 +4,7 @@ import 'package:karma_coin/services/v2.0/txs/tx.dart';
 class KC2ClaimPayoutTxV1 extends KC2Tx {
   KC2ClaimPayoutTxV1(
       {required super.args,
-      required super.failedReason,
+      required super.chainError,
       required super.timestamp,
       required super.hash,
       required super.blockNumber,

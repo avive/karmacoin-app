@@ -66,7 +66,7 @@ void main() {
         // Create pool callback
         kc2Service.createPoolCallback = (tx) async {
           // Check if the tx failed
-          if (tx.failedReason != null) {
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
@@ -179,7 +179,7 @@ void main() {
         // Create pool callback
         kc2Service.createPoolCallback = (tx) async {
           // Check if the tx failed
-          if (tx.failedReason != null) {
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
@@ -206,7 +206,7 @@ void main() {
 
         kc2Service.joinPoolCallback = (tx) async {
           // Check if the tx failed
-          if (tx.failedReason != null) {
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
@@ -288,7 +288,7 @@ void main() {
         // Create pool callback
         kc2Service.createPoolCallback = (tx) async {
           // Check if the tx failed
-          if (tx.failedReason != null) {
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
@@ -313,7 +313,7 @@ void main() {
 
         kc2Service.setPoolCommissionCallback = (tx) async {
           // Check if the tx failed
-          if (tx.failedReason != null) {
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
@@ -390,7 +390,7 @@ void main() {
         // Create pool callback
         kc2Service.createPoolCallback = (tx) async {
           // Check if the tx failed
-          if (tx.failedReason != null) {
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
@@ -414,7 +414,7 @@ void main() {
 
         kc2Service.setPoolCommissionMaxCallback = (tx) async {
           // Check if the tx failed
-          if (tx.failedReason != null) {
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
@@ -490,7 +490,7 @@ void main() {
         // Create pool callback
         kc2Service.createPoolCallback = (tx) async {
           // Check if the tx failed
-          if (tx.failedReason != null) {
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
@@ -519,7 +519,7 @@ void main() {
 
         kc2Service.setPoolCommissionChangeRateCallback = (tx) async {
           // Check if the tx failed
-          if (tx.failedReason != null) {
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
@@ -609,7 +609,7 @@ void main() {
         // Create pool callback
         kc2Service.createPoolCallback = (tx) async {
           // Check if the tx failed
-          if (tx.failedReason != null) {
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
@@ -641,7 +641,7 @@ void main() {
 
         kc2Service.updatePoolRolesCallback = (tx) async {
           // Check if the tx failed
-          if (tx.failedReason != null) {
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
@@ -730,7 +730,7 @@ void main() {
         // Create pool callback
         kc2Service.createPoolCallback = (tx) async {
           // Check if the tx failed
-          if (tx.failedReason != null) {
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
@@ -762,7 +762,7 @@ void main() {
 
         kc2Service.nominatePoolValidatorCallback = (tx) async {
           // Check if the tx failed
-          if (tx.failedReason != null) {
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }

@@ -383,7 +383,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
       BuildContext context, KC2AppreciationTxV1 tx, bool incoming, int index) {
     try {
       String amount = KarmaCoinAmountFormatter.format(tx.amount);
-      TransactionStatus status = tx.failedReason == null
+      TransactionStatus status = tx.chainError == null
           ? TransactionStatus.confirmed
           : TransactionStatus.failed;
 

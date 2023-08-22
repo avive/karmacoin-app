@@ -22,7 +22,7 @@ export 'package:karma_coin/services/v2.0/txs/transfer_tx.dart';
 /// A kc2 transaction
 abstract class KC2Tx {
   late String signer;
-  late ChainError? failedReason;
+  late ChainError? chainError;
 
   late int timestamp;
   late String hash;
@@ -35,7 +35,7 @@ abstract class KC2Tx {
 
   KC2Tx({
     required this.args,
-    required this.failedReason,
+    required this.chainError,
     required this.timestamp,
     required this.hash,
     required this.blockNumber,
@@ -64,7 +64,7 @@ abstract class KC2Tx {
   }
 
   /// Create a KC2Tx object from raw tx data
-  static KC2Tx? createKC2Trnsaction({
+  static KC2Tx? getKC2Trnsaction({
     required Map<String, dynamic> tx,
     required String? hash,
     required List<KC2Event> txEvents,
@@ -74,7 +74,7 @@ abstract class KC2Tx {
     required String? signer,
     required int netId,
     required ChainInfo chainInfo,
-    required ChainError? failedReason,
+    required ChainError? chainError,
   }) {
     signer ??= _getTransactionSigner(tx, netId);
     if (signer == null) {
@@ -90,6 +90,8 @@ abstract class KC2Tx {
     final args = tx['calls'].value.value;
 
     if (pallet == 'Identity' && method == 'new_user') {
+      // todo: use new .create pattern...
+
       final accountId =
           ss58.Codec(netId).encode(args['account_id'].cast<int>());
       final username = args['username'];
@@ -102,7 +104,7 @@ abstract class KC2Tx {
           phoneNumberHash: phoneNumberHash,
           transactionEvents: txEvents,
           args: args,
-          failedReason: failedReason,
+          chainError: chainError,
           timestamp: timestamp,
           hash: hash,
           blockNumber: blockNumber,
@@ -112,6 +114,8 @@ abstract class KC2Tx {
     }
 
     if (pallet == 'Identity' && method == 'update_user') {
+      // todo use new .create pattern
+
       final username = args['username'].value;
       final phoneNumberHashOption = args['phone_number_hash'].value;
       final phoneNumberHash = phoneNumberHashOption == null
@@ -123,7 +127,7 @@ abstract class KC2Tx {
         phoneNumberHash: phoneNumberHash,
         args: args,
         signer: signer,
-        failedReason: failedReason,
+        chainError: chainError,
         timestamp: timestamp,
         hash: hash,
         blockNumber: blockNumber,
@@ -140,7 +144,7 @@ abstract class KC2Tx {
           timeStamp: timestamp,
           signer: signer,
           args: args,
-          failedReason: failedReason,
+          chainError: chainError,
           blockNumber: blockNumber,
           blockIndex: blockIndex,
           rawData: tx,

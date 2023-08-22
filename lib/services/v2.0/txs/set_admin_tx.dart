@@ -10,7 +10,7 @@ class KC2SetAdminTxv1 extends KC2Tx {
     required this.communityId,
     required super.args,
     required super.transactionEvents,
-    required super.failedReason,
+    required super.chainError,
     required super.timestamp,
     required super.hash,
     required super.blockNumber,

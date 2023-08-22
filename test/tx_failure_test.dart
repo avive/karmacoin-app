@@ -55,7 +55,7 @@ void main() {
 
         kc2Service.updateUserCallback = (tx) async {
           debugPrint('>> update user update 1 called');
-          if (tx.failedReason == null) {
+          if (tx.chainError == null) {
             completer.complete(false);
             return;
           }
@@ -66,13 +66,13 @@ void main() {
             return;
           }
 
-          expect(tx.failedReason!.name, 'InvalidArguments');
+          expect(tx.chainError!.name, 'InvalidArguments');
           completer.complete(true);
         };
 
         kc2Service.newUserCallback = (tx) async {
           debugPrint('>> new user callback called');
-          if (tx.failedReason != null) {
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
@@ -158,7 +158,7 @@ void main() {
 
         kc2Service.newUserCallback = (tx) async {
           debugPrint('>> Katya new user callback called');
-          if (tx.failedReason != null) {
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
@@ -181,7 +181,7 @@ void main() {
               return;
             }
 
-            if (tx.failedReason == null) {
+            if (tx.chainError == null) {
               debugPrint('unexpected tx success');
               completer.complete(false);
               return;
@@ -196,7 +196,7 @@ void main() {
 
           kc2Service.newUserCallback = (tx) async {
             debugPrint('>> Punch new user callback called');
-            if (tx.failedReason != null) {
+            if (tx.chainError != null) {
               completer.complete(false);
               return;
             }

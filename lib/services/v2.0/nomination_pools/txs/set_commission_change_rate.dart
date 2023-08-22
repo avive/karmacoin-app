@@ -10,7 +10,7 @@ class KC2SetCommissionChangeRateTxV1 extends KC2Tx {
       {required this.poolId,
       required this.commissionChangeRate,
       required super.args,
-      required super.failedReason,
+      required super.chainError,
       required super.timestamp,
       required super.hash,
       required super.blockNumber,

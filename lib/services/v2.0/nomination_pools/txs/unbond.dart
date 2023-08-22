@@ -13,7 +13,7 @@ class KC2UnbondTxV1 extends KC2Tx {
       {required this.memberAccount,
       required this.unbondingPoints,
       required super.args,
-      required super.failedReason,
+      required super.chainError,
       required super.timestamp,
       required super.hash,
       required super.blockNumber,

@@ -9,7 +9,7 @@ class KC2NominateTxV1 extends KC2Tx {
       {required this.poolId,
       required this.validatorAccounts,
       required super.args,
-      required super.failedReason,
+      required super.chainError,
       required super.timestamp,
       required super.hash,
       required super.blockNumber,

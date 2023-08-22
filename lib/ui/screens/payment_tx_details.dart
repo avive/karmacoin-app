@@ -205,7 +205,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
       ),
     );
 
-    if (widget.tx?.failedReason == null) {
+    if (widget.tx?.chainError == null) {
       tiles.add(
         CupertinoListTile.notched(
           title: Text('Status',

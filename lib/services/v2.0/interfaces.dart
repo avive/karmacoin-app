@@ -120,6 +120,7 @@ abstract class ChainApiProvider {
   }
 
   /// Sign with current key and send transaction to the chain
+  /// Returns the tx's hash
   Future<String> signAndSendTransaction(MapEntry<String, dynamic> call) async {
     try {
       final signer = encodeAccountId(keyring.getPublicKey());
@@ -128,11 +129,13 @@ abstract class ChainApiProvider {
 
       final result =
           await karmachain.send('author_submitExtrinsic', [encodedHex]);
-      // debugPrint('Submit extrinsic result: ${result.result.toString()}');
 
-      return result.result.toString();
+      final txHash = result.result.toString();
+      debugPrint('Submitted tx hash: $txHash');
+
+      return txHash;
     } catch (e) {
-      debugPrint('Failed to submit transaction: $e');
+      debugPrint('Failed to submit tx: $e');
       rethrow;
     }
   }
