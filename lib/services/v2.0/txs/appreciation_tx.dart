@@ -1,8 +1,12 @@
+import 'package:convert/convert.dart';
+import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/personality_traits.dart';
-import 'package:karma_coin/logic/app.dart';
+import 'package:karma_coin/services/v2.0/error.dart';
+import 'package:karma_coin/services/v2.0/event.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
+import 'package:ss58/ss58.dart' as ss58;
 
 /// A basic appreciation tx based on on-chain data only
 /// Use KC2EnrichedAppreciationTxV1 for additional on-chain data
@@ -23,6 +27,72 @@ class KC2AppreciationTxV1 extends KC2Tx {
   BigInt amount;
   int? communityId;
   int? charTraitId;
+
+  /// Create an apprecaition tx from the provided tx data w/o any RPC enrichments
+  static Future<KC2AppreciationTxV1> createAppreciationTx(
+      {required String hash,
+      required int timestamp,
+      required String signer,
+      required Map<String, dynamic> args,
+      required ChainError? failedReason,
+      required BigInt blockNumber,
+      required int blockIndex,
+      required Map<String, dynamic> rawData,
+      required List<KC2Event> txEvents,
+      required int netId}) async {
+    try {
+      // debugPrint("Appreciation tx args: $args");
+      final to = args['to'];
+      final accountIdentityType = to.key;
+      final accountIdentityValue = to.value;
+
+      final BigInt amount = args['amount'];
+      final int? communityId = args['community_id'].value;
+      final int? charTraitId = args['char_trait_id'].value;
+
+      String? toAccountId;
+      String? toUserName;
+      String? toPhoneNumberHash;
+
+      // Extract one of the destination fields from the tx
+      switch (accountIdentityType) {
+        case 'AccountId':
+          toAccountId =
+              ss58.Codec(netId).encode(accountIdentityValue.cast<int>());
+
+          break;
+        case 'Username':
+          toUserName = accountIdentityValue;
+          break;
+        default:
+          toPhoneNumberHash =
+              '0x${hex.encode(accountIdentityValue.cast<int>())}';
+          break;
+      }
+
+      return KC2AppreciationTxV1(
+        fromAddress: signer,
+        toPhoneNumberHash: toPhoneNumberHash,
+        toUserName: toUserName,
+        toAccountId: toAccountId,
+        amount: amount,
+        communityId: communityId,
+        charTraitId: charTraitId,
+        args: args,
+        signer: signer,
+        failedReason: failedReason,
+        timestamp: timestamp,
+        hash: hash,
+        blockNumber: blockNumber,
+        blockIndex: blockIndex,
+        transactionEvents: txEvents,
+        rawData: rawData,
+      );
+    } catch (e) {
+      debugPrint("Error processing appreciation tx: $e");
+      rethrow;
+    }
+  }
 
   KC2AppreciationTxV1(
       {required this.fromAddress,
