@@ -73,7 +73,7 @@ void main() {
               expect(userInfo.getScore(0, 1), 1);
 
               // signup reward
-              expect(userInfo.balance, GenesisConfig.kCentsPerCoinBigInt);
+              expect(userInfo.balance, GenesisConfig.kCentsSignupReward);
 
               await katya.signout();
               completer.complete(true);
@@ -480,7 +480,7 @@ void main() {
                   .getUserInfoByAccountId(katya.identity.accountId);
 
               // katya's signup reward
-              expect(katyaInfo!.balance, GenesisConfig.kCentsPerCoinBigInt);
+              expect(katyaInfo!.balance, GenesisConfig.kCentsSignupReward);
 
               debugPrint('Deleting katya user and waiting for 1 block...');
               await kc2Service.deleteUser();
