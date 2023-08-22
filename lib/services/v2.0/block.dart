@@ -4,14 +4,23 @@ import 'package:karma_coin/services/v2.0/interfaces.dart';
 import 'package:polkadart_scale_codec/polkadart_scale_codec.dart';
 
 class Block {
+  BigInt blockNumber;
+  ChainApiProvider apiProvider;
+  late String blockHash;
+  List<KC2Event> events = [];
+
+  Block({required this.blockNumber, required this.apiProvider});
+
+  Future<void> init() async {
+    final String blockNumberString = '0x${blockNumber.toRadixString(16)}';
+    blockHash = await apiProvider.karmachain
+        .send('chain_getBlockHash', [blockNumberString]).then((v) => v.result);
+    events = await _getBlockEvents(blockHash, apiProvider);
+  }
+
   /// Returns tx events for a specific transaction in a block
-  static Future<List<KC2Event>> getTransactionEvents(BigInt blockNumber,
-      int transactionIndex, ChainApiProvider apiProvider) async {
+  Future<List<KC2Event>> getTransactionEvents(int transactionIndex) async {
     try {
-      final String blockNumberString = '0x${blockNumber.toRadixString(16)}';
-      final blockHash = await apiProvider.karmachain.send(
-          'chain_getBlockHash', [blockNumberString]).then((v) => v.result);
-      final events = await getBlockEvents(blockHash, apiProvider);
       final transactionEvents = events
           .where((event) => event.extrinsicIndex == transactionIndex)
           .toList();
@@ -23,9 +32,9 @@ class Block {
     }
   }
 
-  /// Retrieves events for specific block by accessing `System` pallet storage
+  /// Retrieves events for this accessing `System` pallet storage
   /// return decoded events
-  static Future<List<KC2Event>> getBlockEvents(
+  Future<List<KC2Event>> _getBlockEvents(
       String blockHash, ChainApiProvider apiProvider) async {
     try {
       final value = await apiProvider.readStorage('System', 'Events');

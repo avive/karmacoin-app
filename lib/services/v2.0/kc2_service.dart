@@ -164,13 +164,15 @@ class KarmachainService extends ChainApiProvider
           final txBodyBytes = txData.transaction.transactionBody;
           final transactionBody =
               _decodeTransaction(Input.fromBytes(txBodyBytes));
-          final List<KC2Event> txEvents = await Block.getTransactionEvents(
-              blockNumber, txData.transactionIndex, this);
+
+          Block block = Block(apiProvider: this, blockNumber: blockNumber);
+          // todo: move processing to block object - provide it callbacks
           await _processTransaction(
               hash: null,
               userInfo: userInfo,
               tx: transactionBody,
-              txEvents: txEvents,
+              txEvents:
+                  await block.getTransactionEvents(txData.transactionIndex),
               timestamp: txData.timestamp,
               blockNumber: blockNumber,
               blockIndex: txData.transactionIndex);
@@ -244,16 +246,15 @@ class KarmachainService extends ChainApiProvider
       debugPrint(
           'Processing block $blockNumber. Prev block: $previousBlockNumber');
 
-      final blockHash = await karmachain
-          .send('chain_getBlockHash', [header['number']]).then((v) => v.result);
-      debugPrint('Retrieve current block with hash: $blockHash');
-      final events = await Block.getBlockEvents(blockHash, this);
-      final block = await karmachain
-          .send('chain_getBlock', [blockHash]).then((v) => v.result);
+      final Block block = Block(apiProvider: this, blockNumber: blockNumber);
+
+      final blockData = await karmachain
+          .send('chain_getBlock', [block.blockHash]).then((v) => v.result);
 
       // debugPrint('Block: ${block['block']}');
 
-      final extrinsics = block['block']['extrinsics'].map((encodedExtrinsic) {
+      final extrinsics =
+          blockData['block']['extrinsics'].map((encodedExtrinsic) {
         final extrinsic = _decodeTransaction(Input.fromHex(encodedExtrinsic));
         final extrinsicHash =
             '0x${hex.encode(Hasher.blake2b256.hashString(encodedExtrinsic))}';
@@ -277,7 +278,7 @@ class KarmachainService extends ChainApiProvider
         final hash = e.key;
         final transaction = e.value;
 
-        final transactionEvents = events
+        final transactionEvents = block.events
             .where((event) => event.extrinsicIndex == transactionIndex)
             .toList();
 
