@@ -17,8 +17,6 @@ class KC2TransferTxV1 extends KC2Tx {
     this.fromUserName,
     required super.transactionEvents,
     required super.args,
-    required super.pallet,
-    required super.method,
     required super.failedReason,
     required super.timestamp,
     required super.hash,

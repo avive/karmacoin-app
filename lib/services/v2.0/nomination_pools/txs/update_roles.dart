@@ -15,8 +15,6 @@ class KC2UpdateRolesTxV1 extends KC2Tx {
       required this.nominator,
       required this.bouncer,
       required super.args,
-      required super.pallet,
-      required super.method,
       required super.failedReason,
       required super.timestamp,
       required super.hash,

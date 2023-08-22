@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:convert/convert.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/app_state.dart';
-import 'package:karma_coin/services/v2.0/event.dart';
 import 'package:karma_coin/services/v2.0/interfaces.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/types.dart';

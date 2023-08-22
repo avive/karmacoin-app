@@ -8,8 +8,6 @@ class KC2DeleteUserTxv1 extends KC2Tx {
     required this.userAddress,
     required super.transactionEvents,
     required super.args,
-    required super.pallet,
-    required super.method,
     required super.failedReason,
     required super.timestamp,
     required super.hash,
