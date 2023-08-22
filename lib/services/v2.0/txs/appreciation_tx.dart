@@ -135,6 +135,7 @@ class KC2AppreciationTxV1 extends KC2Tx {
   /// Enrich the tx with additional data from the chain based on sender and receiver
   /// and local user identity
   /// userInfo - local user info
+  /// @HolyGrease - this method eneds extensive code review plz
   Future<void> enrichForUser(KC2UserInfo userInfo) async {
     // the other user for this tx
     KC2UserInfo? otherUserInfo;
