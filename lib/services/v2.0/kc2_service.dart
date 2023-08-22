@@ -150,10 +150,10 @@ class KarmachainService extends ChainApiProvider
   Future<FetchAppreciationsStatus> getAccountTransactions(
       KC2UserInfo userInfo) async {
     try {
-      debugPrint('Getting all txs for account: $userInfo.accountId');
+      debugPrint('Getting all txs for account: ${userInfo.accountId}');
       final txs = await getTransactionsByAccountId(userInfo.accountId);
 
-      debugPrint('Got ${txs.length} txs for account: $userInfo.accountId');
+      debugPrint('Got ${txs.length} txs for account: ${userInfo.accountId}');
 
       // (blokcNumber, Block)
       Map<String, Block> blocks = {};
@@ -194,7 +194,7 @@ class KarmachainService extends ChainApiProvider
       }
 
       debugPrint(
-          'Processed $processed / ${txs.length} txs for account: $userInfo.accountId}');
+          'Processed $processed / ${txs.length} txs for account: ${userInfo.accountId}');
 
       return FetchAppreciationsStatus.fetched;
     } catch (e) {

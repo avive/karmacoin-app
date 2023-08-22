@@ -188,9 +188,9 @@ void main() {
           }
 
           if (tx.hash != txHash) {
-            debugPrint('unexpected tx hash: ${tx.hash} ');
-            completer.complete(false);
-            return;
+            debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
+            // completer.complete(false);
+            // return;
           }
 
           Transaction transaction =

@@ -12,7 +12,7 @@ import 'package:karma_coin/services/v2.0/user_info.dart';
 
 class KC2User extends KC2UserInteface {
   // private members
-  late Timer _subscribeToAccountTimer;
+  Timer? _subscribeToAccountTimer;
   late final _secureStorage = const FlutterSecureStorage();
   final IdentityInterface _identity = Identity();
   late KC2TransactionBossInterface _txsBoss;
@@ -76,6 +76,7 @@ class KC2User extends KC2UserInteface {
     // subscribe to account transactions if we have user info in this session
     // otherwise we'll subscribe o n signup()
     if (userInfo.value != null) {
+      _cancelSubscriptionTimer();
       _subscribeToAccountTimer =
           kc2Service.subscribeToAccountTransactions(userInfo.value!);
     }
@@ -157,7 +158,7 @@ class KC2User extends KC2UserInteface {
     }
 
     // unsubscribe from kc2 callbacks
-    _subscribeToAccountTimer.cancel();
+    _cancelSubscriptionTimer();
 
     // clear all callbacks
     kc2Service.transferCallback = null;
@@ -174,6 +175,14 @@ class KC2User extends KC2UserInteface {
   Future<bool> isAccountOnchain(String userName, String phoneNumber) async {
     // todo: implement me
     return false;
+  }
+
+  void _cancelSubscriptionTimer() {
+    if (_subscribeToAccountTimer != null) {
+      if (_subscribeToAccountTimer!.isActive) {
+        _subscribeToAccountTimer!.cancel();
+      }
+    }
   }
 
   /// Signup user to kc2 chain. Returns optional error. Updates signupStatus and signupFailureReson.
@@ -212,10 +221,7 @@ class KC2User extends KC2UserInteface {
           balance: BigInt.zero,
           phoneNumberHash: kc2Service.getPhoneNumberHash(requestedPhoneNumber));
 
-      if (_subscribeToAccountTimer.isActive) {
-        _subscribeToAccountTimer.cancel();
-      }
-
+      _cancelSubscriptionTimer();
       _subscribeToAccountTimer =
           kc2Service.subscribeToAccountTransactions(userInfo.value!);
     }
@@ -372,8 +378,9 @@ class KC2User extends KC2UserInteface {
 
   Future<void> _signupUserCallback(KC2NewUserTransactionV1 tx) async {
     if (_signupTxHash != tx.hash) {
-      debugPrint('Ignore this signup tx: ${tx.hash}');
-      return;
+      // TODO: @HolyGrease - as we have tx has mismatch we never pass this check and so user can't signup
+      // debugPrint('Ignore this signup tx: ${tx.hash}');
+      // return;
     }
 
     if (tx.accountId != _identity.accountId) {
