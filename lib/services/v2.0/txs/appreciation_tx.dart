@@ -132,8 +132,8 @@ class KC2AppreciationTxV1 extends KC2Tx {
     }
   }
 
-  /// Enrich the tx with additional data from the chain based on sender and receiver
-  /// and local user identity
+  /// Enrich the tx with additional data from the chain based on sender, receiver
+  /// and a local user identity
   /// userInfo - local user info
   /// @HolyGrease - this method eneds extensive code review plz
   Future<void> enrichForUser(KC2UserInfo userInfo) async {
@@ -148,19 +148,20 @@ class KC2AppreciationTxV1 extends KC2Tx {
       if (otherUserInfo != null) {
         fromUserName = otherUserInfo.userName;
       } else {
-        debugPrint('Warning: account not found on chain for signer: $signer');
+        debugPrint(
+            'Warning: account not found on chain for tx signer: $signer');
       }
     }
 
     switch (destinationType) {
       case DestinationType.accountId:
-        // tx was for an accountId
+        // tx was sent for an accountId
         if (toAccountId == signer) {
-          // appreciation is to local user
+          // appreciation is to the local user
           toUserName = userInfo.userName;
           toPhoneNumberHash = userInfo.phoneNumberHash;
         } else {
-          // receiver accintId is not the loca user - obtain data from the api
+          // receiver is not the local user
           otherUserInfo ??=
               await kc2Service.getUserInfoByAccountId(toAccountId!);
           // complete tx data fields from obtained info
@@ -168,20 +169,23 @@ class KC2AppreciationTxV1 extends KC2Tx {
             toUserName = otherUserInfo.userName;
             toPhoneNumberHash = otherUserInfo.phoneNumberHash;
           } else {
-            debugPrint('Warning: account not found on chain for $toAccountId');
+            debugPrint(
+                'Warning: account not found on chain for receiver $toAccountId');
           }
         }
         break;
       case DestinationType.username:
+        // tx dest is a user name
         if (signer == userInfo.accountId) {
-          // appreciation is from local user
-          // get other user by usernmame and fill info
+          // appreciation is from the local user
+          // get other user by usernmame and fill missing info
           otherUserInfo ??= await kc2Service.getUserInfoByUserName(toUserName!);
           if (otherUserInfo != null) {
             toAccountId = otherUserInfo.accountId;
             toPhoneNumberHash = otherUserInfo.phoneNumberHash;
           } else {
-            debugPrint('Warning: account not found on chain for $toAccountId');
+            debugPrint(
+                'Warning: account not found on chain for reciever $toAccountId');
           }
         } else {
           // apprecaition to local user
@@ -190,11 +194,11 @@ class KC2AppreciationTxV1 extends KC2Tx {
         }
         break;
       case DestinationType.phoneNumberHash:
+        // tx is to a phone number hash
         if (signer == userInfo.accountId) {
           // tx from local user - get other user by phone hash and fill info
           otherUserInfo ??=
               await kc2Service.getUserInfoByPhoneNumberHash(toPhoneNumberHash!);
-          // complete missing fields in tx with data from api
           if (otherUserInfo != null) {
             toAccountId = otherUserInfo.accountId;
             toUserName = otherUserInfo.userName;
@@ -202,13 +206,13 @@ class KC2AppreciationTxV1 extends KC2Tx {
             debugPrint('Warning: account not found on chain for $toAccountId');
           }
         } else {
-          // tx to local user
+          // tx is to local user
           toAccountId = userInfo.accountId;
           toUserName = userInfo.userName;
         }
         break;
       default:
-        throw 'Unexpected destination type: $destinationType';
+        throw 'Unsupported destination type: $destinationType';
     }
   }
 }
