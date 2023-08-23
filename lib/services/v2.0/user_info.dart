@@ -3,12 +3,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 
+// only one local user info is supported in the app
 const localUserInfoStorageKey = 'kc2_local_user_info';
 const androidOptions = AndroidOptions(
   encryptedSharedPreferences: true,
 );
 
-/// Chain user info returned from various RPCs such as GetUserInfoByXXX()
+/// Basic user info used by RPCs such as GetUserInfoByXXX()
 class KC2UserInfo {
   String accountId;
   String phoneNumberHash;
