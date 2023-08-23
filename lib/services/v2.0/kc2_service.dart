@@ -302,7 +302,7 @@ class KarmachainService extends ChainApiProvider
               blockNumber: blockNumber,
               blockIndex: transactionIndex);
         } catch (e) {
-          debugPrint('>>> failed block tx processing: $e');
+          debugPrint('>>> failed block tx: $e');
         }
       });
 
@@ -612,7 +612,8 @@ class KarmachainService extends ChainApiProvider
     }
   }
 
-  /// Returns transaction's signer address. Return null if the transaction is unsigned.
+  /// Returns transaction's signer address.
+  /// Return null if the transaction is unsigned.
   String? _getTransactionSigner(Map<String, dynamic> extrinsic) {
     final signature = extrinsic['signature'];
     if (signature == null) {
@@ -638,8 +639,7 @@ class KarmachainService extends ChainApiProvider
       Map<String, dynamic> rawData,
       List<KC2Event> txEvents) async {
     try {
-      // we preprocess the tx before creating the tx object and enriching it
-      // to avoid doing so for block appreciations which are not to or from local user
+      // we preprocess the tx below before creating the tx object and enriching it so we avoid rpc calls for block appreciations which are not to or from the local user
 
       final bool txFromUser = signer == userInfo.accountId;
 
@@ -651,8 +651,7 @@ class KarmachainService extends ChainApiProvider
       String? toUserName;
       String? toPhoneNumberHash;
 
-      // Extract one of the destination fields from the tx and return early in case
-      // userfInfo is not sender or receiver of the tx
+      // Extract one of the destination fields from the tx and return early in case userfInfo is not sender or receiver of the tx
       switch (accountIdentityType) {
         case 'AccountId':
           toAccountId = encodeAccountId(accountIdentityValue.cast<int>());
@@ -699,7 +698,7 @@ class KarmachainService extends ChainApiProvider
         debugPrint('No registered appreciation callback');
       }
     } catch (e) {
-      debugPrint("Error processing appreciation tx: $e");
+      debugPrint(">>> error processing appreciation tx: $e");
       rethrow;
     }
   }
@@ -758,7 +757,7 @@ class KarmachainService extends ChainApiProvider
     try {
       final toAddress = encodeAccountId(args['dest'].value.cast<int>());
       if (signer != userInfo.accountId && toAddress == userInfo.accountId) {
-        // sender and receiver is not local user - skip
+        // sender or receiver is not local user - skip this transfer
         return;
       }
 
@@ -774,7 +773,7 @@ class KarmachainService extends ChainApiProvider
         if (res != null) {
           toUserName = res.userName;
         } else {
-          debugPrint('>> failed to get user info by account id $toAddress');
+          debugPrint('>> failed to get user info by accountId: $toAddress');
         }
       } else {
         toUserName = userInfo.userName;
@@ -782,7 +781,7 @@ class KarmachainService extends ChainApiProvider
         if (res != null) {
           fromUserName = res.userName;
         } else {
-          debugPrint('>> failed to get user info by account id $signer');
+          debugPrint('>> failed to get user info by accountId: $signer');
         }
       }
 
@@ -860,12 +859,9 @@ class KarmachainService extends ChainApiProvider
         return;
       }
 
-      final amount = args['amount'];
-      final poolId = args['pool_id'];
-
       final joinTx = KC2JoinTxV1(
-        amount: amount,
-        poolId: poolId,
+        amount: args['amount'],
+        poolId: args['pool_id'],
         args: args,
         signer: signer,
         chainError: chainError,
@@ -877,7 +873,9 @@ class KarmachainService extends ChainApiProvider
         rawData: rawData,
       );
 
-      await joinPoolCallback!(joinTx);
+      if (joinPoolCallback != null) {
+        await joinPoolCallback!(joinTx);
+      }
     } catch (e) {
       debugPrint('error processing new user tx: $e');
       rethrow;
@@ -913,8 +911,9 @@ class KarmachainService extends ChainApiProvider
         transactionEvents: txEvents,
         rawData: rawData,
       );
-
-      await claimPoolPayoutCallback!(claimPayoutTx);
+      if (claimPoolPayoutCallback != null) {
+        await claimPoolPayoutCallback!(claimPayoutTx);
+      }
     } catch (e) {
       debugPrint('error processing new user tx: $e');
       rethrow;
@@ -939,12 +938,9 @@ class KarmachainService extends ChainApiProvider
         return;
       }
 
-      final memberAccount = args['member_account'];
-      final unbondingPoints = args['unbonding_points'];
-
       final unbondTx = KC2UnbondTxV1(
-        memberAccount: memberAccount,
-        unbondingPoints: unbondingPoints,
+        memberAccount: args['member_account'],
+        unbondingPoints: args['unbonding_points'],
         args: args,
         signer: signer,
         chainError: chainError,
@@ -956,7 +952,9 @@ class KarmachainService extends ChainApiProvider
         rawData: rawData,
       );
 
-      await unbondPoolCallback!(unbondTx);
+      if (unbondPoolCallback != null) {
+        await unbondPoolCallback!(unbondTx);
+      }
     } catch (e) {
       debugPrint('error processing new user tx: $e');
       rethrow;
@@ -981,10 +979,8 @@ class KarmachainService extends ChainApiProvider
         return;
       }
 
-      final memberAccount = args['member_account'];
-
       final withdrawUnbondTx = KC2WithdrawUnbondedTxV1(
-        memberAccount: memberAccount,
+        memberAccount: args['member_account'],
         args: args,
         signer: signer,
         chainError: chainError,
@@ -995,8 +991,9 @@ class KarmachainService extends ChainApiProvider
         transactionEvents: txEvents,
         rawData: rawData,
       );
-
-      await withdrawUnbondedPoolCallback!(withdrawUnbondTx);
+      if (withdrawUnbondedPoolCallback != null) {
+        await withdrawUnbondedPoolCallback!(withdrawUnbondTx);
+      }
     } catch (e) {
       debugPrint('error processing new user tx: $e');
       rethrow;

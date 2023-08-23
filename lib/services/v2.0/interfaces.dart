@@ -131,7 +131,7 @@ abstract class ChainApiProvider {
           await karmachain.send('author_submitExtrinsic', [encodedHex]);
 
       final txHash = result.result.toString();
-      debugPrint('Submitted tx hash: $txHash');
+      debugPrint('>>> submitted tx hash: $txHash');
       return txHash;
     } catch (e) {
       debugPrint('Failed to submit tx: $e');
@@ -151,7 +151,7 @@ abstract class ChainApiProvider {
     bytes.add(storagePrefix);
     bytes.add(key);
 
-    debugPrint('Read storage by ${hex.encode(bytes.toBytes().toList())}');
+    // debugPrint('Read storage by ${hex.encode(bytes.toBytes().toList())}');
     return await api.getStorage(bytes.toBytes());
   }
 
