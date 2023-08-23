@@ -221,7 +221,7 @@ class KarmachainService extends ChainApiProvider
 
   // Utility
 
-  /// Returns hex string hash without a trailing 0x
+  /// Returns hex string hash without a trailing '0x'
   @override
   String getPhoneNumberHash(String phoneNumber) {
     if (phoneNumber.startsWith('+')) {
@@ -330,9 +330,6 @@ class KarmachainService extends ChainApiProvider
     required int blockIndex,
   }) async {
     try {
-      hash ??=
-          '0x${hex.encode(Hasher.blake2b256.hash(ExtrinsicsCodec(chainInfo: chainInfo).encode(tx)))}';
-
       final String pallet = tx['calls'].key;
       final String method = tx['calls'].value.key;
       final args = tx['calls'].value.value;
@@ -340,9 +337,13 @@ class KarmachainService extends ChainApiProvider
       final String? signer = _getTransactionSigner(tx);
 
       if (signer == null) {
-        debugPrint("skipping unsigned tx $pallet/$method");
+        debugPrint(">>> skipping unsigned tx $pallet/$method");
         return;
       }
+
+      /// Use provided hash or generate one if needed
+      hash ??=
+          '0x${hex.encode(Hasher.blake2b256.hash(ExtrinsicsCodec(chainInfo: chainInfo).encode(tx)))}';
 
       debugPrint("Processing tx $pallet/$method. txHash: $hash");
 
@@ -357,7 +358,8 @@ class KarmachainService extends ChainApiProvider
           method == 'new_user' &&
           newUserCallback != null) {
         final txAccountId = encodeAccountId(args['account_id'].cast<int>());
-        if (signer == userInfo.accountId || userInfo.accountId == txAccountId) {
+        // @HolyGrease - shouldn't we just check signer here?
+        if (signer == userInfo.accountId || txAccountId == userInfo.accountId) {
           KC2Tx? newUserTx = KC2Tx.getKC2Trnsaction(
               tx: tx,
               hash: hash,

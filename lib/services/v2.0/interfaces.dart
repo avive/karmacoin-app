@@ -132,7 +132,6 @@ abstract class ChainApiProvider {
 
       final txHash = result.result.toString();
       debugPrint('Submitted tx hash: $txHash');
-
       return txHash;
     } catch (e) {
       debugPrint('Failed to submit tx: $e');

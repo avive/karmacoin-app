@@ -240,6 +240,7 @@ mixin K2ServiceInterface implements ChainApiProvider {
   /// userName - unique username. Must not be empty
   /// phoneNumber - user's phone number. Including country code. Excluding leading +
   /// Returns an (evidence, errorMessage) result.
+  /// @HolyGrease - first string in tuple should be the tx hash and not evidence!
   ///
   /// This method will attempt to obtain verifier evidence regarding the association between the accountId, userName and phoneNumber
   Future<(String?, String?)> newUser(
