@@ -213,9 +213,6 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
     }
   }
 
-  /// @HolyGrease - is there an api got info of all bonded validators that can be nominated?
-  /// if no - we need to have it so user sees options to nominate...
-
   /// Nominate on behalf of the pool.
   ///
   /// The dispatch origin of this call must be signed by the pool nominator
