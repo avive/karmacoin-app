@@ -441,7 +441,6 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   }
 
   /// Returns the equivalent balance of `points` for pools
-  /// @HolyGrease - it is for any pool not for a specific one - correct?
   Future<BigInt> getPoolsPointsToBalance(BigInt points) async {
     try {
       return await callRpc(
