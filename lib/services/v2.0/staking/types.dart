@@ -2,7 +2,7 @@ typedef EraIndex = int;
 
 /// A record of the nominations made by a specific account.
 class Nominations {
-  /// The targets of nomination. @HolyGrease - are these validator accountIds?
+  /// The targets of nomination.
   List<String> targets;
 
   /// The era the nominations were submitted.
