@@ -8,7 +8,6 @@ class CommunityDesignTheme {
   CommunityDesignTheme(this.backgroundColor, this.textColor);
 }
 
-
 class GenesisConfig {
   static const kCentsPerCoin = 1000000;
 

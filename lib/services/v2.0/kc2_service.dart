@@ -267,7 +267,7 @@ class KarmachainService extends ChainApiProvider
           blockData['block']['extrinsics'].map((encodedExtrinsic) {
         final extrinsic = _decodeTransaction(Input.fromHex(encodedExtrinsic));
         final extrinsicHash =
-            '0x${hex.encode(Hasher.blake2b256.hashString(encodedExtrinsic))}';
+            '0x${hex.encode(Hasher.blake2b256.hash(Uint8List.fromList(hex.decode(encodedExtrinsic.substring(2)))))}';
 
         return MapEntry(extrinsicHash, extrinsic);
       }).toList();

@@ -14,8 +14,7 @@ class VerifyNumberRequest {
     request.data = data.writeToBuffer();
   }
 
-  void sign(KC2KeyRing keyring,
-      {keyScheme = KeyScheme.KEY_SCHEME_ED25519}) {
+  void sign(KC2KeyRing keyring, {keyScheme = KeyScheme.KEY_SCHEME_ED25519}) {
     Uint8List signature = keyring.sign(Uint8List.fromList(request.data));
     request.signature = signature.toList();
   }

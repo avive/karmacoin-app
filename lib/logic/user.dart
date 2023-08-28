@@ -378,9 +378,8 @@ class KC2User extends KC2UserInteface {
 
   Future<void> _signupUserCallback(KC2NewUserTransactionV1 tx) async {
     if (_signupTxHash != tx.hash) {
-      // TODO: @HolyGrease - as we have tx has mismatch we never pass this check and so user can't signup
-      // debugPrint('Ignore this signup tx: ${tx.hash}');
-      // return;
+      debugPrint('Ignore this signup tx: ${tx.hash}');
+      return;
     }
 
     if (tx.accountId != _identity.accountId) {
