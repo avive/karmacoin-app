@@ -113,10 +113,6 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   /// However, it may not be possible to release the current unlocking chunks,
   /// in which case, the result of this call will likely be the `NoMoreChunks` error from the staking system.
   ///
-  /// @HolyGrease - what happen if unbound is called for only some of the member's stake?
-  /// I understand the use case of unbounding all of the member's stake, but not some of it
-  /// Does it just mean reduce stake in the pool and stay in it?
-  ///
   Future<String> unbond(String accountId, BigInt unbondingPoints) async {
     try {
       // TODO: use balance as argument and convert it to points inside function
