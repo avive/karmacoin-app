@@ -189,8 +189,8 @@ void main() {
 
           if (tx.hash != txHash) {
             debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
-            // completer.complete(false);
-            // return;
+            completer.complete(false);
+            return;
           }
 
           Transaction transaction =

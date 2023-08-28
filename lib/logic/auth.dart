@@ -14,7 +14,7 @@ class AuthLogic extends AuthLogicInterface {
 
   /// Clear auth data
   @override
-  Future<void> signOut() async {    
+  Future<void> signOut() async {
     await FirebaseAuth.instance.signOut();
   }
 

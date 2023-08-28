@@ -80,8 +80,8 @@ void main() {
 
           if (tx.hash != katyaNewUserTxHash) {
             debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
-            // completer.complete(false);
-            // return;
+            completer.complete(false);
+            return;
           }
 
           // switch local user to punch
@@ -92,7 +92,8 @@ void main() {
           kc2Service.appreciationCallback = (tx) async {
             if (tx.hash != appreciationTxHash) {
               debugPrint('Warning: unexpected tx hash: ${tx.hash}');
-              // return;
+              completer.complete(false);
+              return;
             }
 
             if (tx.chainError != null) {
@@ -121,7 +122,8 @@ void main() {
           kc2Service.newUserCallback = (tx) async {
             if (tx.hash != punchNewUserTxHash) {
               debugPrint('Warning: unexpected tx hash: ${tx.hash}');
-              // return;
+              completer.complete(false);
+              return;
             }
 
             debugPrint('>> Punch new user callback called');
@@ -214,8 +216,8 @@ void main() {
         kc2Service.newUserCallback = (tx) async {
           if (tx.hash != katyaNewUserTxHash) {
             debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
-            // completer.complete(false);
-            // return;
+            completer.complete(false);
+            return;
           }
 
           debugPrint('>> Katya new user callback called');
@@ -233,8 +235,8 @@ void main() {
             if (tx.hash != appreciation1TxHash &&
                 tx.hash != appreciation2TxHash) {
               debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
-              // completer.complete(false);
-              // return;
+              completer.complete(false);
+              return;
             }
 
             if (tx.chainError != null) {
@@ -273,8 +275,8 @@ void main() {
 
             if (tx.hash != punchNewUserTxHash) {
               debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
-              // completer.complete(false);
-              // return;
+              completer.complete(false);
+              return;
             }
 
             // send 2 appreciations from punch to katya

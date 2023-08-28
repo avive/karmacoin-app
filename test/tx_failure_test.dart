@@ -62,9 +62,8 @@ void main() {
 
           if (tx.hash != updateTexHash) {
             debugPrint('Warning: tx mismatch ${tx.hash} != $updateTexHash');
-            // expect(tx.hash, updateTexHash);
-            // completer.complete(false);
-            // return;
+            completer.complete(false);
+            return;
           }
 
           expect(tx.chainError!.name, 'InvalidArguments');
@@ -80,8 +79,8 @@ void main() {
 
           if (tx.hash != txHash) {
             debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
-            // completer.complete(false);
-            // return;
+            completer.complete(false);
+            return;
           }
 
           debugPrint('calling update user with same phone number...');
@@ -166,8 +165,8 @@ void main() {
 
           if (tx.hash != katyaNewUserTxHash) {
             debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
-            // completer.complete(false);
-            // return;
+            completer.complete(false);
+            return;
           }
 
           // switch local user to punch
@@ -178,8 +177,8 @@ void main() {
           kc2Service.appreciationCallback = (tx) async {
             if (tx.hash != appreciationTxHash) {
               debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
-              // completer.complete(false);
-              // return;
+              completer.complete(false);
+              return;
             }
 
             if (tx.chainError == null) {
@@ -204,8 +203,8 @@ void main() {
 
             if (tx.hash != punchNewUserTxHash) {
               debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
-              // completer.complete(false);
-              // return;
+              completer.complete(false);
+              return;
             }
 
             KC2UserInfo? info =
