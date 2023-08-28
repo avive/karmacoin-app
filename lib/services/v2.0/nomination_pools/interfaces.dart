@@ -453,7 +453,6 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   }
 
   /// Returns the equivalent points of `new_funds` for a given pool.
-  /// @HolyGrease - it is for any pool not for a specific one - correct?
   Future<BigInt> getPoolsBalanceToPoints(BigInt balance) async {
     try {
       return await callRpc(
@@ -466,7 +465,6 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   }
 
   /// Returns list of nomination pools.
-  /// @holyGrease - are only open pools returned or all of them?
   Future<List<Pool>> getPools() async {
     try {
       final pools = await callRpc('nominationPools_getPools', []).then(
