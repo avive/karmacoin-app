@@ -20,7 +20,6 @@ import 'package:karma_coin/services/v2.0/nomination_pools/txs/unbond.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/update_roles.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/withdraw_unbonded.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/chill.dart';
-import 'package:karma_coin/services/v2.0/nomination_pools/types.dart';
 import 'package:karma_coin/services/v2.0/staking/interfaces.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
@@ -155,7 +154,7 @@ class KarmachainService extends ChainApiProvider
 
       debugPrint('Got ${txs.length} txs for account: ${userInfo.accountId}');
 
-      // (blokcNumber, Block)
+      // (blockNumber, Block)
       Map<String, Block> blocks = {};
 
       int processed = 0;
@@ -649,7 +648,7 @@ class KarmachainService extends ChainApiProvider
       String? toUserName;
       String? toPhoneNumberHash;
 
-      // Extract one of the destination fields from the tx and return early in case userfInfo is not sender or receiver of the tx
+      // Extract one of the destination fields from the tx and return early in case userInfo is not sender or receiver of the tx
       switch (accountIdentityType) {
         case 'AccountId':
           toAccountId = encodeAccountId(accountIdentityValue.cast<int>());
@@ -857,9 +856,7 @@ class KarmachainService extends ChainApiProvider
         return;
       }
 
-      final joinTx = KC2JoinTxV1(
-        amount: args['amount'],
-        poolId: args['pool_id'],
+      final joinTx = KC2JoinTxV1.createJoinTx(
         args: args,
         signer: signer,
         chainError: chainError,
@@ -867,8 +864,9 @@ class KarmachainService extends ChainApiProvider
         hash: hash,
         blockNumber: blockNumber,
         blockIndex: blockIndex,
-        transactionEvents: txEvents,
+        txEvents: txEvents,
         rawData: rawData,
+        netId: netId,
       );
 
       if (joinPoolCallback != null) {
@@ -898,7 +896,7 @@ class KarmachainService extends ChainApiProvider
         return;
       }
 
-      final claimPayoutTx = KC2ClaimPayoutTxV1(
+      final claimPayoutTx = KC2ClaimPayoutTxV1.createClaimPayoutTx(
         args: args,
         signer: signer,
         chainError: chainError,
@@ -906,9 +904,11 @@ class KarmachainService extends ChainApiProvider
         hash: hash,
         blockNumber: blockNumber,
         blockIndex: blockIndex,
-        transactionEvents: txEvents,
+        txEvents: txEvents,
         rawData: rawData,
+        netId: netId,
       );
+
       if (claimPoolPayoutCallback != null) {
         await claimPoolPayoutCallback!(claimPayoutTx);
       }
@@ -936,9 +936,7 @@ class KarmachainService extends ChainApiProvider
         return;
       }
 
-      final unbondTx = KC2UnbondTxV1(
-        memberAccount: args['member_account'],
-        unbondingPoints: args['unbonding_points'],
+      final unbondTx = KC2UnbondTxV1.createUnbondTx(
         args: args,
         signer: signer,
         chainError: chainError,
@@ -946,8 +944,9 @@ class KarmachainService extends ChainApiProvider
         hash: hash,
         blockNumber: blockNumber,
         blockIndex: blockIndex,
-        transactionEvents: txEvents,
+        txEvents: txEvents,
         rawData: rawData,
+        netId: netId,
       );
 
       if (unbondPoolCallback != null) {
@@ -977,8 +976,7 @@ class KarmachainService extends ChainApiProvider
         return;
       }
 
-      final withdrawUnbondTx = KC2WithdrawUnbondedTxV1(
-        memberAccount: args['member_account'],
+      final withdrawUnbondTx = KC2WithdrawUnbondedTxV1.createWithdrawUnbondedTx(
         args: args,
         signer: signer,
         chainError: chainError,
@@ -986,9 +984,11 @@ class KarmachainService extends ChainApiProvider
         hash: hash,
         blockNumber: blockNumber,
         blockIndex: blockIndex,
-        transactionEvents: txEvents,
+        txEvents: txEvents,
         rawData: rawData,
+        netId: netId,
       );
+
       if (withdrawUnbondedPoolCallback != null) {
         await withdrawUnbondedPoolCallback!(withdrawUnbondTx);
       }
@@ -1016,16 +1016,7 @@ class KarmachainService extends ChainApiProvider
         return;
       }
 
-      final amount = args['amount'];
-      final root = encodeAccountId(args['root'].value.cast<int>());
-      final nominator = encodeAccountId(args['nominator'].value.cast<int>());
-      final bouncer = encodeAccountId(args['bouncer'].value.cast<int>());
-
-      final createTx = KC2CreateTxV1(
-        amount: amount,
-        root: root,
-        nominator: nominator,
-        bouncer: bouncer,
+      final createTx = KC2CreateTxV1.createCreatedTx(
         args: args,
         signer: signer,
         chainError: chainError,
@@ -1033,8 +1024,9 @@ class KarmachainService extends ChainApiProvider
         hash: hash,
         blockNumber: blockNumber,
         blockIndex: blockIndex,
-        transactionEvents: txEvents,
+        txEvents: txEvents,
         rawData: rawData,
+        netId: netId,
       );
 
       await createPoolCallback!(createTx);
@@ -1062,15 +1054,7 @@ class KarmachainService extends ChainApiProvider
         return;
       }
 
-      final poolId = args['pool_id'];
-      final validators = args['validators']
-          .map((e) => encodeAccountId(e.cast<int>()))
-          .toList()
-          .cast<String>();
-
-      final nominateTx = KC2NominateTxV1(
-        poolId: poolId,
-        validatorAccounts: validators,
+      final nominateTx = KC2NominateTxV1.createNominateTx(
         args: args,
         signer: signer,
         chainError: chainError,
@@ -1078,8 +1062,9 @@ class KarmachainService extends ChainApiProvider
         hash: hash,
         blockNumber: blockNumber,
         blockIndex: blockIndex,
-        transactionEvents: txEvents,
+        txEvents: txEvents,
         rawData: rawData,
+        netId: netId,
       );
 
       await nominatePoolValidatorCallback!(nominateTx);
@@ -1107,10 +1092,7 @@ class KarmachainService extends ChainApiProvider
         return;
       }
 
-      final poolId = args['pool_id'];
-
-      final chillTx = KC2ChillTxV1(
-        poolId: poolId,
+      final chillTx = KC2ChillTxV1.createChillTx(
         args: args,
         signer: signer,
         chainError: chainError,
@@ -1118,8 +1100,9 @@ class KarmachainService extends ChainApiProvider
         hash: hash,
         blockNumber: blockNumber,
         blockIndex: blockIndex,
-        transactionEvents: txEvents,
+        txEvents: txEvents,
         rawData: rawData,
+        netId: netId,
       );
 
       await chillPoolCallback!(chillTx);
@@ -1147,37 +1130,7 @@ class KarmachainService extends ChainApiProvider
         return;
       }
 
-      final poolId = args['pool_id'];
-      final newRoot = MapEntry(
-        ConfigOption.values.firstWhere((e) =>
-            e.toString() ==
-            'ConfigOption.${args['new_root'].key.toLowerCase()}'),
-        args['new_root'].value == null
-            ? null
-            : encodeAccountId(args['new_root'].value.cast<int>()),
-      );
-      final newNominator = MapEntry(
-        ConfigOption.values.firstWhere((e) =>
-            e.toString() ==
-            'ConfigOption.${args['new_nominator'].key.toLowerCase()}'),
-        args['new_nominator'].value == null
-            ? null
-            : encodeAccountId(args['new_nominator'].value.cast<int>()),
-      );
-      final newBouncer = MapEntry(
-        ConfigOption.values.firstWhere((e) =>
-            e.toString() ==
-            'ConfigOption.${args['new_bouncer'].key.toLowerCase()}'),
-        args['new_bouncer'].value == null
-            ? null
-            : encodeAccountId(args['new_bouncer'].value.cast<int>()),
-      );
-
-      final updateRolesTx = KC2UpdateRolesTxV1(
-        poolId: poolId,
-        root: newRoot,
-        nominator: newNominator,
-        bouncer: newBouncer,
+      final updateRolesTx = KC2UpdateRolesTxV1.createUpdateRolesTx(
         args: args,
         signer: signer,
         chainError: chainError,
@@ -1185,8 +1138,9 @@ class KarmachainService extends ChainApiProvider
         hash: hash,
         blockNumber: blockNumber,
         blockIndex: blockIndex,
-        transactionEvents: txEvents,
+        txEvents: txEvents,
         rawData: rawData,
+        netId: netId,
       );
 
       await updatePoolRolesCallback!(updateRolesTx);
@@ -1214,21 +1168,7 @@ class KarmachainService extends ChainApiProvider
         return;
       }
 
-      final poolId = args['pool_id'];
-      final newCommission = args['new_commission'];
-
-      int? commission;
-      String? beneficiary;
-
-      if (newCommission.value != null) {
-        commission = newCommission.value[0];
-        beneficiary = encodeAccountId(newCommission.value[1].cast<int>());
-      }
-
-      final setCommissionTx = KC2SetCommissionTxV1(
-        poolId: poolId,
-        commission: commission,
-        beneficiary: beneficiary,
+      final setCommissionTx = KC2SetCommissionTxV1.createSetCommissionTx(
         args: args,
         signer: signer,
         chainError: chainError,
@@ -1236,8 +1176,9 @@ class KarmachainService extends ChainApiProvider
         hash: hash,
         blockNumber: blockNumber,
         blockIndex: blockIndex,
-        transactionEvents: txEvents,
+        txEvents: txEvents,
         rawData: rawData,
+        netId: netId,
       );
 
       await setPoolCommissionCallback!(setCommissionTx);
@@ -1265,12 +1206,7 @@ class KarmachainService extends ChainApiProvider
         return;
       }
 
-      final poolId = args['pool_id'];
-      final maxCommission = args['max_commission'];
-
-      final setCommissionMaxTx = KC2SetCommissionMaxTxV1(
-        poolId: poolId,
-        maxCommission: maxCommission,
+      final setCommissionMaxTx = KC2SetCommissionMaxTxV1.createSetCommissionMaxTx(
         args: args,
         signer: signer,
         chainError: chainError,
@@ -1278,8 +1214,9 @@ class KarmachainService extends ChainApiProvider
         hash: hash,
         blockNumber: blockNumber,
         blockIndex: blockIndex,
-        transactionEvents: txEvents,
+        txEvents: txEvents,
         rawData: rawData,
+        netId: netId,
       );
 
       await setPoolCommissionMaxCallback!(setCommissionMaxTx);
@@ -1307,12 +1244,7 @@ class KarmachainService extends ChainApiProvider
         return;
       }
 
-      final poolId = args['pool_id'];
-      final changeRate = CommissionChangeRate.fromJson(args['change_rate']);
-
-      final setCommissionChangeRateTx = KC2SetCommissionChangeRateTxV1(
-        poolId: poolId,
-        commissionChangeRate: changeRate,
+      final setCommissionChangeRateTx = KC2SetCommissionChangeRateTxV1.createSetCommissionChangeTx(
         args: args,
         signer: signer,
         chainError: chainError,
@@ -1320,8 +1252,9 @@ class KarmachainService extends ChainApiProvider
         hash: hash,
         blockNumber: blockNumber,
         blockIndex: blockIndex,
-        transactionEvents: txEvents,
+        txEvents: txEvents,
         rawData: rawData,
+        netId: netId,
       );
 
       await setPoolCommissionChangeRateCallback!(setCommissionChangeRateTx);
@@ -1349,10 +1282,7 @@ class KarmachainService extends ChainApiProvider
         return;
       }
 
-      final poolId = args['pool_id'];
-
-      final claimCommissionTx = KC2ClaimCommissionTxV1(
-        poolId: poolId,
+      final claimCommissionTx = KC2ClaimCommissionTxV1.createClaimCommissionTx(
         args: args,
         signer: signer,
         chainError: chainError,
@@ -1360,8 +1290,9 @@ class KarmachainService extends ChainApiProvider
         hash: hash,
         blockNumber: blockNumber,
         blockIndex: blockIndex,
-        transactionEvents: txEvents,
+        txEvents: txEvents,
         rawData: rawData,
+        netId: netId,
       );
 
       await claimPoolCommissionCallback!(claimCommissionTx);
