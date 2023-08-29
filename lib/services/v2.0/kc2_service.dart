@@ -158,14 +158,11 @@ class KarmachainService extends ChainApiProvider
       Map<String, Block> blocks = {};
 
       int processed = 0;
-      for (final txData in txs) {
+      for (final transaction in txs) {
         try {
           debugPrint('Processing tx $processed ...');
-          final BigInt blockNumber = BigInt.from(txData.blockNumber);
+          final BigInt blockNumber = transaction.blockNumber;
           final String blockNumberString = blockNumber.toString();
-          final txBodyBytes = txData.transaction.transactionBody;
-          final transactionBody =
-              _decodeTransaction(Input.fromBytes(txBodyBytes));
 
           Block? block = blocks[blockNumberString];
           if (block == null) {
@@ -178,17 +175,16 @@ class KarmachainService extends ChainApiProvider
           await _processTransaction(
               hash: null,
               userInfo: userInfo,
-              tx: transactionBody,
-              txEvents:
-                  await block.getTransactionEvents(txData.transactionIndex),
-              timestamp: txData.timestamp,
-              blockNumber: blockNumber,
-              blockIndex: txData.transactionIndex);
+              tx: transaction.rawData,
+              txEvents: transaction.transactionEvents,
+              timestamp: transaction.timestamp,
+              blockNumber: transaction.blockNumber,
+              blockIndex: transaction.blockIndex);
           processed++;
           debugPrint('Processed tx $processed / ${txs.length}...');
         } catch (e) {
           // don't throw so we can process valid txs even when one is bad
-          debugPrint('>>>>> error processing tx: $txData $e');
+          debugPrint('>>>>> error processing tx: $transaction $e');
         }
       }
 

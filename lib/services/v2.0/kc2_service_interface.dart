@@ -1,13 +1,17 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:convert/convert.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/app_state.dart';
+import 'package:karma_coin/services/v2.0/event.dart';
 import 'package:karma_coin/services/v2.0/interfaces.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
+import 'package:polkadart/scale_codec.dart';
 import 'package:polkadart/substrate/substrate.dart';
 import 'package:polkadart_scale_codec/primitives/primitives.dart';
+import 'package:substrate_metadata_fixed/types/metadata_types.dart';
 
 /// Client callback types
 typedef NewUserCallback = Future<void> Function(KC2NewUserTransactionV1 tx);
@@ -163,12 +167,35 @@ mixin K2ServiceInterface implements ChainApiProvider {
   /// Fetch chain genesis time
   Future<int> getGenesisTimestamp();
 
+  /// Convert RPC `Transaction` type to `KC2Tx` type
+  Future<KC2Tx?> _convertTransaction(Transaction transaction) async {
+    final extrinsic = ExtrinsicsCodec(chainInfo: chainInfo)
+        .decode(Input.fromBytes(transaction.transaction.transactionBody));
+
+    String hash =
+    '0x${hex.encode(Hasher.blake2b256.hash(ExtrinsicsCodec(chainInfo: chainInfo).encode(extrinsic)))}';
+
+    return await KC2Tx.getKC2Transaction(
+        tx: extrinsic,
+        // If transaction indexed on-chain, it is successful
+        chainError: null,
+        timestamp: transaction.timestamp,
+        hash: hash,
+        blockNumber: BigInt.from(transaction.blockNumber),
+        blockIndex: transaction.transactionIndex,
+        txEvents: transaction.events.map((e) => KC2Event.fromJson(e)).toList(),
+        signer: transaction.from!.accountId,
+        netId: netId,
+        chainInfo: chainInfo);
+  }
+
   /// Fetch transaction by block number and transaction index
-  Future<Transaction> getTransaction(int blockNumber, int txIndex) async {
+  Future<KC2Tx?> getTransaction(int blockNumber, int txIndex) async {
     try {
       Map<String, dynamic> result =
           await callRpc('chain_getTransaction', [blockNumber, txIndex]);
-      return Transaction.fromJson(result);
+      final transaction = Transaction.fromJson(result);
+      return await _convertTransaction(transaction);
     } on PlatformException catch (e) {
       debugPrint('Failed to get transactions_getTx: ${e.message}');
       rethrow;
@@ -176,13 +203,12 @@ mixin K2ServiceInterface implements ChainApiProvider {
   }
 
   /// Fetch transaction by transaction hash
-  /// TODO: @holygrease this should return a typed KC2Tx and not just a raw
-  /// Transaction which is pretty useless for clients
-  Future<Transaction> getTransactionByHash(String txHash) async {
+  Future<KC2Tx?> getTransactionByHash(String txHash) async {
     try {
       Map<String, dynamic> result =
           await callRpc('transactions_getTransaction', [txHash]);
-      return Transaction.fromJson(result);
+      final transaction = Transaction.fromJson(result);
+      return await _convertTransaction(transaction);
     } on PlatformException catch (e) {
       debugPrint('Failed to get transactions_getTx: ${e.message}');
       rethrow;
@@ -190,11 +216,20 @@ mixin K2ServiceInterface implements ChainApiProvider {
   }
 
   /// Fetch all transaction belong to the account id
-  Future<List<Transaction>> getTransactionsByAccountId(String accountId) async {
+  Future<List<KC2Tx>> getTransactionsByAccountId(String accountId) async {
     try {
       List<dynamic> result =
           await callRpc('transactions_getTransactions', [accountId]);
-      return result.map((e) => Transaction.fromJson(e)).toList();
+      final transactions = result.map((e) => Transaction.fromJson(e)).toList();
+
+      List<KC2Tx> txs = [];
+      for (final transaction in transactions) {
+        final tx = await _convertTransaction(transaction);
+        if (tx != null) {
+          txs.add(tx);
+        }
+      }
+      return txs;
     } on PlatformException catch (e) {
       debugPrint(
           'Failed to get transactions_getTransactionsByAccountId: ${e.message}');
@@ -202,7 +237,7 @@ mixin K2ServiceInterface implements ChainApiProvider {
     }
   }
 
-  Future<List<Transaction>> getTransactionsByPhoneNumberHash(
+  Future<List<KC2Tx>> getTransactionsByPhoneNumberHash(
       String phoneNumberHash) async {
     try {
       // Cut `0x` prefix if exists
@@ -212,7 +247,16 @@ mixin K2ServiceInterface implements ChainApiProvider {
 
       List<dynamic> result = await callRpc(
           'transactions_getTransactionsByPhoneNumberHash', [phoneNumberHash]);
-      return result.map((e) => Transaction.fromJson(e)).toList();
+      final transactions = result.map((e) => Transaction.fromJson(e)).toList();
+
+      List<KC2Tx> txs = [];
+      for (final transaction in transactions) {
+        final tx = await _convertTransaction(transaction);
+        if (tx != null) {
+          txs.add(tx);
+        }
+      }
+      return txs;
     } on PlatformException catch (e) {
       debugPrint(
           'Failed to get transactions_getTransactionsByPhoneNumberHash: ${e.message}');
