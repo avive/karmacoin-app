@@ -1,10 +1,54 @@
+import 'package:karma_coin/services/v2.0/error.dart';
+import 'package:karma_coin/services/v2.0/event.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
+import 'package:karma_coin/common_libs.dart';
+import 'package:ss58/ss58.dart' as ss58;
 
 class KC2CreateTxV1 extends KC2Tx {
   BigInt amount;
   String root;
   String nominator;
   String bouncer;
+
+  static KC2CreateTxV1 createCreatedTx(
+      {required String hash,
+      required int timestamp,
+      required String signer,
+      required Map<String, dynamic> args,
+      required ChainError? chainError,
+      required BigInt blockNumber,
+      required int blockIndex,
+      required Map<String, dynamic> rawData,
+      required List<KC2Event> txEvents,
+      required int netId}) {
+    try {
+      final amount = args['amount'];
+      final root = ss58.Codec(netId).encode(args['root'].value.cast<int>());
+      final nominator =
+          ss58.Codec(netId).encode(args['nominator'].value.cast<int>());
+      final bouncer =
+          ss58.Codec(netId).encode(args['bouncer'].value.cast<int>());
+
+      return KC2CreateTxV1(
+        amount: amount,
+        root: root,
+        nominator: nominator,
+        bouncer: bouncer,
+        args: args,
+        signer: signer,
+        chainError: chainError,
+        timestamp: timestamp,
+        hash: hash,
+        blockNumber: blockNumber,
+        blockIndex: blockIndex,
+        transactionEvents: txEvents,
+        rawData: rawData,
+      );
+    } catch (e) {
+      debugPrint("Error processing create tx: $e");
+      rethrow;
+    }
+  }
 
   KC2CreateTxV1(
       {required this.amount,
