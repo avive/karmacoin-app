@@ -39,7 +39,7 @@ class _CommunityHomeScreenState extends State<CommunityHomeScreen> {
       //  return;
       // }
 
-      // TODO: show first time user sees this screen - a welcome message
+      // todo: show first time user sees this screen - a welcome message
 
       if (appState.signedUpInCurentSession.value) {
         appState.signedUpInCurentSession.value = false;

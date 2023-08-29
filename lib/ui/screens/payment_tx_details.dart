@@ -29,7 +29,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    // TODO: if tx is null - fetch it from kc2 api once it is available
+    // todo: if tx is null - fetch it from kc2 api once it is available
     // we need kc2Service.getTransactionByHash() to return typed txs
     if (widget.tx == null) {
       throw 'For now - tx must be passed in via router to widget';
@@ -76,7 +76,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
       leading: const Icon(CupertinoIcons.checkmark_seal, size: 28),
       trailing: const Icon(CupertinoIcons.share, size: 28),
       onTap: () {
-        // TODO: implement me and copy
+        // todo: implement me and copy
       },
     );
   }
@@ -87,7 +87,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
 
     tiles.add(_getAmountTile(context, tx.amount));
 
-    bool sentToLocalUser = tx.toAddress == kc2User.identity.accountId ||
+    bool sentToLocalUser = tx.toAccountId == kc2User.identity.accountId ||
         tx.toUserName == kc2User.userInfo.value!.userName;
 
     String fromLabel = sentToLocalUser
@@ -95,7 +95,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
         : 'Sent from you to ${tx.toUserName}';
 
     Widget? icon = sentToLocalUser
-        ? RandomAvatar(tx.fromUserName, height: 34, width: 34)
+        ? RandomAvatar(tx.fromUserName!, height: 34, width: 34)
         : RandomAvatar(tx.toUserName!, height: 28, width: 34);
 
     tiles.add(
@@ -137,7 +137,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
       );
     }*/
 
-    tiles.add(_getAddressTile(context, 'To address', tx.toAddress, false));
+    tiles.add(_getAddressTile(context, 'To address', tx.toAccountId!, false));
     tiles.add(_getAddressTile(context, 'From address', tx.fromAddress, true));
 
     return tiles;
@@ -205,7 +205,7 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
       ),
     );
 
-    if (widget.tx?.failedReason == null) {
+    if (widget.tx?.chainError == null) {
       tiles.add(
         CupertinoListTile.notched(
           title: Text('Status',

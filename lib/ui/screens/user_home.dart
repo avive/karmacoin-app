@@ -85,7 +85,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       }
       // register for push notes but don't wait on it - may show dialog
       // disabled in this release migrating to Twillio
-      // TODO: fix me
+      // todo: fix me
       // settingsLogic.registerPushNotifications();
     });
   }
@@ -99,7 +99,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             return Container();
           }
 
-          // TODO: customize the progress screen for just coin sending...
+          // todo: customize the progress screen for just coin sending...
 
           Future.delayed(const Duration(milliseconds: 200), () async {
             if (!context.mounted) return;
@@ -156,7 +156,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
   Widget _getWidgetForUser(BuildContext context) {
     return ValueListenableBuilder<KC2UserInfo?>(
-        // TODO: how to make this not assert when karmaCoinUser is null?
+        // todo: how to make this not assert when karmaCoinUser is null?
         valueListenable: kc2User.userInfo,
         builder: (context, value, child) {
           if (value == null) {
@@ -273,7 +273,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     }
 
     // kcents value
-    // TODO: properly handle a very large balance
+    // todo: properly handle a very large balance
     double dispValue = balance.toDouble();
     String labelText = 'KARMA CENTS';
     if (balance >= GenesisConfig.kCentsPerCoinBigInt) {

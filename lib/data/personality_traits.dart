@@ -9,4 +9,3 @@ class PersonalityTrait {
     return 'PersonalityTrait{index: $index, name: $name, emoji: $emoji}';
   }
 }
-

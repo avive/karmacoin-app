@@ -173,7 +173,7 @@ class _SendDestinationState extends State<SendDestination> {
       return;
     }
 
-    // TODO: figure out if address and if it is fill it and return
+    // todo: figure out if address and if it is fill it and return
     // appState.sendDestinationAddress.value = value;
     debugPrint('Calling contacts for $value...');
     List<Contact> candidates = await kc2Service.getContacts(value, limit: 1);

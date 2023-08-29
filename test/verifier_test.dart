@@ -9,8 +9,8 @@ import 'package:karma_coin/logic/identity_interface.dart';
 import 'package:karma_coin/logic/verifier.dart';
 import 'package:karma_coin/data/verify_number_request.dart';
 import 'package:karma_coin/services/api/verifier.pb.dart' as proto;
-import 'package:karma_coin/services/v2.0/kc2.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
+import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
@@ -24,27 +24,33 @@ void main() {
 
   GetIt.I.registerLazySingleton<KarmachainService>(() => KarmachainService());
   GetIt.I.registerLazySingleton<K2ServiceInterface>(
-          () => GetIt.I.get<KarmachainService>());
+      () => GetIt.I.get<KarmachainService>());
 
   GetIt.I.registerLazySingleton<Verifier>(() => Verifier());
   GetIt.I.registerLazySingleton<ConfigLogic>(() => ConfigLogic());
 
-
   group('verifier tests', () {
     test(
       'Signup new user using verifier service',
-          () async {
+      () async {
         K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
         // Create a new identity for local user
         IdentityInterface katya = Identity();
         await katya.initNoStorage();
         String katyaUserName =
-        "katya${katya.accountId.substring(0, 5)}".toLowerCase();
+            "katya${katya.accountId.substring(0, 5)}".toLowerCase();
 
         String katyaPhoneNumber = randomPhoneNumber;
+
+        KC2UserInfo katyaInfo = KC2UserInfo(
+            accountId: katya.accountId,
+            userName: katyaUserName,
+            balance: BigInt.zero,
+            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
+
         String phoneNumberHash =
-        kc2Service.getPhoneNumberHash(katyaPhoneNumber);
+            kc2Service.getPhoneNumberHash(katyaPhoneNumber);
 
         // Set katya as signer
         kc2Service.setKeyring(katya.keyring);
@@ -55,13 +61,13 @@ void main() {
 
         kc2Service.newUserCallback = (tx) async {
           debugPrint('>> new user callback called');
-          if (tx.failedReason != null) {
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
 
           if (tx.hash != txHash) {
-            debugPrint('unexpected tx hash: ${tx.hash} ');
+            debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
             completer.complete(false);
             return;
           }
@@ -73,7 +79,7 @@ void main() {
 
           // all 3 methods should return's Katya's account data
           KC2UserInfo? userInfo =
-          await kc2Service.getUserInfoByAccountId(katya.accountId);
+              await kc2Service.getUserInfoByAccountId(katya.accountId);
 
           if (userInfo == null) {
             debugPrint('Failed to get user info by account id');
@@ -90,7 +96,7 @@ void main() {
           expect(userInfo.getScore(0, 1), 1);
 
           userInfo =
-          await kc2Service.getUserInfoByPhoneNumberHash(phoneNumberHash);
+              await kc2Service.getUserInfoByPhoneNumberHash(phoneNumberHash);
 
           if (userInfo == null) {
             debugPrint('Failed to get user info by phone number');
@@ -121,7 +127,8 @@ void main() {
         // Get verifier evidence from verifier serv™ice
 
         // Initialize verification request params
-        final verifierNumberRequest = VerifyNumberRequest(proto.VerifyNumberRequestData(
+        final verifierNumberRequest =
+            VerifyNumberRequest(proto.VerifyNumberRequestData(
           timestamp: Int64(DateTime.now().millisecond),
           accountId: katya.accountId,
           phoneNumber: katyaPhoneNumber,
@@ -135,25 +142,25 @@ void main() {
         // Get verifier service client
         Verifier verifier = GetIt.I.get<Verifier>();
         // Send verification request
-        final value = await verifier.verifierServiceClient.verifyNumber(request);
+        final value =
+            await verifier.verifierServiceClient.verifyNumber(request);
         debugPrint('>> verifier response: ${value.result.name}');
         // Format verification evidence for new user transaction
         VerificationEvidence evidence = VerificationEvidence(
           verificationResult: VerificationResult.fromProto(value.result.name),
-          // TODO: @a from where this value should be taken?
+          // todo: @a from where this value should be taken?
           verifierAccountId: '5EUH4CC5czdqfXbgE1fLkXcqMos1thxJSaj93J6N5bSareuz',
           signature: value.data,
         );
 
-
-
         // subscribe to new account txs
-        kc2Service.subscribeToAccount(katya.accountId);
+        kc2Service.subscribeToAccountTransactions(katyaInfo);
 
         String? err;
         // signup katya
         (txHash, err) = await kc2Service.newUser(
-            katya.accountId, katyaUserName, katyaPhoneNumber, verificationEvidence: evidence);
+            katya.accountId, katyaUserName, katyaPhoneNumber,
+            verificationEvidence: evidence);
 
         expect(txHash, isNotNull);
         expect(err, isNull);
@@ -164,6 +171,5 @@ void main() {
       },
       timeout: const Timeout(Duration(seconds: 120)),
     );
-
   });
 }

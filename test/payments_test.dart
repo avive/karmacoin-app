@@ -7,8 +7,8 @@ import 'package:karma_coin/logic/identity.dart';
 import 'package:karma_coin/logic/identity_interface.dart';
 import 'package:karma_coin/logic/user.dart';
 import 'package:karma_coin/logic/user_interface.dart';
-import 'package:karma_coin/services/v2.0/kc2.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
+import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
 final random = Random.secure();
@@ -46,6 +46,18 @@ void main() {
               "Punch${punch.accountId.substring(0, 5)}".toLowerCase();
           String punchPhoneNumber = randomPhoneNumber;
 
+          KC2UserInfo katyaInfo = KC2UserInfo(
+              accountId: katya.accountId,
+              userName: katyaUserName,
+              balance: BigInt.zero,
+              phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
+
+          KC2UserInfo punchInfo = KC2UserInfo(
+              accountId: punch.accountId,
+              userName: punchUserName,
+              balance: BigInt.zero,
+              phoneNumberHash: kc2Service.getPhoneNumberHash(punchPhoneNumber));
+
           Timer? blocksProcessingTimer;
 
           // Set katya as signer
@@ -64,20 +76,20 @@ void main() {
 
           kc2Service.newUserCallback = (tx) async {
             debugPrint('>> Katya new user callback called');
-            if (tx.failedReason != null) {
+            if (tx.chainError != null) {
               completer.complete(false);
               return;
             }
 
             if (tx.hash != katyaNewUserTxHash) {
-              debugPrint('unexpected tx hash: ${tx.hash} ');
+              debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
               completer.complete(false);
               return;
             }
 
             // switch local user to punch
             blocksProcessingTimer?.cancel();
-            kc2Service.subscribeToAccount(punch.accountId);
+            kc2Service.subscribeToAccountTransactions(punchInfo);
             kc2Service.setKeyring(punch.keyring);
 
             // Define empty appreciation callback
@@ -87,21 +99,21 @@ void main() {
               debugPrint('>> appreciation callback called');
               if (tx.hash != transferTxHash) {
                 debugPrint(
-                    'unexpected tx hash: ${tx.hash}. Expected: $transferTxHash');
+                    'Warning: unexpected tx hash: ${tx.hash}. Expected: $transferTxHash');
                 completer.complete(false);
                 return;
               }
 
-              if (tx.failedReason != null) {
+              if (tx.chainError != null) {
                 completer.complete(false);
                 return;
               }
 
               debugPrint('>> appreciation tx: $tx');
-              expect(tx.failedReason, isNull);
+              expect(tx.chainError, isNull);
               expect(tx.amount, BigInt.from(1000));
               expect(tx.fromAddress, punch.accountId);
-              expect(tx.toAddress, katya.accountId);
+              expect(tx.toAccountId, katya.accountId);
               expect(tx.signer, punch.accountId);
               expect(tx.charTraitId, 0);
 
@@ -112,13 +124,13 @@ void main() {
 
             kc2Service.newUserCallback = (tx) async {
               debugPrint('>> Punch new user callback called');
-              if (tx.failedReason != null) {
+              if (tx.chainError != null) {
                 completer.complete(false);
                 return;
               }
 
               if (tx.hash != punchNewUserTxHash) {
-                debugPrint('unexpected tx hash: ${tx.hash} ');
+                debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
                 completer.complete(false);
                 return;
               }
@@ -145,7 +157,7 @@ void main() {
 
           // subscribe to new account txs
           blocksProcessingTimer =
-              kc2Service.subscribeToAccount(katya.accountId);
+              kc2Service.subscribeToAccountTransactions(katyaInfo);
 
           (katyaNewUserTxHash, err) = await kc2Service.newUser(
               katya.accountId, katyaUserName, katyaPhoneNumber);
@@ -181,6 +193,18 @@ void main() {
           kc2Service.setKeyring(katya.keyring);
           debugPrint('Local user katya public address: ${katya.accountId}');
 
+          KC2UserInfo punchInfo = KC2UserInfo(
+              accountId: punch.accountId,
+              userName: punchUserName,
+              balance: BigInt.zero,
+              phoneNumberHash: kc2Service.getPhoneNumberHash(punchPhoneNumber));
+
+          KC2UserInfo katyaInfo = KC2UserInfo(
+              accountId: katya.accountId,
+              userName: katyaUserName,
+              balance: BigInt.zero,
+              phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
+
           Timer? blockProcessingTimer;
 
           final completer = Completer<bool>();
@@ -194,20 +218,20 @@ void main() {
 
           kc2Service.newUserCallback = (tx) async {
             debugPrint('>> Katya new user callback called');
-            if (tx.failedReason != null) {
+            if (tx.chainError != null) {
               completer.complete(false);
               return;
             }
 
             if (tx.hash != katyaNewUserTxHash) {
-              debugPrint('unexpected tx hash: ${tx.hash} ');
+              debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
               completer.complete(false);
               return;
             }
 
             // switch local user to punch
             blockProcessingTimer?.cancel();
-            kc2Service.subscribeToAccount(punch.accountId);
+            kc2Service.subscribeToAccountTransactions(punchInfo);
             kc2Service.setKeyring(punch.keyring);
 
             // Define empty appreciation callback
@@ -217,18 +241,18 @@ void main() {
               debugPrint('>> transfer callback called');
               if (tx.hash != transferTxHash) {
                 debugPrint(
-                    'unexpected tx hash: ${tx.hash}. Expected: $transferTxHash');
+                    'Warning: unexpected tx hash: ${tx.hash}. Expected: $transferTxHash');
                 completer.complete(false);
                 return;
               }
 
-              if (tx.failedReason != null) {
+              if (tx.chainError != null) {
                 completer.complete(false);
                 return;
               }
 
               debugPrint('>> transfer tx: $tx');
-              expect(tx.failedReason, isNull);
+              expect(tx.chainError, isNull);
               expect(tx.amount, BigInt.from(999));
               expect(tx.fromAddress, punch.accountId);
               expect(tx.toAddress, katya.accountId);
@@ -241,13 +265,13 @@ void main() {
 
             kc2Service.newUserCallback = (tx) async {
               debugPrint('>> Punch new user callback called');
-              if (tx.failedReason != null) {
+              if (tx.chainError != null) {
                 completer.complete(false);
                 return;
               }
 
               if (tx.hash != punchNewUserTxHash) {
-                debugPrint('unexpected tx hash: ${tx.hash} ');
+                debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
                 completer.complete(false);
                 return;
               }
@@ -278,7 +302,8 @@ void main() {
           await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
           // subscribe to new account txs
-          blockProcessingTimer = kc2Service.subscribeToAccount(katya.accountId);
+          blockProcessingTimer =
+              kc2Service.subscribeToAccountTransactions(katyaInfo);
 
           (katyaNewUserTxHash, err) = await kc2Service.newUser(
               katya.accountId, katyaUserName, katyaPhoneNumber);
@@ -308,6 +333,18 @@ void main() {
               "Punch${punch.accountId.substring(0, 5)}".toLowerCase();
           String punchPhoneNumber = randomPhoneNumber;
 
+          KC2UserInfo punchInfo = KC2UserInfo(
+              accountId: punch.accountId,
+              userName: punchUserName,
+              balance: BigInt.zero,
+              phoneNumberHash: kc2Service.getPhoneNumberHash(punchPhoneNumber));
+
+          KC2UserInfo katyaInfo = KC2UserInfo(
+              accountId: katya.accountId,
+              userName: katyaUserName,
+              balance: BigInt.zero,
+              phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
+
           Timer? blockProcessingTimer;
 
           // Set katya as signer
@@ -325,20 +362,20 @@ void main() {
 
           kc2Service.newUserCallback = (tx) async {
             debugPrint('>> Katya new user callback called');
-            if (tx.failedReason != null) {
+            if (tx.chainError != null) {
               completer.complete(false);
               return;
             }
 
             if (tx.hash != katyaNewUserTxHash) {
-              debugPrint('unexpected tx hash: ${tx.hash} ');
+              debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
               completer.complete(false);
               return;
             }
 
             // switch local user to punch
             blockProcessingTimer?.cancel();
-            kc2Service.subscribeToAccount(punch.accountId);
+            kc2Service.subscribeToAccountTransactions(punchInfo);
             kc2Service.setKeyring(punch.keyring);
 
             // Define empty appreciation callback
@@ -348,13 +385,13 @@ void main() {
               debugPrint('>> transfer callback called');
               if (tx.hash != transferTxHash) {
                 debugPrint(
-                    'unexpected tx hash: ${tx.hash}. Expected: $transferTxHash');
+                    'Warning. unexpected tx hash: ${tx.hash}. Expected: $transferTxHash');
                 completer.complete(false);
                 return;
               }
 
-              if (tx.failedReason == null) {
-                debugPrint('transfer should have failed with failedReason');
+              if (tx.chainError == null) {
+                debugPrint('transfer should have failed with chainError');
                 completer.complete(false);
                 return;
               }
@@ -366,13 +403,13 @@ void main() {
 
             kc2Service.newUserCallback = (tx) async {
               debugPrint('>> Punch new user callback called');
-              if (tx.failedReason != null) {
+              if (tx.chainError != null) {
                 completer.complete(false);
                 return;
               }
 
               if (tx.hash != punchNewUserTxHash) {
-                debugPrint('unexpected tx hash: ${tx.hash} ');
+                debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
                 completer.complete(false);
                 return;
               }
@@ -409,7 +446,8 @@ void main() {
           await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
           // subscribe to new account txs
-          blockProcessingTimer = kc2Service.subscribeToAccount(katya.accountId);
+          blockProcessingTimer =
+              kc2Service.subscribeToAccountTransactions(katyaInfo);
 
           (katyaNewUserTxHash, err) = await kc2Service.newUser(
               katya.accountId, katyaUserName, katyaPhoneNumber);

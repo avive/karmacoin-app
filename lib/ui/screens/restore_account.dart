@@ -205,7 +205,7 @@ class _RestoreAccountScreenState extends State<RestoreAccountScreen> {
     appState.triggerSignupAfterRestore.value = true;
 
     Future.delayed(Duration.zero, () async {
-      // TODO: only if not came from welcome?
+      // todo: only if not came from welcome?
       if (context.mounted) {
         debugPrint("mounted - puhsing signup screen");
         context.go(ScreenPaths.signup, extra: 'Verify Number');

@@ -3,7 +3,7 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/data/personality_traits.dart';
-import 'package:karma_coin/services/v2.0/kc2_service.dart';
+import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/ui/helpers/transactions.dart';
@@ -383,7 +383,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
       BuildContext context, KC2AppreciationTxV1 tx, bool incoming, int index) {
     try {
       String amount = KarmaCoinAmountFormatter.format(tx.amount);
-      TransactionStatus status = tx.failedReason == null
+      TransactionStatus status = tx.chainError == null
           ? TransactionStatus.confirmed
           : TransactionStatus.failed;
 
@@ -468,7 +468,7 @@ class _AppreciationsScreenState extends State<AppreciationsScreen> {
     if (tx is KC2AppreciationTxV1) {
       return _getAppreciationWidget(context, tx, incoming, index);
     } else if (tx is KC2TransferTxV1) {
-      // TODO: implement transfer display widget
+      // todo: implement transfer display widget
       return Container();
     } else {
       debugPrint('Unexpected tx type: $tx');

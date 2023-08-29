@@ -6,13 +6,13 @@ import 'package:karma_coin/logic/identity_interface.dart';
 import 'package:karma_coin/logic/txs_boss2.dart';
 import 'package:karma_coin/logic/txs_boss2_interface.dart';
 import 'package:karma_coin/logic/user_interface.dart';
-import 'package:karma_coin/services/v2.0/kc2_service.dart';
+import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
 class KC2User extends KC2UserInteface {
   // private members
-  late Timer _subscribeToAccountTimer;
+  Timer? _subscribeToAccountTimer;
   late final _secureStorage = const FlutterSecureStorage();
   final IdentityInterface _identity = Identity();
   late KC2TransactionBossInterface _txsBoss;
@@ -59,23 +59,27 @@ class KC2User extends KC2UserInteface {
     kc2Service.transferCallback = (tx) async {
       _txsBoss.addTransferTx(tx);
       // update user balance, etc...
-      // TODO: this will cause update on every tx to/from user's account. Optimize to only call per block for possible multiple txs in a block.
+      // todo: this will cause update on every tx to/from user's account. Optimize to only call per block for possible multiple txs in a block.
       await getUserDataFromChain();
     };
 
     kc2Service.appreciationCallback = (tx) async {
       _txsBoss.addAppreciation(tx);
       // update user balance, etc..
-      // TODO: this will cause update on every tx to/from user's account. Optimize to only call per block for possible multiple txs in a block.
+      // todo: this will cause update on every tx to/from user's account. Optimize to only call per block for possible multiple txs in a block.
       await getUserDataFromChain();
     };
 
     kc2Service.newUserCallback = _signupUserCallback;
     kc2Service.updateUserCallback = _updateUserCallback;
 
-    // subscribe to account transactions
-    _subscribeToAccountTimer =
-        kc2Service.subscribeToAccount(_identity.accountId);
+    // subscribe to account transactions if we have user info in this session
+    // otherwise we'll subscribe o n signup()
+    if (userInfo.value != null) {
+      _cancelSubscriptionTimer();
+      _subscribeToAccountTimer =
+          kc2Service.subscribeToAccountTransactions(userInfo.value!);
+    }
 
     // register on firebase auth state changes
     /*
@@ -139,7 +143,7 @@ class KC2User extends KC2UserInteface {
   Future<FetchAppreciationsStatus> fetchAppreciations() async {
     fetchAppreciationStatus.value = FetchAppreciationsStatus.fetching;
     fetchAppreciationStatus.value =
-        await kc2Service.processTransactions(_identity.accountId);
+        await kc2Service.getAccountTransactions(userInfo.value!);
 
     return fetchAppreciationStatus.value;
   }
@@ -150,10 +154,11 @@ class KC2User extends KC2UserInteface {
   Future<void> signout() async {
     if (userInfo.value != null) {
       await userInfo.value?.deleteFromSecureStorage(_secureStorage);
+      userInfo.value == null;
     }
 
     // unsubscribe from kc2 callbacks
-    _subscribeToAccountTimer.cancel();
+    _cancelSubscriptionTimer();
 
     // clear all callbacks
     kc2Service.transferCallback = null;
@@ -168,8 +173,16 @@ class KC2User extends KC2UserInteface {
   /// returns true if (account id, phone number, user name) exists on chain
   @override
   Future<bool> isAccountOnchain(String userName, String phoneNumber) async {
-    // TODO: implement me
+    // todo: implement me
     return false;
+  }
+
+  void _cancelSubscriptionTimer() {
+    if (_subscribeToAccountTimer != null) {
+      if (_subscribeToAccountTimer!.isActive) {
+        _subscribeToAccountTimer!.cancel();
+      }
+    }
   }
 
   /// Signup user to kc2 chain. Returns optional error. Updates signupStatus and signupFailureReson.
@@ -199,6 +212,19 @@ class KC2User extends KC2UserInteface {
         signupFailureReson = SignupFailureReason.connectionTimeOut;
       }
     });
+
+    // create userInfo and subscribe if needed
+    if (userInfo.value == null) {
+      userInfo.value = KC2UserInfo(
+          accountId: _identity.accountId,
+          userName: requestedUserName,
+          balance: BigInt.zero,
+          phoneNumberHash: kc2Service.getPhoneNumberHash(requestedPhoneNumber));
+
+      _cancelSubscriptionTimer();
+      _subscribeToAccountTimer =
+          kc2Service.subscribeToAccountTransactions(userInfo.value!);
+    }
 
     String? err;
     String? txHash;
@@ -236,7 +262,7 @@ class KC2User extends KC2UserInteface {
       return;
     }
     if (txHash != null) {
-      // store the tx hash so we can match on it
+      // store the tx hash so we can match on it on callback
       _signupTxHash = txHash;
     }
   }
@@ -361,8 +387,8 @@ class KC2User extends KC2UserInteface {
       return;
     }
 
-    if (tx.failedReason != null) {
-      debugPrint('failed to signup user: ${tx.failedReason}');
+    if (tx.chainError != null) {
+      debugPrint('failed to signup user: ${tx.chainError}');
       signupFailureReson = SignupFailureReason.invalidData;
       signupStatus.value = SignupStatus.notSignedUp;
       return;
@@ -394,14 +420,14 @@ class KC2User extends KC2UserInteface {
       return;
     }
 
-    if (tx.failedReason != null) {
-      debugPrint('failed to update user: ${tx.failedReason}');
+    if (tx.chainError != null) {
+      debugPrint('failed to update user: ${tx.chainError}');
       updateResult.value = UpdateResult.invalidData;
-      // TODO: go deeper into reason and update result
+      // todo: go deeper into reason and update result
       return;
     }
 
-    // TODO: consider just getting user info from chain - it should have the updated information so all the code below is redundant
+    // todo: consider just getting user info from chain - it should have the updated information so all the code below is redundant
 
     // Clone needed here as we want to set a new observable value
     KC2UserInfo u = KC2UserInfo.clone(userInfo.value!);

@@ -8,9 +8,7 @@ class KC2ChillTxV1 extends KC2Tx {
   KC2ChillTxV1(
       {required this.poolId,
       required super.args,
-      required super.pallet,
-      required super.method,
-      required super.failedReason,
+      required super.chainError,
       required super.timestamp,
       required super.hash,
       required super.blockNumber,

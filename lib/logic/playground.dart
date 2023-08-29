@@ -104,11 +104,17 @@ Future<void> startKC2Playground() async {
     // Get all on-chain txs to and from the local user's account
     // await kc2Service.getTransactions(katya.accountId);
 
+    KC2UserInfo katyaInfo = KC2UserInfo(
+        accountId: katya.accountId,
+        userName: "katya",
+        balance: BigInt.zero,
+        phoneNumberHash: kc2Service.getPhoneNumberHash("972549805380"));
+
     // subscribe to new account txs
-    kc2Service.subscribeToAccount(katya.accountId);
+    kc2Service.subscribeToAccountTransactions(katyaInfo);
 
     // signup katya
-    await kc2Service.newUser(katya.accountId, "Katya", "972549805380");
+    await kc2Service.newUser(katya.accountId, "katya", "972549805380");
   } catch (e) {
     debugPrint('kc2 error: $e');
   }

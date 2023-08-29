@@ -16,7 +16,7 @@ class KarmaCoinUserSelector extends StatefulWidget {
   final String title;
   final bool enableSelection;
 
-  // TODO: alwyas enbable selection and trigger appreciation of user if tapped/clicked
+  // todo: alwyas enbable selection and trigger appreciation of user if tapped/clicked
 
   final Function(Contact)? contactSelectedCallback;
 
@@ -222,7 +222,7 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
   }
 
   void _setAdmin(Contact contact) {
-    // TODO: move this to kc2
+    // todo: move this to kc2
     /*
     Future.delayed(Duration.zero, () async {
       try {
@@ -311,7 +311,7 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
   }
 
   Widget _getContactWidget(BuildContext context, Contact contact, int index) {
-    // TODO: add personality trait emojis from appreciation
+    // todo: add personality trait emojis from appreciation
     // show appreciations strip for user :-)
     // String phoneNumber = '+${contact.mobileNumber.number.formatPhoneNumber()}';
     String displayName =

@@ -7,8 +7,8 @@ import 'package:karma_coin/logic/identity.dart';
 import 'package:karma_coin/logic/identity_interface.dart';
 import 'package:karma_coin/logic/user.dart';
 import 'package:karma_coin/logic/user_interface.dart';
-import 'package:karma_coin/services/v2.0/kc2.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
+import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
 final random = Random.secure();
@@ -42,6 +42,12 @@ void main() {
         kc2Service.setKeyring(katya.keyring);
         debugPrint('Local user katya public address: ${katya.accountId}');
 
+        KC2UserInfo katyaInfo = KC2UserInfo(
+            accountId: katya.accountId,
+            userName: katyaUserName,
+            balance: BigInt.zero,
+            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
+
         final completer = Completer<bool>();
         String? txHash;
         String? updateTexHash;
@@ -49,30 +55,30 @@ void main() {
 
         kc2Service.updateUserCallback = (tx) async {
           debugPrint('>> update user update 1 called');
-          if (tx.failedReason == null) {
+          if (tx.chainError == null) {
             completer.complete(false);
             return;
           }
 
           if (tx.hash != updateTexHash) {
-            expect(tx.hash, updateTexHash);
+            debugPrint('Warning: tx mismatch ${tx.hash} != $updateTexHash');
             completer.complete(false);
             return;
           }
 
-          expect(tx.failedReason!.name, 'InvalidArguments');
+          expect(tx.chainError!.name, 'InvalidArguments');
           completer.complete(true);
         };
 
         kc2Service.newUserCallback = (tx) async {
           debugPrint('>> new user callback called');
-          if (tx.failedReason != null) {
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
 
           if (tx.hash != txHash) {
-            debugPrint('unexpected tx hash: ${tx.hash} ');
+            debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
             completer.complete(false);
             return;
           }
@@ -88,7 +94,7 @@ void main() {
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         // subscribe to new account txs
-        kc2Service.subscribeToAccount(katya.accountId);
+        kc2Service.subscribeToAccountTransactions(katyaInfo);
 
         // signup katya
 
@@ -126,6 +132,18 @@ void main() {
             "Punch${punch.accountId.substring(0, 5)}".toLowerCase();
         String punchPhoneNumber = randomPhoneNumber;
 
+        KC2UserInfo katyaInfo = KC2UserInfo(
+            accountId: katya.accountId,
+            userName: katyaUserName,
+            balance: BigInt.zero,
+            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
+
+        KC2UserInfo punchInfo = KC2UserInfo(
+            accountId: punch.accountId,
+            userName: punchUserName,
+            balance: BigInt.zero,
+            phoneNumberHash: kc2Service.getPhoneNumberHash(punchPhoneNumber));
+
         Timer? blockProcessingTimer;
 
         // Set katya as signer
@@ -140,30 +158,30 @@ void main() {
 
         kc2Service.newUserCallback = (tx) async {
           debugPrint('>> Katya new user callback called');
-          if (tx.failedReason != null) {
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
 
           if (tx.hash != katyaNewUserTxHash) {
-            debugPrint('unexpected tx hash: ${tx.hash} ');
+            debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
             completer.complete(false);
             return;
           }
 
           // switch local user to punch
           blockProcessingTimer?.cancel();
-          kc2Service.subscribeToAccount(punch.accountId);
+          kc2Service.subscribeToAccountTransactions(punchInfo);
           kc2Service.setKeyring(punch.keyring);
 
           kc2Service.appreciationCallback = (tx) async {
             if (tx.hash != appreciationTxHash) {
-              debugPrint('unexpected tx hash: ${tx.hash} ');
+              debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
               completer.complete(false);
               return;
             }
 
-            if (tx.failedReason == null) {
+            if (tx.chainError == null) {
               debugPrint('unexpected tx success');
               completer.complete(false);
               return;
@@ -178,13 +196,13 @@ void main() {
 
           kc2Service.newUserCallback = (tx) async {
             debugPrint('>> Punch new user callback called');
-            if (tx.failedReason != null) {
+            if (tx.chainError != null) {
               completer.complete(false);
               return;
             }
 
             if (tx.hash != punchNewUserTxHash) {
-              debugPrint('unexpected tx hash: ${tx.hash} ');
+              debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
               completer.complete(false);
               return;
             }
@@ -214,7 +232,8 @@ void main() {
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         // subscribe to new account txs
-        blockProcessingTimer = kc2Service.subscribeToAccount(katya.accountId);
+        blockProcessingTimer =
+            kc2Service.subscribeToAccountTransactions(katyaInfo);
 
         (katyaNewUserTxHash, err) = await kc2Service.newUser(
             katya.accountId, katyaUserName, katyaPhoneNumber);

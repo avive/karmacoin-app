@@ -79,7 +79,7 @@ class _AboutKarmaMiningState extends State<AboutKarmaMining> {
       );
     }
 
-    // TODO: enable back when api doesn't throw an exception
+    // todo: enable back when api doesn't throw an exception
     /*
     if (blockchainStats == null) {
       return const Center(

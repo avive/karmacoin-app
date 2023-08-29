@@ -8,9 +8,7 @@ class KC2WithdrawUnbondedTxV1 extends KC2Tx {
   KC2WithdrawUnbondedTxV1(
       {required this.memberAccount,
       required super.args,
-      required super.pallet,
-      required super.method,
-      required super.failedReason,
+      required super.chainError,
       required super.timestamp,
       required super.hash,
       required super.blockNumber,
