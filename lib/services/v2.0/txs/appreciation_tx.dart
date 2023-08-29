@@ -17,13 +17,13 @@ class KC2AppreciationTxV1 extends KC2Tx {
 
   String? fromUserName;
 
-  // non-null if apprecaition was to a phone number hash or enriched
+  // non-null if appreciation was to a phone number hash or enriched
   String? toPhoneNumberHash;
 
   // non-null if appreciation was to a username or enriched
   String? toUserName;
 
-  // non-null if apprecaition was to an account id enriched
+  // non-null if appreciation was to an account id enriched
   String? toAccountId;
 
   BigInt amount;
@@ -32,7 +32,7 @@ class KC2AppreciationTxV1 extends KC2Tx {
 
   DestinationType destinationType = DestinationType.unknown;
 
-  /// Create an apprecaition tx from the provided tx data w/o any RPC enrichments
+  /// Create an appreciation tx from the provided tx data w/o any RPC enrichment's
   static Future<KC2AppreciationTxV1> createAppreciationTx(
       {required String hash,
       required int timestamp,
@@ -135,7 +135,6 @@ class KC2AppreciationTxV1 extends KC2Tx {
   /// Enrich the tx with additional data from the chain based on sender, receiver
   /// and a local user identity
   /// userInfo - local user info
-  /// @HolyGrease - this method eneds extensive code review plz
   Future<void> enrichForUser(KC2UserInfo userInfo) async {
     // the other user for this tx
     KC2UserInfo? otherUserInfo;
@@ -178,17 +177,17 @@ class KC2AppreciationTxV1 extends KC2Tx {
         // tx dest is a user name
         if (signer == userInfo.accountId) {
           // appreciation is from the local user
-          // get other user by usernmame and fill missing info
+          // get other user by username and fill missing info
           otherUserInfo ??= await kc2Service.getUserInfoByUserName(toUserName!);
           if (otherUserInfo != null) {
             toAccountId = otherUserInfo.accountId;
             toPhoneNumberHash = otherUserInfo.phoneNumberHash;
           } else {
             debugPrint(
-                'Warning: account not found on chain for reciever $toAccountId');
+                'Warning: account not found on chain for receiver $toAccountId');
           }
         } else {
-          // apprecaition to local user
+          // appreciation to local user
           toAccountId = userInfo.accountId;
           toPhoneNumberHash = userInfo.phoneNumberHash;
         }
