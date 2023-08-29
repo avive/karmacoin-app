@@ -113,10 +113,6 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   /// However, it may not be possible to release the current unlocking chunks,
   /// in which case, the result of this call will likely be the `NoMoreChunks` error from the staking system.
   ///
-  /// @HolyGrease - what happen if unbound is called for only some of the member's stake?
-  /// I understand the use case of unbounding all of the member's stake, but not some of it
-  /// Does it just mean reduce stake in the pool and stay in it?
-  ///
   Future<String> unbond(String accountId, BigInt unbondingPoints) async {
     try {
       // todo: use balance as argument and convert it to points inside function
@@ -174,9 +170,6 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
     }
   }
 
-  /// @HolyGrease - is there an api to get the min pool amount to create one?
-  /// If not please add one... we need to check amount is above this min whnen creating...
-
   /// Create a new delegation pool.
   ///
   /// # Arguments
@@ -215,9 +208,6 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
       rethrow;
     }
   }
-
-  /// @HolyGrease - is there an api got info of all bonded validators that can be nominated?
-  /// if no - we need to have it so user sees options to nominate...
 
   /// Nominate on behalf of the pool.
   ///
@@ -447,7 +437,6 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   }
 
   /// Returns the equivalent balance of `points` for pools
-  /// @HolyGrease - it is for any pool not for a specific one - correct?
   Future<BigInt> getPoolsPointsToBalance(BigInt points) async {
     try {
       return await callRpc(
@@ -460,7 +449,6 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   }
 
   /// Returns the equivalent points of `new_funds` for a given pool.
-  /// @HolyGrease - it is for any pool not for a specific one - correct?
   Future<BigInt> getPoolsBalanceToPoints(BigInt balance) async {
     try {
       return await callRpc(
@@ -473,7 +461,6 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   }
 
   /// Returns list of nomination pools.
-  /// @holyGrease - are only open pools returned or all of them?
   Future<List<Pool>> getPools() async {
     try {
       final pools = await callRpc('nominationPools_getPools', []).then(

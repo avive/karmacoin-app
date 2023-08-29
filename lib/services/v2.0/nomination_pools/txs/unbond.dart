@@ -4,9 +4,6 @@ import 'package:karma_coin/services/v2.0/txs/tx.dart';
 /// Amount will be available via withdraw_unbonded call after unbonding period has passed.
 class KC2UnbondTxV1 extends KC2Tx {
   String memberAccount;
-
-  /// @HolyGrease - please add code doc. What are unbouding points?
-
   BigInt unbondingPoints;
 
   KC2UnbondTxV1(

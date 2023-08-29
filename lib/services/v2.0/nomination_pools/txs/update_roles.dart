@@ -5,8 +5,6 @@ class KC2UpdateRolesTxV1 extends KC2Tx {
   PoolId poolId;
   MapEntry<ConfigOption, String?> root;
   MapEntry<ConfigOption, String?> nominator;
-
-  /// @HolyGrease - please add code doc. What is a bouncer?
   MapEntry<ConfigOption, String?> bouncer;
 
   KC2UpdateRolesTxV1(
