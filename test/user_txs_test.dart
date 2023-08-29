@@ -10,6 +10,7 @@ import 'package:karma_coin/logic/user.dart';
 import 'package:karma_coin/logic/user_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
+import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
@@ -193,13 +194,13 @@ void main() {
             return;
           }
 
-          Transaction transaction =
-              await kc2Service.getTransactionByHash(tx.hash);
+          KC2Tx? transaction = await kc2Service.getTransactionByHash(tx.hash);
 
-          expect(transaction.timestamp, tx.timestamp);
-          expect(transaction.from?.accountId, tx.accountId);
-          expect(transaction.blockNumber, tx.blockNumber.toInt());
-          expect(transaction.transactionIndex, tx.blockIndex);
+          expect(transaction!.timestamp, tx.timestamp);
+          expect(transaction.signer, tx.accountId);
+          expect(transaction.blockNumber, tx.blockNumber);
+          expect(transaction.blockIndex, tx.blockIndex);
+          expect(transaction.hash, tx.hash);
 
           completer.complete(true);
         };
