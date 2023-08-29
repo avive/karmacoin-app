@@ -53,7 +53,7 @@ class KC2TransferTxV1 extends KC2Tx {
   /// Create a transfer tx from provided data
   static KC2TransferTxV1 createTransferTransaction(
       {required String hash,
-      required int timeStamp,
+      required int timestamp,
       required String signer,
       required Map<String, dynamic> args,
       required ChainError? chainError,
@@ -76,7 +76,7 @@ class KC2TransferTxV1 extends KC2Tx {
         args: args,
         signer: signer,
         chainError: chainError,
-        timestamp: timeStamp,
+        timestamp: timestamp,
         hash: hash,
         blockNumber: blockNumber,
         blockIndex: blockIndex,

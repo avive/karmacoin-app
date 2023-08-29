@@ -2,6 +2,19 @@ import 'package:convert/convert.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/v2.0/event.dart';
 import 'package:karma_coin/services/v2.0/error.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/chill.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/claim_commission.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/claim_payout.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/create.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/join.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/nominate.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/set_commission.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/set_commission_change_rate.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/set_commission_max.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/unbond.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/update_roles.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/withdraw_unbonded.dart';
+import 'package:karma_coin/services/v2.0/txs/appreciation_tx.dart';
 import 'package:karma_coin/services/v2.0/txs/new_user_tx.dart';
 import 'package:karma_coin/services/v2.0/txs/transfer_tx.dart';
 import 'package:karma_coin/services/v2.0/txs/update_user_tx.dart';
@@ -64,7 +77,7 @@ abstract class KC2Tx {
   }
 
   /// Create a KC2Tx object from raw tx data
-  static KC2Tx? getKC2Trnsaction({
+  static Future<KC2Tx?> getKC2Transaction({
     required Map<String, dynamic> tx,
     required String? hash,
     required List<KC2Event> txEvents,
@@ -75,10 +88,10 @@ abstract class KC2Tx {
     required int netId,
     required ChainInfo chainInfo,
     required ChainError? chainError,
-  }) {
+  }) async {
     signer ??= _getTransactionSigner(tx, netId);
     if (signer == null) {
-      debugPrint('Skipping unsiged tx');
+      debugPrint('Skipping unsigned tx');
       return null;
     }
 
@@ -90,58 +103,9 @@ abstract class KC2Tx {
     final args = tx['calls'].value.value;
 
     if (pallet == 'Identity' && method == 'new_user') {
-      // todo: use new .create pattern...
-
-      final accountId =
-          ss58.Codec(netId).encode(args['account_id'].cast<int>());
-      final username = args['username'];
-      final phoneNumberHash =
-          '0x${hex.encode(args['phone_number_hash'].cast<int>())}';
-
-      return KC2NewUserTransactionV1(
-          accountId: accountId,
-          username: username,
-          phoneNumberHash: phoneNumberHash,
-          transactionEvents: txEvents,
-          args: args,
-          chainError: chainError,
+      return KC2NewUserTransactionV1.createNewUserTx(
+          hash: hash,
           timestamp: timestamp,
-          hash: hash,
-          blockNumber: blockNumber,
-          blockIndex: blockIndex,
-          rawData: tx,
-          signer: signer);
-    }
-
-    if (pallet == 'Identity' && method == 'update_user') {
-      // todo use new .create pattern
-
-      final username = args['username'].value;
-      final phoneNumberHashOption = args['phone_number_hash'].value;
-      final phoneNumberHash = phoneNumberHashOption == null
-          ? null
-          : '0x${hex.encode(phoneNumberHashOption.cast<int>())}';
-
-      return KC2UpdateUserTxV1(
-        username: username,
-        phoneNumberHash: phoneNumberHash,
-        args: args,
-        signer: signer,
-        chainError: chainError,
-        timestamp: timestamp,
-        hash: hash,
-        blockNumber: blockNumber,
-        blockIndex: blockIndex,
-        transactionEvents: txEvents,
-        rawData: tx,
-      );
-    }
-
-    if (pallet == 'Balances' &&
-        (method == 'transfer_keep_alive' || method == 'transfer')) {
-      return KC2TransferTxV1.createTransferTransaction(
-          hash: hash,
-          timeStamp: timestamp,
           signer: signer,
           args: args,
           chainError: chainError,
@@ -152,8 +116,218 @@ abstract class KC2Tx {
           txEvents: txEvents);
     }
 
-    // TODO: add other types of txs here
+    if (pallet == 'Identity' && method == 'update_user') {
+      return KC2UpdateUserTxV1.createUpdateUserTx(
+          hash: hash,
+          timestamp: timestamp,
+          signer: signer,
+          args: args,
+          chainError: chainError,
+          blockNumber: blockNumber,
+          blockIndex: blockIndex,
+          rawData: tx,
+          netId: netId,
+          txEvents: txEvents);
+    }
 
+    if (pallet == 'Appreciation' && method == 'appreciation') {
+      return await KC2AppreciationTxV1.createAppreciationTx(
+          hash: hash,
+          timestamp: timestamp,
+          signer: signer,
+          args: args,
+          chainError: chainError,
+          blockNumber: blockNumber,
+          blockIndex: blockIndex,
+          rawData: tx,
+          netId: netId,
+          txEvents: txEvents);
+    }
+
+    if (pallet == 'Balances' &&
+        (method == 'transfer_keep_alive' || method == 'transfer')) {
+      return KC2TransferTxV1.createTransferTransaction(
+          hash: hash,
+          timestamp: timestamp,
+          signer: signer,
+          args: args,
+          chainError: chainError,
+          blockNumber: blockNumber,
+          blockIndex: blockIndex,
+          rawData: tx,
+          netId: netId,
+          txEvents: txEvents);
+    }
+
+    if (pallet == 'NominationPools' && method == 'join') {
+      return KC2JoinTxV1.createJoinTx(
+          hash: hash,
+          timestamp: timestamp,
+          signer: signer,
+          args: args,
+          chainError: chainError,
+          blockNumber: blockNumber,
+          blockIndex: blockIndex,
+          rawData: tx,
+          netId: netId,
+          txEvents: txEvents);
+    }
+
+    if (pallet == 'NominationPools' && method == 'claim_payout') {
+      return KC2ClaimPayoutTxV1.createClaimPayoutTx(
+          hash: hash,
+          timestamp: timestamp,
+          signer: signer,
+          args: args,
+          chainError: chainError,
+          blockNumber: blockNumber,
+          blockIndex: blockIndex,
+          rawData: tx,
+          netId: netId,
+          txEvents: txEvents);
+    }
+
+    if (pallet == 'NominationPools' && method == 'unbond') {
+      return KC2UnbondTxV1.createUnbondTx(
+          hash: hash,
+          timestamp: timestamp,
+          signer: signer,
+          args: args,
+          chainError: chainError,
+          blockNumber: blockNumber,
+          blockIndex: blockIndex,
+          rawData: tx,
+          netId: netId,
+          txEvents: txEvents);
+    }
+
+    if (pallet == 'NominationPools' && method == 'withdraw_unbonded') {
+      return KC2WithdrawUnbondedTxV1.createWithdrawUnbondedTx(
+          hash: hash,
+          timestamp: timestamp,
+          signer: signer,
+          args: args,
+          chainError: chainError,
+          blockNumber: blockNumber,
+          blockIndex: blockIndex,
+          rawData: tx,
+          netId: netId,
+          txEvents: txEvents);
+    }
+
+    if (pallet == 'NominationPools' && method == 'create') {
+      return KC2CreateTxV1.createCreatedTx(
+          hash: hash,
+          timestamp: timestamp,
+          signer: signer,
+          args: args,
+          chainError: chainError,
+          blockNumber: blockNumber,
+          blockIndex: blockIndex,
+          rawData: tx,
+          netId: netId,
+          txEvents: txEvents);
+    }
+
+    if (pallet == 'NominationPools' && method == 'nominate') {
+      return KC2NominateTxV1.createNominateTx(
+          hash: hash,
+          timestamp: timestamp,
+          signer: signer,
+          args: args,
+          chainError: chainError,
+          blockNumber: blockNumber,
+          blockIndex: blockIndex,
+          rawData: tx,
+          netId: netId,
+          txEvents: txEvents);
+    }
+
+    if (pallet == 'NominationPools' && method == 'chill') {
+      return KC2ChillTxV1.createChillTx(
+          hash: hash,
+          timestamp: timestamp,
+          signer: signer,
+          args: args,
+          chainError: chainError,
+          blockNumber: blockNumber,
+          blockIndex: blockIndex,
+          rawData: tx,
+          netId: netId,
+          txEvents: txEvents);
+    }
+
+    if (pallet == 'NominationPools' && method == 'update_roles') {
+      return KC2UpdateRolesTxV1.createUpdateRolesTx(
+          hash: hash,
+          timestamp: timestamp,
+          signer: signer,
+          args: args,
+          chainError: chainError,
+          blockNumber: blockNumber,
+          blockIndex: blockIndex,
+          rawData: tx,
+          netId: netId,
+          txEvents: txEvents);
+    }
+
+    if (pallet == 'NominationPools' && method == 'set_commission') {
+      return KC2SetCommissionTxV1.createSetCommissionTx(
+          hash: hash,
+          timestamp: timestamp,
+          signer: signer,
+          args: args,
+          chainError: chainError,
+          blockNumber: blockNumber,
+          blockIndex: blockIndex,
+          rawData: tx,
+          netId: netId,
+          txEvents: txEvents);
+    }
+
+    if (pallet == 'NominationPools' && method == 'set_commission_max') {
+      return KC2SetCommissionMaxTxV1.createSetCommissionMaxTx(
+          hash: hash,
+          timestamp: timestamp,
+          signer: signer,
+          args: args,
+          chainError: chainError,
+          blockNumber: blockNumber,
+          blockIndex: blockIndex,
+          rawData: tx,
+          netId: netId,
+          txEvents: txEvents);
+    }
+
+    if (pallet == 'NominationPools' && method == 'set_commission_change_rate') {
+      return KC2SetCommissionChangeRateTxV1.createSetCommissionChangeTx(
+          hash: hash,
+          timestamp: timestamp,
+          signer: signer,
+          args: args,
+          chainError: chainError,
+          blockNumber: blockNumber,
+          netId: netId,
+          blockIndex: blockIndex,
+          rawData: tx,
+          txEvents: txEvents);
+    }
+
+    if (pallet == 'NominationPools' && method == 'claim_commission') {
+      return KC2ClaimCommissionTxV1.createClaimCommissionTx(
+          hash: hash,
+          timestamp: timestamp,
+          signer: signer,
+          args: args,
+          chainError: chainError,
+          blockNumber: blockNumber,
+          netId: netId,
+          blockIndex: blockIndex,
+          rawData: tx,
+          txEvents: txEvents);
+    }
+
+    debugPrint('Skipped unknown tx $pallet/$method');
     return null;
   }
 }

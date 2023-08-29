@@ -357,10 +357,8 @@ class KarmachainService extends ChainApiProvider
       if (pallet == 'Identity' &&
           method == 'new_user' &&
           newUserCallback != null) {
-        final txAccountId = encodeAccountId(args['account_id'].cast<int>());
-        // @HolyGrease - shouldn't we just check signer here?
-        if (signer == userInfo.accountId || txAccountId == userInfo.accountId) {
-          KC2Tx? newUserTx = KC2Tx.getKC2Trnsaction(
+        if (signer == userInfo.accountId) {
+          KC2Tx? newUserTx = await KC2Tx.getKC2Transaction(
               tx: tx,
               hash: hash,
               txEvents: txEvents,
@@ -385,7 +383,7 @@ class KarmachainService extends ChainApiProvider
           pallet == 'Identity' &&
           method == 'update_user' &&
           signer == userInfo.accountId) {
-        KC2Tx? updateUserTx = KC2Tx.getKC2Trnsaction(
+        KC2Tx? updateUserTx = await KC2Tx.getKC2Transaction(
             tx: tx,
             hash: hash,
             txEvents: txEvents,
@@ -788,7 +786,7 @@ class KarmachainService extends ChainApiProvider
       final KC2TransferTxV1 transferTx =
           KC2TransferTxV1.createTransferTransaction(
               hash: hash,
-              timeStamp: timestamp,
+              timestamp: timestamp,
               signer: signer,
               args: args,
               chainError: chainError,
