@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:convert/convert.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/app_state.dart';
@@ -10,7 +9,6 @@ import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:polkadart/scale_codec.dart';
 import 'package:polkadart/substrate/substrate.dart';
-import 'package:polkadart_scale_codec/primitives/primitives.dart';
 import 'package:substrate_metadata_fixed/types/metadata_types.dart';
 
 /// Client callback types
