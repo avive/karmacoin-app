@@ -19,6 +19,8 @@ class PoolMember {
 
   /// The number of points this member has in the bonded pool or in a sub pool if
   /// `Self::unbonding_era` is some.
+  ///
+  /// A unit of measure for a members portion of a pool’s funds. Points initially have a ratio of 1 (as set by POINTS_TO_BALANCE_INIT_RATIO) to balance, but as slashing happens, this can change.
   BigInt points;
 
   PoolMember(this.id, this.points);
@@ -35,26 +37,22 @@ class NominationPoolsConfiguration {
 
   /// Minimum bond required to create a pool
   ///
-  /// This is the amount that the depositor must put as their initial stake in the pool, as an
-  /// indication of "skin in the game"
-  ///
-  /// This is the value that will always exist in the staking ledger of the pool bonded account
-  /// while all other accounts leave
+  /// This is the amount that the depositor must put as their initial stake in the pool, as an indication of "skin in the game". This is the value that will always exist in the staking ledger of the pool bonded account while all other accounts leave.
   BigInt minCreateBond;
 
-  /// Maximum number of nomination pools that can exist. If `null`, then an unbounded number of
-  /// pools can exist
+  /// Maximum number of nomination pools that can exist.
+  /// If `null`, then an unbounded number of pools can exist.
   int? maxPools;
 
-  /// Maximum number of members that can exist in the system. If `null`, then the count
-  /// members are not bound on a system wide basis
+  /// Maximum number of members that can exist in the system.
+  /// If `null`, then the count members are not bound on a system wide basis.
   int? maxPoolMembers;
 
-  /// Maximum number of members that may belong to pool. If `null`, then the count of
-  /// members is not bound on a per pool basis
+  /// Maximum number of members that may belong to pool.
+  /// If `null`, then the count of members is not bound on a per pool basis.
   int? maxPoolMembersPerPool;
 
-  /// The maximum commission that can be charged by a pool
+  /// The maximum commission that can be charged by a pool.
   BigInt globalMaxCommission;
 
   NominationPoolsConfiguration(
@@ -86,8 +84,7 @@ enum PoolState {
 
   /// The pool is in the process of being destroyed.
   ///
-  /// All members can now be permissionlessly unbonded, and the pool can never go back to any
-  /// other state other than being dissolved.
+  /// All members can now be permissionlessly unbonded, and the pool can never go back to any other state other than being dissolved.
   destroying,
 }
 
@@ -106,16 +103,12 @@ extension StringValue on PoolState {
 
 /// Pool administration roles.
 ///
-/// Any pool has a depositor, which can never change. But, all the other roles are optional, and
-/// cannot exist. Note that if `root` is set to `null`, it basically means that the roles of this
-/// pool can never change again (except via governance).
+/// Any pool has a depositor, which can never change. But, all the other roles are optional, and cannot exist. Note that if `root` is set to `null`, it basically means that the roles of this pool can never change again (except via governance).
 class PoolRoles {
-  /// Creates the pool and is the initial member. They can only leave the pool once all other
-  /// members have left. Once they fully leave, the pool is destroyed.
+  /// Creates the pool and is the initial member. They can only leave the pool once all other members have left. Once they fully leave, the pool is destroyed.
   String depositor;
 
-  /// Can change the nominator, bouncer, or itself and can perform any of the actions the
-  /// nominator or bouncer can.
+  /// Can change the nominator, bouncer, or itself and can perform any of the actions the nominator or bouncer can.
   String? root;
 
   /// Can select which validators the pool nominates.
@@ -159,11 +152,10 @@ class CommissionChangeRate {
 ///
 /// The pool `root` can set commission configuration after pool creation. By default, all commission values are `null`. Pool `root` can also set `max` and `change_rate` configurations before setting an initial `current` commission.
 ///
-/// `current` is a tuple of the commission percentage and payee of commission. `throttle_from`
-/// keeps track of which block `current` was last updated. A `max` commission value can only be
-/// decreased after the initial value is set, to prevent commission from repeatedly increasing.
+/// `current` is a tuple of the commission percentage and payee of commission. `throttle_from` keeps track of which block `current` was last updated. A `max` commission value can only be decreased after the initial value is set, to prevent commission from repeatedly increasing.
 ///
 /// An optional commission `change_rate` allows the pool to set strict limits to how much commission can change in each update, and how often updates can take place.
+///
 /// TODO: change all strange units to standard ones - percentages, KCs
 class Commission {
   /// The account commission is paid to
@@ -172,16 +164,14 @@ class Commission {
   /// Optional commission rate of the pool. [0,...,1B]
   int? current;
 
-  /// Optional maximum commission that can be set by the pool `root`. Once set, this value can
-  /// only be updated to a decreased value. [0,...,1B]
+  /// Optional maximum commission that can be set by the pool `root`. Once set, this value can only be updated to a decreased value. [0,...,1B]
   int? max;
 
-  /// Optional configuration around how often commission can be updated, and when the last
-  /// commission update took place.
+  /// Optional configuration around how often commission can be updated, and when the last commission update took place.
   CommissionChangeRate? changeRate;
 
-  /// The block from where throttling should be checked from. This value will be updated on all
-  /// commission updates and when setting an initial `change_rate`.
+  /// The block from where throttling should be checked from.
+  /// This value will be updated on all commission updates and when setting an initial `change_rate`.
   int? throttleFrom;
 
   Commission(this.beneficiary, this.current, this.max, this.changeRate,
