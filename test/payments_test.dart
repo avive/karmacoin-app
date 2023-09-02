@@ -75,14 +75,13 @@ void main() {
           kc2Service.appreciationCallback = null;
 
           kc2Service.newUserCallback = (tx) async {
-            debugPrint('>> Katya new user callback called');
-            if (tx.chainError != null) {
-              completer.complete(false);
+            if (tx.hash != katyaNewUserTxHash) {
               return;
             }
 
-            if (tx.hash != katyaNewUserTxHash) {
-              debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
+            debugPrint('>> Katya new user callback called');
+
+            if (tx.chainError != null) {
               completer.complete(false);
               return;
             }
@@ -123,14 +122,12 @@ void main() {
             };
 
             kc2Service.newUserCallback = (tx) async {
-              debugPrint('>> Punch new user callback called');
-              if (tx.chainError != null) {
-                completer.complete(false);
+              if (tx.hash != punchNewUserTxHash) {
                 return;
               }
 
-              if (tx.hash != punchNewUserTxHash) {
-                debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
+              debugPrint('>> Punch new user callback called');
+              if (tx.chainError != null) {
                 completer.complete(false);
                 return;
               }
@@ -217,14 +214,12 @@ void main() {
           kc2Service.appreciationCallback = null;
 
           kc2Service.newUserCallback = (tx) async {
-            debugPrint('>> Katya new user callback called');
-            if (tx.chainError != null) {
-              completer.complete(false);
+            if (tx.hash != katyaNewUserTxHash) {
               return;
             }
 
-            if (tx.hash != katyaNewUserTxHash) {
-              debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
+            debugPrint('>> Katya new user callback called');
+            if (tx.chainError != null) {
               completer.complete(false);
               return;
             }
@@ -238,13 +233,11 @@ void main() {
             kc2Service.appreciationCallback = (tx) async {};
 
             kc2Service.transferCallback = (tx) async {
-              debugPrint('>> transfer callback called');
               if (tx.hash != transferTxHash) {
-                debugPrint(
-                    'Warning: unexpected tx hash: ${tx.hash}. Expected: $transferTxHash');
-                completer.complete(false);
                 return;
               }
+
+              debugPrint('>> transfer callback called');
 
               if (tx.chainError != null) {
                 completer.complete(false);
@@ -264,14 +257,13 @@ void main() {
             };
 
             kc2Service.newUserCallback = (tx) async {
-              debugPrint('>> Punch new user callback called');
-              if (tx.chainError != null) {
-                completer.complete(false);
+              if (tx.hash != punchNewUserTxHash) {
                 return;
               }
 
-              if (tx.hash != punchNewUserTxHash) {
-                debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
+              debugPrint('>> Punch new user callback called');
+
+              if (tx.chainError != null) {
                 completer.complete(false);
                 return;
               }
@@ -361,14 +353,12 @@ void main() {
           kc2Service.appreciationCallback = null;
 
           kc2Service.newUserCallback = (tx) async {
-            debugPrint('>> Katya new user callback called');
-            if (tx.chainError != null) {
-              completer.complete(false);
+            if (tx.hash != katyaNewUserTxHash) {
               return;
             }
 
-            if (tx.hash != katyaNewUserTxHash) {
-              debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
+            debugPrint('>> Katya new user callback called');
+            if (tx.chainError != null) {
               completer.complete(false);
               return;
             }
@@ -402,14 +392,12 @@ void main() {
             };
 
             kc2Service.newUserCallback = (tx) async {
-              debugPrint('>> Punch new user callback called');
-              if (tx.chainError != null) {
-                completer.complete(false);
+              if (tx.hash != punchNewUserTxHash) {
                 return;
               }
 
-              if (tx.hash != punchNewUserTxHash) {
-                debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
+              debugPrint('>> Punch new user callback called');
+              if (tx.chainError != null) {
                 completer.complete(false);
                 return;
               }

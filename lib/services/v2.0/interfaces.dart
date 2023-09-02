@@ -131,7 +131,7 @@ abstract class ChainApiProvider {
           await karmachain.send('author_submitExtrinsic', [encodedHex]);
 
       final txHash = result.result.toString();
-      debugPrint('>>> submitted tx hash: $txHash');
+      // debugPrint('>>> submitted tx hash: $txHash');
       return txHash;
     } catch (e) {
       debugPrint('Failed to submit tx: $e');

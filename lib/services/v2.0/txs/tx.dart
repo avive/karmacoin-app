@@ -91,7 +91,7 @@ abstract class KC2Tx {
   }) async {
     signer ??= _getTransactionSigner(tx, netId);
     if (signer == null) {
-      debugPrint('Skipping unsigned tx');
+      // debugPrint('Skipping unsigned tx');
       return null;
     }
 

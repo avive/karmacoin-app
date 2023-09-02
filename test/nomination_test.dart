@@ -33,7 +33,7 @@ void main() {
     // 3. Check that callback is called and pool is created
     // 4. Check that pool Katya is a member of the pool
     test(
-      'create a pool',
+      'create pool',
       () async {
         // todo: delete all pools so a pool can be created w/o an error on any chain, and add a test for creating a pool when pools are maxed out and verify create fails
 
@@ -65,15 +65,13 @@ void main() {
 
         // Create pool callback
         kc2Service.createPoolCallback = (tx) async {
-          // Check if the tx failed
-          if (tx.chainError != null) {
-            completer.complete(false);
+          if (tx.hash != txHash) {
+            // allow other tests to run in parallel
             return;
           }
 
-          // Check if the tx hash is the same
-          if (tx.hash != txHash) {
-            debugPrint('unexpected tx hash: ${tx.hash} ');
+          // Check if the tx failed
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
@@ -85,6 +83,7 @@ void main() {
           final pool = pools.firstWhere(
               (pool) => pool.roles.depositor == katya.accountId,
               orElse: () => fail('pool not found'));
+
           expect(pool.commission.beneficiary, null);
           expect(pool.commission.current, null);
           expect(pool.commission.max, null);
@@ -178,15 +177,13 @@ void main() {
 
         // Create pool callback
         kc2Service.createPoolCallback = (tx) async {
-          // Check if the tx failed
-          if (tx.chainError != null) {
-            completer.complete(false);
+          // Check if the tx hash is the same
+          if (tx.hash != txHash) {
             return;
           }
 
-          // Check if the tx hash is the same
-          if (tx.hash != txHash) {
-            debugPrint('unexpected tx hash: ${tx.hash} ');
+          // Check if the tx failed
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
@@ -205,15 +202,12 @@ void main() {
         };
 
         kc2Service.joinPoolCallback = (tx) async {
-          // Check if the tx failed
-          if (tx.chainError != null) {
-            completer.complete(false);
+          if (tx.hash != txHash) {
             return;
           }
 
-          // Check if the tx hash is the same
-          if (tx.hash != txHash) {
-            debugPrint('unexpected tx hash: ${tx.hash} ');
+          // Check if the tx failed
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
@@ -287,15 +281,12 @@ void main() {
 
         // Create pool callback
         kc2Service.createPoolCallback = (tx) async {
-          // Check if the tx failed
-          if (tx.chainError != null) {
-            completer.complete(false);
+          if (tx.hash != txHash) {
             return;
           }
 
-          // Check if the tx hash is the same
-          if (tx.hash != txHash) {
-            debugPrint('unexpected tx hash: ${tx.hash} ');
+          // Check if the tx failed
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
@@ -312,15 +303,12 @@ void main() {
         };
 
         kc2Service.setPoolCommissionCallback = (tx) async {
-          // Check if the tx failed
-          if (tx.chainError != null) {
-            completer.complete(false);
+          if (tx.hash != txHash) {
             return;
           }
 
-          // Check if the tx hash is the same
-          if (tx.hash != txHash) {
-            debugPrint('unexpected tx hash: ${tx.hash} ');
+          // Check if the tx failed
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
@@ -389,15 +377,12 @@ void main() {
 
         // Create pool callback
         kc2Service.createPoolCallback = (tx) async {
-          // Check if the tx failed
-          if (tx.chainError != null) {
-            completer.complete(false);
+          // Check if the tx hash is the same
+          if (tx.hash != txHash) {
             return;
           }
 
-          // Check if the tx hash is the same
-          if (tx.hash != txHash) {
-            debugPrint('unexpected tx hash: ${tx.hash} ');
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
@@ -489,15 +474,12 @@ void main() {
 
         // Create pool callback
         kc2Service.createPoolCallback = (tx) async {
-          // Check if the tx failed
-          if (tx.chainError != null) {
-            completer.complete(false);
+          if (tx.hash != txHash) {
             return;
           }
 
-          // Check if the tx hash is the same
-          if (tx.hash != txHash) {
-            debugPrint('unexpected tx hash: ${tx.hash} ');
+          // Check if the tx failed
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
@@ -518,15 +500,12 @@ void main() {
         };
 
         kc2Service.setPoolCommissionChangeRateCallback = (tx) async {
-          // Check if the tx failed
-          if (tx.chainError != null) {
-            completer.complete(false);
+          if (tx.hash != txHash) {
             return;
           }
 
-          // Check if the tx hash is the same
-          if (tx.hash != txHash) {
-            debugPrint('unexpected tx hash: ${tx.hash} ');
+          // Check if the tx failed
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
@@ -608,15 +587,12 @@ void main() {
 
         // Create pool callback
         kc2Service.createPoolCallback = (tx) async {
-          // Check if the tx failed
-          if (tx.chainError != null) {
-            completer.complete(false);
+          if (tx.hash != txHash) {
             return;
           }
 
-          // Check if the tx hash is the same
-          if (tx.hash != txHash) {
-            debugPrint('unexpected tx hash: ${tx.hash} ');
+          // Check if the tx failed
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
@@ -640,15 +616,13 @@ void main() {
         };
 
         kc2Service.updatePoolRolesCallback = (tx) async {
-          // Check if the tx failed
-          if (tx.chainError != null) {
-            completer.complete(false);
+          // Check if the tx hash is the same
+          if (tx.hash != txHash) {
             return;
           }
 
-          // Check if the tx hash is the same
-          if (tx.hash != txHash) {
-            debugPrint('unexpected tx hash: ${tx.hash} ');
+          // Check if the tx failed
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
@@ -729,15 +703,13 @@ void main() {
 
         // Create pool callback
         kc2Service.createPoolCallback = (tx) async {
-          // Check if the tx failed
-          if (tx.chainError != null) {
-            completer.complete(false);
+          // Check if the tx hash is the same
+          if (tx.hash != txHash) {
             return;
           }
 
-          // Check if the tx hash is the same
-          if (tx.hash != txHash) {
-            debugPrint('unexpected tx hash: ${tx.hash} ');
+          // Check if the tx failed
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }
@@ -761,15 +733,13 @@ void main() {
         };
 
         kc2Service.nominatePoolValidatorCallback = (tx) async {
-          // Check if the tx failed
-          if (tx.chainError != null) {
-            completer.complete(false);
+          // Check if the tx hash is the same
+          if (tx.hash != txHash) {
             return;
           }
 
-          // Check if the tx hash is the same
-          if (tx.hash != txHash) {
-            debugPrint('unexpected tx hash: ${tx.hash} ');
+          // Check if the tx failed
+          if (tx.chainError != null) {
             completer.complete(false);
             return;
           }

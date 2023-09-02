@@ -48,8 +48,6 @@ void main() {
 
         kc2Service.newUserCallback = (tx) async {
           if (tx.hash != txHash) {
-            debugPrint(
-                'Warning: unexpected tx hash: ${tx.hash}. Expected: $txHash');
             return;
           }
 
@@ -162,7 +160,6 @@ void main() {
 
         kc2Service.updateUserCallback = (tx) async {
           if (tx.hash != updateTexHash) {
-            debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
             return;
           }
 
@@ -219,7 +216,6 @@ void main() {
 
         kc2Service.newUserCallback = (tx) async {
           if (tx.hash != txHash) {
-            debugPrint('Warning: unexpected tx hash: ${tx.hash} ');
             return;
           }
 
@@ -295,8 +291,6 @@ void main() {
 
         kc2Service.updateUserCallback = (tx) async {
           if (tx.hash != updateTexHash) {
-            debugPrint('Warning: tx hash mismatch');
-            completer.complete(false);
             return;
           }
 
@@ -356,8 +350,6 @@ void main() {
 
         kc2Service.newUserCallback = (tx) async {
           if (tx.hash != txHash) {
-            debugPrint('Warning: txHAshes mismatch');
-            completer.complete(false);
             return;
           }
 
@@ -433,13 +425,11 @@ void main() {
         kc2Service.appreciationCallback = null;
 
         kc2Service.newUserCallback = (tx) async {
-          // debugPrint('>> Katya new user callback called');
-
           if (tx.hash != katyaNewUserTxHash) {
-            debugPrint('Warning: tx hash mismatch');
-            completer.complete(false);
             return;
           }
+
+          debugPrint('>> Katya new user callback called');
 
           if (tx.chainError != null) {
             completer.complete(false);

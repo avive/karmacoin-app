@@ -332,7 +332,7 @@ class KarmachainService extends ChainApiProvider
       final String? signer = _getTransactionSigner(tx);
 
       if (signer == null) {
-        debugPrint(">>> skipping unsigned tx $pallet/$method");
+        // debugPrint(">>> skipping unsigned tx $pallet/$method");
         return;
       }
 
@@ -379,7 +379,6 @@ class KarmachainService extends ChainApiProvider
         return;
       }
 
-      // TODO: review this, refactor like other transactions
       if (appreciationCallback != null &&
           pallet == 'Appreciation' &&
           method == 'appreciation') {
