@@ -138,6 +138,9 @@ class PoolRoles {
 /// The pool root is able to set a commission change rate for their pool. A commission change rate consists of 2 values; (1) the maximum allowed commission change, and (2) the minimum number of blocks that must elapse before commission updates are allowed again.
 ///
 /// Commission change rates are not applied to decreases in commission.
+///
+/// TODO: change units to time and intenrnally convert to block based on block-time
+///
 class CommissionChangeRate {
   /// The maximum amount the commission can be updated by per `min_delay` period.
   int maxIncrease;
@@ -161,6 +164,7 @@ class CommissionChangeRate {
 /// decreased after the initial value is set, to prevent commission from repeatedly increasing.
 ///
 /// An optional commission `change_rate` allows the pool to set strict limits to how much commission can change in each update, and how often updates can take place.
+/// TODO: change all strange units to standard ones - percentages, KCs
 class Commission {
   /// The account commission is paid to
   String? beneficiary;

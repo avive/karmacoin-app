@@ -332,7 +332,10 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   /// - If a `null` is supplied to `commission` and `beneficiary`, existing
   ///   commission will be removed.
   /// - Both `commission` and `beneficiary` must be supplied or be `null`
-  /// - commision - [0,...,1B]
+  /// - commision in range [0 = 0%, ...,1B = 100%]
+  ///
+  /// TODO: change all weird units in pools to standard ones such as % and KCs
+  ///
   Future<String> setPoolCommission(
       PoolId poolId, int? commission, String? beneficiary) async {
     try {
@@ -364,6 +367,10 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   ///   thereafter.
   /// - Current commission will be lowered in the event it is higher than a
   ///   new max commission.
+  ///
+  /// TODO: change all weird units in pools to standard ones such as % and KCs
+  ///
+
   Future<String> setPoolCommissionMax(PoolId poolId, int maxCommission) async {
     try {
       final call = MapEntry(
