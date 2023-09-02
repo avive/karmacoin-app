@@ -1,4 +1,4 @@
-/// Type mapping to on-chain type for pool id
+/// Type mapping to on-chain type for a unique pool id
 typedef PoolId = int;
 
 /// Possible operations on the configuration values of this pallet
@@ -14,7 +14,7 @@ enum ConfigOption {
 }
 
 class PoolMember {
-  /// The identifier of the pool to which `who` belongs.
+  /// The unique identifier of the pool to which `who` belongs.
   PoolId id;
 
   /// The number of points this member has in the bonded pool or in a sub pool if
@@ -30,12 +30,12 @@ class PoolMember {
         points = BigInt.from(json['points']);
 }
 
-/// Global on-chain configuration for nomination pools
+/// Global on-chain configuration for nomination pools.
 class NominationPoolsConfiguration {
-  /// Minimum amount to bond to join a pool
+  /// Minimum amount to bond to join a pool.
   BigInt minJoinBond;
 
-  /// Minimum bond required to create a pool
+  /// Minimum bond required to create a pool.
   ///
   /// This is the amount that the depositor must put as their initial stake in the pool, as an indication of "skin in the game". This is the value that will always exist in the staking ledger of the pool bonded account while all other accounts leave.
   BigInt minCreateBond;
@@ -105,7 +105,9 @@ extension StringValue on PoolState {
 ///
 /// Any pool has a depositor, which can never change. But, all the other roles are optional, and cannot exist. Note that if `root` is set to `null`, it basically means that the roles of this pool can never change again (except via governance).
 class PoolRoles {
-  /// Creates the pool and is the initial member. They can only leave the pool once all other members have left. Once they fully leave, the pool is destroyed.
+  /// Creates the pool and is the initial member.
+  /// They can only leave the pool once all other members have left.
+  /// Once they fully leave, the pool is destroyed.
   String depositor;
 
   /// Can change the nominator, bouncer, or itself and can perform any of the actions the nominator or bouncer can.
@@ -128,7 +130,7 @@ class PoolRoles {
 
 /// Pool commission change rate preferences.
 ///
-/// The pool root is able to set a commission change rate for their pool. A commission change rate consists of 2 values; (1) the maximum allowed commission change, and (2) the minimum number of blocks that must elapse before commission updates are allowed again.
+/// The pool root is able to set a commission change rate for their pool. A commission change rate consists of 2 values. (1) the maximum allowed commission change, and (2) the minimum number of blocks that must elapse before commission updates are allowed again.
 ///
 /// Commission change rates are not applied to decreases in commission.
 ///

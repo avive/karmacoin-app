@@ -24,13 +24,15 @@ class Nominations {
 
 /// Preference of what happens regarding validation.
 class ValidatorPrefs {
-  /// Validator account id
+  /// Validator account id.
   String accountId;
 
   /// Reward that validator takes up-front; only the rest is split between themselves and nominators.
   int commission;
 
-  /// Whether or not this validator is accepting more nominations. If `true`, then no nominator who is not already nominating this validator may nominate them. By default, validators are accepting nominations.
+  /// Whether or not this validator is accepting more nominations. 
+  /// If `true`, then no nominator who is not already nominating this validator may nominate them. 
+  /// By default, validators are accepting nominations.
   bool blocked;
 
   ValidatorPrefs(this.accountId, this.commission, this.blocked);

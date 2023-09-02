@@ -36,10 +36,8 @@ typedef ClaimPoolCommissionCallback = Future<void> Function(
     KC2ClaimCommissionTxV1 tx);
 
 mixin KC2NominationPoolsInterface on ChainApiProvider {
-  /// Stake funds with a pool. The amount to bond is transferred from the member
-  /// to the pool's account and immediately increases the pool's bond.
-  ///
-  /// # Note
+  /// Stake funds with a pool.
+  /// The amount to bond is transferred from the member to the pool's account and immediately increases the pool's bond.
   ///
   /// * An account can only be a member of a single pool.
   /// * An account cannot join the same pool multiple times.
@@ -58,9 +56,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
     }
   }
 
-  /// A bonded member can use this to claim its payout based on the rewards
-  /// that the pool has accumulated since their last claimed payout
-  /// (OR since joining if this is their first time claiming rewards).
+  /// A bonded member can use this to claim its payout based on the rewards that the pool has accumulated since their last claimed payout OR since joining if this is their first time claiming rewards).
+  ///
   /// The payout will be transferred to the member's account.
   ///
   /// The member will earn rewards pro-rate based on the members stake vs the
@@ -443,7 +440,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
     }
   }
 
-  /// Returns the equivalent balance of `points` for pools
+  /// Returns the equivalent balance of `points` for pools.
   Future<BigInt> getPoolsPointsToBalance(BigInt points) async {
     try {
       return await callRpc(
@@ -492,7 +489,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
     }
   }
 
-  /// If account id is a member of any nomination pool returns pool id of this pool otherwise `null`
+  /// If account id is a member of any nomination pool returns pool id of this pool otherwise `null`.
   Future<PoolMember?> getMembershipPool(String accountId) async {
     try {
       return await callRpc('nominationPools_memberOf', [accountId])

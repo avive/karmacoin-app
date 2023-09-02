@@ -4,6 +4,7 @@ import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/common_libs.dart';
 
 /// Unbond a portion or all of the staked amount from the pool and leave it.
+/// 
 /// Amount will be available via withdraw_unbonded call after unbonding period has passed.
 class KC2UnbondTxV1 extends KC2Tx {
   String memberAccount;

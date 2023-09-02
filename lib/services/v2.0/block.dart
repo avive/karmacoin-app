@@ -16,7 +16,7 @@ class Block {
     events = await _getBlockEvents(blockHash);
   }
 
-  /// Returns tx events for a specific transaction in a block
+  /// Returns tx events for a specific transaction in a block.
   Future<List<KC2Event>> getTransactionEvents(int transactionIndex) async {
     try {
       final transactionEvents = events
@@ -30,8 +30,7 @@ class Block {
     }
   }
 
-  /// Retrieves events for this accessing `System` pallet storage
-  /// return decoded events
+  /// Retrieves events for this accessing `System` pallet storage return decoded events.
   Future<List<KC2Event>> _getBlockEvents(String blockHash) async {
     try {
       final value = await kc2Service.readStorage('System', 'Events');

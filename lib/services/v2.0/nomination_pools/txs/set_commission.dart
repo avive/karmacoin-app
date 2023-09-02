@@ -6,6 +6,7 @@ import 'package:ss58/ss58.dart' as ss58;
 import 'package:karma_coin/common_libs.dart';
 
 /// Set the commission of a pool. Pool as a validator can set its own commission.
+/// 
 /// The commission is a percentage of the reward that will be taken by the pool.
 /// The beneficiary is the account that will receive the commission.
 class KC2SetCommissionTxV1 extends KC2Tx {

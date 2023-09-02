@@ -3,7 +3,7 @@ import 'package:karma_coin/services/v2.0/interfaces.dart';
 import 'package:karma_coin/services/v2.0/staking/types.dart';
 
 mixin KC2StakingInterface on ChainApiProvider {
-  /// Returns the nominations of the specified validator account
+  /// Returns the nominations of the specified validator account.
   Future<Nominations?> getNominations(String accountId) async {
     try {
       final result = await callRpc('staking_getNominations', [accountId]);
@@ -16,7 +16,7 @@ mixin KC2StakingInterface on ChainApiProvider {
     }
   }
 
-  /// Returns a list of validators who may be nominated
+  /// Returns a list of validators who may be nominated.
   Future<List<ValidatorPrefs>> getValidators() async {
     try {
       return await callRpc('staking_getValidators', []).then((v) => v

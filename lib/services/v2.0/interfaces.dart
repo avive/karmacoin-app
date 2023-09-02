@@ -120,7 +120,7 @@ abstract class ChainApiProvider {
   }
 
   /// Sign with current key and send transaction to the chain
-  /// Returns the tx's hash
+  /// Returns the tx's hash.
   Future<String> signAndSendTransaction(MapEntry<String, dynamic> call) async {
     try {
       final signer = encodeAccountId(keyring.getPublicKey());

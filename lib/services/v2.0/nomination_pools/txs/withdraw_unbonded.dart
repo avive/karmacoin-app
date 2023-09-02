@@ -4,7 +4,7 @@ import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/common_libs.dart';
 
 // Withdraw all unbonded amount from the pool and leave it.
-// Can only be called once the unbound period has finished
+// Can only be called once the unbound period has finished.
 class KC2WithdrawUnbondedTxV1 extends KC2Tx {
   String memberAccount;
 
