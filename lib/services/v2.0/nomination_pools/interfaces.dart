@@ -328,18 +328,20 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   ///
   /// - If a `null` is supplied to `commission` and `beneficiary`, existing
   ///   commission will be removed.
-  /// - Both `commission` and `beneficiary` must be supplied or be `null`
-  /// - commision in range [0 = 0%, ...,1B = 100%]
+  /// - Both `commission` and `beneficiary` must be supplied or be `null`.
+  /// - commision range [0.0,...,1.0].
   ///
-  /// TODO: change all weird units in pools to standard ones such as % and KCs
   ///
   Future<String> setPoolCommission(
-      PoolId poolId, int? commission, String? beneficiary) async {
+      PoolId poolId, double? commission, String? beneficiary) async {
     try {
       Option newCommission;
-
       if (commission != null && beneficiary != null) {
-        newCommission = Option.some([commission, decodeAccountId(beneficiary)]);
+        if (commission < 0.0 || commission > 1.0) {
+          throw Exception('Commission must be in range [0.0,...,1.0]');
+        }
+        int c = (commission * 1000000000).toInt();
+        newCommission = Option.some([c, decodeAccountId(beneficiary)]);
       } else {
         newCommission = const Option.none();
       }
@@ -364,17 +366,22 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   ///   thereafter.
   /// - Current commission will be lowered in the event it is higher than a
   ///   new max commission.
-  ///
-  /// TODO: change all weird units in pools to standard ones such as % and KCs
-  ///
+  /// - maxCommision range [0.0,...,1.0]
 
-  Future<String> setPoolCommissionMax(PoolId poolId, int maxCommission) async {
+  Future<String> setPoolCommissionMax(
+      PoolId poolId, double maxCommission) async {
+    if (maxCommission < 0.0 || maxCommission > 1.0) {
+      throw Exception('Max commission must be in range [0.0,...,1.0]');
+    }
+
+    int maxC = (maxCommission * 1000000000).toInt();
+
     try {
       final call = MapEntry(
           'NominationPools',
           MapEntry('set_commission_max', {
             'pool_id': poolId,
-            'max_commission': maxCommission,
+            'max_commission': maxC,
           }));
 
       return await signAndSendTransaction(call);

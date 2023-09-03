@@ -134,7 +134,7 @@ class PoolRoles {
 ///
 /// Commission change rates are not applied to decreases in commission.
 ///
-/// TODO: change units to time and intenrnally convert to block based on block-time
+/// TODO: @HolyGrease change units to calendar time and intenrnally convert to block based on networl's block-time
 ///
 class CommissionChangeRate {
   /// The maximum amount the commission can be updated by per `min_delay` period.
@@ -158,7 +158,7 @@ class CommissionChangeRate {
 ///
 /// An optional commission `change_rate` allows the pool to set strict limits to how much commission can change in each update, and how often updates can take place.
 ///
-/// TODO: change all strange units to standard ones - percentages, KCs
+
 class Commission {
   /// The account commission is paid to
   String? beneficiary;
