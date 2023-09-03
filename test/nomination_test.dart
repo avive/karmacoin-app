@@ -23,6 +23,13 @@ void main() {
   GetIt.I.registerLazySingleton<K2ServiceInterface>(
       () => GetIt.I.get<KarmachainService>());
 
+  // @HolyGrease - we need the following basic pools integration test:
+  // 1. create a nominator.
+  // 2. have nominator nominate the devnet validator.
+  // 3. create pool and nominate the nominator.
+  // 4. have 1 user join the pool.
+  // 5. wait an era and verify pool gets rewarded and verify user can withdraw their reward.
+
   group('nomination tests', () {
     // todo: add test when user joins a pool and pools nominates the devnet validator
     // wait an era and verify pool gets rewarded and verify user can withdraw their reward
