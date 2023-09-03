@@ -53,6 +53,8 @@ class NominationPoolsConfiguration {
   int? maxPoolMembersPerPool;
 
   /// The maximum commission that can be charged by a pool.
+  /// @HolyGrease - in what units is this? [0,...,1B]?
+  /// Why BigInt and not int?
   BigInt globalMaxCommission;
 
   NominationPoolsConfiguration(
@@ -172,8 +174,15 @@ class Commission {
   /// Optional configuration around how often commission can be updated, and when the last commission update took place.
   CommissionChangeRate? changeRate;
 
+  double? get currentAsPrercnet =>
+      current != null ? current! / 1000000000 : null;
+
+  double? get maxAsPrercnet => max != null ? max! / 1000000000 : null;
+
   /// The block from where throttling should be checked from.
   /// This value will be updated on all commission updates and when setting an initial `change_rate`.
+  ///
+  /// @HolyGrease - don't block numbers always need to be BigInts?
   int? throttleFrom;
 
   Commission(this.beneficiary, this.current, this.max, this.changeRate,
@@ -191,16 +200,16 @@ class Commission {
 
 /// Pool permissions and state
 class Pool {
-  /// The identifier of the pool.
+  /// Unique identifier.
   PoolId id;
 
-  /// Bonded account id of this pool.
+  /// Bonded account id.
   String bondedAccountId;
 
-  /// The commission rate of the pool.
+  /// Commission rate.
   Commission commission;
 
-  /// Count of members that belong to the pool.
+  /// Number of members.
   int memberCounter;
 
   /// Total points of all the members in the pool who are actively bonded.
@@ -209,7 +218,7 @@ class Pool {
   /// See [`PoolRoles`].
   PoolRoles roles;
 
-  /// The current state of the pool.
+  /// Current state
   PoolState state;
 
   Pool(this.id, this.bondedAccountId, this.commission, this.memberCounter,

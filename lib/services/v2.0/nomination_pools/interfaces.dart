@@ -471,7 +471,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
     }
   }
 
-  /// Returns list of nomination pools.
+  /// Returns list of all on-chain nomination pools.
   Future<List<Pool>> getPools() async {
     try {
       final pools = await callRpc('nominationPools_getPools', []).then(
