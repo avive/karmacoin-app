@@ -24,11 +24,10 @@ void main() {
       () => GetIt.I.get<KarmachainService>());
 
   // @HolyGrease - we need the following basic pools integration test:
-  // 1. create a nominator.
-  // 2. have nominator nominate the devnet validator.
+  // 1. create a nominator and have nominator nominate the devnet's validator.
   // 3. create pool and nominate the nominator.
-  // 4. have 1 user join the pool.
-  // 5. wait an era and verify pool gets rewarded and verify user can withdraw their reward.
+  // 4. Have 1 user join the pool.
+  // 5. Wait an era and verify pool gets rewarded and verify user can withdraw their reward while staying in pool.
 
   group('nomination tests', () {
     // todo: add test when user joins a pool and pools nominates the devnet validator
