@@ -298,8 +298,8 @@ void main() {
           final poolId = pool.id;
 
           // Set commission equal to 2%
-          txHash = await kc2Service.setPoolCommission(
-              poolId, 20000000, katya.accountId);
+          txHash =
+              await kc2Service.setPoolCommission(poolId, 0.02, katya.accountId);
         };
 
         kc2Service.setPoolCommissionCallback = (tx) async {
@@ -394,7 +394,7 @@ void main() {
           final poolId = pool.id;
 
           // Set commission equal to 20%
-          txHash = await kc2Service.setPoolCommissionMax(poolId, 200000000);
+          txHash = await kc2Service.setPoolCommissionMax(poolId, 0.2);
         };
 
         kc2Service.setPoolCommissionMaxCallback = (tx) async {
