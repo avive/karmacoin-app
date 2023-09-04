@@ -32,6 +32,9 @@ migrate_working_dir/
 .pub/
 /build/
 
+# tests config file
+**/test_config.dart
+
 # Symbolication related
 app.*.symbols
 
