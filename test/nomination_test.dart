@@ -117,7 +117,9 @@ void main() {
             final result = await kc2Service.getMembershipPool(punch.accountId);
             expect(result, isNull);
           } catch (e) {
-            fail('execption thrown when getting membership for punch');
+            debugPrint('Error getting pool member: $e');
+            completer.complete(false);
+            return;
           }
 
           completer.complete(true);
