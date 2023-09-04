@@ -54,7 +54,7 @@ class ConfigLogic {
   late final apiHostName = ValueNotifier<String>('127.0.0.1');
   late final apiHostPort = ValueNotifier<int>(9080);
   late final apiProtocol = ValueNotifier<String>('ws');
-  late final verifierHostName = ValueNotifier<String>('127.0.0.1');
+  late final verifierHostName = ValueNotifier<String>('https://verifier1.karmaco.in');
   late final verifierHostPort = ValueNotifier<int>(9080);
   late final verifierSecureConnection = ValueNotifier<bool>(false);
 
