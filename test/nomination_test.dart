@@ -51,7 +51,6 @@ void main() {
         String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
         String katyaPhoneNumber = randomPhoneNumber;
         kc2Service.setKeyring(katya.keyring);
-
         KC2UserInfo katyaInfo = KC2UserInfo(
             accountId: katya.accountId,
             userName: katyaUserName,
@@ -110,6 +109,16 @@ void main() {
           expect(poolMember, isNotNull);
           expect(poolMember!.id, pool.id);
           expect(poolMember.points, BigInt.from(1000000));
+
+          // verify punch is not a pool member of any pool
+          IdentityInterface punch = Identity();
+          await punch.initNoStorage();
+          try {
+            final result = await kc2Service.getMembershipPool(punch.accountId);
+            expect(result, isNull);
+          } catch (e) {
+            fail('execption thrown when getting membership for punch');
+          }
 
           completer.complete(true);
         };
