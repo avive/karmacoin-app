@@ -104,8 +104,6 @@ class KC2AppLogic with KC2AppLogicInterface {
       await FlutterDisplayMode.setHighRefreshRate();
     }
 
-
-
     // Load app settings
     await configLogic.init();
 

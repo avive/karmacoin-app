@@ -17,6 +17,9 @@ export 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 /// Client callback types
 typedef NewUserCallback = Future<void> Function(KC2NewUserTransactionV1 tx);
 typedef UpdateUserCallback = Future<void> Function(KC2UpdateUserTxV1 tx);
+typedef RemoveMetadataCallback = Future<void> Function(
+    KC2RemoveMetadataTxV1 tx);
+typedef SetMetadataCallback = Future<void> Function(KC2SetMetadataTxV1 tx);
 typedef AppreciationCallback = Future<void> Function(KC2AppreciationTxV1 tx);
 typedef TransferCallback = Future<void> Function(KC2TransferTxV1 tx);
 
@@ -278,6 +281,16 @@ mixin K2ServiceInterface implements ChainApiProvider {
     }
   }
 
+  Future<String?> getMetadata(String accountId) async {
+    try {
+      List<dynamic>? result = await callRpc('identity_getMetadata', [accountId]);
+      return result == null ? null : String.fromCharCodes(result.cast<int>());
+    } on PlatformException catch (e) {
+      debugPrint('Failed to get account metadata: ${e.message}');
+      rethrow;
+    }
+  }
+
   // transactions
 
   /// Create a new on-chain user with provided data
@@ -409,6 +422,36 @@ mixin K2ServiceInterface implements ChainApiProvider {
     }
   }
 
+  /// Set metadata for the account. In case if metadata is already set, it will be overwritten
+  Future<String> setMetadata(String metadata) async {
+    try {
+      final bytes = metadata.codeUnits;
+
+      final call = MapEntry(
+          'Identity',
+          MapEntry('set_metadata', {
+            'metadata': bytes,
+          }));
+
+      return await signAndSendTransaction(call);
+    } on PlatformException catch (e) {
+      debugPrint('Failed to set admin: ${e.details}');
+      rethrow;
+    }
+  }
+
+  /// Remove metadata for the account
+  Future<String> removeMetadata() async {
+    try {
+      const call = MapEntry('Identity', MapEntry('remove_metadata', <String, dynamic>{}));
+
+      return await signAndSendTransaction(call);
+    } on PlatformException catch (e) {
+      debugPrint('Failed to set admin: ${e.details}');
+      rethrow;
+    }
+  }
+
   /// Transfer coins from local account to an account
   Future<String> sendTransfer(String accountId, BigInt amount) async {
     appState.txSubmissionStatus.value = TxSubmissionStatus.submitting;
@@ -514,4 +557,10 @@ mixin K2ServiceInterface implements ChainApiProvider {
   AppreciationCallback? appreciationCallback;
 
   // todo: setAdminCallback
+
+  /// Callback when account set metadata
+  SetMetadataCallback? setMetadataCallback;
+
+  /// Callback when account remove metadata
+  RemoveMetadataCallback? removeMetadataCallback;
 }

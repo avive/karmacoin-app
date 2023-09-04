@@ -16,6 +16,8 @@ import 'package:karma_coin/services/v2.0/nomination_pools/txs/update_roles.dart'
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/withdraw_unbonded.dart';
 import 'package:karma_coin/services/v2.0/txs/appreciation_tx.dart';
 import 'package:karma_coin/services/v2.0/txs/new_user_tx.dart';
+import 'package:karma_coin/services/v2.0/txs/remove_metadata_tx.dart';
+import 'package:karma_coin/services/v2.0/txs/set_metadata_tx.dart';
 import 'package:karma_coin/services/v2.0/txs/transfer_tx.dart';
 import 'package:karma_coin/services/v2.0/txs/update_user_tx.dart';
 import 'package:substrate_metadata_fixed/models/models.dart';
@@ -27,7 +29,9 @@ import 'package:polkadart/substrate/substrate.dart';
 // export all tx types
 export 'package:karma_coin/services/v2.0/txs/appreciation_tx.dart';
 export 'package:karma_coin/services/v2.0/txs/new_user_tx.dart';
+export 'package:karma_coin/services/v2.0/txs/remove_metadata_tx.dart';
 export 'package:karma_coin/services/v2.0/txs/set_admin_tx.dart';
+export 'package:karma_coin/services/v2.0/txs/set_metadata_tx.dart';
 export 'package:karma_coin/services/v2.0/txs/update_user_tx.dart';
 export 'package:karma_coin/services/v2.0/txs/delete_user_tx.dart';
 export 'package:karma_coin/services/v2.0/txs/transfer_tx.dart';
@@ -118,6 +122,34 @@ abstract class KC2Tx {
 
     if (pallet == 'Identity' && method == 'update_user') {
       return KC2UpdateUserTxV1.createUpdateUserTx(
+          hash: hash,
+          timestamp: timestamp,
+          signer: signer,
+          args: args,
+          chainError: chainError,
+          blockNumber: blockNumber,
+          blockIndex: blockIndex,
+          rawData: tx,
+          netId: netId,
+          txEvents: txEvents);
+    }
+
+    if (pallet == 'Identity' && method == 'remove_metadata') {
+      return KC2RemoveMetadataTxV1.createRemoveMetadataTx(
+          hash: hash,
+          timestamp: timestamp,
+          signer: signer,
+          args: args,
+          chainError: chainError,
+          blockNumber: blockNumber,
+          blockIndex: blockIndex,
+          rawData: tx,
+          netId: netId,
+          txEvents: txEvents);
+    }
+
+    if (pallet == 'Identity' && method == 'set_metadata') {
+      return KC2SetMetadataTxV1.createSetMetadataTx(
           hash: hash,
           timestamp: timestamp,
           signer: signer,
