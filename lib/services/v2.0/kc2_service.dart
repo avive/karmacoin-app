@@ -7,7 +7,6 @@ import 'package:karma_coin/services/v2.0/error.dart';
 import 'package:karma_coin/services/v2.0/interfaces.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/event.dart';
-import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/claim_commission.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/claim_payout.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/create.dart';
@@ -20,6 +19,9 @@ import 'package:karma_coin/services/v2.0/nomination_pools/txs/unbond.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/update_roles.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/withdraw_unbonded.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/chill.dart';
+
+
+
 import 'package:karma_coin/services/v2.0/staking/interfaces.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';

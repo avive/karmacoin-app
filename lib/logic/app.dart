@@ -17,6 +17,9 @@ import 'package:karma_coin/logic/verifier.dart';
 import 'package:karma_coin/services/v2.0/kc2_service.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 
+export 'package:karma_coin/services/v2.0/kc2_service.dart';
+export 'package:karma_coin/services/v2.0/nomination_pools/types.dart';
+
 /// Add syntax sugar for quickly accessing the main "logic" controllers in the app
 KC2AppLogic get appLogic => GetIt.I.get<KC2AppLogic>();
 
@@ -100,6 +103,8 @@ class KC2AppLogic with KC2AppLogicInterface {
     if (!kIsWeb && PlatformInfo.isAndroid) {
       await FlutterDisplayMode.setHighRefreshRate();
     }
+
+
 
     // Load app settings
     await configLogic.init();

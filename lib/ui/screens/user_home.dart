@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:karma_coin/ui/widgets/animated_background.dart';
 import 'package:karma_coin/ui/widgets/animated_wave.dart';
@@ -14,7 +15,7 @@ import 'package:karma_coin/ui/widgets/appreciation_intro.dart';
 import 'package:karma_coin/ui/widgets/appreciation_progress.dart';
 import 'package:karma_coin/ui/widgets/into.dart';
 import 'package:karma_coin/ui/widgets/leaderboard.dart';
-import 'package:karma_coin/ui/widgets/mining_intro.dart';
+import 'package:karma_coin/ui/widgets/staking_intro.dart';
 import 'package:karma_coin/ui/widgets/traits_scores_wheel.dart';
 
 const smallScreenHeight = 1334;
@@ -226,12 +227,17 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             fullscreenDialog: true,
             builder: ((context) =>
                 // push intro screen here
-                const MiningIntro())))
-        .then((completion) {
-      Future.delayed(const Duration(milliseconds: 250), () async {
-        if (!context.mounted) return;
-        // push mining screen here...
-      });
+                const StakingIntro())))
+        .then((completion) async {
+      if (!context.mounted) return;
+      PoolMember? membership = await (kc2Service as KC2NominationPoolsInterface)
+          .getMembershipPool(kc2User.identity.accountId);
+
+      if (membership != null) {
+        // local user is member of a pool - show pool details screen
+      } else {
+        // local user is not a member of a pook - push pool selection screen
+      }
     });
   }
 

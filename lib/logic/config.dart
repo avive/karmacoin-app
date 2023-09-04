@@ -54,9 +54,10 @@ class ConfigLogic {
   late final apiHostName = ValueNotifier<String>('127.0.0.1');
   late final apiHostPort = ValueNotifier<int>(9080);
   late final apiProtocol = ValueNotifier<String>('ws');
-  late final verifierHostName = ValueNotifier<String>('127.0.0.1');
-  late final verifierHostPort = ValueNotifier<int>(9080);
-  late final verifierSecureConnection = ValueNotifier<bool>(false);
+  late final verifierHostName =
+      ValueNotifier<String>('https://verifier1.karmaco.in');
+  late final verifierHostPort = ValueNotifier<int>(443);
+  late final verifierSecureConnection = ValueNotifier<bool>(true);
 
   // Public key of the verifier account id
   // Client should only accept verifier responses signed by this account
@@ -107,17 +108,12 @@ class ConfigLogic {
         debugPrint('Running in Android emulator');
         // on android emulator, use the host machine ip address
         apiHostName.value = '10.0.2.2';
-        verifierHostName.value = '10.0.2.2';
       } else {
         apiHostName.value = '127.0.0.1';
-        verifierHostName.value = '127.0.0.1';
       }
 
       apiHostPort.value = 9944;
-      verifierHostPort.value = 8080;
       apiProtocol.value = 'ws';
-
-      verifierSecureConnection.value = false;
     } else {
       switch (networkId) {
         case KCNetworkType.testnet:
@@ -127,7 +123,7 @@ class ConfigLogic {
           apiProtocol.value = 'wss';
           //
           // verifier info for testnet
-          verifierHostName.value = 'api.karmaco.in';
+          verifierHostName.value = 'https://verifier1.karmaco.in';
           verifierHostPort.value = 443;
           verifierSecureConnection.value = true;
           break;
@@ -139,7 +135,7 @@ class ConfigLogic {
           apiProtocol.value = 'wss';
           //
           // verifier info for mainnet
-          verifierHostName.value = 'api.karmaco.in';
+          verifierHostName.value = 'https://verifier1.karmaco.in';
           verifierHostPort.value = 443;
           verifierSecureConnection.value = true;
           break;

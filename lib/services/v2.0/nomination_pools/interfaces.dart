@@ -11,7 +11,6 @@ import 'package:karma_coin/services/v2.0/nomination_pools/txs/set_commission_max
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/unbond.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/update_roles.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/withdraw_unbonded.dart';
-import 'package:karma_coin/services/v2.0/nomination_pools/types.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:polkadart/scale_codec.dart';
 

@@ -11,6 +11,9 @@ import 'package:polkadart/scale_codec.dart';
 import 'package:polkadart/substrate/substrate.dart';
 import 'package:substrate_metadata_fixed/types/metadata_types.dart';
 
+export 'package:karma_coin/services/v2.0/nomination_pools/types.dart';
+export 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
+
 /// Client callback types
 typedef NewUserCallback = Future<void> Function(KC2NewUserTransactionV1 tx);
 typedef UpdateUserCallback = Future<void> Function(KC2UpdateUserTxV1 tx);
@@ -171,7 +174,7 @@ mixin K2ServiceInterface implements ChainApiProvider {
         .decode(Input.fromBytes(transaction.transaction.transactionBody));
 
     String hash =
-    '0x${hex.encode(Hasher.blake2b256.hash(ExtrinsicsCodec(chainInfo: chainInfo).encode(extrinsic)))}';
+        '0x${hex.encode(Hasher.blake2b256.hash(ExtrinsicsCodec(chainInfo: chainInfo).encode(extrinsic)))}';
 
     return await KC2Tx.getKC2Transaction(
         tx: extrinsic,

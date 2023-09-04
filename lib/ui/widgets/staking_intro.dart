@@ -2,14 +2,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 
-class MiningIntro extends StatefulWidget {
-  const MiningIntro({super.key});
+class StakingIntro extends StatefulWidget {
+  const StakingIntro({super.key});
 
   @override
-  State<MiningIntro> createState() => _MiningIntroState();
+  State<StakingIntro> createState() => _StakingIntroState();
 }
 
-class _MiningIntroState extends State<MiningIntro> {
+class _StakingIntroState extends State<StakingIntro> {
   @override
   initState() {
     super.initState();
@@ -87,12 +87,14 @@ class _MiningIntroState extends State<MiningIntro> {
               ),
             ],
           ),
+          const SizedBox(height: sepHeight),
           CupertinoButton(
             onPressed: () async {
               // TODO: implement me
             },
             child: const Text('Learn More about Staking'),
           ),
+          const SizedBox(height: sepHeight),
           CupertinoButton.filled(
             onPressed: () => context.pop(),
             child: const Text('Got it'),
