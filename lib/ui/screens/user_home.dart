@@ -14,6 +14,7 @@ import 'package:karma_coin/ui/widgets/appreciation_intro.dart';
 import 'package:karma_coin/ui/widgets/appreciation_progress.dart';
 import 'package:karma_coin/ui/widgets/into.dart';
 import 'package:karma_coin/ui/widgets/leaderboard.dart';
+import 'package:karma_coin/ui/widgets/mining_intro.dart';
 import 'package:karma_coin/ui/widgets/traits_scores_wheel.dart';
 
 const smallScreenHeight = 1334;
@@ -185,6 +186,20 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   ),
                   CupertinoButton(
                     onPressed: () async {
+                      await earnButtonHandler(context);
+                    },
+                    child: Text(
+                      'Earn Karma Coins',
+                      style: CupertinoTheme.of(context)
+                          .textTheme
+                          .actionTextStyle
+                          .merge(
+                            const TextStyle(fontSize: 15),
+                          ),
+                    ),
+                  ),
+                  CupertinoButton(
+                    onPressed: () async {
                       await openUrl(configLogic.learnYoutubePlaylistUrl);
                     },
                     child: Text(
@@ -201,6 +216,23 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 ]),
           );
         });
+  }
+
+  Future<void> earnButtonHandler(BuildContext context) async {
+    if (!context.mounted) return;
+
+    Navigator.of(context)
+        .push(CupertinoPageRoute(
+            fullscreenDialog: true,
+            builder: ((context) =>
+                // push intro screen here
+                const MiningIntro())))
+        .then((completion) {
+      Future.delayed(const Duration(milliseconds: 250), () async {
+        if (!context.mounted) return;
+        // push mining screen here...
+      });
+    });
   }
 
   Widget _getKarmaScoreWidget(BuildContext context) {

@@ -36,7 +36,7 @@ typedef ClaimPoolCommissionCallback = Future<void> Function(
     KC2ClaimCommissionTxV1 tx);
 
 mixin KC2NominationPoolsInterface on ChainApiProvider {
-  /// Stake funds with a pool.
+  /// Stake funds with a pool and join it.
   /// The amount to bond is transferred from the member to the pool's account and immediately increases the pool's bond.
   ///
   /// * An account can only be a member of a single pool.
@@ -448,6 +448,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   }
 
   /// Returns the equivalent balance of `points` for pools.
+  /// @HolyGrease - isn't this always 1:1?
   Future<BigInt> getPoolsPointsToBalance(BigInt points) async {
     try {
       return await callRpc(
@@ -496,7 +497,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
     }
   }
 
-  /// If account id is a member of any nomination pool returns pool id of this pool otherwise `null`.
+  /// Returns the pool id if accountId is memember of a pool.
   Future<PoolMember?> getMembershipPool(String accountId) async {
     try {
       return await callRpc('nominationPools_memberOf', [accountId])
