@@ -1,16 +1,14 @@
 import 'package:karma_coin/services/v2.0/error.dart';
 import 'package:karma_coin/services/v2.0/event.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
+import 'dart:convert' show utf8;
 import 'package:karma_coin/common_libs.dart';
 
-/// Unbond a portion or all of the staked amount from the pool and leave it.
-///
-/// Amount will be available via withdraw_unbonded call after unbonding period has passed.
-class KC2UnbondTxV1 extends KC2Tx {
-  String memberAccount;
-  BigInt unbondingPoints;
+/// kc2 set metadata tx
+class KC2SetMetadataTxV1 extends KC2Tx {
+  String metadata;
 
-  static KC2UnbondTxV1 createUnbondTx(
+  static KC2SetMetadataTxV1 createSetMetadataTx(
       {required String hash,
       required int timestamp,
       required String signer,
@@ -22,9 +20,10 @@ class KC2UnbondTxV1 extends KC2Tx {
       required List<KC2Event> txEvents,
       required int netId}) {
     try {
-      return KC2UnbondTxV1(
-        memberAccount: args['member_account'],
-        unbondingPoints: args['unbonding_points'],
+      final metadata = utf8.decode(args['metadata'].cast<int>());
+
+      return KC2SetMetadataTxV1(
+        metadata: metadata,
         args: args,
         signer: signer,
         chainError: chainError,
@@ -36,21 +35,21 @@ class KC2UnbondTxV1 extends KC2Tx {
         rawData: rawData,
       );
     } catch (e) {
-      debugPrint("Error processing unbond tx: $e");
+      debugPrint("Error processing set metadata tx: $e");
       rethrow;
     }
   }
 
-  KC2UnbondTxV1(
-      {required this.memberAccount,
-      required this.unbondingPoints,
-      required super.args,
-      required super.chainError,
-      required super.timestamp,
-      required super.hash,
-      required super.blockNumber,
-      required super.blockIndex,
-      required super.transactionEvents,
-      required super.rawData,
-      required super.signer});
+  KC2SetMetadataTxV1({
+    required this.metadata,
+    required super.args,
+    required super.transactionEvents,
+    required super.chainError,
+    required super.timestamp,
+    required super.hash,
+    required super.blockNumber,
+    required super.blockIndex,
+    required super.rawData,
+    required super.signer,
+  });
 }

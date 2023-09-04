@@ -18,6 +18,7 @@ import 'package:karma_coin/services/v2.0/nomination_pools/txs/unbond.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/update_roles.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/withdraw_unbonded.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/chill.dart';
+
 import 'package:karma_coin/services/v2.0/staking/interfaces.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
@@ -374,6 +375,20 @@ class KarmachainService extends ChainApiProvider
           transaction is KC2UpdateUserTxV1 &&
           updateUserCallback != null) {
         await updateUserCallback!(transaction);
+        return;
+      }
+
+      if (signer == userInfo.accountId &&
+          transaction is KC2RemoveMetadataTxV1 &&
+          removeMetadataCallback != null) {
+        await removeMetadataCallback!(transaction);
+        return;
+      }
+
+      if (signer == userInfo.accountId &&
+          transaction is KC2SetMetadataTxV1 &&
+          setMetadataCallback != null) {
+        await setMetadataCallback!(transaction);
         return;
       }
 

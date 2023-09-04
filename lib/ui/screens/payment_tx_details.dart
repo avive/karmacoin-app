@@ -27,7 +27,7 @@ class TransactionDetailsScreen extends StatefulWidget {
 
 class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
   late final KC2Tx? tx;
-  late  bool txNotFound = false;
+  late bool txNotFound = false;
 
   @override
   void initState() async {

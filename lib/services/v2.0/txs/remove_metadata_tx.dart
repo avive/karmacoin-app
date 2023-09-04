@@ -3,14 +3,9 @@ import 'package:karma_coin/services/v2.0/event.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/common_libs.dart';
 
-/// Unbond a portion or all of the staked amount from the pool and leave it.
-///
-/// Amount will be available via withdraw_unbonded call after unbonding period has passed.
-class KC2UnbondTxV1 extends KC2Tx {
-  String memberAccount;
-  BigInt unbondingPoints;
-
-  static KC2UnbondTxV1 createUnbondTx(
+/// kc2 remove metadata tx
+class KC2RemoveMetadataTxV1 extends KC2Tx {
+  static KC2RemoveMetadataTxV1 createRemoveMetadataTx(
       {required String hash,
       required int timestamp,
       required String signer,
@@ -22,9 +17,7 @@ class KC2UnbondTxV1 extends KC2Tx {
       required List<KC2Event> txEvents,
       required int netId}) {
     try {
-      return KC2UnbondTxV1(
-        memberAccount: args['member_account'],
-        unbondingPoints: args['unbonding_points'],
+      return KC2RemoveMetadataTxV1(
         args: args,
         signer: signer,
         chainError: chainError,
@@ -36,21 +29,20 @@ class KC2UnbondTxV1 extends KC2Tx {
         rawData: rawData,
       );
     } catch (e) {
-      debugPrint("Error processing unbond tx: $e");
+      debugPrint("Error processing remove metadata tx: $e");
       rethrow;
     }
   }
 
-  KC2UnbondTxV1(
-      {required this.memberAccount,
-      required this.unbondingPoints,
-      required super.args,
-      required super.chainError,
-      required super.timestamp,
-      required super.hash,
-      required super.blockNumber,
-      required super.blockIndex,
-      required super.transactionEvents,
-      required super.rawData,
-      required super.signer});
+  KC2RemoveMetadataTxV1({
+    required super.args,
+    required super.transactionEvents,
+    required super.chainError,
+    required super.timestamp,
+    required super.hash,
+    required super.blockNumber,
+    required super.blockIndex,
+    required super.rawData,
+    required super.signer,
+  });
 }
