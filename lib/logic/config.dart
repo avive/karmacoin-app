@@ -122,7 +122,7 @@ class ConfigLogic {
           apiProtocol.value = 'wss';
           //
           // verifier info for testnet
-          verifierHostName.value = 'https://verifier1.karmaco.in';
+          verifierHostName.value = 'verifier1.karmaco.in';
           verifierHostPort.value = 443;
           verifierSecureConnection.value = true;
           break;
@@ -134,7 +134,7 @@ class ConfigLogic {
           apiProtocol.value = 'wss';
           //
           // verifier info for mainnet
-          verifierHostName.value = 'https://verifier1.karmaco.in';
+          verifierHostName.value = 'verifier1.karmaco.in';
           verifierHostPort.value = 443;
           verifierSecureConnection.value = true;
           break;
