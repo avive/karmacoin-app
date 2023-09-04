@@ -38,7 +38,7 @@ class ConfigLogic {
 
   /// Skip whatsapp verification for local testing. kc2Api should use the bypass token
   /// obtain from local config file to bypass whatsapp verification.
-  final bool skipWhatsappVerification = true;
+  final bool skipWhatsappVerification = false;
 
   /// check internet connections and show error messages
   final bool enableInternetConnectionChecking = false;
@@ -54,8 +54,7 @@ class ConfigLogic {
   late final apiHostName = ValueNotifier<String>('127.0.0.1');
   late final apiHostPort = ValueNotifier<int>(9080);
   late final apiProtocol = ValueNotifier<String>('ws');
-  late final verifierHostName =
-      ValueNotifier<String>('https://verifier1.karmaco.in');
+  late final verifierHostName = ValueNotifier<String>('verifier1.karmaco.in');
   late final verifierHostPort = ValueNotifier<int>(443);
   late final verifierSecureConnection = ValueNotifier<bool>(true);
 
@@ -123,7 +122,7 @@ class ConfigLogic {
           apiProtocol.value = 'wss';
           //
           // verifier info for testnet
-          verifierHostName.value = 'https://verifier1.karmaco.in';
+          verifierHostName.value = 'verifier1.karmaco.in';
           verifierHostPort.value = 443;
           verifierSecureConnection.value = true;
           break;
@@ -135,7 +134,7 @@ class ConfigLogic {
           apiProtocol.value = 'wss';
           //
           // verifier info for mainnet
-          verifierHostName.value = 'https://verifier1.karmaco.in';
+          verifierHostName.value = 'verifier1.karmaco.in';
           verifierHostPort.value = 443;
           verifierSecureConnection.value = true;
           break;

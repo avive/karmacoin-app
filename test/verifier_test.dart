@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -12,6 +11,8 @@ import 'package:karma_coin/services/api/verifier.pb.dart' as proto;
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
+
+import 'test_config.dart' as config;
 
 final random = Random.secure();
 String get randomPhoneNumber => (random.nextInt(900000) + 100000).toString();
@@ -130,7 +131,7 @@ void main() {
           accountId: katya.accountId,
           phoneNumber: katyaPhoneNumber,
           userName: katyaUserName,
-          bypassToken: 'dummy',
+          bypassToken: config.verifierBypassCode,
         ));
         // Sign verification request params
         verifierNumberRequest.sign(katya.keyring);

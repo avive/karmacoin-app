@@ -147,8 +147,6 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
         'Starting signup flow... Phone number: ${phoneController.value.toString()}');
     String number =
         '+${phoneController.value!.countryCode}${phoneController.value!.nsn}';
-    debugPrint(
-        'Phone number canonical string: $number. Calling verificaiton api...');
 
     setState(() {
       isSigninIn = true;
@@ -170,6 +168,9 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
       return;
     } else {
       try {
+        debugPrint(
+            'Phone number canonical string: $number. Calling verificaiton api...');
+
         SendVerificationCodeResponse resp = await verifier.verifierServiceClient
             .sendVerificationCode(
                 SendVerificationCodeRequest(mobileNumber: number));
