@@ -500,7 +500,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   Future<PoolMember?> getMembershipPool(String accountId) async {
     try {
       return await callRpc('nominationPools_memberOf', [accountId])
-          .then((v) => PoolMember.fromJson(v));
+          .then((v) => v == null ? null : PoolMember.fromJson(v));
     } on PlatformException catch (e) {
       debugPrint('Failed to get nomination pool id: ${e.details}');
       rethrow;
