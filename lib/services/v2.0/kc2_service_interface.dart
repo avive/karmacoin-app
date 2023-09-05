@@ -42,9 +42,7 @@ mixin K2ServiceInterface implements ChainApiProvider {
   /// Connect to a karmachain api service. e.g
   /// Local running node - "ws://127.0.0.1:9944"
   /// Testnet - "wss://testnet.karmaco.in/testnet/ws"
-  /// Optionally provide a verifier provider url, to allow connecting to api providers which are not
-  /// verifiers (not yet supported)
-  Future<void> connectToApi({required String apiWsUrl, String? verifierWsUrl});
+  Future<void> connectToApi({required String apiWsUrl});
 
   // rpc methods
 
@@ -268,22 +266,10 @@ mixin K2ServiceInterface implements ChainApiProvider {
     }
   }
 
-  getVerificationEvidence(String accountId, String username, String phoneNumber,
-      {String? byPassToken}) async {
-    try {
-      Map<String, dynamic>? result = await callRpc(
-          'verifier_verify', [accountId, username, phoneNumber, byPassToken]);
-
-      return result == null ? null : VerificationEvidence.fromJson(result);
-    } on PlatformException catch (e) {
-      debugPrint('Failed to get verification evidence: ${e.message}');
-      rethrow;
-    }
-  }
-
   Future<String?> getMetadata(String accountId) async {
     try {
-      List<dynamic>? result = await callRpc('identity_getMetadata', [accountId]);
+      List<dynamic>? result =
+          await callRpc('identity_getMetadata', [accountId]);
       return result == null ? null : String.fromCharCodes(result.cast<int>());
     } on PlatformException catch (e) {
       debugPrint('Failed to get account metadata: ${e.message}');
@@ -293,42 +279,25 @@ mixin K2ServiceInterface implements ChainApiProvider {
 
   // transactions
 
-  /// Create a new on-chain user with provided data
-  /// accountId - ss58 encoded user's public ed25519 key
-  /// userName - unique username. Must not be empty
-  /// phoneNumber - user's phone number. Including country code. Excluding leading +
-  /// Returns an (evidence, errorMessage) result.
-  ///
-  /// This method will attempt to obtain verifier evidence regarding the association between the accountId, userName and phoneNumber
+  /// Create a new on-chain user with provided verification evidence
   Future<(String?, String?)> newUser(
-      String accountId, String username, String phoneNumber,
-      {VerificationEvidence? verificationEvidence}) async {
+      {required VerificationEvidence evidence}) async {
     try {
-      // Get verification evidence if not provided
-      verificationEvidence ??= await getVerificationEvidence(
-          accountId, username, phoneNumber,
-          byPassToken: verificationBypassToken);
-
-      // Failed to get verification evidence
-      if (verificationEvidence == null) {
-        return (null, 'NoVerifierEvidence');
-      }
-
       // Verification failed
-      if (verificationEvidence.verificationResult !=
-          VerificationResult.verified) {
-        return (null, verificationEvidence.verificationResult.toString());
+      if (evidence.verificationResult != VerificationResult.verified) {
+        return (null, evidence.verificationResult.toString());
       }
 
-      final phoneNumberHash = hasher.hashString(phoneNumber);
+      final Uint8List phoneNumberHash =
+          Uint8List.fromList(evidence.phoneNumberHash.toHex());
+
       final call = MapEntry(
           'Identity',
           MapEntry('new_user', {
-            'verifier_public_key':
-                decodeAccountId(verificationEvidence.verifierAccountId!),
-            'verifier_signature': verificationEvidence.signature,
-            'account_id': decodeAccountId(accountId),
-            'username': username,
+            'verifier_public_key': decodeAccountId(evidence.verifierAccountId),
+            'verifier_signature': evidence.signature,
+            'account_id': decodeAccountId(evidence.accountId),
+            'username': evidence.username,
             'phone_number_hash': phoneNumberHash,
           }));
 
@@ -347,49 +316,23 @@ mixin K2ServiceInterface implements ChainApiProvider {
   /// Returns an (evidence, errorMessage) result.
   ///
   /// Implementation will attempt to obtain verifier evidence regarding the association between the accountId, and the new userName or the new phoneNumber
-  Future<(String?, String?)> updateUser(String? username, String? phoneNumber,
-      {VerificationEvidence? verificationEvidence}) async {
+  Future<(String?, String?)> updateUser(
+      {required VerificationEvidence evidence}) async {
     try {
-      Uint8List? verifierPublicKey;
-      List<int>? verifierSignature;
+      Uint8List? verifierPublicKey =
+          decodeAccountId(evidence.verifierAccountId);
+      List<int>? verifierSignature = evidence.signature;
 
-      // Get evidence for phone number change if not provided
-      if (phoneNumber != null && verificationEvidence == null) {
-        final userInfo = await getUserInfoByAccountId(keyring.getAccountId());
+      // @HolyGrease best if request always have phone number hsah and user name
+      // and server-side should decide how to update based on on-chain data
 
-        final verificationEvidence = await getVerificationEvidence(
-            userInfo!.accountId, userInfo.userName, phoneNumber,
-            byPassToken: verificationBypassToken);
+      final verifierPublicKeyOption = Option.some(verifierPublicKey);
+      final verifierSignatureOption = Option.some(verifierSignature);
+      final usernameOption = Option.some(evidence.username);
+      final Uint8List phoneNumberHash =
+          Uint8List.fromList(evidence.phoneNumberHash.toHex());
 
-        // Failed to get verification evidence
-        if (verificationEvidence == null) {
-          return (null, 'NoVerifierEvidence');
-        }
-
-        // Verification failed
-        if (verificationEvidence.verificationResult !=
-            VerificationResult.verified) {
-          return (null, verificationEvidence.verificationResult.toString());
-        }
-
-        verifierPublicKey =
-            decodeAccountId(verificationEvidence.verifierAccountId!);
-        verifierSignature = verificationEvidence.signature;
-      }
-
-      final verifierPublicKeyOption = verifierPublicKey == null
-          ? const Option.none()
-          : Option.some(verifierPublicKey);
-      final verifierSignatureOption = verifierSignature == null
-          ? const Option.none()
-          : Option.some(verifierSignature);
-      final usernameOption =
-          username == null ? const Option.none() : Option.some(username);
-      final Uint8List? phoneNumberHash =
-          phoneNumber != null ? hasher.hashString(phoneNumber) : null;
-      final phoneNumberHashOption = phoneNumberHash == null
-          ? const Option.none()
-          : Option.some(phoneNumberHash);
+      final phoneNumberHashOption = Option.some(phoneNumberHash);
 
       final call = MapEntry(
           'Identity',
@@ -443,7 +386,8 @@ mixin K2ServiceInterface implements ChainApiProvider {
   /// Remove metadata for the account
   Future<String> removeMetadata() async {
     try {
-      const call = MapEntry('Identity', MapEntry('remove_metadata', <String, dynamic>{}));
+      const call = MapEntry(
+          'Identity', MapEntry('remove_metadata', <String, dynamic>{}));
 
       return await signAndSendTransaction(call);
     } on PlatformException catch (e) {

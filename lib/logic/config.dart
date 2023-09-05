@@ -1,7 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/common/platform_info.dart';
+import 'package:yaml/yaml.dart';
 
 // todo: add ConfigLogic public interface
 
@@ -38,7 +38,7 @@ class ConfigLogic {
 
   /// Skip whatsapp verification for local testing. kc2Api should use the bypass token
   /// obtain from local config file to bypass whatsapp verification.
-  final bool skipWhatsappVerification = false;
+  final bool skipWhatsappVerification = true;
 
   /// check internet connections and show error messages
   final bool enableInternetConnectionChecking = false;
@@ -60,8 +60,11 @@ class ConfigLogic {
 
   // Public key of the verifier account id
   // Client should only accept verifier responses signed by this account
-  late final verifierAccountId = ValueNotifier<String>(
+  late final vieriferPublicKey = ValueNotifier<String>(
       'fe9d0c0df86c72ae733bf9ec0eeaff6e43e29bad4488f5e4845e455ea1095bf3');
+
+  late final verifierAccountId =
+      ValueNotifier<String>('5EUH4CC5czdqfXbgE1fLkXcqMos1thxJSaj93J6N5bSareuz');
 
   late final learnYoutubePlaylistUrl =
       'https://www.youtube.com/playlist?list=PLF4zx8ioKJTszWMz1MKiHwStfMCdxh8MP';
@@ -94,6 +97,12 @@ class ConfigLogic {
         aOptions: _aOptions);
 
     karmaMiningScreenDisplayed.value = value;
+  }
+
+  /// Load optional test config
+  Future<dynamic> getTestConfig() async {
+    final yamlString = await rootBundle.loadString('assets/test_config.yaml');
+    return loadYaml(yamlString);
   }
 
   /// Call this everytime network is changed from the ui. e.g. a switch between mainnet to testnet...

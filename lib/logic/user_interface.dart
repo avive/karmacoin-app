@@ -19,7 +19,7 @@ enum SignupFailureReason {
   usernameTaken,
   invalidData,
   serverError,
-  connectionTimeOut,
+  connectionTimeout,
   accountMismatch;
 }
 
@@ -32,7 +32,7 @@ enum UpdateResult {
   invalidSignature,
   serverError,
   accountMismatch,
-  connectionTimeOut;
+  connectionTimeout;
 }
 
 /// Usage patterns:
@@ -128,7 +128,7 @@ abstract class KC2UserInteface {
         return 'Invalid data.';
       case SignupFailureReason.accountMismatch:
         return 'Account Id mismatch.';
-      case SignupFailureReason.connectionTimeOut:
+      case SignupFailureReason.connectionTimeout:
         return 'Connection timed out.';
       default:
         return 'Signup error.';

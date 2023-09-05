@@ -145,7 +145,8 @@ enum VerificationResult {
   unverified,
   missingData,
   invalidSignature,
-  accountMismatch;
+  accountMismatch,
+  failed;
 
   const VerificationResult();
 
@@ -158,19 +159,19 @@ enum VerificationResult {
 
 class VerificationEvidence {
   VerificationResult verificationResult;
-  String? verifierAccountId;
+  String verifierAccountId;
   List<int>? signature;
-  String? accountId;
-  String? username;
-  String? phoneNumberHash;
+  String accountId;
+  String username;
+  String phoneNumberHash;
 
   VerificationEvidence({
     required this.verificationResult,
-    this.verifierAccountId,
+    required this.verifierAccountId,
     this.signature,
-    this.accountId,
-    this.username,
-    this.phoneNumberHash,
+    required this.accountId,
+    required this.username,
+    required this.phoneNumberHash,
   });
 
   VerificationEvidence.fromJson(Map<String, dynamic> v)

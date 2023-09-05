@@ -1,9 +1,12 @@
 import 'dart:async';
 
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/data/verify_number_request.dart';
 import 'package:karma_coin/logic/identity.dart';
 import 'package:karma_coin/logic/identity_interface.dart';
+import 'package:karma_coin/logic/verifier.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
@@ -11,10 +14,13 @@ final random = Random.secure();
 String get randomPhoneNumber => (random.nextInt(900000) + 100000).toString();
 
 void main() {
-  // TestWidgetsFlutterBinding.ensureInitialized();
-  // WidgetsFlutterBinding.ensureInitialized();
+  TestWidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
+  FlutterSecureStorage.setMockInitialValues({});
 
   GetIt.I.registerLazySingleton<K2ServiceInterface>(() => KarmachainService());
+  GetIt.I.registerLazySingleton<Verifier>(() => Verifier());
+  GetIt.I.registerLazySingleton<ConfigLogic>(() => ConfigLogic());
 
   group('signup tests', () {
     test(
@@ -111,10 +117,24 @@ void main() {
         // subscribe to new account txs
         kc2Service.subscribeToAccountTransactions(katyaInfo);
 
+        // Create a verification request for verifier with a bypass token or with
+        // a verification code and session id from app state
+        VerifyNumberRequest req = await verifier.createVerificationRequest(
+            accountId: katyaInfo.accountId,
+            userName: katyaUserName,
+            phoneNumber: katyaPhoneNumber,
+            keyring: katya.keyring,
+            useBypassToken: true);
+
+        VerifyNumberData vd = await verifier.verifyNumber(req);
+        if (vd.data == null || vd.error != null) {
+          completer.complete(false);
+          return;
+        }
+
         String? err;
         // signup katya
-        (txHash, err) = await kc2Service.newUser(
-            katya.accountId, katyaUserName, katyaPhoneNumber);
+        (txHash, err) = await kc2Service.newUser(evidence: vd.data!);
 
         expect(txHash, isNotNull);
         expect(err, isNull);
@@ -224,14 +244,31 @@ void main() {
             return;
           }
 
+          // Create a verification request for verifier with a bypass token or with
+          // a verification code and session id from app state
+          VerifyNumberRequest req = await verifier.createVerificationRequest(
+              accountId: katyaInfo.accountId,
+              userName: katyaUserName,
+              phoneNumber: katyaNewPhoneNumber,
+              keyring: katya.keyring,
+              useBypassToken: true);
+
+          VerifyNumberData vd = await verifier.verifyNumber(req);
+          if (vd.data == null || vd.error != null) {
+            completer.complete(false);
+            return;
+          }
+
           debugPrint('calling update user...');
 
           String? err;
           (updateTexHash, err) =
-              await kc2Service.updateUser(null, katyaNewPhoneNumber);
+              await kc2Service.updateUser(evidence: vd.data!);
 
           expect(updateTexHash, isNotNull);
           expect(err, isNull);
+
+          // todo: get user by new phone number from the api...
         };
 
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
@@ -239,10 +276,24 @@ void main() {
         // subscribe to new account txs
         kc2Service.subscribeToAccountTransactions(katyaInfo);
 
+        // Create a verification request for verifier with a bypass token or with
+        // a verification code and session id from app state
+        VerifyNumberRequest req = await verifier.createVerificationRequest(
+            accountId: katyaInfo.accountId,
+            userName: katyaUserName,
+            phoneNumber: katyaPhoneNumber,
+            keyring: katya.keyring,
+            useBypassToken: true);
+
+        VerifyNumberData vd = await verifier.verifyNumber(req);
+        if (vd.data == null || vd.error != null) {
+          completer.complete(false);
+          return;
+        }
+
         // signup katya
         String? err;
-        (txHash, err) = await kc2Service.newUser(
-            katya.accountId, katyaUserName, katyaPhoneNumber);
+        (txHash, err) = await kc2Service.newUser(evidence: vd.data!);
 
         expect(txHash, isNotNull);
         expect(err, isNull);
@@ -360,9 +411,23 @@ void main() {
 
           debugPrint('calling update user...');
 
+          // Create a verification request for verifier with a bypass token or with
+          // a verification code and session id from app state
+          VerifyNumberRequest req = await verifier.createVerificationRequest(
+              accountId: katyaInfo.accountId,
+              userName: katyaNewUserName,
+              phoneNumber: katyaPhoneNumber,
+              keyring: katya.keyring,
+              useBypassToken: true);
+
+          VerifyNumberData vd = await verifier.verifyNumber(req);
+          if (vd.data == null || vd.error != null) {
+            completer.complete(false);
+          }
+
           String? err;
           (updateTexHash, err) =
-              await kc2Service.updateUser(katyaNewUserName, null);
+              await kc2Service.updateUser(evidence: vd.data!);
           expect(updateTexHash, isNotNull);
           expect(err, isNull);
         };
@@ -372,10 +437,23 @@ void main() {
         // subscribe to new account txs
         kc2Service.subscribeToAccountTransactions(katyaInfo);
 
+        // Create a verification request for verifier with a bypass token or with
+        // a verification code and session id from app state
+        VerifyNumberRequest req = await verifier.createVerificationRequest(
+            accountId: katyaInfo.accountId,
+            userName: katyaUserName,
+            phoneNumber: katyaPhoneNumber,
+            keyring: katya.keyring,
+            useBypassToken: true);
+
+        VerifyNumberData vd = await verifier.verifyNumber(req);
+        if (vd.data == null || vd.error != null) {
+          completer.complete(false);
+        }
+
         // signup katya
         String? err;
-        (txHash, err) = await kc2Service.newUser(
-            katya.accountId, katyaUserName, katyaPhoneNumber);
+        (txHash, err) = await kc2Service.newUser(evidence: vd.data!);
 
         expect(txHash, isNotNull);
         expect(err, isNull);
@@ -439,10 +517,26 @@ void main() {
           kc2Service.setKeyring(punch.keyring);
           kc2Service.newUserCallback = null;
 
+          // Create a verification request for verifier with a bypass token or with
+          // a verification code and session id from app state
+          VerifyNumberRequest req = await verifier.createVerificationRequest(
+              accountId: punch.accountId,
+              // we use an existing user name
+              userName: katyaUserName,
+              phoneNumber: punchPhoneNumber,
+              keyring: punch.keyring,
+              useBypassToken: true);
+
+          VerifyNumberData vd = await verifier.verifyNumber(req);
+          if (vd.data == null || vd.error != null) {
+            completer.complete(false);
+            return;
+          }
+
           // attempt signup punch with used user name
           String? err;
-          (punchNewUserTxHash, err) = await kc2Service.newUser(
-              punch.accountId, katyaUserName, punchPhoneNumber);
+          (punchNewUserTxHash, err) =
+              await kc2Service.newUser(evidence: vd.data!);
 
           expect(punchNewUserTxHash, isNull);
           expect(err, isNotNull);
@@ -454,9 +548,23 @@ void main() {
         // subscribe to new account txs
         kc2Service.subscribeToAccountTransactions(katyaInfo);
 
+        // Create a verification request for verifier with a bypass token or with
+        // a verification code and session id from app state
+        VerifyNumberRequest req = await verifier.createVerificationRequest(
+            accountId: katyaInfo.accountId,
+            userName: katyaUserName,
+            phoneNumber: katyaPhoneNumber,
+            keyring: katya.keyring,
+            useBypassToken: true);
+
+        VerifyNumberData vd = await verifier.verifyNumber(req);
+        if (vd.data == null || vd.error != null) {
+          completer.complete(false);
+          return;
+        }
         String? err;
-        (katyaNewUserTxHash, err) = await kc2Service.newUser(
-            katya.accountId, katyaUserName, katyaPhoneNumber);
+        (katyaNewUserTxHash, err) =
+            await kc2Service.newUser(evidence: vd.data!);
 
         expect(katyaNewUserTxHash, isNotNull);
         expect(err, isNull);

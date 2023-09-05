@@ -6,9 +6,11 @@ import 'package:karma_coin/logic/identity_interface.dart';
 import 'package:karma_coin/logic/txs_boss2.dart';
 import 'package:karma_coin/logic/txs_boss2_interface.dart';
 import 'package:karma_coin/logic/user_interface.dart';
+import 'package:karma_coin/logic/verifier.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
+import 'package:karma_coin/data/verify_number_request.dart' as vnr;
 
 class KC2User extends KC2UserInteface {
   // private members
@@ -204,12 +206,41 @@ class KC2User extends KC2UserInteface {
       return;
     }
 
+    // Create a verification request for verifier with a bypass token or with
+    // a verification code and session id from app state
+    vnr.VerifyNumberRequest req = configLogic.skipWhatsappVerification
+        ? await verifier.createVerificationRequest(
+            accountId: identity.accountId,
+            userName: requestedUserName,
+            phoneNumber: requestedPhoneNumber,
+            keyring: identity.keyring,
+            useBypassToken: true)
+        : await verifier.createVerificationRequest(
+            accountId: identity.accountId,
+            userName: requestedUserName,
+            phoneNumber: requestedPhoneNumber,
+            keyring: identity.keyring,
+            useBypassToken: false,
+            verificaitonSessionId: appState.twilloVerificationSid,
+            verificationCode: appState.twilloVerificationCode);
+
+    VerifyNumberData resp = await verifier.verifyNumber(req);
+
+    if (resp.error != null || resp.data == null) {
+      signupFailureReson = SignupFailureReason.invalidData;
+      signupStatus.value = SignupStatus.notSignedUp;
+      // deal with error and update state
+      return;
+    }
+
+    // use resp.data
+
     // set failure callback for 60 secs
     Future.delayed(const Duration(seconds: 60), () async {
       if (signupStatus.value == SignupStatus.signingUp) {
         // timed out waiting for new user transaction
         signupStatus.value = SignupStatus.notSignedUp;
-        signupFailureReson = SignupFailureReason.connectionTimeOut;
+        signupFailureReson = SignupFailureReason.connectionTimeout;
       }
     });
 
@@ -228,8 +259,7 @@ class KC2User extends KC2UserInteface {
 
     String? err;
     String? txHash;
-    (txHash, err) = await kc2Service.newUser(
-        _identity.accountId, requestedUserName, requestedPhoneNumber);
+    (txHash, err) = await kc2Service.newUser(evidence: resp.data!);
 
     if (err != null) {
       signupStatus.value = SignupStatus.notSignedUp;
@@ -318,16 +348,47 @@ class KC2User extends KC2UserInteface {
 
     updateResult.value = UpdateResult.updating;
 
+    if (requestedUserName == null && requestedPhoneNumber == null) {
+      updateResult.value = UpdateResult.invalidData;
+      return;
+    }
+
+    requestedUserName ??= userInfo.value!.userName;
+    requestedPhoneNumber ??= kc2User.identity.phoneNumber!;
+
+    // Create a verification request for verifier with a bypass token or with
+    // a verification code and session id from app state
+    vnr.VerifyNumberRequest req = configLogic.skipWhatsappVerification
+        ? await verifier.createVerificationRequest(
+            accountId: identity.accountId,
+            userName: requestedUserName,
+            phoneNumber: requestedPhoneNumber,
+            keyring: identity.keyring,
+            useBypassToken: true)
+        : await verifier.createVerificationRequest(
+            accountId: identity.accountId,
+            userName: requestedUserName,
+            phoneNumber: requestedPhoneNumber,
+            keyring: identity.keyring,
+            useBypassToken: false,
+            verificaitonSessionId: appState.twilloVerificationSid,
+            verificationCode: appState.twilloVerificationCode);
+
+    VerifyNumberData evidence = await verifier.verifyNumber(req);
+    if (evidence.error != null || evidence.data == null) {
+      updateResult.value == UpdateResult.invalidData;
+      return;
+    }
+
     // set failure callback for 30 secs
     Future.delayed(const Duration(seconds: 30), () async {
       if (updateResult.value == UpdateResult.updating) {
         // timed out waiting for update transaction
-        updateResult.value == UpdateResult.connectionTimeOut;
+        updateResult.value == UpdateResult.connectionTimeout;
       }
     });
 
-    (txHash, err) =
-        await kc2Service.updateUser(requestedUserName, requestedPhoneNumber);
+    (txHash, err) = await kc2Service.updateUser(evidence: evidence.data!);
 
     if (err != null) {
       switch (err) {

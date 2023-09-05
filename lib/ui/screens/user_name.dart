@@ -184,7 +184,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
             case UpdateResult.accountMismatch:
               text = 'Account mismatch error.';
               break;
-            case UpdateResult.connectionTimeOut:
+            case UpdateResult.connectionTimeout:
               text = 'Connection timeout. Please try again later.';
               break;
           }

@@ -30,8 +30,6 @@ import 'package:substrate_metadata_fixed/substrate_metadata.dart';
 import 'package:convert/convert.dart';
 import 'package:substrate_metadata_fixed/types/metadata_types.dart';
 
-String verificationBypassToken = 'dummy';
-
 class KarmachainService extends ChainApiProvider
     with KC2NominationPoolsInterface, KC2StakingInterface, K2ServiceInterface {
   bool _connectedToApi = false;
@@ -53,15 +51,9 @@ class KarmachainService extends ChainApiProvider
   /// Connect to a karmachain api service. e.g.
   /// Local running node - "ws://127.0.0.1:9944"
   /// Testnet - "wss://testnet.karmaco.in/testnet/ws"
-  /// Optionally provide a verifier provider url, to allow connecting to api providers which are not verifiers (not yet supported)
   @override
-  Future<void> connectToApi(
-      {required String apiWsUrl, String? verifierWsUrl}) async {
+  Future<void> connectToApi({required String apiWsUrl}) async {
     try {
-      if (verifierWsUrl != null) {
-        throw 'Custom verifier provider not supported yet';
-      }
-
       debugPrint('Connecting to kc2 api...');
       _apiWsUrl = apiWsUrl;
       karmachain = polkadart.Provider(Uri.parse(apiWsUrl));
