@@ -27,15 +27,16 @@ class TestUserInfo {
 /// Create a new test user and sign it up to the chain
 /// Returns usable user info data
 Future<TestUserInfo> createLocalUser(
-    {required Completer<bool> completer}) async {
+    {required Completer<bool> completer, String? usernamePrefix}) async {
   if (!kc2Service.connectedToApi) {
     await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
   }
 
+  usernamePrefix ??= 'katya';
 
   IdentityInterface user = Identity();
   await user.initNoStorage();
-  String userName = "katya${user.accountId.substring(0, 5)}".toLowerCase();
+  String userName = "$usernamePrefix${user.accountId.substring(0, 5)}".toLowerCase();
   String phoneNumber = randomPhoneNumber;
   user.setPhoneNumber(phoneNumber);
 
