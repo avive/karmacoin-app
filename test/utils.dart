@@ -4,6 +4,7 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/verify_number_request.dart';
 import 'package:karma_coin/logic/identity.dart';
 import 'package:karma_coin/logic/identity_interface.dart';
+import 'package:karma_coin/logic/user.dart';
 import 'package:karma_coin/logic/verifier.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
@@ -30,6 +31,8 @@ Future<TestUserInfo> createLocalUser(
   if (!kc2Service.connectedToApi) {
     await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
   }
+
+
   IdentityInterface user = Identity();
   await user.initNoStorage();
   String userName = "katya${user.accountId.substring(0, 5)}".toLowerCase();

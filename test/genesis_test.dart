@@ -1,6 +1,7 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/logic/verifier.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 
@@ -12,9 +13,9 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   FlutterSecureStorage.setMockInitialValues({});
 
-  GetIt.I.registerLazySingleton<KarmachainService>(() => KarmachainService());
-  GetIt.I.registerLazySingleton<K2ServiceInterface>(
-      () => GetIt.I.get<KarmachainService>());
+  GetIt.I.registerLazySingleton<K2ServiceInterface>(() => KarmachainService());
+  GetIt.I.registerLazySingleton<Verifier>(() => Verifier());
+  GetIt.I.registerLazySingleton<ConfigLogic>(() => ConfigLogic());
 
   group('genesis tests', () {
     test(
@@ -81,3 +82,5 @@ void main() {
     });
   });
 }
+
+class TTestWidgetsFlutterBinding {}

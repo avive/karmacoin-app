@@ -19,14 +19,10 @@ void main() {
   FlutterSecureStorage.setMockInitialValues({});
 
   GetIt.I.registerLazySingleton<K2ServiceInterface>(() => KarmachainService());
-
-  K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
-
   GetIt.I.registerLazySingleton<AppState>(() => AppState());
-
   GetIt.I.registerLazySingleton<KC2UserInteface>(() => KC2User());
 
-  /// Tests using K2CUser
+  K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
   group('KC2User tests', () {
     test(

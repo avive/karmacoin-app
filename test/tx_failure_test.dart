@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/app_state.dart';
@@ -7,21 +8,25 @@ import 'package:karma_coin/logic/identity.dart';
 import 'package:karma_coin/logic/identity_interface.dart';
 import 'package:karma_coin/logic/user.dart';
 import 'package:karma_coin/logic/user_interface.dart';
+import 'package:karma_coin/logic/verifier.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
+
+import 'utils.dart';
 
 final random = Random.secure();
 String get randomPhoneNumber => (random.nextInt(900000) + 100000).toString();
 
 void main() {
-  // TestWidgetsFlutterBinding.ensureInitialized();
-  // WidgetsFlutterBinding.ensureInitialized();
+  TestWidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
+  FlutterSecureStorage.setMockInitialValues({});
 
   GetIt.I.registerLazySingleton<K2ServiceInterface>(() => KarmachainService());
-
   GetIt.I.registerLazySingleton<AppState>(() => AppState());
-
   GetIt.I.registerLazySingleton<KC2UserInteface>(() => KC2User());
+  GetIt.I.registerLazySingleton<Verifier>(() => Verifier());
+  GetIt.I.registerLazySingleton<ConfigLogic>(() => ConfigLogic());
 
   group('failure tests', () {
     test(
@@ -29,25 +34,10 @@ void main() {
       () async {
         K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
-        // Create a new identity for local user
-        IdentityInterface katya = Identity();
-        await katya.initNoStorage();
-
-        String katyaPhoneNumber = randomPhoneNumber;
-        String katyaUserName =
-            "Katya${katya.accountId.substring(0, 5)}".toLowerCase();
-
-        // Set katya as signer
-        kc2Service.setKeyring(katya.keyring);
-        debugPrint('Local user katya public address: ${katya.accountId}');
-
-        KC2UserInfo katyaInfo = KC2UserInfo(
-            accountId: katya.accountId,
-            userName: katyaUserName,
-            balance: BigInt.zero,
-            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
-
         final completer = Completer<bool>();
+        TestUserInfo katya = await createLocalUser(completer: completer);
+        await Future.delayed(const Duration(seconds: 12));
+
         String? txHash;
         String? updateTexHash;
         String? err;

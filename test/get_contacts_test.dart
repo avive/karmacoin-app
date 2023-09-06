@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/identity.dart';
 import 'package:karma_coin/logic/identity_interface.dart';
+import 'package:karma_coin/logic/verifier.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
@@ -11,8 +13,13 @@ final random = Random.secure();
 String get randomPhoneNumber => (random.nextInt(900000) + 100000).toString();
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
+  FlutterSecureStorage.setMockInitialValues({});
+
   GetIt.I.registerLazySingleton<K2ServiceInterface>(() => KarmachainService());
-  K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
+  GetIt.I.registerLazySingleton<Verifier>(() => Verifier());
+  GetIt.I.registerLazySingleton<ConfigLogic>(() => ConfigLogic());
 
   group(
     'get contacts tests',

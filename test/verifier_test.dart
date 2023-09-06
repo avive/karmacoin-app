@@ -19,16 +19,15 @@ void main() {
   GetIt.I.registerLazySingleton<KarmachainService>(() => KarmachainService());
   GetIt.I.registerLazySingleton<K2ServiceInterface>(
       () => GetIt.I.get<KarmachainService>());
-
   GetIt.I.registerLazySingleton<Verifier>(() => Verifier());
   GetIt.I.registerLazySingleton<ConfigLogic>(() => ConfigLogic());
+
+  K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
   group('verifier tests', () {
     test(
       'Verify using bypass code',
       () async {
-        K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
-
         final completer = Completer<bool>();
         TestUserInfo katya = await createLocalUser(completer: completer);
         await Future.delayed(const Duration(seconds: 13));

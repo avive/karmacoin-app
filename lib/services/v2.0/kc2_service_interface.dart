@@ -25,8 +25,6 @@ typedef TransferCallback = Future<void> Function(KC2TransferTxV1 tx);
 
 enum FetchAppreciationsStatus { idle, fetching, fetched, error }
 
-String verificationBypassToken = 'dummy';
-
 mixin K2ServiceInterface implements ChainApiProvider {
   /// Get the chain's existential deposit amount
   BigInt get existentialDeposit;
