@@ -16,7 +16,7 @@ class TestUserInfo {
   String? newUserTxHash;
 
   String get phoneNumberHash => userInfo!.phoneNumberHash;
-  String get phoenNumber => user.phoneNumber!;
+  String get phoneNumber => user.phoneNumber!;
   String get accountId => user.accountId;
   String get userName => userInfo!.userName;
 
@@ -69,7 +69,7 @@ Future<TestUserInfo> createLocalUser(
   String? err;
   String? txHash;
 
-  debugPrint('Signin up user...');
+  debugPrint('Signing up user...');
 
   (txHash, err) = await kc2Service.newUser(evidence: vd.data!);
   if (err != null) {
@@ -95,7 +95,7 @@ Future<TestUserInfo> updateLocalUser(
     String? userName,
     String? phoneNumber}) async {
   userName ??= userInfo.userName;
-  phoneNumber ??= userInfo.phoenNumber;
+  phoneNumber ??= userInfo.phoneNumber;
 
   TestUserInfo updatedUserInfo = userInfo.copy();
   updatedUserInfo.userInfo!.userName = userName;

@@ -570,7 +570,7 @@ void main() {
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createLocalUser(completer: completer);
-        TestUserInfo punch = await createLocalUser(completer: completer);
+        await createLocalUser(completer: completer);
 
         // Test utils
         String txHash = "";

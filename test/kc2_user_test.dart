@@ -294,7 +294,7 @@ void main() {
                     expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
                     expect(userInfo.userName, katyaUserName);
 
-                    // expected to see balance reflecting katya's signup-reward and no additional reward for katyas1 signup
+                    // expected to see balance reflecting katya's signup-reward and no additional reward for katya signup
                     expect(userInfo.balance, BigInt.from(10000000));
 
                     KC2UserInfo? oldAccountInfo =
@@ -468,7 +468,7 @@ void main() {
               debugPrint('Katya is signing up...');
               break;
             case SignupStatus.signedUp:
-              debugPrint('Katya signen up');
+              debugPrint('Katya signing up');
 
               // Get userInfo from chain for katya's phone number
               katyaInfo = await kc2Service

@@ -3,9 +3,6 @@ import 'dart:async';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/logic/app_state.dart';
-import 'package:karma_coin/logic/user.dart';
-import 'package:karma_coin/logic/user_interface.dart';
 import 'package:karma_coin/logic/verifier.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
@@ -88,7 +85,7 @@ void main() {
     );
 
     test(
-      'Karma Reward for 2 recieved appreciations',
+      'Karma Reward for 2 received appreciations',
       () async {
         K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 

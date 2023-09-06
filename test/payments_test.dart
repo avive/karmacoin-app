@@ -108,7 +108,7 @@ void main() {
               // Transfer via an appreciation with charTraitId of 0
               // callback from chain should be transfer tx
               transferTxHash = await kc2Service.sendAppreciation(
-                  kc2Service.getPhoneNumberHash(katya.phoenNumber),
+                  kc2Service.getPhoneNumberHash(katya.phoneNumber),
                   BigInt.from(1000),
                   0,
                   0);
