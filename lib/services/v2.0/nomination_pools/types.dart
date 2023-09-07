@@ -163,20 +163,28 @@ class CommissionChangeRate {
 
 class Commission {
   /// The account commission is paid to
+  /// @HolyGrease - what does it mean that there's no beneficiary? that the pool
+  /// has no commision?
   String? beneficiary;
 
   /// Optional commission rate of the pool. [0,...,1B]
+  /// @HolyGrease - what does it mean that a pool doesn't have commision rate.
+  /// Does it mean no commision?
   int? current;
 
   /// Optional maximum commission that can be set by the pool `root`. Once set, this value can only be updated to a decreased value. [0,...,1B]
+  /// @HolyGrease - what does it mean if value is null? there's no commision on the pool?
   int? max;
 
   /// Optional configuration around how often commission can be updated, and when the last commission update took place.
+  /// @HolyGrease - what does it mean if value is null? there's no commision on the pool?
   CommissionChangeRate? changeRate;
 
+  /// Get current commision as a percentage
   double? get currentAsPrercnet =>
       current != null ? current! / 1000000000 : null;
 
+  /// Get max commision as  a precentage
   double? get maxAsPrercnet => max != null ? max! / 1000000000 : null;
 
   /// The block from where throttling should be checked from.
@@ -198,7 +206,7 @@ class Commission {
         throttleFrom = json['throttle_from'];
 }
 
-/// Pool permissions and state
+/// A nomination pool.
 class Pool {
   /// Unique identifier.
   PoolId id;
@@ -218,7 +226,7 @@ class Pool {
   /// See [`PoolRoles`].
   PoolRoles roles;
 
-  /// Current state
+  /// Current state.
   PoolState state;
 
   Pool(this.id, this.bondedAccountId, this.commission, this.memberCounter,

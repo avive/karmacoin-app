@@ -1,12 +1,12 @@
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
-import 'package:karma_coin/ui/widgets/about_karma_mining.dart';
-import 'package:karma_coin/ui/widgets/communities_list.dart';
-import 'package:karma_coin/ui/widgets/delete_account_tile.dart';
+import 'package:karma_coin/ui/screens/about_karma_mining.dart';
+import 'package:karma_coin/ui/screens/communities_list.dart';
+import 'package:karma_coin/ui/components/delete_account_tile.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:badges/badges.dart' as badges;
-import 'package:karma_coin/ui/widgets/leaderboard.dart';
+import 'package:karma_coin/ui/screens/leaderboard.dart';
 
 const _privacyUrl = 'https://karmaco.in/docs/privacy';
 const _supportUrl = 'https://karmaco.in/docs/support';

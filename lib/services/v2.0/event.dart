@@ -39,7 +39,7 @@ class KC2Event {
     final eventName = parts[0].replaceAll('Event::', '').trim();
     parts.removeAt(0);
 
-    // TODO: @a
+    // TODO: @HolyGrease - please fix this
     // $EVENT_DATA is represented as { id: 1 } for example so jsonDecode fails
     // to do this as it expected { "id": 1 }
     Map<String, dynamic> data = {};

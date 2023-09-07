@@ -6,7 +6,7 @@ import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
-import 'package:karma_coin/ui/widgets/pill.dart';
+import 'package:karma_coin/ui/components/pill.dart';
 import 'package:random_avatar/random_avatar.dart';
 
 /// Display transaction details for a a locally available transaction

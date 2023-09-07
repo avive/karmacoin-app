@@ -17,7 +17,7 @@ import 'package:karma_coin/ui/screens/sms_code_input.dart';
 import 'package:karma_coin/ui/screens/user_details.dart';
 import 'package:karma_coin/ui/screens/user_home.dart';
 import 'package:karma_coin/ui/screens/user_name.dart';
-import 'package:karma_coin/ui/widgets/send.dart';
+import 'package:karma_coin/ui/screens/send.dart';
 
 /// Shared paths / urls used across the app
 class ScreenPaths {

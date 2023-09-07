@@ -2,7 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:karma_coin/logic/app.dart';
-import 'package:karma_coin/ui/widgets/app.dart';
+import 'package:karma_coin/ui/components/app.dart';
 import 'firebase_options.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 

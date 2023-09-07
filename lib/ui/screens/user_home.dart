@@ -4,19 +4,18 @@ import 'package:intl/intl.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
-import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
-import 'package:karma_coin/ui/widgets/animated_background.dart';
-import 'package:karma_coin/ui/widgets/animated_wave.dart';
-import 'package:karma_coin/ui/widgets/animated_wave_right.dart';
-import 'package:karma_coin/ui/widgets/appreciate.dart';
+import 'package:karma_coin/ui/screens/appreciate.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
-import 'package:karma_coin/ui/widgets/appreciation_intro.dart';
-import 'package:karma_coin/ui/widgets/appreciation_progress.dart';
-import 'package:karma_coin/ui/widgets/into.dart';
-import 'package:karma_coin/ui/widgets/leaderboard.dart';
-import 'package:karma_coin/ui/widgets/staking_intro.dart';
-import 'package:karma_coin/ui/widgets/traits_scores_wheel.dart';
+import 'package:karma_coin/ui/components/animated_background.dart';
+import 'package:karma_coin/ui/components/animated_wave.dart';
+import 'package:karma_coin/ui/components/animated_wave_right.dart';
+import 'package:karma_coin/ui/components/traits_scores_wheel.dart';
+import 'package:karma_coin/ui/screens/appreciation_intro.dart';
+import 'package:karma_coin/ui/screens/appreciation_progress.dart';
+import 'package:karma_coin/ui/screens/intro.dart';
+import 'package:karma_coin/ui/screens/leaderboard.dart';
+import 'package:karma_coin/ui/screens/staking_intro.dart';
 
 const smallScreenHeight = 1334;
 
@@ -187,7 +186,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   ),
                   CupertinoButton(
                     onPressed: () async {
-                      await earnButtonHandler(context);
+                      await _earnButtonHandler(context);
                     },
                     child: Text(
                       'Earn Karma Coins',
@@ -219,7 +218,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         });
   }
 
-  Future<void> earnButtonHandler(BuildContext context) async {
+  Future<void> _earnButtonHandler(BuildContext context) async {
     if (!context.mounted) return;
 
     Navigator.of(context)
@@ -230,13 +229,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 const StakingIntro())))
         .then((completion) async {
       if (!context.mounted) return;
-      PoolMember? membership = await (kc2Service as KC2NominationPoolsInterface)
-          .getMembershipPool(kc2User.identity.accountId);
+
+      PoolMember? membership = await kc2User.getPoolMembership();
 
       if (membership != null) {
         // local user is member of a pool - show pool details screen
       } else {
-        // local user is not a member of a pook - push pool selection screen
+        // local user is not a member of a pool - push pool selection screen
       }
     });
   }

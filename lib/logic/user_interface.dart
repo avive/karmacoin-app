@@ -35,6 +35,16 @@ enum UpdateResult {
   connectionTimeout;
 }
 
+enum SetMetadataStatus {
+  unknown,
+  updating,
+  updated,
+  invalidData,
+  invalidSignature,
+  serverError,
+  connectionTimeout;
+}
+
 /// Usage patterns:
 /// 1. Create a new KC2UserInteface object
 /// 2. Check hasLocalIdentity to see if user has a local identity persisted on this device.
@@ -56,6 +66,10 @@ abstract class KC2UserInteface {
 
   /// Last known signup failure reason
   SignupFailureReason signupFailureReson = SignupFailureReason.unknown;
+
+  /// Observable set metadata status
+  final ValueNotifier<SetMetadataStatus> setMetadataStatus =
+      ValueNotifier(SetMetadataStatus.unknown);
 
   /// Observeable txs fetching status
   final ValueNotifier<FetchAppreciationsStatus> fetchAppreciationStatus =
@@ -98,6 +112,9 @@ abstract class KC2UserInteface {
   Future<void> updateUserInfo(
       String? requestedUserName, String? requestedPhoneNumber);
 
+  /// Set user metadata
+  Future<void> setMetadata(String metadata);
+
   /// Delete user from karmachain. This will delete all user's data from the chain and local store and will sign out the user. Don't use this user object after calling this method.
   Future<void> deleteUser();
 
@@ -106,6 +123,9 @@ abstract class KC2UserInteface {
 
   /// Update user info from chain via the node's rpc api
   Future<void> getUserDataFromChain();
+
+  /// Get pool membership if user is a pool member
+  Future<PoolMember?> getPoolMembership();
 
   /// Fetch all account related appreciations and payment txs - incoming and outgoing
   /// Client should call this before user wants to view his txs as this is an expensive slow operation.

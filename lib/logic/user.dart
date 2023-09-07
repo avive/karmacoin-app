@@ -23,6 +23,7 @@ class KC2User extends KC2UserInteface {
   // app state when they were submitted in this app session
   late String _signupTxHash = '';
   late String _updateUserTxHash = '';
+  late String _setMetadataTxHash = '';
 
   @override
   ValueNotifier<Map<String, KC2Tx>> get incomingAppreciations =>
@@ -74,6 +75,7 @@ class KC2User extends KC2UserInteface {
 
     kc2Service.newUserCallback = _signupUserCallback;
     kc2Service.updateUserCallback = _updateUserCallback;
+    kc2Service.setMetadataCallback = _setMetadataCallback;
 
     // subscribe to account transactions if we have user info in this session
     // otherwise we'll subscribe o n signup()
@@ -167,6 +169,7 @@ class KC2User extends KC2UserInteface {
     kc2Service.appreciationCallback = null;
     kc2Service.updateUserCallback = null;
     kc2Service.newUserCallback = null;
+    kc2Service.setMetadataCallback = null;
 
     // remove the id from local store
     await _identity.removeFromStore();
@@ -177,6 +180,12 @@ class KC2User extends KC2UserInteface {
   Future<bool> isAccountOnchain(String userName, String phoneNumber) async {
     // todo: implement me
     return false;
+  }
+
+  @override
+  Future<PoolMember?> getPoolMembership() async {
+    return await (kc2Service as KC2NominationPoolsInterface)
+        .getMembershipPool(kc2User.identity.accountId);
   }
 
   void _cancelSubscriptionTimer() {
@@ -341,6 +350,27 @@ class KC2User extends KC2UserInteface {
   }
 
   @override
+  Future<void> setMetadata(String metadata) async {
+    setMetadataStatus.value = SetMetadataStatus.updating;
+
+    Future.delayed(const Duration(seconds: 60), () async {
+      if (setMetadataStatus.value == SetMetadataStatus.updating) {
+        // tx timed out
+        setMetadataStatus.value = SetMetadataStatus.connectionTimeout;
+      }
+    });
+
+    try {
+      _setMetadataTxHash = await kc2Service.setMetadata(metadata);
+      // status updated via callback
+    } catch (e) {
+      debugPrint('failed to set metadata: $e');
+      setMetadataStatus.value = SetMetadataStatus.serverError;
+      return;
+    }
+  }
+
+  @override
   Future<void> updateUserInfo(
       String? requestedUserName, String? requestedPhoneNumber) async {
     String? err;
@@ -435,6 +465,24 @@ class KC2User extends KC2UserInteface {
   @override
   Future<void> deleteUser() async {
     throw UnimplementedError();
+  }
+
+  Future<void> _setMetadataCallback(KC2SetMetadataTxV1 tx) async {
+    if (_setMetadataTxHash != tx.hash) {
+      // not of interest
+      return;
+    }
+
+    // @HolyGrease - update local metadata for user with the value once
+    // we support metadata field for user in userInfo.
+    // something like:
+    // userInfo.value.metadata = tx.metadata;
+
+    tx.chainError != null
+        ? setMetadataStatus.value = SetMetadataStatus.invalidData
+        : setMetadataStatus.value = SetMetadataStatus.updated;
+
+    _setMetadataTxHash = '';
   }
 
   Future<void> _signupUserCallback(KC2NewUserTransactionV1 tx) async {

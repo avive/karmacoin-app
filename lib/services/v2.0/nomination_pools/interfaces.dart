@@ -14,6 +14,20 @@ import 'package:karma_coin/services/v2.0/nomination_pools/txs/withdraw_unbonded.
 import 'package:karma_coin/common_libs.dart';
 import 'package:polkadart/scale_codec.dart';
 
+export 'package:karma_coin/services/v2.0/nomination_pools/txs/claim_commission.dart';
+export 'package:karma_coin/services/v2.0/nomination_pools/txs/claim_payout.dart';
+export 'package:karma_coin/services/v2.0/nomination_pools/txs/create.dart';
+export 'package:karma_coin/services/v2.0/nomination_pools/txs/join.dart';
+export 'package:karma_coin/services/v2.0/nomination_pools/txs/nominate.dart';
+export 'package:karma_coin/services/v2.0/nomination_pools/txs/set_commission.dart';
+export 'package:karma_coin/services/v2.0/nomination_pools/txs/set_commission_change_rate.dart';
+export 'package:karma_coin/services/v2.0/nomination_pools/txs/set_commission_max.dart';
+export 'package:karma_coin/services/v2.0/nomination_pools/txs/unbond.dart';
+export 'package:karma_coin/services/v2.0/nomination_pools/txs/update_roles.dart';
+export 'package:karma_coin/services/v2.0/nomination_pools/txs/withdraw_unbonded.dart';
+export 'package:karma_coin/services/v2.0/nomination_pools/txs/chill.dart';
+export 'package:karma_coin/services/v2.0/nomination_pools/types.dart';
+
 /// Client callback types
 typedef JoinPoolCallback = Future<void> Function(KC2JoinTxV1 tx);
 typedef ClaimPoolPayoutCallback = Future<void> Function(KC2ClaimPayoutTxV1 tx);
@@ -471,13 +485,17 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
     }
   }
 
-  /// Returns list of all on-chain nomination pools.
-  Future<List<Pool>> getPools() async {
+  /// Returns list of on-chain nomination pools.
+  /// Optionally only return pools in the specified state.
+  Future<List<Pool>> getPools({PoolState? state}) async {
     try {
-      final pools = await callRpc('nominationPools_getPools', []).then(
+      List<Pool> pools = await callRpc('nominationPools_getPools', []).then(
           (pools) =>
               pools.map((pool) => Pool.fromJson(pool)).toList().cast<Pool>());
 
+      if (state != null) {
+        pools = pools.where((pool) => pool.state == state).toList();
+      }
       return pools;
     } on PlatformException catch (e) {
       debugPrint('Failed to get nomination pools: ${e.details}');

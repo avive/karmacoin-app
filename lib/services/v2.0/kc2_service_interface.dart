@@ -10,8 +10,6 @@ import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:polkadart/scale_codec.dart';
 import 'package:polkadart/substrate/substrate.dart';
 import 'package:substrate_metadata_fixed/types/metadata_types.dart';
-
-export 'package:karma_coin/services/v2.0/nomination_pools/types.dart';
 export 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 
 /// Client callback types
@@ -264,6 +262,8 @@ mixin K2ServiceInterface implements ChainApiProvider {
     }
   }
 
+  /// @HolyGrease - this is not needed once Contact and KC2UserInfo always
+  /// return metadata from chain as requested
   Future<String?> getMetadata(String accountId) async {
     try {
       List<dynamic>? result =
@@ -351,8 +351,13 @@ mixin K2ServiceInterface implements ChainApiProvider {
   /// Delete user from chain
   Future<String> deleteUser() async {
     try {
-      const call =
-          MapEntry('Identity', MapEntry('delete_user', <String, dynamic>{}));
+      const call = MapEntry(
+        'Identity',
+        MapEntry(
+          'delete_user',
+          <String, dynamic>{},
+        ),
+      );
 
       String deleteAccountTxId = await signAndSendTransaction(call);
       debugPrint('Account deletion tx submitted');
@@ -364,15 +369,24 @@ mixin K2ServiceInterface implements ChainApiProvider {
   }
 
   /// Set metadata for the account. In case if metadata is already set, it will be overwritten
+  /// Returns tx hash
   Future<String> setMetadata(String metadata) async {
     try {
       final bytes = metadata.codeUnits;
 
+      if (bytes.length > 256) {
+        throw ArgumentError('Metadata must be less than 256 bytes');
+      }
+
       final call = MapEntry(
-          'Identity',
-          MapEntry('set_metadata', {
+        'Identity',
+        MapEntry(
+          'set_metadata',
+          {
             'metadata': bytes,
-          }));
+          },
+        ),
+      );
 
       return await signAndSendTransaction(call);
     } on PlatformException catch (e) {
@@ -385,7 +399,12 @@ mixin K2ServiceInterface implements ChainApiProvider {
   Future<String> removeMetadata() async {
     try {
       const call = MapEntry(
-          'Identity', MapEntry('remove_metadata', <String, dynamic>{}));
+        'Identity',
+        MapEntry(
+          'remove_metadata',
+          <String, dynamic>{},
+        ),
+      );
 
       return await signAndSendTransaction(call);
     } on PlatformException catch (e) {
@@ -399,11 +418,12 @@ mixin K2ServiceInterface implements ChainApiProvider {
     appState.txSubmissionStatus.value = TxSubmissionStatus.submitting;
     try {
       final call = MapEntry(
-          'Balances',
-          MapEntry('transfer', {
-            'dest': MapEntry('Id', decodeAccountId(accountId)),
-            'value': amount
-          }));
+        'Balances',
+        MapEntry(
+          'transfer',
+          {'dest': MapEntry('Id', decodeAccountId(accountId)), 'value': amount},
+        ),
+      );
 
       String txHash = await signAndSendTransaction(call);
       appState.txSubmissionStatus.value = TxSubmissionStatus.submitted;
@@ -429,13 +449,17 @@ mixin K2ServiceInterface implements ChainApiProvider {
 
     try {
       final call = MapEntry(
-          'Appreciation',
-          MapEntry('appreciation', {
+        'Appreciation',
+        MapEntry(
+          'appreciation',
+          {
             'to': MapEntry('PhoneNumberHash', hex.decode(phoneNumberHash)),
             'amount': amount,
             'community_id': Option.some(communityId),
             'char_trait_id': Option.some(charTraitId),
-          }));
+          },
+        ),
+      );
 
       String txHash = await signAndSendTransaction(call);
       appState.txSubmissionStatus.value = TxSubmissionStatus.submitted;
@@ -451,11 +475,15 @@ mixin K2ServiceInterface implements ChainApiProvider {
   Future<String> setAdmin(int communityId, String accountId) async {
     try {
       final call = MapEntry(
-          'Appreciation',
-          MapEntry('set_admin', {
+        'Appreciation',
+        MapEntry(
+          'set_admin',
+          {
             'community_id': communityId,
             'new_admin': MapEntry('AccountId', decodeAccountId(accountId)),
-          }));
+          },
+        ),
+      );
 
       return await signAndSendTransaction(call);
     } on PlatformException catch (e) {

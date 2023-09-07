@@ -9,7 +9,7 @@ import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/ui/helpers/transactions.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
-import 'package:karma_coin/ui/widgets/pill.dart';
+import 'package:karma_coin/ui/components/pill.dart';
 
 enum Group { received, sent }
 

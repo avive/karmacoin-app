@@ -2,9 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
-import 'package:karma_coin/ui/widgets/animated_background.dart';
-import 'package:karma_coin/ui/widgets/animated_wave.dart';
-import 'package:karma_coin/ui/widgets/animated_wave_right.dart';
+import 'package:karma_coin/ui/components/animated_background.dart';
+import 'package:karma_coin/ui/components/animated_wave.dart';
+import 'package:karma_coin/ui/components/animated_wave_right.dart';
 import 'package:status_alert/status_alert.dart';
 
 /// temp screen with some

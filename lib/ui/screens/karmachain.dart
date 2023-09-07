@@ -4,7 +4,7 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
-import 'package:karma_coin/ui/widgets/users_browser.dart';
+import 'package:karma_coin/ui/screens/users_browser.dart';
 import 'package:status_alert/status_alert.dart';
 import 'package:substrate_metadata_fixed/models/models.dart';
 import 'package:time_ago_provider/time_ago_provider.dart' as time_ago;

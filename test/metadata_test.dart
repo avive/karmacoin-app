@@ -20,6 +20,8 @@ void main() {
   GetIt.I.registerLazySingleton<K2ServiceInterface>(
           () => GetIt.I.get<KarmachainService>());
 
+  const String metadata = "https://linktr.ee/karmaco.in";
+
   group('Metadata tests', () {
     test(
       'set metadata for account',
@@ -63,15 +65,14 @@ void main() {
           // Check if the pool is created
           final result = await kc2Service.getMetadata(katya.accountId);
           expect(result, isNotNull);
-          expect(result, 'metadata');
+          expect(result, metadata);
 
           completer.complete(true);
         };
 
         kc2Service.subscribeToAccountTransactions(katyaInfo);
 
-        // Create a pool
-        txHash = await kc2Service.setMetadata('metadata');
+        txHash = await kc2Service.setMetadata(metadata);
 
         // Wait for completer and verify test success
         expect(await completer.future, equals(true));
@@ -134,7 +135,6 @@ void main() {
 
         kc2Service.subscribeToAccountTransactions(katyaInfo);
 
-        // Create a pool
         txHash = await kc2Service.setMetadata('metadata');
 
         // Wait for completer and verify test success
@@ -211,7 +211,6 @@ void main() {
 
         kc2Service.subscribeToAccountTransactions(katyaInfo);
 
-        // Create a pool
         txHash = await kc2Service.setMetadata('metadata');
 
         // Wait for completer and verify test success

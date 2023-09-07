@@ -2,6 +2,8 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/v2.0/interfaces.dart';
 import 'package:karma_coin/services/v2.0/staking/types.dart';
 
+
+
 mixin KC2StakingInterface on ChainApiProvider {
   /// Returns the nominations of the specified validator account.
   Future<Nominations?> getNominations(String accountId) async {
