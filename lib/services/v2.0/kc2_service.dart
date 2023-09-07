@@ -197,6 +197,9 @@ class KarmachainService extends ChainApiProvider
   /// Returns hex string hash without a trailing '0x'
   @override
   String getPhoneNumberHash(String phoneNumber) {
+    if (!phoneNumber.startsWith('+')) {
+      throw ArgumentError('Phone number must be + prefixed');
+    }
     final phoneNumberHash = hasher.hashString(phoneNumber);
     return hex.encode(phoneNumberHash);
   }
