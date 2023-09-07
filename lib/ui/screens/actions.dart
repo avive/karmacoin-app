@@ -1,12 +1,14 @@
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/pool_member.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/ui/screens/about_karma_mining.dart';
-import 'package:karma_coin/ui/screens/communities_list.dart';
 import 'package:karma_coin/ui/components/delete_account_tile.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:karma_coin/ui/screens/leaderboard.dart';
+import 'package:karma_coin/ui/screens/pools.dart';
+import 'package:karma_coin/ui/screens/staking_intro.dart';
 import 'package:karma_coin/ui/screens/user_metadata.dart';
 
 const _privacyUrl = 'https://karmaco.in/docs/privacy';
@@ -26,6 +28,31 @@ class ActionsScreen extends StatefulWidget {
 }
 
 class _ActionsScreenState extends State<ActionsScreen> {
+  /// Show pools or user's current pool after intro
+  Future<void> _earnButtonHandler(BuildContext context) async {
+    Navigator.of(context)
+        .push(CupertinoPageRoute(
+            fullscreenDialog: true,
+            builder: ((context) =>
+                // push intro screen here
+                const StakingIntro())))
+        .then((completion) async {
+      if (!context.mounted) return;
+
+      PoolMember? membership = await kc2User.getPoolMembership();
+
+      if (membership != null) {
+        // TODO: implement me
+        // local user is member of a pool - show pool details screen
+      } else {
+        if (context.mounted) {
+          // local user is not a member of a pool - push pool selection screen
+          context.push(ScreenPaths.pools);
+        }
+      }
+    });
+  }
+
   Widget _getAppreciationsIcon(BuildContext context) {
     return ValueListenableBuilder<Map<String, KC2Tx>>(
         valueListenable: kc2User.incomingAppreciations,
@@ -104,12 +131,20 @@ class _ActionsScreenState extends State<ActionsScreen> {
                   );
                 }),
             CupertinoListTile.notched(
+                title: const Text('Mine & Earn'),
+                leading: const FaIcon(FontAwesomeIcons.coins, size: 24),
+                onTap: () async {
+                  await _earnButtonHandler(context);
+                }),
+            CupertinoListTile.notched(
                 title: const Text('Learn More'),
                 leading: const FaIcon(FontAwesomeIcons.circleInfo, size: 24),
                 onTap: () async {
                   await openUrl(configLogic.learnYoutubePlaylistUrl);
                 }),
           ]),
+
+      /*
       CupertinoListSection.insetGrouped(
         header: Text(
           'COMMUNITIES',
@@ -119,7 +154,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
               ),
         ),
         children: const <Widget>[CommunitiesListSection()],
-      ),
+      ),*/
       CupertinoListSection.insetGrouped(
         header: Text(
           'ACCOUNT',

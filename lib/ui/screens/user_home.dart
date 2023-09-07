@@ -234,9 +234,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       PoolMember? membership = await kc2User.getPoolMembership();
 
       if (membership != null) {
+        // TODO: implement me
         // local user is member of a pool - show pool details screen
       } else {
-        // local user is not a member of a pool - push pool selection screen
+        if (context.mounted) {
+          // local user is not a member of a pool - push pool selection screen
+          context.push(ScreenPaths.pools);
+        }
       }
     });
   }

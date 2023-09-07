@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:random_avatar/random_avatar.dart';
+// import 'package:random_avatar/random_avatar.dart';
 import 'package:status_alert/status_alert.dart';
 
 const _aboutPoolsUrl = 'https://karmaco.in/pools/';
@@ -79,18 +80,6 @@ class _PoolsScreenState extends State<PoolsScreen> {
 
     List<Widget> widgets = [];
 
-    widgets.add(Padding(
-        padding: const EdgeInsets.only(left: 24, right: 24, top: 12),
-        child: Text('Open Pools',
-            textAlign: TextAlign.center,
-            style: CupertinoTheme.of(context).textTheme.pickerTextStyle)));
-
-    widgets.add(CupertinoButton(
-        child: const Text('Learn more...'),
-        onPressed: () {
-          openUrl(_aboutPoolsUrl);
-        }));
-
     if (entries != null) {
       if (entries!.isNotEmpty) {
         widgets.add(_getPoolsWidget(context));
@@ -106,6 +95,12 @@ class _PoolsScreenState extends State<PoolsScreen> {
           ),
         );
       }
+
+      widgets.add(CupertinoButton(
+          child: const Text('Learn more...'),
+          onPressed: () {
+            openUrl(_aboutPoolsUrl);
+          }));
     }
 
     return Padding(
@@ -136,6 +131,26 @@ class _PoolsScreenState extends State<PoolsScreen> {
   }
 
   Widget _getPoolWidget(BuildContext context, Pool entry, int index) {
+    return CupertinoListSection.insetGrouped(
+      key: Key(index.toString()),
+      header: Text(
+        'KARMA COINS',
+        style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+              const TextStyle(
+                  fontSize: 14, color: CupertinoColors.inactiveGray),
+            ),
+      ),
+      children: <CupertinoListTile>[
+        CupertinoListTile.notched(
+          title: const Text('Send Karma Coin'),
+          leading: const FaIcon(FontAwesomeIcons.moneyBillTransfer, size: 24),
+          trailing: const CupertinoListTileChevron(),
+          onTap: () => context.push(ScreenPaths.send),
+        ),
+      ],
+    );
+
+    /*
     return CupertinoListTile(
       key: Key(index.toString()),
       padding: const EdgeInsets.only(top: 0, bottom: 6, left: 14, right: 14),
@@ -147,7 +162,7 @@ class _PoolsScreenState extends State<PoolsScreen> {
         ),
       ),
       leading: RandomAvatar(entry.roles.root!, height: 50, width: 50),
-    );
+    );*/
   }
 
   @override
@@ -160,16 +175,6 @@ class _PoolsScreenState extends State<PoolsScreen> {
             padding: EdgeInsetsDirectional.zero,
             backgroundColor: kcPurple,
             border: kcOrangeBorder,
-            leading: Container(),
-            trailing: adjustNavigationBarButtonPosition(
-                CupertinoButton(
-                  onPressed: () {
-                    context.pop();
-                  },
-                  child: const Icon(CupertinoIcons.xmark_circle, size: 24),
-                ),
-                0,
-                0),
             largeTitle: Center(
               child: Text('☥ MINING POOLS',
                   style: getNavBarTitleTextStyle(context)),

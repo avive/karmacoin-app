@@ -5,6 +5,7 @@ import 'package:karma_coin/ui/screens/backup_account.dart';
 import 'package:karma_coin/ui/screens/community_home.dart';
 import 'package:karma_coin/ui/screens/karmachain.dart';
 import 'package:karma_coin/ui/screens/payment_tx_details.dart';
+import 'package:karma_coin/ui/screens/pools.dart';
 import 'package:karma_coin/ui/screens/signup_progress.dart';
 import 'package:karma_coin/ui/screens/welcome.dart';
 import 'package:karma_coin/ui/screens/profile.dart';
@@ -37,6 +38,9 @@ class ScreenPaths {
 
   /// About screen
   static String about = '/about';
+
+  /// Pools screen
+  static String pools = '/pools';
 
   // about karmachain screen
   static String karmaChain = '/karmachain';
@@ -130,6 +134,9 @@ class ScreenNames {
   /// about screen
   static String about = 'about';
 
+  /// Pools screen
+  static String pools = '/pools';
+
   // scruity words screen
   static String securityWords = 'security words';
 
@@ -211,6 +218,12 @@ final GoRouter appRouter = GoRouter(
         builder: (BuildContext context, GoRouterState state) {
           final String userName = Uri.decodeFull(state.params['username']!);
           return ProfileScreen(ValueKey(userName), userName);
+        }),
+    GoRoute(
+        name: ScreenNames.pools,
+        path: ScreenPaths.pools,
+        builder: (BuildContext context, GoRouterState state) {
+          return const PoolsScreen();
         }),
     GoRoute(
         // New User name input screen
