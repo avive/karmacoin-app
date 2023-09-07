@@ -145,6 +145,7 @@ void main() {
         await Future.delayed(const Duration(seconds: 12));
 
         // Test utils
+        Timer? blocksProcessingTimer;
         String txHash = "";
 
         // Create pool callback
@@ -166,10 +167,12 @@ void main() {
               .firstWhere((pool) => pool.roles.depositor == katya.accountId);
           final poolId = pool.id;
 
+          // Unsubscribe from Alice's transactions
+          blocksProcessingTimer?.cancel();
+          // Listen to Punch transactions
+          blocksProcessingTimer = kc2Service.subscribeToAccountTransactions(punch.userInfo!);
           // Punch join the pool
           kc2Service.setKeyring(punch.user.keyring);
-          // Listen to Punch transactions
-          kc2Service.subscribeToAccountTransactions(punch.userInfo!);
           txHash = await kc2Service.join(BigInt.from(1000000), poolId);
         };
 
@@ -201,8 +204,9 @@ void main() {
           completer.complete(true);
         };
 
-        kc2Service.subscribeToAccountTransactions(katya.userInfo!);
+        blocksProcessingTimer = kc2Service.subscribeToAccountTransactions(katya.userInfo!);
 
+        kc2Service.setKeyring(katya.user.keyring);
         // Create a pool
         txHash = await kc2Service.createPool(
             amount: GenesisConfig.kCentsPerCoinBigInt,
@@ -541,7 +545,8 @@ void main() {
         };
 
         kc2Service.subscribeToAccountTransactions(katya.userInfo!);
-
+        //
+        kc2Service.setKeyring(katya.user.keyring);
         // Create a pool
         txHash = await kc2Service.createPool(
           amount: GenesisConfig.kCentsPerCoinBigInt,
@@ -632,6 +637,7 @@ void main() {
 
         kc2Service.subscribeToAccountTransactions(katya.userInfo!);
 
+        kc2Service.setKeyring(katya.user.keyring);
         // Create a pool
         txHash = await kc2Service.createPool(
           amount: BigInt.from(1000000),
