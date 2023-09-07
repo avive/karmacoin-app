@@ -356,7 +356,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   /// - If a `null` is supplied to `commission` and `beneficiary`, existing
   ///   commission will be removed.
   /// - Both `commission` and `beneficiary` must be supplied or be `null`.
-  /// - commision range [0.0,...,1.0].
+  /// - Commision range [0.0,...,1.0].
   ///
   ///
   Future<String> setPoolCommission(
@@ -389,10 +389,9 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
 
   /// Set the maximum commission of a pool.
   ///
-  /// - Initial max can be set to any percentage, and only smaller values
+  /// - Initial max can be set to any percentage up to the chain's global max commision %, and only smaller values
   ///   thereafter.
-  /// - Current commission will be lowered in the event it is higher than a
-  ///   new max commission.
+  /// - Current commission will be lowered in the event it is higher than a new max commission.
   /// - maxCommision range [0.0,...,1.0]
   Future<String> setPoolCommissionMax(
       PoolId poolId, double maxCommission) async {

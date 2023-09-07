@@ -183,6 +183,8 @@ class _PoolsScreenState extends State<PoolsScreen> {
           // todo: format this properly
           creator.userName),
       trailing: const CupertinoListTileChevron(),
+      onTap: () => context.pushNamed(ScreenNames.account,
+          params: {'accountId': creator.accountId}),
     ));
 
     KC2UserInfo? nominator = pool.nominator;
@@ -194,18 +196,42 @@ class _PoolsScreenState extends State<PoolsScreen> {
             // todo: format this properly
             nominator.userName),
         trailing: const CupertinoListTileChevron(),
+        onTap: () => context.pushNamed(ScreenNames.account,
+            params: {'accountId': nominator.accountId}),
       ));
     }
 
     KC2UserInfo? bouncer = pool.bouncer;
     if (bouncer != null) {
       tiles.add(CupertinoListTile.notched(
-        title: const Text('Nominator'),
+        title: const Text('Bouncer'),
         leading: RandomAvatar(bouncer.userName, height: 50, width: 50),
         subtitle: Text(
             // todo: format this properly
             bouncer.userName),
         trailing: const CupertinoListTileChevron(),
+        onTap: () => context.pushNamed(ScreenNames.account,
+            params: {'accountId': bouncer.accountId}),
+      ));
+    }
+
+    tiles.add(CupertinoListTile.notched(
+      title: const Text('Commision'),
+      trailing: Text('${pool.commission.currentAsPrercnet.toString()}%'),
+    ));
+
+    KC2UserInfo? commisionBeneficiary = pool.commisionBeneficiary;
+    if (commisionBeneficiary != null) {
+      tiles.add(CupertinoListTile.notched(
+        title: const Text('Nominator'),
+        leading:
+            RandomAvatar(commisionBeneficiary.userName, height: 50, width: 50),
+        subtitle: Text(
+            // todo: format this properly
+            commisionBeneficiary.userName),
+        trailing: const CupertinoListTileChevron(),
+        onTap: () => context.pushNamed(ScreenNames.account,
+            params: {'accountId': commisionBeneficiary.accountId}),
       ));
     }
 

@@ -29,7 +29,7 @@ class Commission {
 
   /// Get current commision as a percentage
   double? get currentAsPrercnet =>
-      current != null ? current! / 1000000000 : null;
+      current != null ? current! / 1000000000 : 0.0;
 
   /// Get max commision as a precentage
   double? get maxAsPrercnet => max != null ? max! / 1000000000 : null;

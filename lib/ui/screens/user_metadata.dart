@@ -18,6 +18,7 @@ class _SetMetadataScreenState extends State<SetMetadataScreen> {
   bool apiDown = false;
   late final _textController = TextEditingController();
   bool isSubmitInProgress = false;
+  String? onChainMetadata;
 
   @override
   void initState() {
@@ -27,6 +28,7 @@ class _SetMetadataScreenState extends State<SetMetadataScreen> {
 
     kc2Service.getMetadata(kc2User.identity.accountId).then((value) {
       if (value != null) {
+        onChainMetadata = value;
         _textController.text = value;
       }
     });
@@ -151,6 +153,19 @@ class _SetMetadataScreenState extends State<SetMetadataScreen> {
         duration: const Duration(seconds: 2),
         title: 'Ooops',
         subtitle: 'Please enter your social link. e.g. linktr.ee/you',
+        configuration: const IconConfiguration(
+            icon: CupertinoIcons.exclamationmark_triangle),
+        maxWidth: statusAlertWidth,
+      );
+      return;
+    }
+
+    if (onChainMetadata == metadata) {
+      StatusAlert.show(
+        context,
+        duration: const Duration(seconds: 2),
+        title: 'No Change',
+        subtitle: 'This is already your social link.',
         configuration: const IconConfiguration(
             icon: CupertinoIcons.exclamationmark_triangle),
         maxWidth: statusAlertWidth,

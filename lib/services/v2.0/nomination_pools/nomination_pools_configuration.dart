@@ -22,7 +22,7 @@ class NominationPoolsConfiguration {
 
   /// The maximum commission that can be charged by a pool.
   /// @HolyGrease - in what units is this? [0,...,1B]?
-  /// Why BigInt and not int?
+  /// Why BigInt and not int if max is 1B?
   BigInt globalMaxCommission;
 
   NominationPoolsConfiguration(

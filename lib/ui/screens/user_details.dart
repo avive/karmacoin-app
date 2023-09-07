@@ -155,9 +155,8 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
     }
 
     if (socialUrl != null) {
-      final String url = socialUrl!.startsWith('https://')
-          ? socialUrl!
-          : 'https://$socialUrl!';
+      final String url =
+          socialUrl!.startsWith('https://') ? socialUrl! : 'https://$socialUrl';
 
       tiles.add(
         CupertinoListTile.notched(

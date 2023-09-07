@@ -38,6 +38,10 @@ class Pool {
   KC2UserInfo? get nominator =>
       roles.bouncer != null ? poolsUsers[roles.nominator] : null;
 
+  KC2UserInfo? get commisionBeneficiary => commission.beneficiary != null
+      ? poolsUsers[commission.beneficiary]
+      : null;
+
   Pool(this.id, this.bondedAccountId, this.commission, this.memberCounter,
       this.points, this.roles, this.state);
 
@@ -73,6 +77,10 @@ class Pool {
 
     if (roles.bouncer != null) {
       await _addPoolUser(roles.bouncer!);
+    }
+
+    if (commission.beneficiary != null) {
+      await _addPoolUser(commission.beneficiary!);
     }
 
     // TODO: get rid of this when user info returned from server includes social url (metadata)

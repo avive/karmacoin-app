@@ -1,3 +1,5 @@
+/// Shared types used in pools classes
+
 /// Type mapping to on-chain type for a unique pool id
 typedef PoolId = int;
 
@@ -12,5 +14,3 @@ enum ConfigOption {
   /// Remove from storage
   remove,
 }
-
-
