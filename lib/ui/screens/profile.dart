@@ -33,6 +33,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool apiOffline = false;
   bool userNotFound = false;
   KC2UserInfo? userInfo;
+  String? socialUrl;
 
   @override
   void initState() {
@@ -60,10 +61,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
 
       try {
-        // change to kc2 api
-
         KC2UserInfo? info =
             await kc2Service.getUserInfoByUserName(widget.userName);
+
+        if (info != null) {
+          // TODO: remove this once metadata is part of KC2UserInfo
+          socialUrl = await kc2Service.getMetadata(info.accountId);
+        }
 
         setState(() {
           if (info != null) {
@@ -140,12 +144,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             _getKarmaScoreWidget(context),
-            TraitsViewer(null, userInfo!.getScores(0))
+            TraitsViewer(null, userInfo!.getScores(0)),
+            _getSocialProfile(context),
           ],
         ),
         _getActionArea(context),
       ]),
     );
+  }
+
+  Widget _getSocialProfile(BuildContext context) {
+    if (socialUrl == null) {
+      return Container();
+    }
+
+    final String url =
+        socialUrl!.startsWith('https://') ? socialUrl! : 'https://$socialUrl!';
+
+    return CupertinoButton(
+        child: Text(socialUrl!,
+            style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                  const TextStyle(color: CupertinoColors.activeBlue),
+                )),
+        onPressed: () async {
+          if (!context.mounted) return;
+          await openUrl(url);
+        });
   }
 
   Widget _getActionArea(BuildContext context) {

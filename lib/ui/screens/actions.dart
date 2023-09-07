@@ -130,7 +130,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
         ),
         children: <CupertinoListTile>[
           CupertinoListTile.notched(
-              title: const Text('Social Profile Link'),
+              title: const Text('Social Profile'),
               leading: const Icon(CupertinoIcons.person_circle, size: 28),
               onTap: () {
                 if (!context.mounted) return;

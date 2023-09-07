@@ -25,6 +25,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
   late bool isLocal = false;
   late final String? phoneNumber = null;
   late bool userNotFound = false;
+  late String? socialUrl;
 
   @override
   void initState() {
@@ -51,6 +52,12 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
         }
         local = true;
       }
+
+      if (u != null) {
+        // TODO: remove this once metadata is part of KC2UserInfo
+        socialUrl = await kc2Service.getMetadata(u.accountId);
+      }
+
       setState(() {
         user = u;
         isLocal = local;
@@ -147,7 +154,31 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
       );
     }
 
-    String uri = Uri.encodeFull('https://app.karmaco.in/#/p/${u.userName}');
+    if (socialUrl != null) {
+      final String url = socialUrl!.startsWith('https://')
+          ? socialUrl!
+          : 'https://$socialUrl!';
+
+      tiles.add(
+        CupertinoListTile.notched(
+          title: Text('Social Profile',
+              style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
+          leading: const Icon(CupertinoIcons.globe, size: 28),
+          subtitle: Text(
+            url,
+            style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                  const TextStyle(color: CupertinoColors.activeBlue),
+                ),
+          ),
+          onTap: () async {
+            await openUrl(url);
+          },
+        ),
+      );
+    }
+
+    final String uri =
+        Uri.encodeFull('https://app.karmaco.in/#/p/${u.userName}');
 
     tiles.add(
       CupertinoListTile.notched(
