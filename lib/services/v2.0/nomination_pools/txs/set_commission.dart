@@ -3,6 +3,7 @@ import 'package:karma_coin/services/v2.0/event.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:ss58/ss58.dart' as ss58;
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 
 /// Set the commission of a pool. Pool as a validator can set its own commission.
 ///

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/pool_member.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:karma_coin/ui/screens/appreciate.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';

@@ -1,4 +1,9 @@
 import 'package:karma_coin/services/v2.0/interfaces.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/commission_change_rate.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/nomination_pools_configuration.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/pool.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/pool_member.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/pool_state.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/chill.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/claim_commission.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/claim_payout.dart';
@@ -12,6 +17,7 @@ import 'package:karma_coin/services/v2.0/nomination_pools/txs/unbond.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/update_roles.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/withdraw_unbonded.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/types.dart';
 import 'package:polkadart/scale_codec.dart';
 
 export 'package:karma_coin/services/v2.0/nomination_pools/txs/claim_commission.dart';
@@ -26,6 +32,14 @@ export 'package:karma_coin/services/v2.0/nomination_pools/txs/unbond.dart';
 export 'package:karma_coin/services/v2.0/nomination_pools/txs/update_roles.dart';
 export 'package:karma_coin/services/v2.0/nomination_pools/txs/withdraw_unbonded.dart';
 export 'package:karma_coin/services/v2.0/nomination_pools/txs/chill.dart';
+
+export 'package:karma_coin/services/v2.0/nomination_pools/commission_change_rate.dart';
+export 'package:karma_coin/services/v2.0/nomination_pools/commission.dart';
+export 'package:karma_coin/services/v2.0/nomination_pools/nomination_pools_configuration.dart';
+export 'package:karma_coin/services/v2.0/nomination_pools/pool_member.dart';
+export 'package:karma_coin/services/v2.0/nomination_pools/pool_roles.dart';
+export 'package:karma_coin/services/v2.0/nomination_pools/pool_state.dart';
+export 'package:karma_coin/services/v2.0/nomination_pools/pool.dart';
 export 'package:karma_coin/services/v2.0/nomination_pools/types.dart';
 
 /// Client callback types

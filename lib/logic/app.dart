@@ -18,7 +18,6 @@ import 'package:karma_coin/services/v2.0/kc2_service.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 
 export 'package:karma_coin/services/v2.0/kc2_service.dart';
-export 'package:karma_coin/services/v2.0/nomination_pools/types.dart';
 
 /// Add syntax sugar for quickly accessing the main "logic" controllers in the app
 KC2AppLogic get appLogic => GetIt.I.get<KC2AppLogic>();
