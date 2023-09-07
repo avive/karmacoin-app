@@ -1,7 +1,6 @@
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/user_interface.dart';
-import 'package:karma_coin/logic/user_name_availability.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:status_alert/status_alert.dart';
 

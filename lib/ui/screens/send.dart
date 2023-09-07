@@ -1,14 +1,14 @@
 import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/data/genesis_config.dart';
+import 'package:karma_coin/ui/components/amount_input.dart';
+import 'package:karma_coin/ui/components/send_destination.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
-import 'package:karma_coin/ui/widgets/components/amount_input.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:status_alert/status_alert.dart';
-import 'package:karma_coin/ui/components/components/send_destination.dart';
 
 class SendWidget extends StatefulWidget {
   const SendWidget({super.key});
