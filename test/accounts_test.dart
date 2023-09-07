@@ -62,7 +62,7 @@ void main() {
           }
 
           expect(tx.accountId, katya.accountId);
-          expect(tx.phoneNumberHash, '0x$phoneNumberHash');
+          expect(tx.phoneNumberHash, phoneNumberHash);
           expect(tx.username, katyaUserName);
           expect(tx.signer, katya.accountId);
 
@@ -77,7 +77,7 @@ void main() {
           }
 
           expect(userInfo.accountId, katya.accountId);
-          expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
+          expect(userInfo.phoneNumberHash, phoneNumberHash);
           expect(userInfo.userName, katyaUserName);
 
           expect(userInfo.traitScores[0], isNotNull);
@@ -94,7 +94,7 @@ void main() {
           }
 
           expect(userInfo.accountId, katya.accountId);
-          expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
+          expect(userInfo.phoneNumberHash, phoneNumberHash);
           expect(userInfo.userName, katyaUserName);
 
           userInfo = await kc2Service.getUserInfoByUserName(katyaUserName);
@@ -105,7 +105,7 @@ void main() {
           }
 
           expect(userInfo.accountId, katya.accountId);
-          expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
+          expect(userInfo.phoneNumberHash, phoneNumberHash);
           expect(userInfo.userName, katyaUserName);
 
           completer.complete(true);
@@ -187,7 +187,7 @@ void main() {
             return;
           }
 
-          expect(tx.phoneNumberHash, '0x$newPhoneNumberHash');
+          expect(tx.phoneNumberHash, newPhoneNumberHash);
           expect(tx.signer, katya.accountId);
 
           // all 3 methods should return's Katya's account data
@@ -201,7 +201,7 @@ void main() {
           }
 
           expect(userInfo.accountId, katya.accountId);
-          expect(userInfo.phoneNumberHash, '0x$newPhoneNumberHash');
+          expect(userInfo.phoneNumberHash, newPhoneNumberHash);
           expect(userInfo.userName, katyaUserName);
 
           // get the user by updated phone number
@@ -215,7 +215,7 @@ void main() {
           }
 
           expect(userInfo.accountId, katya.accountId);
-          expect(userInfo.phoneNumberHash, '0x$newPhoneNumberHash');
+          expect(userInfo.phoneNumberHash, newPhoneNumberHash);
           expect(userInfo.userName, katyaUserName);
 
           userInfo = await kc2Service.getUserInfoByUserName(katyaUserName);
@@ -226,7 +226,7 @@ void main() {
           }
 
           expect(userInfo.accountId, katya.accountId);
-          expect(userInfo.phoneNumberHash, '0x$newPhoneNumberHash');
+          expect(userInfo.phoneNumberHash, newPhoneNumberHash);
           expect(userInfo.userName, katyaUserName);
 
           completer.complete(true);
@@ -366,7 +366,7 @@ void main() {
           }
 
           expect(userInfo.accountId, katya.accountId);
-          expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
+          expect(userInfo.phoneNumberHash, phoneNumberHash);
           expect(userInfo.userName, katyaNewUserName);
 
           // get the user by updated phone number
@@ -380,7 +380,7 @@ void main() {
           }
 
           expect(userInfo.accountId, katya.accountId);
-          expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
+          expect(userInfo.phoneNumberHash, phoneNumberHash);
           expect(userInfo.userName, katyaNewUserName);
 
           userInfo = await kc2Service.getUserInfoByUserName(katyaNewUserName);
@@ -391,7 +391,7 @@ void main() {
           }
 
           expect(userInfo.accountId, katya.accountId);
-          expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
+          expect(userInfo.phoneNumberHash, phoneNumberHash);
           expect(userInfo.userName, katyaNewUserName);
 
           completer.complete(true);
