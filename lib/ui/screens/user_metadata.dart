@@ -22,8 +22,14 @@ class _SetMetadataScreenState extends State<SetMetadataScreen> {
   @override
   void initState() {
     super.initState();
-    // todo: @HolyGrease - populate text field with current user's metadata
+    // TODO: populate text field with current user's metadata
     // once it is part of kc2User - should be loaded on new app session start from chain...
+
+    kc2Service.getMetadata(kc2User.identity.accountId).then((value) {
+      if (value != null) {
+        _textController.text = value;
+      }
+    });
   }
 
   @override
@@ -78,13 +84,10 @@ class _SetMetadataScreenState extends State<SetMetadataScreen> {
               color = CupertinoTheme.of(context).textTheme.textStyle.color;
               break;
             case SetMetadataStatus.updated:
-              cancelSubmit = true;
               text = 'Social link saved';
               color = CupertinoColors.activeGreen;
               kc2User.setMetadataStatus.value = SetMetadataStatus.unknown;
-              setState(() {
-                isSubmitInProgress = false;
-              });
+              isSubmitInProgress = false;
               Future.delayed(Duration.zero, () {
                 if (context.mounted) {
                   Navigator.of(context).pop();
@@ -93,26 +96,20 @@ class _SetMetadataScreenState extends State<SetMetadataScreen> {
               break;
             case SetMetadataStatus.invalidData:
               text = 'Server error. Please try again later.';
-              cancelSubmit = true;
+              isSubmitInProgress = false;
               break;
             case SetMetadataStatus.invalidSignature:
               text = 'Invalid signature. Please try again later.';
-              cancelSubmit = true;
+              isSubmitInProgress = false;
               break;
             case SetMetadataStatus.serverError:
               text = 'Server error. Please try again later.';
-              cancelSubmit = true;
+              isSubmitInProgress = false;
               break;
             case SetMetadataStatus.connectionTimeout:
               text = 'Connection timeout. Please try again later.';
-              cancelSubmit = true;
-              break;
-          }
-
-          if (cancelSubmit) {
-            setState(() {
               isSubmitInProgress = false;
-            });
+              break;
           }
 
           Text textWidget = Text(
@@ -205,7 +202,7 @@ class _SetMetadataScreenState extends State<SetMetadataScreen> {
           context,
           duration: const Duration(seconds: 2),
           title: 'Too long',
-          subtitle: 'Please make link shorter.',
+          subtitle: 'Please make your link shorter.',
           configuration: const IconConfiguration(
               icon: CupertinoIcons.exclamationmark_triangle),
           maxWidth: statusAlertWidth,
@@ -227,12 +224,15 @@ class _SetMetadataScreenState extends State<SetMetadataScreen> {
   Widget _getTextField(BuildContext context) {
     return Title(
       color: CupertinoColors.black, // This is required
-      title: 'Enter your social Link. e.g. linktr.ee/you',
+      title: 'Social media link',
       child: Column(
         children: [
+          Text('Enter your social media link. e.g. linktr.ee/you',
+              style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
+          const SizedBox(height: 14),
           CupertinoTextField(
             prefix: const Icon(
-              CupertinoIcons.person_solid,
+              CupertinoIcons.person_crop_circle,
               color: CupertinoColors.lightBackgroundGray,
               size: 28,
             ),
@@ -240,6 +240,7 @@ class _SetMetadataScreenState extends State<SetMetadataScreen> {
             autocorrect: false,
             clearButtonMode: OverlayVisibilityMode.editing,
             placeholder: 'Social link',
+            maxLength: 128,
             style: CupertinoTheme.of(context).textTheme.textStyle,
             textAlign: TextAlign.center,
             padding: const EdgeInsets.all(16.0),

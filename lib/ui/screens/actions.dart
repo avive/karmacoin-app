@@ -7,6 +7,7 @@ import 'package:karma_coin/ui/components/delete_account_tile.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:karma_coin/ui/screens/leaderboard.dart';
+import 'package:karma_coin/ui/screens/user_metadata.dart';
 
 const _privacyUrl = 'https://karmaco.in/docs/privacy';
 const _supportUrl = 'https://karmaco.in/docs/support';
@@ -128,6 +129,18 @@ class _ActionsScreenState extends State<ActionsScreen> {
               ),
         ),
         children: <CupertinoListTile>[
+          CupertinoListTile.notched(
+              title: const Text('Social profile link'),
+              leading: const Icon(CupertinoIcons.person_circle, size: 28),
+              onTap: () {
+                if (!context.mounted) return;
+                Navigator.of(context).push(
+                  CupertinoPageRoute(
+                    fullscreenDialog: true,
+                    builder: ((context) => const SetMetadataScreen()),
+                  ),
+                );
+              }),
           CupertinoListTile.notched(
             title: const Text('Account Details'),
             leading: const Icon(CupertinoIcons.person, size: 28),
