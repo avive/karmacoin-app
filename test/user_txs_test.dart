@@ -6,6 +6,7 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/logic/user.dart';
 import 'package:karma_coin/logic/user_interface.dart';
+import 'package:karma_coin/logic/verifier.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 
 final random = Random.secure();
@@ -19,6 +20,8 @@ void main() {
   K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
   GetIt.I.registerLazySingleton<AppState>(() => AppState());
   GetIt.I.registerLazySingleton<KC2UserInteface>(() => KC2User());
+  GetIt.I.registerLazySingleton<Verifier>(() => Verifier());
+  GetIt.I.registerLazySingleton<ConfigLogic>(() => ConfigLogic());
 
   group('kc2 user txs tests', () {
     test(

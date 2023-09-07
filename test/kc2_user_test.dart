@@ -7,6 +7,7 @@ import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/logic/user.dart';
 import 'package:karma_coin/logic/user_interface.dart';
+import 'package:karma_coin/logic/verifier.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
@@ -21,6 +22,8 @@ void main() {
   GetIt.I.registerLazySingleton<K2ServiceInterface>(() => KarmachainService());
   GetIt.I.registerLazySingleton<AppState>(() => AppState());
   GetIt.I.registerLazySingleton<KC2UserInteface>(() => KC2User());
+  GetIt.I.registerLazySingleton<Verifier>(() => Verifier());
+  GetIt.I.registerLazySingleton<ConfigLogic>(() => ConfigLogic());
 
   K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
@@ -61,7 +64,7 @@ void main() {
               }
 
               expect(userInfo.accountId, katya.identity.accountId);
-              expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
+              expect(userInfo.phoneNumberHash, phoneNumberHash);
               expect(userInfo.userName, katyaUserName);
               expect(userInfo.traitScores[0], isNotNull);
               expect(userInfo.traitScores[0]!.length, 1);
@@ -291,7 +294,7 @@ void main() {
 
                     expect(userInfo, isNotNull);
                     expect(userInfo!.accountId, katya1.identity.accountId);
-                    expect(userInfo.phoneNumberHash, '0x$phoneNumberHash');
+                    expect(userInfo.phoneNumberHash, phoneNumberHash);
                     expect(userInfo.userName, katyaUserName);
 
                     // expected to see balance reflecting katya's signup-reward and no additional reward for katya signup
@@ -518,8 +521,6 @@ void main() {
                       expect(katya1Info.phoneNumberHash, '0x$phoneNumberHash');
                       expect(katya1Info.userName, katyaUserName);
 
-                      // @Danylo Kyrieiev  this should be 1 - existential deposit
-                      // as soon as your change is merged
                       expect(katya1Info.balance, BigInt.zero);
                       await katya1.signout();
                       completer.complete(true);
