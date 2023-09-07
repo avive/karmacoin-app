@@ -171,7 +171,7 @@ mixin K2ServiceInterface implements ChainApiProvider {
         .decode(Input.fromBytes(transaction.transaction.transactionBody));
 
     String hash =
-        '0x${hex.encode(Hasher.blake2b256.hash(ExtrinsicsCodec(chainInfo: chainInfo).encode(extrinsic)))}';
+        hex.encode(Hasher.blake2b256.hash(ExtrinsicsCodec(chainInfo: chainInfo).encode(extrinsic)));
 
     return await KC2Tx.getKC2Transaction(
         tx: extrinsic,

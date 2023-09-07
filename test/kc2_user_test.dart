@@ -183,10 +183,10 @@ void main() {
 
         String phoneNumber = randomPhoneNumber;
         String phoneNumberHash =
-            '0x${kc2Service.getPhoneNumberHash(phoneNumber)}';
+            kc2Service.getPhoneNumberHash(phoneNumber);
         String phoneNumber1 = randomPhoneNumber;
         String phoneNumberHash1 =
-            '0x${kc2Service.getPhoneNumberHash(phoneNumber1)}';
+            kc2Service.getPhoneNumberHash(phoneNumber1);
 
         final completer = Completer<bool>();
 

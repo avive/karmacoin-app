@@ -100,7 +100,7 @@ abstract class KC2Tx {
     }
 
     hash ??=
-        '0x${hex.encode(Hasher.blake2b256.hash(ExtrinsicsCodec(chainInfo: chainInfo).encode(tx)))}';
+        hex.encode(Hasher.blake2b256.hash(ExtrinsicsCodec(chainInfo: chainInfo).encode(tx)));
 
     final String pallet = tx['calls'].key;
     final String method = tx['calls'].value.key;

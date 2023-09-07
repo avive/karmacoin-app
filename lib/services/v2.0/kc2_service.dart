@@ -100,7 +100,7 @@ class KarmachainService extends ChainApiProvider
       final extrinsics = block['block']['extrinsics'].map((encodedExtrinsic) {
         final extrinsic = _decodeTransaction(Input.fromHex(encodedExtrinsic));
         final extrinsicHash =
-            '0x${hex.encode(Hasher.blake2b256.hashString(encodedExtrinsic))}';
+            hex.encode(Hasher.blake2b256.hashString(encodedExtrinsic));
 
         return MapEntry(extrinsicHash, extrinsic);
       }).toList();
@@ -240,7 +240,7 @@ class KarmachainService extends ChainApiProvider
           blockData['block']['extrinsics'].map((encodedExtrinsic) {
         final extrinsic = _decodeTransaction(Input.fromHex(encodedExtrinsic));
         final extrinsicHash =
-            '0x${hex.encode(Hasher.blake2b256.hash(Uint8List.fromList(hex.decode(encodedExtrinsic.substring(2)))))}';
+            hex.encode(Hasher.blake2b256.hash(Uint8List.fromList(hex.decode(encodedExtrinsic.substring(2)))));
 
         return MapEntry(extrinsicHash, extrinsic);
       }).toList();
@@ -316,7 +316,7 @@ class KarmachainService extends ChainApiProvider
 
       /// Use provided hash or generate one if needed
       hash ??=
-          '0x${hex.encode(Hasher.blake2b256.hash(ExtrinsicsCodec(chainInfo: chainInfo).encode(tx)))}';
+          hex.encode(Hasher.blake2b256.hash(ExtrinsicsCodec(chainInfo: chainInfo).encode(tx)));
 
       debugPrint("Processing tx $pallet/$method. txHash: $hash");
 

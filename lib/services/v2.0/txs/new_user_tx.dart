@@ -26,8 +26,7 @@ class KC2NewUserTransactionV1 extends KC2Tx {
       final accountId =
           ss58.Codec(netId).encode(args['account_id'].cast<int>());
       final username = args['username'];
-      final phoneNumberHash =
-          '0x${hex.encode(args['phone_number_hash'].cast<int>())}';
+      final phoneNumberHash = hex.encode(args['phone_number_hash'].cast<int>());
 
       return KC2NewUserTransactionV1(
           accountId: accountId,

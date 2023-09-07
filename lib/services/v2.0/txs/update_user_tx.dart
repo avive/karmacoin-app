@@ -25,7 +25,7 @@ class KC2UpdateUserTxV1 extends KC2Tx {
       final phoneNumberHashOption = args['phone_number_hash'].value;
       final phoneNumberHash = phoneNumberHashOption == null
           ? null
-          : '0x${hex.encode(phoneNumberHashOption.cast<int>())}';
+          : hex.encode(phoneNumberHashOption.cast<int>());
 
       return KC2UpdateUserTxV1(
         username: username,
