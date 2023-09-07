@@ -48,7 +48,7 @@ typedef ClaimPoolPayoutCallback = Future<void> Function(KC2ClaimPayoutTxV1 tx);
 typedef UnbondPoolCallback = Future<void> Function(KC2UnbondTxV1 tx);
 typedef WithdrawUnbondedPoolCallback = Future<void> Function(
     KC2WithdrawUnbondedTxV1 tx);
-typedef CreatePoolCallback = Future<void> Function(KC2CreateTxV1 tx);
+typedef CreatePoolCallback = Future<void> Function(KC2CreatePoolTxV1 tx);
 typedef NominatePoolValidatorCallback = Future<void> Function(
     KC2NominateTxV1 tx);
 typedef ChillPoolCallback = Future<void> Function(KC2ChillTxV1 tx);

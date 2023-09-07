@@ -126,7 +126,7 @@ class _StakingIntroState extends State<StakingIntro> {
                 0),
             largeTitle: Center(
               child: Center(
-                child: Text('STAKE & EARN',
+                child: Text('MINE & EARN',
                     style: getNavBarTitleTextStyle(context)),
               ),
             ),

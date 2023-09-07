@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:random_avatar/random_avatar.dart';
 // import 'package:random_avatar/random_avatar.dart';
 import 'package:status_alert/status_alert.dart';
+
+import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 
 const _aboutPoolsUrl = 'https://karmaco.in/pools/';
 
@@ -100,8 +101,8 @@ class _PoolsScreenState extends State<PoolsScreen> {
 
       widgets.add(CupertinoButton(
           child: const Text('Learn more...'),
-          onPressed: () {
-            openUrl(_aboutPoolsUrl);
+          onPressed: () async {
+            await openUrl(_aboutPoolsUrl);
           }));
     }
 
@@ -137,7 +138,7 @@ class _PoolsScreenState extends State<PoolsScreen> {
     if (pool.socialUrl != null) {
       String url = pool.socialUrl!.startsWith("https://")
           ? pool.socialUrl!
-          : "https://${pool.socialUrl!}";
+          : "https://${pool.socialUrl}";
 
       tiles.add(CupertinoListTile.notched(
         title: Text('Web Profile',
@@ -235,13 +236,16 @@ class _PoolsScreenState extends State<PoolsScreen> {
       ));
     }
 
-    tiles.add(CupertinoListTile.notched(
+    tiles.add(
+      CupertinoListTile.notched(
         title: CupertinoButton(
-      onPressed: () {
-        // TODO:: push join pool screen
-      },
-      child: const Text('Join'),
-    )));
+          onPressed: () {
+            // TODO: push join pool screen
+          },
+          child: const Text('Join'),
+        ),
+      ),
+    );
 
     return CupertinoListSection.insetGrouped(
         key: Key(index.toString()),

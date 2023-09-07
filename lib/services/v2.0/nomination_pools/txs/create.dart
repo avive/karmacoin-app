@@ -4,13 +4,13 @@ import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:ss58/ss58.dart' as ss58;
 
-class KC2CreateTxV1 extends KC2Tx {
+class KC2CreatePoolTxV1 extends KC2Tx {
   BigInt amount;
   String root;
   String nominator;
   String bouncer;
 
-  static KC2CreateTxV1 createCreatedTx(
+  static KC2CreatePoolTxV1 createCreatedTx(
       {required String hash,
       required int timestamp,
       required String signer,
@@ -29,7 +29,7 @@ class KC2CreateTxV1 extends KC2Tx {
       final bouncer =
           ss58.Codec(netId).encode(args['bouncer'].value.cast<int>());
 
-      return KC2CreateTxV1(
+      return KC2CreatePoolTxV1(
         amount: amount,
         root: root,
         nominator: nominator,
@@ -50,7 +50,7 @@ class KC2CreateTxV1 extends KC2Tx {
     }
   }
 
-  KC2CreateTxV1(
+  KC2CreatePoolTxV1(
       {required this.amount,
       required this.root,
       required this.nominator,

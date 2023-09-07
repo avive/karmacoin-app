@@ -209,7 +209,6 @@ class _SendWidgetState extends State<SendWidget> {
   void initState() {
     super.initState();
 
-    String defaultNumber = configLogic.devMode ? "549805380" : "";
     IsoCode code = configLogic.devMode ? IsoCode.IL : IsoCode.US;
 
     // set default country code from user's mobile number's country code
@@ -223,13 +222,15 @@ class _SendWidgetState extends State<SendWidget> {
       }
     }
 
+    String defaultNumber = configLogic.devMode ? "549805380" : "";
+
     phoneController =
         PhoneController(PhoneNumber(isoCode: code, nsn: defaultNumber));
 
     if (defaultNumber.isNotEmpty) {
       // set hash as default when we have set default number
       appState.sendDestinationPhoneNumberHash.value =
-          kc2Service.getPhoneNumberHash(defaultNumber);
+          kc2Service.getPhoneNumberHash('+972$defaultNumber');
     }
   }
 

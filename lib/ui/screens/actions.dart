@@ -7,7 +7,6 @@ import 'package:karma_coin/ui/components/delete_account_tile.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:karma_coin/ui/screens/leaderboard.dart';
-import 'package:karma_coin/ui/screens/pools.dart';
 import 'package:karma_coin/ui/screens/staking_intro.dart';
 import 'package:karma_coin/ui/screens/user_metadata.dart';
 

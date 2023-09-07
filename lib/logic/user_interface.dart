@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/identity_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
@@ -45,6 +46,16 @@ enum SetMetadataStatus {
   connectionTimeout;
 }
 
+enum CreatePoolStatus {
+  unknown,
+  creating,
+  created,
+  invalidData,
+  invalidSignature,
+  serverError,
+  connectionTimeout;
+}
+
 /// Usage patterns:
 /// 1. Create a new KC2UserInteface object
 /// 2. Check hasLocalIdentity to see if user has a local identity persisted on this device.
@@ -70,6 +81,10 @@ abstract class KC2UserInteface {
   /// Observable set metadata status
   final ValueNotifier<SetMetadataStatus> setMetadataStatus =
       ValueNotifier(SetMetadataStatus.unknown);
+
+  /// Observable create pool status
+  final ValueNotifier<CreatePoolStatus> createPoolStatus =
+      ValueNotifier(CreatePoolStatus.unknown);
 
   /// Observeable txs fetching status
   final ValueNotifier<FetchAppreciationsStatus> fetchAppreciationStatus =
@@ -114,6 +129,12 @@ abstract class KC2UserInteface {
 
   /// Set user metadata
   Future<void> setMetadata(String metadata);
+
+  Future<void> createPool(
+      {required BigInt amount,
+      required String root,
+      required String nominator,
+      required String bouncer});
 
   /// Delete user from karmachain. This will delete all user's data from the chain and local store and will sign out the user. Don't use this user object after calling this method.
   Future<void> deleteUser();

@@ -6,6 +6,7 @@ import 'package:karma_coin/services/v2.0/error.dart';
 import 'package:karma_coin/services/v2.0/interfaces.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/event.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 import 'package:karma_coin/services/v2.0/staking/interfaces.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
@@ -239,8 +240,8 @@ class KarmachainService extends ChainApiProvider
       final extrinsics =
           blockData['block']['extrinsics'].map((encodedExtrinsic) {
         final extrinsic = _decodeTransaction(Input.fromHex(encodedExtrinsic));
-        final extrinsicHash =
-            hex.encode(Hasher.blake2b256.hash(Uint8List.fromList(hex.decode(encodedExtrinsic.substring(2)))));
+        final extrinsicHash = hex.encode(Hasher.blake2b256.hash(
+            Uint8List.fromList(hex.decode(encodedExtrinsic.substring(2)))));
 
         return MapEntry(extrinsicHash, extrinsic);
       }).toList();
@@ -315,8 +316,8 @@ class KarmachainService extends ChainApiProvider
       }
 
       /// Use provided hash or generate one if needed
-      hash ??=
-          hex.encode(Hasher.blake2b256.hash(ExtrinsicsCodec(chainInfo: chainInfo).encode(tx)));
+      hash ??= hex.encode(Hasher.blake2b256
+          .hash(ExtrinsicsCodec(chainInfo: chainInfo).encode(tx)));
 
       debugPrint("Processing tx $pallet/$method. txHash: $hash");
 
@@ -427,7 +428,7 @@ class KarmachainService extends ChainApiProvider
       }
 
       if (signer == userInfo.accountId &&
-          transaction is KC2CreateTxV1 &&
+          transaction is KC2CreatePoolTxV1 &&
           createPoolCallback != null) {
         await createPoolCallback!(transaction);
         return;

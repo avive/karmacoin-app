@@ -8,6 +8,7 @@ import 'package:karma_coin/logic/txs_boss2_interface.dart';
 import 'package:karma_coin/logic/user_interface.dart';
 import 'package:karma_coin/logic/verifier.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:karma_coin/data/verify_number_request.dart' as vnr;
@@ -24,6 +25,7 @@ class KC2User extends KC2UserInteface {
   late String _signupTxHash = '';
   late String _updateUserTxHash = '';
   late String _setMetadataTxHash = '';
+  late String _createPoolTxHash = '';
 
   @override
   ValueNotifier<Map<String, KC2Tx>> get incomingAppreciations =>
@@ -76,6 +78,7 @@ class KC2User extends KC2UserInteface {
     kc2Service.newUserCallback = _signupUserCallback;
     kc2Service.updateUserCallback = _updateUserCallback;
     kc2Service.setMetadataCallback = _setMetadataCallback;
+    kc2Service.createPoolCallback = _createPoolCallback;
 
     // subscribe to account transactions if we have user info in this session
     // otherwise we'll subscribe o n signup()
@@ -170,6 +173,7 @@ class KC2User extends KC2UserInteface {
     kc2Service.updateUserCallback = null;
     kc2Service.newUserCallback = null;
     kc2Service.setMetadataCallback = null;
+    kc2Service.createPoolCallback = null;
 
     // remove the id from local store
     await _identity.removeFromStore();
@@ -348,6 +352,36 @@ class KC2User extends KC2UserInteface {
   }
 
   @override
+  Future<void> createPool(
+      {required BigInt amount,
+      required String root,
+      required String nominator,
+      required String bouncer}) async {
+    createPoolStatus.value = CreatePoolStatus.creating;
+
+    Future.delayed(const Duration(seconds: 60), () async {
+      if (createPoolStatus.value == CreatePoolStatus.creating) {
+        // tx timed out
+        createPoolStatus.value = CreatePoolStatus.connectionTimeout;
+      }
+    });
+
+    try {
+      _createPoolTxHash = await (kc2Service as KC2NominationPoolsInterface)
+          .createPool(
+              amount: amount,
+              root: root,
+              nominator: nominator,
+              bouncer: bouncer);
+      // status updated via callback
+    } catch (e) {
+      debugPrint('failed to set metadata: $e');
+      createPoolStatus.value = CreatePoolStatus.serverError;
+      return;
+    }
+  }
+
+  @override
   Future<void> setMetadata(String metadata) async {
     setMetadataStatus.value = SetMetadataStatus.updating;
 
@@ -463,6 +497,19 @@ class KC2User extends KC2UserInteface {
   @override
   Future<void> deleteUser() async {
     throw UnimplementedError();
+  }
+
+  Future<void> _createPoolCallback(KC2CreatePoolTxV1 tx) async {
+    if (_createPoolTxHash != tx.hash) {
+      // not of interest
+      return;
+    }
+
+    tx.chainError != null
+        ? createPoolStatus.value = CreatePoolStatus.invalidData
+        : createPoolStatus.value = CreatePoolStatus.created;
+
+    _createPoolTxHash = '';
   }
 
   Future<void> _setMetadataCallback(KC2SetMetadataTxV1 tx) async {

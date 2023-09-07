@@ -99,8 +99,8 @@ abstract class KC2Tx {
       return null;
     }
 
-    hash ??=
-        hex.encode(Hasher.blake2b256.hash(ExtrinsicsCodec(chainInfo: chainInfo).encode(tx)));
+    hash ??= hex.encode(Hasher.blake2b256
+        .hash(ExtrinsicsCodec(chainInfo: chainInfo).encode(tx)));
 
     final String pallet = tx['calls'].key;
     final String method = tx['calls'].value.key;
@@ -248,7 +248,7 @@ abstract class KC2Tx {
     }
 
     if (pallet == 'NominationPools' && method == 'create') {
-      return KC2CreateTxV1.createCreatedTx(
+      return KC2CreatePoolTxV1.createCreatedTx(
           hash: hash,
           timestamp: timestamp,
           signer: signer,

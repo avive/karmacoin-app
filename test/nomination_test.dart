@@ -8,6 +8,7 @@ import 'package:karma_coin/logic/identity.dart';
 import 'package:karma_coin/logic/identity_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/logic/verifier.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 
 import 'utils.dart';
 
@@ -171,7 +172,8 @@ void main() {
           // Unsubscribe from Alice's transactions
           blocksProcessingTimer?.cancel();
           // Listen to Punch transactions
-          blocksProcessingTimer = kc2Service.subscribeToAccountTransactions(punch.userInfo!);
+          blocksProcessingTimer =
+              kc2Service.subscribeToAccountTransactions(punch.userInfo!);
           // Punch join the pool
           kc2Service.setKeyring(punch.user.keyring);
           txHash = await kc2Service.join(BigInt.from(1000000), poolId);
@@ -205,7 +207,8 @@ void main() {
           completer.complete(true);
         };
 
-        blocksProcessingTimer = kc2Service.subscribeToAccountTransactions(katya.userInfo!);
+        blocksProcessingTimer =
+            kc2Service.subscribeToAccountTransactions(katya.userInfo!);
 
         kc2Service.setKeyring(katya.user.keyring);
         // Create a pool

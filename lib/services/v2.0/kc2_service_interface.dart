@@ -4,13 +4,13 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/services/v2.0/event.dart';
 import 'package:karma_coin/services/v2.0/interfaces.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:polkadart/scale_codec.dart';
 import 'package:polkadart/substrate/substrate.dart';
 import 'package:substrate_metadata_fixed/types/metadata_types.dart';
-export 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 
 /// Client callback types
 typedef NewUserCallback = Future<void> Function(KC2NewUserTransactionV1 tx);
@@ -20,6 +20,7 @@ typedef RemoveMetadataCallback = Future<void> Function(
 typedef SetMetadataCallback = Future<void> Function(KC2SetMetadataTxV1 tx);
 typedef AppreciationCallback = Future<void> Function(KC2AppreciationTxV1 tx);
 typedef TransferCallback = Future<void> Function(KC2TransferTxV1 tx);
+typedef CreatePoolCallback = Future<void> Function(KC2CreatePoolTxV1 tx);
 
 enum FetchAppreciationsStatus { idle, fetching, fetched, error }
 
@@ -170,8 +171,8 @@ mixin K2ServiceInterface implements ChainApiProvider {
     final extrinsic = ExtrinsicsCodec(chainInfo: chainInfo)
         .decode(Input.fromBytes(transaction.transaction.transactionBody));
 
-    String hash =
-        hex.encode(Hasher.blake2b256.hash(ExtrinsicsCodec(chainInfo: chainInfo).encode(extrinsic)));
+    String hash = hex.encode(Hasher.blake2b256
+        .hash(ExtrinsicsCodec(chainInfo: chainInfo).encode(extrinsic)));
 
     return await KC2Tx.getKC2Transaction(
         tx: extrinsic,
@@ -526,6 +527,9 @@ mixin K2ServiceInterface implements ChainApiProvider {
 
   /// Callback when account set metadata
   SetMetadataCallback? setMetadataCallback;
+
+  /// Callback when pool is created
+  CreatePoolCallback? createPoolCallback;
 
   /// Callback when account remove metadata
   RemoveMetadataCallback? removeMetadataCallback;
