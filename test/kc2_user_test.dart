@@ -518,7 +518,7 @@ void main() {
 
                       expect(katya1Info, isNotNull);
                       expect(katya1Info!.accountId, katya1.identity.accountId);
-                      expect(katya1Info.phoneNumberHash, '0x$phoneNumberHash');
+                      expect(katya1Info.phoneNumberHash, phoneNumberHash);
                       expect(katya1Info.userName, katyaUserName);
 
                       expect(katya1Info.balance, BigInt.zero);
