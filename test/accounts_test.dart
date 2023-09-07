@@ -10,8 +10,7 @@ import 'package:karma_coin/logic/verifier.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
-final random = Random.secure();
-String get randomPhoneNumber => (random.nextInt(900000) + 100000).toString();
+import 'utils.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

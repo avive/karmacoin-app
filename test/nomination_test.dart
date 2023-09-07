@@ -8,6 +8,7 @@ import 'package:karma_coin/logic/identity.dart';
 import 'package:karma_coin/logic/identity_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/logic/verifier.dart';
+
 import 'utils.dart';
 
 void main() {
