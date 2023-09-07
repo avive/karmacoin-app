@@ -4,8 +4,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/app_state.dart';
-import 'package:karma_coin/logic/user.dart';
-import 'package:karma_coin/logic/user_interface.dart';
 import 'package:karma_coin/logic/verifier.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
@@ -20,6 +18,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   FlutterSecureStorage.setMockInitialValues({});
 
+  GetIt.I.registerLazySingleton<AppState>(() => AppState());
   GetIt.I.registerLazySingleton<K2ServiceInterface>(() => KarmachainService());
   GetIt.I.registerLazySingleton<Verifier>(() => Verifier());
   GetIt.I.registerLazySingleton<ConfigLogic>(() => ConfigLogic());
@@ -88,7 +87,7 @@ void main() {
     );
 
     test(
-      'Karma Reward for 2 recieved appreciations',
+      'Karma Reward for 2 received appreciations',
       () async {
         K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
@@ -136,15 +135,15 @@ void main() {
           }
         };
 
-        // send 2 appreciations from punch to katya
+        // Subscribe to punch account
+        kc2Service.subscribeToAccountTransactions(punch.userInfo!);
 
         // Set punch as signer
         kc2Service.setKeyring(punch.user.keyring);
         debugPrint('Local user punch public address: ${punch.user.accountId}');
-
+        // Send 2 appreciations from punch to katya
         appreciation1TxHash = await kc2Service.sendAppreciation(
             katya.userInfo!.phoneNumberHash, BigInt.from(1000), 0, 35);
-
         appreciation2TxHash = await kc2Service.sendAppreciation(
             katya.userInfo!.phoneNumberHash, BigInt.from(1000), 0, 35);
 

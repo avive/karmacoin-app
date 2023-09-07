@@ -7,10 +7,8 @@ import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/logic/identity.dart';
 import 'package:karma_coin/logic/identity_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
-import 'package:karma_coin/services/v2.0/user_info.dart';
-
-final random = Random.secure();
-String get randomPhoneNumber => (random.nextInt(900000) + 100000).toString();
+import 'package:karma_coin/logic/verifier.dart';
+import 'utils.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +18,8 @@ void main() {
   GetIt.I.registerLazySingleton<KarmachainService>(() => KarmachainService());
   GetIt.I.registerLazySingleton<K2ServiceInterface>(
       () => GetIt.I.get<KarmachainService>());
-
+  GetIt.I.registerLazySingleton<Verifier>(() => Verifier());
+  GetIt.I.registerLazySingleton<ConfigLogic>(() => ConfigLogic());
   // @HolyGrease - we need the following basic pools integration test:
   // 1. create a nominator and have nominator nominate the devnet's validator.
   // 3. create pool and nominate the nominator.
@@ -45,25 +44,11 @@ void main() {
         // Connect to the chain
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
-        // Create a new identity for local user
-        IdentityInterface katya = Identity();
-        await katya.initNoStorage();
-        String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
-        String katyaPhoneNumber = randomPhoneNumber;
-        kc2Service.setKeyring(katya.keyring);
-        KC2UserInfo katyaInfo = KC2UserInfo(
-            accountId: katya.accountId,
-            userName: katyaUserName,
-            balance: BigInt.zero,
-            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
-
-        // Assume sign up flow works successfully, just wait to tx complete
-        await kc2Service.newUser(
-            katya.accountId, katyaUserName, katyaPhoneNumber);
+        final completer = Completer<bool>();
+        TestUserInfo katya = await createLocalUser(completer: completer);
         await Future.delayed(const Duration(seconds: 12));
 
         // Test utils
-        final completer = Completer<bool>();
         String txHash = "";
 
         // Create pool callback
@@ -125,7 +110,7 @@ void main() {
           completer.complete(true);
         };
 
-        kc2Service.subscribeToAccountTransactions(katyaInfo);
+        kc2Service.subscribeToAccountTransactions(katya.userInfo!);
 
         // Create a pool
         txHash = await kc2Service.createPool(
@@ -154,40 +139,13 @@ void main() {
         // Connect to the chain
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
-        // Create a new identity for local user Katya
-        IdentityInterface katya = Identity();
-        await katya.initNoStorage();
-        String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
-        String katyaPhoneNumber = randomPhoneNumber;
-        // Create a new identity for local user Punch
-        IdentityInterface punch = Identity();
-        await punch.initNoStorage();
-        String punchUserName = "Punch${katya.accountId.substring(0, 5)}";
-        String punchPhoneNumber = randomPhoneNumber;
-
-        kc2Service.setKeyring(katya.keyring);
-        await kc2Service.newUser(
-            katya.accountId, katyaUserName, katyaPhoneNumber);
-        kc2Service.setKeyring(punch.keyring);
-        await kc2Service.newUser(
-            punch.accountId, punchUserName, punchPhoneNumber);
+        final completer = Completer<bool>();
+        TestUserInfo katya = await createLocalUser(completer: completer);
+        TestUserInfo punch = await createLocalUser(completer: completer);
         await Future.delayed(const Duration(seconds: 12));
 
-        kc2Service.setKeyring(katya.keyring);
-
-        KC2UserInfo punchInfo = KC2UserInfo(
-            accountId: punch.accountId,
-            userName: punchUserName,
-            balance: BigInt.zero,
-            phoneNumberHash: kc2Service.getPhoneNumberHash(punchPhoneNumber));
-
-        KC2UserInfo katyaInfo = KC2UserInfo(
-            accountId: katya.accountId,
-            userName: katyaUserName,
-            balance: BigInt.zero,
-            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
-
-        final completer = Completer<bool>();
+        // Test utils
+        Timer? blocksProcessingTimer;
         String txHash = "";
 
         // Create pool callback
@@ -209,10 +167,12 @@ void main() {
               .firstWhere((pool) => pool.roles.depositor == katya.accountId);
           final poolId = pool.id;
 
-          // Punch join the pool
-          kc2Service.setKeyring(punch.keyring);
+          // Unsubscribe from Alice's transactions
+          blocksProcessingTimer?.cancel();
           // Listen to Punch transactions
-          kc2Service.subscribeToAccountTransactions(punchInfo);
+          blocksProcessingTimer = kc2Service.subscribeToAccountTransactions(punch.userInfo!);
+          // Punch join the pool
+          kc2Service.setKeyring(punch.user.keyring);
           txHash = await kc2Service.join(BigInt.from(1000000), poolId);
         };
 
@@ -244,8 +204,9 @@ void main() {
           completer.complete(true);
         };
 
-        kc2Service.subscribeToAccountTransactions(katyaInfo);
+        blocksProcessingTimer = kc2Service.subscribeToAccountTransactions(katya.userInfo!);
 
+        kc2Service.setKeyring(katya.user.keyring);
         // Create a pool
         txHash = await kc2Service.createPool(
             amount: GenesisConfig.kCentsPerCoinBigInt,
@@ -272,26 +233,11 @@ void main() {
         // Connect to the chain
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
-        // Create a new identity for local user
-        IdentityInterface katya = Identity();
-        await katya.initNoStorage();
-        String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
-        String katyaPhoneNumber = randomPhoneNumber;
-        kc2Service.setKeyring(katya.keyring);
-
-        KC2UserInfo katyaInfo = KC2UserInfo(
-            accountId: katya.accountId,
-            userName: katyaUserName,
-            balance: BigInt.zero,
-            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
-
-        // Assume sign up flow works successfully, just wait to tx complete
-        await kc2Service.newUser(
-            katya.accountId, katyaUserName, katyaPhoneNumber);
+        final completer = Completer<bool>();
+        TestUserInfo katya = await createLocalUser(completer: completer);
         await Future.delayed(const Duration(seconds: 12));
 
         // Test utils
-        final completer = Completer<bool>();
         String txHash = "";
 
         // Create pool callback
@@ -339,7 +285,7 @@ void main() {
           completer.complete(true);
         };
 
-        kc2Service.subscribeToAccountTransactions(katyaInfo);
+        kc2Service.subscribeToAccountTransactions(katya.userInfo!);
 
         // Create a pool
         txHash = await kc2Service.createPool(
@@ -368,26 +314,11 @@ void main() {
         // Connect to the chain
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
-        // Create a new identity for local user
-        IdentityInterface katya = Identity();
-        await katya.initNoStorage();
-        String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
-        String katyaPhoneNumber = randomPhoneNumber;
-        kc2Service.setKeyring(katya.keyring);
-
-        KC2UserInfo katyaInfo = KC2UserInfo(
-            accountId: katya.accountId,
-            userName: katyaUserName,
-            balance: BigInt.zero,
-            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
-
-        // Assume sign up flow works successfully, just wait to tx complete
-        await kc2Service.newUser(
-            katya.accountId, katyaUserName, katyaPhoneNumber);
+        final completer = Completer<bool>();
+        TestUserInfo katya = await createLocalUser(completer: completer);
         await Future.delayed(const Duration(seconds: 12));
 
         // Test utils
-        final completer = Completer<bool>();
         String txHash = "";
 
         // Create pool callback
@@ -436,7 +367,7 @@ void main() {
           completer.complete(true);
         };
 
-        kc2Service.subscribeToAccountTransactions(katyaInfo);
+        kc2Service.subscribeToAccountTransactions(katya.userInfo!);
 
         // Create a pool
         txHash = await kc2Service.createPool(
@@ -465,26 +396,11 @@ void main() {
         // Connect to the chain
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
-        // Create a new identity for local user
-        IdentityInterface katya = Identity();
-        await katya.initNoStorage();
-        String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
-        String katyaPhoneNumber = randomPhoneNumber;
-        kc2Service.setKeyring(katya.keyring);
-
-        KC2UserInfo katyaInfo = KC2UserInfo(
-            accountId: katya.accountId,
-            userName: katyaUserName,
-            balance: BigInt.zero,
-            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
-
-        // Assume sign up flow works successfully, just wait to tx complete
-        await kc2Service.newUser(
-            katya.accountId, katyaUserName, katyaPhoneNumber);
+        final completer = Completer<bool>();
+        TestUserInfo katya = await createLocalUser(completer: completer);
         await Future.delayed(const Duration(seconds: 12));
 
         // Test utils
-        final completer = Completer<bool>();
         String txHash = "";
 
         // Create pool callback
@@ -536,7 +452,7 @@ void main() {
           completer.complete(true);
         };
 
-        kc2Service.subscribeToAccountTransactions(katyaInfo);
+        kc2Service.subscribeToAccountTransactions(katya.userInfo!);
 
         // Create a pool
         txHash = await kc2Service.createPool(
@@ -566,38 +482,11 @@ void main() {
         // Connect to the chain
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
-        // Create a new identity for local user Katya
-        IdentityInterface katya = Identity();
-        await katya.initNoStorage();
-        String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
-        String katyaPhoneNumber = randomPhoneNumber;
-
-        // Create a new identity for local user Punch
-        IdentityInterface punch = Identity();
-        await punch.initNoStorage();
-        String punchUserName = "Punch${katya.accountId.substring(0, 5)}";
-        String punchPhoneNumber = randomPhoneNumber;
-
-        // Assume sign up flow works successfully, just wait to tx complete,
-        // sign up both Katya and Punch
-        kc2Service.setKeyring(katya.keyring);
-        await kc2Service.newUser(
-            katya.accountId, katyaUserName, katyaPhoneNumber);
-        kc2Service.setKeyring(punch.keyring);
-        await kc2Service.newUser(
-            punch.accountId, punchUserName, punchPhoneNumber);
-        await Future.delayed(const Duration(seconds: 12));
-
-        kc2Service.setKeyring(katya.keyring);
-
-        KC2UserInfo katyaInfo = KC2UserInfo(
-            accountId: katya.accountId,
-            userName: katyaUserName,
-            balance: BigInt.zero,
-            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
+        final completer = Completer<bool>();
+        TestUserInfo katya = await createLocalUser(completer: completer);
+        TestUserInfo punch = await createLocalUser(completer: completer);
 
         // Test utils
-        final completer = Completer<bool>();
         String txHash = "";
 
         // Create pool callback
@@ -655,8 +544,9 @@ void main() {
           completer.complete(true);
         };
 
-        kc2Service.subscribeToAccountTransactions(katyaInfo);
-
+        kc2Service.subscribeToAccountTransactions(katya.userInfo!);
+        //
+        kc2Service.setKeyring(katya.user.keyring);
         // Create a pool
         txHash = await kc2Service.createPool(
           amount: GenesisConfig.kCentsPerCoinBigInt,
@@ -683,37 +573,11 @@ void main() {
         // Connect to the chain
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
-        // Create a new identity for local user Katya
-        IdentityInterface katya = Identity();
-        await katya.initNoStorage();
-        String katyaUserName = "Katya${katya.accountId.substring(0, 5)}";
-        String katyaPhoneNumber = randomPhoneNumber;
-        // Create a new identity for local user Punch
-        IdentityInterface punch = Identity();
-        await punch.initNoStorage();
-        String punchUserName = "Punch${katya.accountId.substring(0, 5)}";
-        String punchPhoneNumber = randomPhoneNumber;
-
-        // Assume sign up flow works successfully, just wait to tx complete,
-        // sign up both Katya and Punch
-        kc2Service.setKeyring(katya.keyring);
-        await kc2Service.newUser(
-            katya.accountId, katyaUserName, katyaPhoneNumber);
-        kc2Service.setKeyring(punch.keyring);
-        await kc2Service.newUser(
-            punch.accountId, punchUserName, punchPhoneNumber);
-        await Future.delayed(const Duration(seconds: 12));
-
-        kc2Service.setKeyring(katya.keyring);
-
-        KC2UserInfo katyaInfo = KC2UserInfo(
-            accountId: katya.accountId,
-            userName: katyaUserName,
-            balance: BigInt.zero,
-            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
+        final completer = Completer<bool>();
+        TestUserInfo katya = await createLocalUser(completer: completer);
+        await createLocalUser(completer: completer);
 
         // Test utils
-        final completer = Completer<bool>();
         String txHash = "";
 
         // Create pool callback
@@ -771,8 +635,9 @@ void main() {
           completer.complete(true);
         };
 
-        kc2Service.subscribeToAccountTransactions(katyaInfo);
+        kc2Service.subscribeToAccountTransactions(katya.userInfo!);
 
+        kc2Service.setKeyring(katya.user.keyring);
         // Create a pool
         txHash = await kc2Service.createPool(
           amount: BigInt.from(1000000),

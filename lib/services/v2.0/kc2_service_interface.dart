@@ -321,15 +321,11 @@ mixin K2ServiceInterface implements ChainApiProvider {
           decodeAccountId(evidence.verifierAccountId);
       List<int>? verifierSignature = evidence.signature;
 
-      // @HolyGrease best if request always have phone number hsah and user name
-      // and server-side should decide how to update based on on-chain data
-
       final verifierPublicKeyOption = Option.some(verifierPublicKey);
       final verifierSignatureOption = Option.some(verifierSignature);
       final usernameOption = Option.some(evidence.username);
       final Uint8List phoneNumberHash =
           Uint8List.fromList(evidence.phoneNumberHash.toHex());
-
       final phoneNumberHashOption = Option.some(phoneNumberHash);
 
       final call = MapEntry(

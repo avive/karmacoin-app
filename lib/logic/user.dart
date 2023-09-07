@@ -187,17 +187,13 @@ class KC2User extends KC2UserInteface {
     }
   }
 
-  /// Signup user to kc2 chain. Returns optional error. Updates signupStatus and signupFailureReson.
+  /// Signup user to kc2 chain. Returns optional error. Updates signupStatus and signupFailureReason.
   @override
   Future<void> signup(
       String requestedUserName, String requestedPhoneNumber) async {
     signupStatus.value = SignupStatus.signingUp;
     signupFailureReson = SignupFailureReason.unknown;
 
-    // trimm validate data, remove leading + from phone number if exists
-    if (requestedPhoneNumber.startsWith('+')) {
-      requestedPhoneNumber = requestedPhoneNumber.substring(1);
-    }
     requestedPhoneNumber = requestedPhoneNumber.trim();
     requestedUserName = requestedUserName.trim();
     if (requestedUserName.isEmpty || requestedPhoneNumber.isEmpty) {
@@ -205,6 +201,8 @@ class KC2User extends KC2UserInteface {
       signupFailureReson = SignupFailureReason.invalidData;
       return;
     }
+
+    // TODO: verify phone number format
 
     // Create a verification request for verifier with a bypass token or with
     // a verification code and session id from app state

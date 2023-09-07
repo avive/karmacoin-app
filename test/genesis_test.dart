@@ -21,7 +21,7 @@ void main() {
     test(
       'get net id works',
       () async {
-        KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
+        K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
         // Connect to the chain
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
@@ -33,7 +33,7 @@ void main() {
     );
 
     test('char traits exists on genesis', () async {
-      KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
+      K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
       // Connect to the chain
       await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
@@ -47,7 +47,7 @@ void main() {
     });
 
     test('rewards exists on genesis', () async {
-      KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
+      K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
       // Connect to the chain
       await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
