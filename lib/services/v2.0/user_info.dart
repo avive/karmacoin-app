@@ -89,7 +89,9 @@ class KC2UserInfo {
 
   KC2UserInfo.fromJson(Map<String, dynamic> u)
       : accountId = u['account_id'],
-        phoneNumberHash = u['phone_number_hash'],
+        phoneNumberHash = u['phone_number_hash'].startsWith('0x')
+            ? u['phone_number_hash'].substring(2)
+            : u['phone_number_hash'],
         userName = u['user_name'],
         // we assume value is a string or a num...
         balance = u['balance'] is String

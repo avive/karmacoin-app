@@ -4,15 +4,10 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/app_state.dart';
-import 'package:karma_coin/logic/identity.dart';
-import 'package:karma_coin/logic/identity_interface.dart';
 import 'package:karma_coin/logic/user.dart';
 import 'package:karma_coin/logic/user_interface.dart';
+import 'package:karma_coin/logic/verifier.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
-import 'package:karma_coin/services/v2.0/txs/tx.dart';
-import 'package:karma_coin/services/v2.0/user_info.dart';
-
-import 'utils.dart';
 
 final random = Random.secure();
 String get randomPhoneNumber => (random.nextInt(900000) + 100000).toString();
@@ -25,6 +20,8 @@ void main() {
   K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
   GetIt.I.registerLazySingleton<AppState>(() => AppState());
   GetIt.I.registerLazySingleton<KC2UserInteface>(() => KC2User());
+  GetIt.I.registerLazySingleton<Verifier>(() => Verifier());
+  GetIt.I.registerLazySingleton<ConfigLogic>(() => ConfigLogic());
 
   group('kc2 user txs tests', () {
     test(
@@ -90,7 +87,7 @@ void main() {
                     // get all account txs from chain
                     await punch.fetchAppreciations();
 
-                    // we should get 1 incoming apprecation for punch
+                    // we should get 1 incoming appreciation for punch
                     expect(punch.incomingAppreciations.value.length, 1);
                     expect(punch.outgoingAppreciations.value.length, 0);
 
