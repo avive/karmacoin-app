@@ -74,13 +74,12 @@ class _SetMetadataScreenState extends State<SetMetadataScreen> {
         builder: (context, value, child) {
           String text = '';
           Color? color = CupertinoColors.systemRed;
-          bool cancelSubmit = false;
           switch (value) {
             case SetMetadataStatus.unknown:
               text = '';
               break;
             case SetMetadataStatus.updating:
-              text = 'Please wait...';
+              text = 'Please wait and take 5 deep breaths...';
               color = CupertinoTheme.of(context).textTheme.textStyle.color;
               break;
             case SetMetadataStatus.updated:

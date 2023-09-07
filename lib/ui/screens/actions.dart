@@ -130,7 +130,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
         ),
         children: <CupertinoListTile>[
           CupertinoListTile.notched(
-              title: const Text('Social profile link'),
+              title: const Text('Social Profile Link'),
               leading: const Icon(CupertinoIcons.person_circle, size: 28),
               onTap: () {
                 if (!context.mounted) return;
@@ -143,14 +143,14 @@ class _ActionsScreenState extends State<ActionsScreen> {
               }),
           CupertinoListTile.notched(
             title: const Text('Account Details'),
-            leading: const Icon(CupertinoIcons.person, size: 28),
+            leading: const Icon(CupertinoIcons.info, size: 28),
             trailing: const CupertinoListTileChevron(),
             onTap: () => context.pushNamed(ScreenNames.account,
                 params: {'accountId': kc2User.identity.accountId}),
           ),
           CupertinoListTile.notched(
             title: const Text('Public Profile'),
-            leading: const Icon(CupertinoIcons.bookmark, size: 28),
+            leading: const Icon(CupertinoIcons.globe, size: 28),
             trailing: const CupertinoListTileChevron(),
             onTap: () {
               context.pushNamed(ScreenNames.profile,
@@ -166,7 +166,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
           ),
           CupertinoListTile.notched(
             title: const Text('Change User Name'),
-            leading: const Icon(CupertinoIcons.person_crop_circle, size: 28),
+            leading: const Icon(CupertinoIcons.text_append, size: 28),
             trailing: const CupertinoListTileChevron(),
             onTap: () => context.push(ScreenPaths.updateUserName),
           ),

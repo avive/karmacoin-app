@@ -25,10 +25,15 @@ class _PoolsScreenState extends State<PoolsScreen> {
 
     Future.delayed(Duration.zero, () async {
       try {
-        debugPrint('getting open pools');
+        debugPrint('getting open pools...');
         List<Pool> pools = await (kc2Service as KC2NominationPoolsInterface)
             .getPools(state: PoolState.open);
         debugPrint('got ${pools.length} entries');
+
+        // Populate user infos for all pools roles
+        for (final Pool pool in pools) {
+          await pool.populateUsers();
+        }
 
         setState(() {
           entries = pools;

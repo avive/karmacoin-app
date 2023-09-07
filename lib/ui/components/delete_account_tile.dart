@@ -23,7 +23,7 @@ class DeleteAccountTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoListTile.notched(
       title: const Text('Delete Account'),
-      leading: const FaIcon(FontAwesomeIcons.userXmark, size: 22),
+      leading: const FaIcon(FontAwesomeIcons.xmark, size: 26),
       onTap: () {
         _displayDeleteAccountWarning(context);
       },

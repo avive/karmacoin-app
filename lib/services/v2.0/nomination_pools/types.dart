@@ -1,3 +1,6 @@
+import 'package:karma_coin/logic/app.dart';
+import 'package:karma_coin/services/v2.0/user_info.dart';
+
 /// Type mapping to on-chain type for a unique pool id
 typedef PoolId = int;
 
@@ -107,15 +110,15 @@ extension StringValue on PoolState {
 ///
 /// Any pool has a depositor, which can never change. But, all the other roles are optional, and cannot exist. Note that if `root` is set to `null`, it basically means that the roles of this pool can never change again (except via governance).
 class PoolRoles {
-  /// Creates the pool and is the initial member.
-  /// They can only leave the pool once all other members have left.
-  /// Once they fully leave, the pool is destroyed.
+  /// Creates the pool and is its initial member.
+  /// Can only leave the pool once all other members have left.
+  /// Once it has left the pool, the pool is destroyed.
   String depositor;
 
   /// Can change the nominator, bouncer, or itself and can perform any of the actions the nominator or bouncer can.
   String? root;
 
-  /// Can select which validators the pool nominates.
+  /// Can set which validators the pool nominates.
   String? nominator;
 
   /// Can change the pools state and kick members if the pool is blocked.
@@ -241,4 +244,32 @@ class Pool {
         roles = PoolRoles.fromJson(json['roles']),
         state = PoolState.values.firstWhere(
             (e) => e.toString() == 'PoolState.${json['state'].toLowerCase()}');
+
+  // User infos for the various pool roles
+  Map<String, KC2UserInfo> poolsUsers = {};
+
+  Future<void> _addPoolUser(String accountId) async {
+    if (!poolsUsers.containsKey(accountId)) {
+      KC2UserInfo? user = await kc2Service.getUserInfoByAccountId(accountId);
+      if (user != null) {
+        poolsUsers[user.accountId] = user;
+      }
+    }
+  }
+
+  /// Populate poolsUsers with info about the pool's roles users
+  Future<void> populateUsers() async {
+    if (roles.root != null) {
+      await _addPoolUser(roles.root!);
+    }
+    if (roles.nominator != null) {
+      await _addPoolUser(roles.nominator!);
+    }
+
+    await _addPoolUser(roles.depositor);
+
+    if (roles.bouncer != null) {
+      await _addPoolUser(roles.bouncer!);
+    }
+  }
 }
