@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
+import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:random_avatar/random_avatar.dart';
 // import 'package:random_avatar/random_avatar.dart';
 import 'package:status_alert/status_alert.dart';
 
@@ -130,39 +132,101 @@ class _PoolsScreenState extends State<PoolsScreen> {
     );
   }
 
-  Widget _getPoolWidget(BuildContext context, Pool entry, int index) {
-    return CupertinoListSection.insetGrouped(
-      key: Key(index.toString()),
-      header: Text(
-        'KARMA COINS',
-        style: CupertinoTheme.of(context).textTheme.textStyle.merge(
-              const TextStyle(
-                  fontSize: 14, color: CupertinoColors.inactiveGray),
-            ),
-      ),
-      children: <CupertinoListTile>[
-        CupertinoListTile.notched(
-          title: const Text('Send Karma Coin'),
-          leading: const FaIcon(FontAwesomeIcons.moneyBillTransfer, size: 24),
-          trailing: const CupertinoListTileChevron(),
-          onTap: () => context.push(ScreenPaths.send),
-        ),
-      ],
-    );
+  Widget _getPoolWidget(BuildContext context, Pool pool, int index) {
+    List<CupertinoListTile> tiles = [];
+    if (pool.socialUrl != null) {
+      String url = pool.socialUrl!.startsWith("https://")
+          ? pool.socialUrl!
+          : "https://${pool.socialUrl!}";
 
-    /*
-    return CupertinoListTile(
-      key: Key(index.toString()),
-      padding: const EdgeInsets.only(top: 0, bottom: 6, left: 14, right: 14),
-      title: Text(
-        entry.id.toString(),
-        style: const TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.w300,
+      tiles.add(CupertinoListTile.notched(
+        title: Text('Web Profile',
+            style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
+        leading: const Icon(CupertinoIcons.globe, size: 28),
+        subtitle: Text(
+          pool.socialUrl!,
+          style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                const TextStyle(color: CupertinoColors.activeBlue),
+              ),
         ),
+        trailing: const CupertinoListTileChevron(),
+        onTap: () async {
+          await openUrl(url);
+        },
+      ));
+    }
+
+    tiles.add(CupertinoListTile.notched(
+      title: const Text('Points'),
+      leading: const FaIcon(FontAwesomeIcons.coins, size: 24),
+      trailing: Text(
+        // todo: format it properly
+        pool.points.toString(),
       ),
-      leading: RandomAvatar(entry.roles.root!, height: 50, width: 50),
-    );*/
+    ));
+
+    tiles.add(CupertinoListTile.notched(
+      title: const Text('Members'),
+      leading: const FaIcon(FontAwesomeIcons.peopleGroup, size: 24),
+      trailing: Text(
+        // todo: format this properly
+        pool.memberCounter.toString(),
+      ),
+    ));
+
+    KC2UserInfo creator = pool.depositor!;
+
+    tiles.add(CupertinoListTile.notched(
+      title: const Text('Creator'),
+      leading: RandomAvatar(creator.userName, height: 50, width: 50),
+      subtitle: Text(
+          // todo: format this properly
+          creator.userName),
+      trailing: const CupertinoListTileChevron(),
+    ));
+
+    KC2UserInfo? nominator = pool.nominator;
+    if (nominator != null) {
+      tiles.add(CupertinoListTile.notched(
+        title: const Text('Nominator'),
+        leading: RandomAvatar(nominator.userName, height: 50, width: 50),
+        subtitle: Text(
+            // todo: format this properly
+            nominator.userName),
+        trailing: const CupertinoListTileChevron(),
+      ));
+    }
+
+    KC2UserInfo? bouncer = pool.bouncer;
+    if (bouncer != null) {
+      tiles.add(CupertinoListTile.notched(
+        title: const Text('Nominator'),
+        leading: RandomAvatar(bouncer.userName, height: 50, width: 50),
+        subtitle: Text(
+            // todo: format this properly
+            bouncer.userName),
+        trailing: const CupertinoListTileChevron(),
+      ));
+    }
+
+    tiles.add(CupertinoListTile.notched(
+        title: CupertinoButton(
+      onPressed: () {
+        // TODO:: push join pool screen
+      },
+      child: const Text('Join'),
+    )));
+
+    return CupertinoListSection.insetGrouped(
+        key: Key(index.toString()),
+        header: Text(
+          pool.id.toString(),
+          style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                const TextStyle(
+                    fontSize: 14, color: CupertinoColors.inactiveGray),
+              ),
+        ),
+        children: tiles);
   }
 
   @override
@@ -176,8 +240,8 @@ class _PoolsScreenState extends State<PoolsScreen> {
             backgroundColor: kcPurple,
             border: kcOrangeBorder,
             largeTitle: Center(
-              child: Text('☥ MINING POOLS',
-                  style: getNavBarTitleTextStyle(context)),
+              child:
+                  Text('MINING POOLS', style: getNavBarTitleTextStyle(context)),
             ),
           ),
           SliverFillRemaining(

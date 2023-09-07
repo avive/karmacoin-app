@@ -31,7 +31,7 @@ class Commission {
   double? get currentAsPrercnet =>
       current != null ? current! / 1000000000 : null;
 
-  /// Get max commision as  a precentage
+  /// Get max commision as a precentage
   double? get maxAsPrercnet => max != null ? max! / 1000000000 : null;
 
   /// The block from where throttling should be checked from.

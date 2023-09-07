@@ -25,6 +25,19 @@ class Pool {
   /// Current state.
   PoolState state;
 
+  // User infos for the various pool roles
+  Map<String, KC2UserInfo> poolsUsers = {};
+
+  String? socialUrl;
+
+  // only available after call to populateUsers()
+  KC2UserInfo? get depositor => poolsUsers[roles.depositor];
+  KC2UserInfo? get root => roles.root != null ? poolsUsers[roles.root] : null;
+  KC2UserInfo? get bouncer =>
+      roles.bouncer != null ? poolsUsers[roles.bouncer] : null;
+  KC2UserInfo? get nominator =>
+      roles.bouncer != null ? poolsUsers[roles.nominator] : null;
+
   Pool(this.id, this.bondedAccountId, this.commission, this.memberCounter,
       this.points, this.roles, this.state);
 
@@ -37,9 +50,6 @@ class Pool {
         roles = PoolRoles.fromJson(json['roles']),
         state = PoolState.values.firstWhere(
             (e) => e.toString() == 'PoolState.${json['state'].toLowerCase()}');
-
-  // User infos for the various pool roles
-  Map<String, KC2UserInfo> poolsUsers = {};
 
   Future<void> _addPoolUser(String accountId) async {
     if (!poolsUsers.containsKey(accountId)) {
@@ -64,5 +74,8 @@ class Pool {
     if (roles.bouncer != null) {
       await _addPoolUser(roles.bouncer!);
     }
+
+    // TODO: get rid of this when user info returned from server includes social url (metadata)
+    socialUrl = await kc2Service.getMetadata(roles.depositor);
   }
 }

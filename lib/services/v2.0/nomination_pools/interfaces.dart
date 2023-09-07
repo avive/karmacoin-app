@@ -389,12 +389,11 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
 
   /// Set the maximum commission of a pool.
   ///
-  /// - Initial max can be set to any `Perbill`, and only smaller values
+  /// - Initial max can be set to any percentage, and only smaller values
   ///   thereafter.
   /// - Current commission will be lowered in the event it is higher than a
   ///   new max commission.
   /// - maxCommision range [0.0,...,1.0]
-
   Future<String> setPoolCommissionMax(
       PoolId poolId, double maxCommission) async {
     if (maxCommission < 0.0 || maxCommission > 1.0) {
