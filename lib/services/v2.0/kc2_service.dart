@@ -705,7 +705,6 @@ class KarmachainService extends ChainApiProvider
 
     final codecSchema = decodedMetadata.metadata['lookup']['types']
         .firstWhere((e) => e['id'] == codecTypeId);
-    debugPrint('Codec schema: $codecSchema');
 
     final errorMetadata =
         codecSchema['type']['def'].value['variants'][errorIndex];

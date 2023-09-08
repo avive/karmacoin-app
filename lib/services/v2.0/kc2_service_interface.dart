@@ -316,18 +316,26 @@ mixin K2ServiceInterface implements ChainApiProvider {
   ///
   /// Implementation will attempt to obtain verifier evidence regarding the association between the accountId, and the new userName or the new phoneNumber
   Future<(String?, String?)> updateUser(
-      {required VerificationEvidence evidence}) async {
+      {String? username,
+      String? phoneNumberHash,
+      required VerificationEvidence evidence}) async {
     try {
       Uint8List? verifierPublicKey =
           decodeAccountId(evidence.verifierAccountId);
       List<int>? verifierSignature = evidence.signature;
 
+      if (username == null && phoneNumberHash == null) {
+        return (null, "UsernameOrPhoneNumberMustBeProvided");
+      }
+
       final verifierPublicKeyOption = Option.some(verifierPublicKey);
       final verifierSignatureOption = Option.some(verifierSignature);
-      final usernameOption = Option.some(evidence.username);
-      final Uint8List phoneNumberHash =
-          Uint8List.fromList(evidence.phoneNumberHash.toHex());
-      final phoneNumberHashOption = Option.some(phoneNumberHash);
+      final usernameOption = username == null
+          ? const Option.none()
+          : Option.some(evidence.username);
+      final phoneNumberHashOption = phoneNumberHash == null
+          ? const Option.none()
+          : Option.some(Uint8List.fromList(phoneNumberHash.toHex()));
 
       final call = MapEntry(
           'Identity',

@@ -26,32 +26,14 @@ void main() {
       'Signup new user',
       () async {
         K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         // Create a new identity for local user
-        IdentityInterface katya = Identity();
-        await katya.initNoStorage();
-        String katyaUserName =
-            "katya${katya.accountId.substring(0, 5)}".toLowerCase();
-
-        String katyaPhoneNumber = randomPhoneNumber;
-        String phoneNumberHash =
-            kc2Service.getPhoneNumberHash(katyaPhoneNumber);
-
-        // Set katya as signer
-        kc2Service.setKeyring(katya.keyring);
-        debugPrint('Local user katya public address: ${katya.accountId}');
-
-        KC2UserInfo katyaInfo = KC2UserInfo(
-            accountId: katya.accountId,
-            userName: katyaUserName,
-            balance: BigInt.zero,
-            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
-
         final completer = Completer<bool>();
-        String? txHash;
+        TestUserInfo katya = await createLocalUser(completer: completer);
 
         kc2Service.newUserCallback = (tx) async {
-          if (tx.hash != txHash) {
+          if (tx.hash != katya.newUserTxHash) {
             return;
           }
 
@@ -62,8 +44,8 @@ void main() {
           }
 
           expect(tx.accountId, katya.accountId);
-          expect(tx.phoneNumberHash, phoneNumberHash);
-          expect(tx.username, katyaUserName);
+          expect(tx.phoneNumberHash, katya.phoneNumberHash);
+          expect(tx.username, katya.userName);
           expect(tx.signer, katya.accountId);
 
           // all 3 methods should return's Katya's account data
@@ -77,15 +59,15 @@ void main() {
           }
 
           expect(userInfo.accountId, katya.accountId);
-          expect(userInfo.phoneNumberHash, phoneNumberHash);
-          expect(userInfo.userName, katyaUserName);
+          expect(userInfo.phoneNumberHash, katya.phoneNumberHash);
+          expect(userInfo.userName, katya.userName);
 
           expect(userInfo.traitScores[0], isNotNull);
           expect(userInfo.traitScores[0]!.length, 1);
           expect(userInfo.getScore(0, 1), 1);
 
-          userInfo =
-              await kc2Service.getUserInfoByPhoneNumberHash(phoneNumberHash);
+          userInfo = await kc2Service
+              .getUserInfoByPhoneNumberHash(katya.phoneNumberHash);
 
           if (userInfo == null) {
             debugPrint('Failed to get user info by phone number');
@@ -94,10 +76,10 @@ void main() {
           }
 
           expect(userInfo.accountId, katya.accountId);
-          expect(userInfo.phoneNumberHash, phoneNumberHash);
-          expect(userInfo.userName, katyaUserName);
+          expect(userInfo.phoneNumberHash, katya.phoneNumberHash);
+          expect(userInfo.userName, katya.userName);
 
-          userInfo = await kc2Service.getUserInfoByUserName(katyaUserName);
+          userInfo = await kc2Service.getUserInfoByUserName(katya.userName);
           if (userInfo == null) {
             debugPrint('Failed to get user info by nickname');
             completer.complete(false);
@@ -105,38 +87,14 @@ void main() {
           }
 
           expect(userInfo.accountId, katya.accountId);
-          expect(userInfo.phoneNumberHash, phoneNumberHash);
-          expect(userInfo.userName, katyaUserName);
+          expect(userInfo.phoneNumberHash, katya.phoneNumberHash);
+          expect(userInfo.userName, katya.userName);
 
           completer.complete(true);
         };
 
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
-
         // subscribe to new account txs
-        kc2Service.subscribeToAccountTransactions(katyaInfo);
-
-        // Create a verification request for verifier with a bypass token or with
-        // a verification code and session id from app state
-        VerifyNumberRequest req = await verifier.createVerificationRequest(
-            accountId: katyaInfo.accountId,
-            userName: katyaUserName,
-            phoneNumber: katyaPhoneNumber,
-            keyring: katya.keyring,
-            useBypassToken: true);
-
-        VerifyNumberData vd = await verifier.verifyNumber(req);
-        if (vd.data == null || vd.error != null) {
-          completer.complete(false);
-          return;
-        }
-
-        String? err;
-        // signup katya
-        (txHash, err) = await kc2Service.newUser(evidence: vd.data!);
-
-        expect(txHash, isNotNull);
-        expect(err, isNull);
+        kc2Service.subscribeToAccountTransactions(katya.userInfo!);
 
         // wait for completer and verify test success
         expect(await completer.future, equals(true));
@@ -149,38 +107,17 @@ void main() {
       'Update user phone number',
       () async {
         K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         // Create a new identity for local user
-        IdentityInterface katya = Identity();
-        await katya.initNoStorage();
+        final completer = Completer<bool>();
+        TestUserInfo katya = await createLocalUser(completer: completer);
 
-        String katyaPhoneNumber = randomPhoneNumber;
         String katyaNewPhoneNumber = randomPhoneNumber;
         String newPhoneNumberHash =
             kc2Service.getPhoneNumberHash(katyaNewPhoneNumber);
 
-        String katyaUserName =
-            "Katya${katya.accountId.substring(0, 5)}".toLowerCase();
-
-        // Set katya as signer
-        kc2Service.setKeyring(katya.keyring);
-        debugPrint('Local user katya public address: ${katya.accountId}');
-
-        KC2UserInfo katyaInfo = KC2UserInfo(
-            accountId: katya.accountId,
-            userName: katyaUserName,
-            balance: BigInt.zero,
-            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
-
-        final completer = Completer<bool>();
-        String? txHash;
-        String? updateTexHash;
-
         kc2Service.updateUserCallback = (tx) async {
-          if (tx.hash != updateTexHash) {
-            return;
-          }
-
           debugPrint('>> update user update 1 called');
           if (tx.chainError != null) {
             completer.complete(false);
@@ -202,7 +139,7 @@ void main() {
 
           expect(userInfo.accountId, katya.accountId);
           expect(userInfo.phoneNumberHash, newPhoneNumberHash);
-          expect(userInfo.userName, katyaUserName);
+          expect(userInfo.userName, katya.userName);
 
           // get the user by updated phone number
           userInfo =
@@ -216,9 +153,9 @@ void main() {
 
           expect(userInfo.accountId, katya.accountId);
           expect(userInfo.phoneNumberHash, newPhoneNumberHash);
-          expect(userInfo.userName, katyaUserName);
+          expect(userInfo.userName, katya.userName);
 
-          userInfo = await kc2Service.getUserInfoByUserName(katyaUserName);
+          userInfo = await kc2Service.getUserInfoByUserName(katya.userName);
           if (userInfo == null) {
             debugPrint('Failed to get user info by nickname');
             completer.complete(false);
@@ -227,13 +164,13 @@ void main() {
 
           expect(userInfo.accountId, katya.accountId);
           expect(userInfo.phoneNumberHash, newPhoneNumberHash);
-          expect(userInfo.userName, katyaUserName);
+          expect(userInfo.userName, katya.userName);
 
           completer.complete(true);
         };
 
         kc2Service.newUserCallback = (tx) async {
-          if (tx.hash != txHash) {
+          if (tx.hash != katya.newUserTxHash) {
             return;
           }
 
@@ -243,59 +180,14 @@ void main() {
             return;
           }
 
-          // Create a verification request for verifier with a bypass token or with
-          // a verification code and session id from app state
-          VerifyNumberRequest req = await verifier.createVerificationRequest(
-              accountId: katyaInfo.accountId,
-              userName: katyaUserName,
-              phoneNumber: katyaNewPhoneNumber,
-              keyring: katya.keyring,
-              useBypassToken: true);
-
-          VerifyNumberData vd = await verifier.verifyNumber(req);
-          if (vd.data == null || vd.error != null) {
-            completer.complete(false);
-            return;
-          }
-
-          debugPrint('calling update user...');
-
-          String? err;
-          (updateTexHash, err) =
-              await kc2Service.updateUser(evidence: vd.data!);
-
-          expect(updateTexHash, isNotNull);
-          expect(err, isNull);
-
-          // todo: get user by new phone number from the api...
+          katya = await updateLocalUser(
+              completer: completer,
+              userInfo: katya,
+              requestedPhoneNumber: katyaNewPhoneNumber);
         };
 
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
-
         // subscribe to new account txs
-        kc2Service.subscribeToAccountTransactions(katyaInfo);
-
-        // Create a verification request for verifier with a bypass token or with
-        // a verification code and session id from app state
-        VerifyNumberRequest req = await verifier.createVerificationRequest(
-            accountId: katyaInfo.accountId,
-            userName: katyaUserName,
-            phoneNumber: katyaPhoneNumber,
-            keyring: katya.keyring,
-            useBypassToken: true);
-
-        VerifyNumberData vd = await verifier.verifyNumber(req);
-        if (vd.data == null || vd.error != null) {
-          completer.complete(false);
-          return;
-        }
-
-        // signup katya
-        String? err;
-        (txHash, err) = await kc2Service.newUser(evidence: vd.data!);
-
-        expect(txHash, isNotNull);
-        expect(err, isNull);
+        kc2Service.subscribeToAccountTransactions(katya.userInfo!);
 
         // wait for completer and verify test success
         expect(await completer.future, equals(true));
@@ -309,40 +201,16 @@ void main() {
     test(
       'Update user name',
       () async {
-        debugPrint('Signup test');
-
         K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         // Create a new identity for local user
-        IdentityInterface katya = Identity();
-        await katya.initNoStorage();
-        String katyaUserName =
-            "Katya${katya.accountId.substring(0, 5)}".toLowerCase();
-        String katyaPhoneNumber = randomPhoneNumber;
+        final completer = Completer<bool>();
+        TestUserInfo katya = await createLocalUser(completer: completer);
         String katyaNewUserName =
             "Katya${katya.accountId.substring(5, 10)}".toLowerCase();
 
-        KC2UserInfo katyaInfo = KC2UserInfo(
-            accountId: katya.accountId,
-            userName: katyaUserName,
-            balance: BigInt.zero,
-            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
-
-        // Set katya as signer
-        kc2Service.setKeyring(katya.keyring);
-        debugPrint('Local user katya public address: ${katya.accountId}');
-
-        final completer = Completer<bool>();
-        String? txHash;
-        String? updateTexHash;
-        String phoneNumberHash =
-            kc2Service.getPhoneNumberHash(katyaPhoneNumber);
-
         kc2Service.updateUserCallback = (tx) async {
-          if (tx.hash != updateTexHash) {
-            return;
-          }
-
           debugPrint('>> update user update 1 called. tx: ${tx.args}');
           if (tx.chainError != null) {
             completer.complete(false);
@@ -352,7 +220,7 @@ void main() {
           // it is currently empty in case user name updated
           //expect(tx.phoneNumberHash, phoneNumberHash);
 
-          expect(tx.username, katyaNewUserName);
+          expect(tx.username, katya.userName);
           expect(tx.signer, katya.accountId);
 
           // all 3 methods should return's Katya's account data
@@ -366,12 +234,12 @@ void main() {
           }
 
           expect(userInfo.accountId, katya.accountId);
-          expect(userInfo.phoneNumberHash, phoneNumberHash);
-          expect(userInfo.userName, katyaNewUserName);
+          expect(userInfo.phoneNumberHash, katya.phoneNumberHash);
+          expect(userInfo.userName, katya.userName);
 
           // get the user by updated phone number
-          userInfo =
-              await kc2Service.getUserInfoByPhoneNumberHash(phoneNumberHash);
+          userInfo = await kc2Service
+              .getUserInfoByPhoneNumberHash(katya.phoneNumberHash);
 
           if (userInfo == null) {
             debugPrint('Failed to get user info by phone number');
@@ -380,10 +248,10 @@ void main() {
           }
 
           expect(userInfo.accountId, katya.accountId);
-          expect(userInfo.phoneNumberHash, phoneNumberHash);
-          expect(userInfo.userName, katyaNewUserName);
+          expect(userInfo.phoneNumberHash, katya.phoneNumberHash);
+          expect(userInfo.userName, katya.userName);
 
-          userInfo = await kc2Service.getUserInfoByUserName(katyaNewUserName);
+          userInfo = await kc2Service.getUserInfoByUserName(katya.userName);
           if (userInfo == null) {
             debugPrint('Failed to get user info by updated user name');
             completer.complete(false);
@@ -391,14 +259,14 @@ void main() {
           }
 
           expect(userInfo.accountId, katya.accountId);
-          expect(userInfo.phoneNumberHash, phoneNumberHash);
-          expect(userInfo.userName, katyaNewUserName);
+          expect(userInfo.phoneNumberHash, katya.phoneNumberHash);
+          expect(userInfo.userName, katya.userName);
 
           completer.complete(true);
         };
 
         kc2Service.newUserCallback = (tx) async {
-          if (tx.hash != txHash) {
+          if (tx.hash != katya.newUserTxHash) {
             return;
           }
 
@@ -408,54 +276,14 @@ void main() {
             return;
           }
 
-          debugPrint('calling update user...');
-
-          // Create a verification request for verifier with a bypass token or with
-          // a verification code and session id from app state
-          VerifyNumberRequest req = await verifier.createVerificationRequest(
-              accountId: katyaInfo.accountId,
-              userName: katyaNewUserName,
-              phoneNumber: katyaPhoneNumber,
-              keyring: katya.keyring,
-              useBypassToken: true);
-
-          VerifyNumberData vd = await verifier.verifyNumber(req);
-          if (vd.data == null || vd.error != null) {
-            completer.complete(false);
-          }
-
-          String? err;
-          (updateTexHash, err) =
-              await kc2Service.updateUser(evidence: vd.data!);
-          expect(updateTexHash, isNotNull);
-          expect(err, isNull);
+          katya = await updateLocalUser(
+              completer: completer,
+              userInfo: katya,
+              requestedUserName: katyaNewUserName);
         };
 
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
-
         // subscribe to new account txs
-        kc2Service.subscribeToAccountTransactions(katyaInfo);
-
-        // Create a verification request for verifier with a bypass token or with
-        // a verification code and session id from app state
-        VerifyNumberRequest req = await verifier.createVerificationRequest(
-            accountId: katyaInfo.accountId,
-            userName: katyaUserName,
-            phoneNumber: katyaPhoneNumber,
-            keyring: katya.keyring,
-            useBypassToken: true);
-
-        VerifyNumberData vd = await verifier.verifyNumber(req);
-        if (vd.data == null || vd.error != null) {
-          completer.complete(false);
-        }
-
-        // signup katya
-        String? err;
-        (txHash, err) = await kc2Service.newUser(evidence: vd.data!);
-
-        expect(txHash, isNotNull);
-        expect(err, isNull);
+        kc2Service.subscribeToAccountTransactions(katya.userInfo!);
 
         // wait for completer and verify test success
         expect(await completer.future, equals(true));
@@ -470,103 +298,36 @@ void main() {
       'Signup with a used user name',
       () async {
         K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         // Create a new identity for local user
-        IdentityInterface katya = Identity();
-        IdentityInterface punch = Identity();
-
-        await katya.initNoStorage();
-        await punch.initNoStorage();
-
-        String katyaUserName =
-            "Katya${katya.accountId.substring(0, 5)}".toLowerCase();
-        String katyaPhoneNumber = randomPhoneNumber;
-        String punchPhoneNumber = randomPhoneNumber;
-
-        // Set katya as signer
-        kc2Service.setKeyring(katya.keyring);
-        debugPrint('Local user katya public address: ${katya.accountId}');
-
-        KC2UserInfo katyaInfo = KC2UserInfo(
-            accountId: katya.accountId,
-            userName: katyaUserName,
-            balance: BigInt.zero,
-            phoneNumberHash: kc2Service.getPhoneNumberHash(katyaPhoneNumber));
-
         final completer = Completer<bool>();
-        String? katyaNewUserTxHash;
-        String? punchNewUserTxHash;
+        TestUserInfo katya = await createLocalUser(completer: completer);
+        await Future.delayed(const Duration(seconds: 12));
+        TestUserInfo punch = await createLocalUser(completer: completer);
+        await Future.delayed(const Duration(seconds: 12));
 
         // remove appreciation callback which is getting called right now in case of appreciation sent with charTrait == 0
         kc2Service.appreciationCallback = null;
+        // switch local user to punch
+        kc2Service.setKeyring(punch.user.keyring);
 
-        kc2Service.newUserCallback = (tx) async {
-          if (tx.hash != katyaNewUserTxHash) {
-            return;
-          }
+        // subscribe to new account txs
+        kc2Service.subscribeToAccountTransactions(punch.userInfo!);
 
-          debugPrint('>> Katya new user callback called');
-
-          if (tx.chainError != null) {
+        kc2Service.updateUserCallback = (tx) async {
+          if (tx.chainError == null) {
             completer.complete(false);
             return;
           }
 
-          // switch local user to punch
-          kc2Service.setKeyring(punch.keyring);
-          kc2Service.newUserCallback = null;
-
-          // Create a verification request for verifier with a bypass token or with
-          // a verification code and session id from app state
-          VerifyNumberRequest req = await verifier.createVerificationRequest(
-              accountId: punch.accountId,
-              // we use an existing user name
-              userName: katyaUserName,
-              phoneNumber: punchPhoneNumber,
-              keyring: punch.keyring,
-              useBypassToken: true);
-
-          VerifyNumberData vd = await verifier.verifyNumber(req);
-          if (vd.data == null || vd.error != null) {
-            completer.complete(false);
-            return;
-          }
-
-          // attempt signup punch with used user name
-          String? err;
-          (punchNewUserTxHash, err) =
-              await kc2Service.newUser(evidence: vd.data!);
-
-          expect(punchNewUserTxHash, isNull);
-          expect(err, isNotNull);
           completer.complete(true);
         };
 
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
-
-        // subscribe to new account txs
-        kc2Service.subscribeToAccountTransactions(katyaInfo);
-
-        // Create a verification request for verifier with a bypass token or with
-        // a verification code and session id from app state
-        VerifyNumberRequest req = await verifier.createVerificationRequest(
-            accountId: katyaInfo.accountId,
-            userName: katyaUserName,
-            phoneNumber: katyaPhoneNumber,
-            keyring: katya.keyring,
-            useBypassToken: true);
-
-        VerifyNumberData vd = await verifier.verifyNumber(req);
-        if (vd.data == null || vd.error != null) {
-          completer.complete(false);
-          return;
-        }
-        String? err;
-        (katyaNewUserTxHash, err) =
-            await kc2Service.newUser(evidence: vd.data!);
-
-        expect(katyaNewUserTxHash, isNotNull);
-        expect(err, isNull);
+        updateLocalUser(
+            completer: completer,
+            userInfo: punch,
+            requestedUserName: katya.userName);
 
         // wait for completer and verify test success
         expect(await completer.future, equals(true));

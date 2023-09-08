@@ -661,13 +661,13 @@ void main() {
 
     test(
       'get pools configuration works',
-        () async {
-          KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
-          // Connect to the chain
-          await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+      () async {
+        KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
+        // Connect to the chain
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
-          final configuration = await kc2Service.getPoolsConfiguration();
-        },
+        final configuration = await kc2Service.getPoolsConfiguration();
+      },
       timeout: const Timeout(Duration(seconds: 280)),
     );
   });

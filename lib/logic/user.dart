@@ -416,22 +416,22 @@ class KC2User extends KC2UserInteface {
       return;
     }
 
-    requestedUserName ??= userInfo.value!.userName;
-    requestedPhoneNumber ??= kc2User.identity.phoneNumber!;
+    final userName = requestedUserName ?? userInfo.value!.userName;
+    final phoneNumber = requestedPhoneNumber ?? kc2User.identity.phoneNumber!;
 
     // Create a verification request for verifier with a bypass token or with
     // a verification code and session id from app state
     vnr.VerifyNumberRequest req = configLogic.skipWhatsappVerification
         ? await verifier.createVerificationRequest(
             accountId: identity.accountId,
-            userName: requestedUserName,
-            phoneNumber: requestedPhoneNumber,
+            userName: userName,
+            phoneNumber: phoneNumber,
             keyring: identity.keyring,
             useBypassToken: true)
         : await verifier.createVerificationRequest(
             accountId: identity.accountId,
-            userName: requestedUserName,
-            phoneNumber: requestedPhoneNumber,
+            userName: userName,
+            phoneNumber: phoneNumber,
             keyring: identity.keyring,
             useBypassToken: false,
             verificaitonSessionId: appState.twilloVerificationSid,
@@ -451,7 +451,12 @@ class KC2User extends KC2UserInteface {
       }
     });
 
-    (txHash, err) = await kc2Service.updateUser(evidence: evidence.data!);
+    (txHash, err) = await kc2Service.updateUser(
+        username: requestedUserName,
+        phoneNumberHash: requestedPhoneNumber == null
+            ? null
+            : kc2Service.getPhoneNumberHash(requestedPhoneNumber),
+        evidence: evidence.data!);
 
     if (err != null) {
       switch (err) {

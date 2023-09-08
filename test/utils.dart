@@ -39,7 +39,8 @@ Future<TestUserInfo> createLocalUser(
 
   IdentityInterface user = Identity();
   await user.initNoStorage();
-  String userName = "$usernamePrefix${user.accountId.substring(0, 5)}".toLowerCase();
+  String userName =
+      "$usernamePrefix${user.accountId.substring(0, 5)}".toLowerCase();
   String phoneNumber = randomPhoneNumber;
   user.setPhoneNumber(phoneNumber);
 
@@ -92,10 +93,10 @@ Future<TestUserInfo> createLocalUser(
 Future<TestUserInfo> updateLocalUser(
     {required Completer<bool> completer,
     required TestUserInfo userInfo,
-    String? userName,
-    String? phoneNumber}) async {
-  userName ??= userInfo.userName;
-  phoneNumber ??= userInfo.phoneNumber;
+    String? requestedUserName,
+    String? requestedPhoneNumber}) async {
+  final userName = requestedUserName ?? userInfo.userName;
+  final phoneNumber = requestedPhoneNumber ?? userInfo.phoneNumber;
 
   TestUserInfo updatedUserInfo = userInfo.copy();
   updatedUserInfo.userInfo!.userName = userName;
@@ -119,14 +120,22 @@ Future<TestUserInfo> updateLocalUser(
 
   VerifyNumberData vd = await verifier.verifyNumber(req);
   if (vd.data == null || vd.error != null) {
+    debugPrint('UpdateUser verification error: ${vd.error}');
     completer.complete(false);
     return TestUserInfo(updatedUserInfo.user, null, null);
   }
 
   String? err;
 
-  (_, err) = await kc2Service.updateUser(evidence: vd.data!);
+  (_, err) = await kc2Service.updateUser(
+      evidence: vd.data!,
+      username: requestedUserName,
+      phoneNumberHash: requestedPhoneNumber == null
+          ? null
+          : kc2Service.getPhoneNumberHash(requestedPhoneNumber));
+
   if (err != null) {
+    debugPrint('UpdateUser tx error: $err');
     completer.completeError(err);
     return TestUserInfo(updatedUserInfo.user, null, null);
   }

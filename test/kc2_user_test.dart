@@ -182,11 +182,9 @@ void main() {
             "Katya${katya.identity.accountId.substring(0, 5)}".toLowerCase();
 
         String phoneNumber = randomPhoneNumber;
-        String phoneNumberHash =
-            kc2Service.getPhoneNumberHash(phoneNumber);
+        String phoneNumberHash = kc2Service.getPhoneNumberHash(phoneNumber);
         String phoneNumber1 = randomPhoneNumber;
-        String phoneNumberHash1 =
-            kc2Service.getPhoneNumberHash(phoneNumber1);
+        String phoneNumberHash1 = kc2Service.getPhoneNumberHash(phoneNumber1);
 
         final completer = Completer<bool>();
 

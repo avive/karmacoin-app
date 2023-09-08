@@ -56,7 +56,10 @@ void main() {
           }
 
           debugPrint('calling update user with same phone number...');
-          updateLocalUser(completer: completer, userInfo: katya);
+          updateLocalUser(
+              completer: completer,
+              userInfo: katya,
+              requestedPhoneNumber: katya.phoneNumber);
         };
 
         // subscribe to new account txs
