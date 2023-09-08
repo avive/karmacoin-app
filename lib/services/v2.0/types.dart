@@ -157,7 +157,10 @@ enum VerificationResult {
   factory VerificationResult.fromProto(String result) {
     return values.firstWhere((e) =>
         e.toString().replaceFirst('VerificationResult.', '').toLowerCase() ==
-        result.replaceFirst('VERIFICATION_RESULT_', '').toLowerCase());
+        result
+            .replaceFirst('VERIFICATION_RESULT_', '')
+            .replaceAll('_', '')
+            .toLowerCase());
   }
 }
 

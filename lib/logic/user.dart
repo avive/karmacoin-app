@@ -416,9 +416,6 @@ class KC2User extends KC2UserInteface {
       return;
     }
 
-    requestedUserName ??= userInfo.value!.userName;
-    requestedPhoneNumber ??= kc2User.identity.phoneNumber!;
-
     // Create a verification request for verifier with a bypass token or with
     // a verification code and session id from app state
     vnr.VerifyNumberRequest req = configLogic.skipWhatsappVerification

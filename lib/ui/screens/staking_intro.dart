@@ -2,6 +2,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 
+const _aboutPoolsUrl = 'https://karmaco.in/pools/';
+
 class StakingIntro extends StatefulWidget {
   const StakingIntro({super.key});
 
@@ -90,7 +92,7 @@ class _StakingIntroState extends State<StakingIntro> {
           const SizedBox(height: sepHeight),
           CupertinoButton(
             onPressed: () async {
-              // TODO: implement me
+              await openUrl(_aboutPoolsUrl);
             },
             child: const Text('Learn More'),
           ),

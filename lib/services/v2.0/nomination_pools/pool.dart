@@ -47,7 +47,7 @@ class Pool {
 
   Pool.fromJson(Map<String, dynamic> json)
       : id = json['id'],
-        bondedAccountId = json['boznded_account'],
+        bondedAccountId = json['bonded_account'],
         commission = Commission.fromJson(json['commission']),
         memberCounter = json['member_counter'],
         points = BigInt.from(json['points']),

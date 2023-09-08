@@ -36,8 +36,8 @@ class Verifier {
   Future<vnr.VerifyNumberRequest> createVerificationRequest(
       {bool useBypassToken = true,
       required String accountId,
-      required String phoneNumber,
-      required String userName,
+      required String? phoneNumber,
+      required String? userName,
       required KC2KeyRing keyring,
       String? verificationCode,
       String? verificaitonSessionId}) async {
