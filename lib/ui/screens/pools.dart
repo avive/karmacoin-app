@@ -218,7 +218,7 @@ class _PoolsScreenState extends State<PoolsScreen> {
 
     tiles.add(CupertinoListTile.notched(
       title: const Text('Commision'),
-      trailing: Text('${pool.commission.currentAsPrercnet.toString()}%'),
+      trailing: Text('${pool.commission.currentAsPercent.toString()}%'),
     ));
 
     KC2UserInfo? commisionBeneficiary = pool.commissionBeneficiary;

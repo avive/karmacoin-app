@@ -263,8 +263,6 @@ mixin K2ServiceInterface implements ChainApiProvider {
     }
   }
 
-  /// @HolyGrease - this is not needed once Contact and KC2UserInfo always
-  /// return metadata from chain as requested
   Future<String?> getMetadata(String accountId) async {
     try {
       List<dynamic>? result =

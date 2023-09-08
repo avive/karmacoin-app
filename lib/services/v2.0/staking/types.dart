@@ -27,9 +27,7 @@ class ValidatorPrefs {
   /// Validator account id.
   String accountId;
 
-  /// Reward that validator takes up-front; only the rest is split between themselves and nominators.
-  /// @HolyGrease - what are the min and max values for this? shouldn't this be double rpresenting a % in range [0.0,...,1.0]
-  /// Is this int's range [0,...,100] or other suchg as [0,...,1B]?
+  /// Reward that validator takes up-front; only the rest is split between themselves and nominators. [0,...,1B]
   int commission;
 
   /// Whether or not this validator is accepting more nominations.
