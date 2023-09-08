@@ -19,6 +19,7 @@ class KC2UserInfo {
   int karmaScore;
   late Map<int, List<TraitScore>> traitScores;
   late List<CommunityMembership> communityMemberships;
+  String? metadata;
 
   KC2UserInfo({
     required this.accountId,
@@ -29,6 +30,7 @@ class KC2UserInfo {
     this.karmaScore = 0,
     this.traitScores = const {},
     this.communityMemberships = const [],
+    this.metadata,
   });
 
   /// Returns the list of trait scores for a given communityId
@@ -85,6 +87,7 @@ class KC2UserInfo {
           karmaScore: u.karmaScore,
           traitScores: u.traitScores,
           communityMemberships: u.communityMemberships,
+          metadata: u.metadata,
         );
 
   KC2UserInfo.fromJson(Map<String, dynamic> u)
@@ -100,7 +103,10 @@ class KC2UserInfo {
         nonce = u['nonce'] is String ? int.parse(u['nonce']) : u['nonce'],
         karmaScore = u['karma_score'] is int
             ? u['karma_score']
-            : int.parse(u['karma_score']) {
+            : int.parse(u['karma_score']),
+        metadata = u['metadata'] == null
+            ? null
+            : String.fromCharCodes(u['metadata'].cast<int>()) {
     List<dynamic> memberships = u['community_membership'];
     communityMemberships =
         memberships.map((e) => CommunityMembership.fromJson(e)).toList();
