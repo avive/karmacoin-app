@@ -118,12 +118,9 @@ class _PoolsScreenState extends State<PoolsScreen> {
   Widget _getPoolsWidget(BuildContext context) {
     return Expanded(
       child: ListView.separated(
-        padding: const EdgeInsets.only(top: 24),
+        padding: const EdgeInsets.all(0),
         separatorBuilder: (context, index) {
-          return const Divider(
-            thickness: 1,
-            indent: 0,
-          );
+          return Container();
         },
         itemCount: entries!.length,
         itemBuilder: (context, index) {
@@ -250,10 +247,10 @@ class _PoolsScreenState extends State<PoolsScreen> {
     return CupertinoListSection.insetGrouped(
         key: Key(index.toString()),
         header: Text(
-          pool.id.toString(),
-          style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+          'Pool ${pool.id.toString()}',
+          style: CupertinoTheme.of(context).textTheme.navTitleTextStyle.merge(
                 const TextStyle(
-                    fontSize: 14, color: CupertinoColors.inactiveGray),
+                    fontSize: 20, color: CupertinoColors.activeGreen),
               ),
         ),
         children: tiles);

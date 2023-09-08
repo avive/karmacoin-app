@@ -22,11 +22,12 @@ void main() {
       () => GetIt.I.get<KarmachainService>());
   GetIt.I.registerLazySingleton<Verifier>(() => Verifier());
   GetIt.I.registerLazySingleton<ConfigLogic>(() => ConfigLogic());
+
   // @HolyGrease - we need the following basic pools integration test:
   // 1. create a nominator and have nominator nominate the devnet's validator.
   // 3. create pool and nominate the nominator.
   // 4. Have 1 user join the pool.
-  // 5. Wait an era and verify pool gets rewarded and verify user can withdraw their reward while staying in pool.
+  // 5. Wait an era and verify nominator & pool gets rewarded and verify user can withdraw their rewards while staying in pool.
 
   group('nomination tests', () {
     // todo: add test when user joins a pool and pools nominates the devnet validator
@@ -135,7 +136,7 @@ void main() {
     // 1. Connects to the chain
     // 2. Create pool using Katya account
     // 3. Join the pool using Punch account
-    // 4. Check that both Alice and Bob are members of the pool
+    // 4. Check that both Katya and Punch are members of the pool
     test(
       'join pool',
       () async {
@@ -661,13 +662,12 @@ void main() {
 
     test(
       'get pools configuration works',
-        () async {
-          KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
-          // Connect to the chain
-          await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
-
-          final configuration = await kc2Service.getPoolsConfiguration();
-        },
+      () async {
+        KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
+        // Connect to the chain
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+        await kc2Service.getPoolsConfiguration();
+      },
       timeout: const Timeout(Duration(seconds: 280)),
     );
   });

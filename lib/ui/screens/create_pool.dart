@@ -47,7 +47,7 @@ class _CreatePoolState extends State<CreatePool> {
         StatusAlert.show(context,
             duration: const Duration(seconds: 4),
             title: 'No Internet',
-            subtitle: 'Check your connection',
+            subtitle: 'Check your connection.',
             configuration: const IconConfiguration(
                 icon: CupertinoIcons.exclamationmark_triangle),
             dismissOnBackgroundTap: true,
@@ -56,13 +56,29 @@ class _CreatePoolState extends State<CreatePool> {
       return false;
     }
 
-    if (appState.kCentsAmount.value < GenesisConfig.kCentsPerCoinBigInt) {
+    if (config == null) {
+      // failed to get pool config from api
       if (context.mounted) {
         StatusAlert.show(
           context,
           duration: const Duration(seconds: 2),
-          title: 'Oops...',
-          subtitle: 'Amount must be 1 Karma Coin or more',
+          title: 'Server Unreachable',
+          subtitle: 'Please try again later.',
+          configuration: const IconConfiguration(
+              icon: CupertinoIcons.exclamationmark_triangle),
+          maxWidth: statusAlertWidth,
+        );
+      }
+      return false;
+    }
+
+    if (appState.kCentsAmount.value < config!.minCreateBond) {
+      if (context.mounted) {
+        StatusAlert.show(
+          context,
+          duration: const Duration(seconds: 2),
+          title: 'Insufficient Bond',
+          subtitle: 'Minimum bond amount is 1 Karma Coin.',
           configuration: const IconConfiguration(
               icon: CupertinoIcons.exclamationmark_triangle),
           maxWidth: statusAlertWidth,
@@ -111,10 +127,8 @@ class _CreatePoolState extends State<CreatePool> {
 
     // set initial value to 1 KC (todo: take from nomniation pools config)
     appState.kCentsAmount.value = GenesisConfig.kCentsPerCoinBigInt;
-
     kc2User.createPoolStatus.value = CreatePoolStatus.unknown;
 
-    /*
     Future.delayed(Duration.zero, () async {
       try {
         NominationPoolsConfiguration conf =
@@ -130,20 +144,15 @@ class _CreatePoolState extends State<CreatePool> {
           StatusAlert.show(
             context,
             duration: const Duration(seconds: 2),
-            title: 'Oops...',
-            subtitle: 'Karma coin server unreachable. Please try later.',
+            title: 'Server unreachable',
+            subtitle: 'Please try later.',
             configuration: const IconConfiguration(
                 icon: CupertinoIcons.exclamationmark_triangle),
             maxWidth: statusAlertWidth,
           );
         }
       }
-    });*/
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
+    });
   }
 
   Widget _getUpdateStatus(BuildContext context) {
@@ -168,6 +177,7 @@ class _CreatePoolState extends State<CreatePool> {
               kc2User.setMetadataStatus.value = SetMetadataStatus.unknown;
               Future.delayed(Duration.zero, () {
                 if (context.mounted) {
+                  debugPrint('Pool created!');
                   Navigator.of(context).pop();
                 }
               });

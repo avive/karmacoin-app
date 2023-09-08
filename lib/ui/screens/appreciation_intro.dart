@@ -10,14 +10,7 @@ class AppreciationIntro extends StatefulWidget {
 }
 
 class _AppreciationIntroState extends State<AppreciationIntro> {
-  @override
-  initState() {
-    super.initState();
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => _postFrameCallback(context));
-  }
-
-  void _postFrameCallback(BuildContext context) {}
+  
 
   Widget _getBodyContent(BuildContext context) {
     const double sepHeight = 24.0;

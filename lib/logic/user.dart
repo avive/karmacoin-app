@@ -523,10 +523,8 @@ class KC2User extends KC2UserInteface {
       return;
     }
 
-    // @HolyGrease - update local metadata for user with the value once
-    // we support metadata field for user in userInfo.
-    // something like:
-    // userInfo.value.metadata = tx.metadata;
+    // update metadata locally
+    userInfo.value?.metadata = tx.metadata;
 
     tx.chainError != null
         ? setMetadataStatus.value = SetMetadataStatus.invalidData
