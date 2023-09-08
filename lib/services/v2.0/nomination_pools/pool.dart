@@ -25,10 +25,12 @@ class Pool {
   /// Current state.
   PoolState state;
 
-  // User infos for the various pool roles
+  /// User infos for the various pool roles
   Map<String, KC2UserInfo> poolsUsers = {};
 
-  String? get socialUrl => poolsUsers[roles.depositor]?.metadata;
+  /// Pool's social url - must be set by depositor/creator
+  String? get socialUrl =>
+      'https://linktree/pool'; //poolsUsers[roles.depositor]?.metadata;
 
   // only available after call to populateUsers()
   KC2UserInfo? get depositor => poolsUsers[roles.depositor];

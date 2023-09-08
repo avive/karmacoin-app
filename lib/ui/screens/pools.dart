@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
@@ -138,7 +138,7 @@ class _PoolsScreenState extends State<PoolsScreen> {
           : "https://${pool.socialUrl}";
 
       tiles.add(CupertinoListTile.notched(
-        title: Text('Web Profile',
+        title: Text('Profile',
             style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
         leading: const Icon(CupertinoIcons.globe, size: 28),
         subtitle: Text(
@@ -159,7 +159,7 @@ class _PoolsScreenState extends State<PoolsScreen> {
       leading: const FaIcon(FontAwesomeIcons.coins, size: 24),
       trailing: Text(
         // todo: format it properly
-        pool.points.toString(),
+        KarmaCoinAmountFormatter.deicmalFormat.format(pool.points.toInt()),
       ),
     ));
 
@@ -168,7 +168,7 @@ class _PoolsScreenState extends State<PoolsScreen> {
       leading: const FaIcon(FontAwesomeIcons.peopleGroup, size: 24),
       trailing: Text(
         // todo: format this properly
-        pool.memberCounter.toString(),
+        KarmaCoinAmountFormatter.deicmalFormat.format(pool.memberCounter),
       ),
     ));
 
@@ -184,6 +184,20 @@ class _PoolsScreenState extends State<PoolsScreen> {
       onTap: () => context.pushNamed(ScreenNames.account,
           params: {'accountId': creator.accountId}),
     ));
+
+    KC2UserInfo? root = pool.root;
+    if (root != null) {
+      tiles.add(CupertinoListTile.notched(
+        title: const Text('Root'),
+        leading: RandomAvatar(root.userName, height: 50, width: 50),
+        subtitle: Text(
+            // todo: format this properly
+            root.userName),
+        trailing: const CupertinoListTileChevron(),
+        onTap: () => context.pushNamed(ScreenNames.account,
+            params: {'accountId': root.accountId}),
+      ));
+    }
 
     KC2UserInfo? nominator = pool.nominator;
     if (nominator != null) {
@@ -212,16 +226,20 @@ class _PoolsScreenState extends State<PoolsScreen> {
             params: {'accountId': bouncer.accountId}),
       ));
     }
+    final double commision = pool.commission.currentAsPercent ?? 0.0;
+    final String commisionString =
+        KarmaCoinAmountFormatter.deicmalFormat.format(commision);
 
     tiles.add(CupertinoListTile.notched(
       title: const Text('Commision'),
-      trailing: Text('${pool.commission.currentAsPercent.toString()}%'),
+      leading: const FaIcon(FontAwesomeIcons.percent, size: 24),
+      trailing: Text('$commisionString%'),
     ));
 
     KC2UserInfo? commisionBeneficiary = pool.commissionBeneficiary;
     if (commisionBeneficiary != null) {
       tiles.add(CupertinoListTile.notched(
-        title: const Text('Nominator'),
+        title: const Text('Commision Beneficiery'),
         leading:
             RandomAvatar(commisionBeneficiary.userName, height: 50, width: 50),
         subtitle: Text(
@@ -233,9 +251,21 @@ class _PoolsScreenState extends State<PoolsScreen> {
       ));
     }
 
+    final double? maxAsPrecent = pool.commission.maxAsPercent;
+    if (maxAsPrecent != null) {
+      final String maxCommision =
+          KarmaCoinAmountFormatter.deicmalFormat.format(maxAsPrecent);
+
+      tiles.add(CupertinoListTile.notched(
+        title: const Text('Max Commision'),
+        leading: const FaIcon(FontAwesomeIcons.maximize, size: 24),
+        trailing: Text('$maxCommision%'),
+      ));
+    }
+
     tiles.add(
       CupertinoListTile.notched(
-        title: CupertinoButton(
+        title: CupertinoButton.filled(
           onPressed: () {
             // TODO: push join pool screen
           },

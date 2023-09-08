@@ -235,11 +235,9 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
 
   /// Nominate on behalf of the pool.
   ///
-  /// The dispatch origin of this call must be signed by the pool nominator
-  /// or the pool root role.
+  /// The dispatch origin of this call must be signed by the pool nominator or the pool root role.
   ///
-  /// This directly forward the call to the staking pallet, on behalf of the
-  /// pool bonded account.
+  /// This directly forward the call to the staking pallet, on behalf of the pool bonded account.
   Future<String> nominateForPool(
       PoolId poolId, List<String> validatorsAccountIds) async {
     try {
@@ -262,11 +260,9 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
 
   /// Chill on behalf of the pool.
   ///
-  /// The dispatch origin of this call must be signed by the pool nominator
-  /// or the pool root role, same as [`Pallet::nominate`].
+  /// The dispatch origin of this call must be signed by the pool nominator or the pool root role, same as [`Pallet::nominate`].
   ///
-  /// This directly forward the call to the staking pallet, on behalf of the
-  /// pool bonded account.
+  /// This directly forward the call to the staking pallet, on behalf of the pool bonded account.
   Future<String> chillPool(PoolId poolId) async {
     try {
       final call = MapEntry(
@@ -284,8 +280,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
 
   /// Update the roles of the pool.
   ///
-  /// The root is the only entity that can change any of the roles, including
-  /// itself, excluding the depositor, who can never change.
+  /// The root is the only entity that can change any of the roles, including itself, excluding the depositor, who can never change.
   ///
   /// It emits an event, notifying UIs of the role change. This event is quite relevant to most pool members and they should be informed of changes to pool roles.
   Future<String> updatePoolRoles(
@@ -389,8 +384,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
 
   /// Set the maximum commission of a pool.
   ///
-  /// - Initial max can be set to any percentage up to the chain's global max commision %, and only smaller values
-  ///   thereafter.
+  /// - Initial max can be set to any percentage up to the chain's global max commision %, and only smaller values thereafter.
   /// - Current commission will be lowered in the event it is higher than a new max commission.
   /// - maxCommision range [0.0,...,1.0]
   Future<String> setPoolCommissionMax(
@@ -441,9 +435,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
 
   /// Claim pending commission.
   ///
-  /// The dispatch origin of this call must be signed by the `root` role of the pool.
-  /// Pending commission is paid out and added to total claimed commission`.
-  /// Total pending commission is reset to zero. the current.
+  /// The dispatch origin of this call must be signed by the `root` role of the pool. Pending commission is paid out and added to total claimed commission`. Total pending commission is reset to zero. the current.
   Future<String> claimPoolCommission(PoolId poolId) async {
     try {
       final call = MapEntry(
@@ -537,9 +529,11 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   }
 
   /// Returns pool members for a given pool.
-  Future<List<String>> getPoolMembers(PoolId poolId, {int? fromIndex, int? limit}) async {
+  Future<List<String>> getPoolMembers(PoolId poolId,
+      {int? fromIndex, int? limit}) async {
     try {
-      return await callRpc('nominationPools_getPoolMembers', [poolId, fromIndex, limit])
+      return await callRpc(
+              'nominationPools_getPoolMembers', [poolId, fromIndex, limit])
           .then((v) => v.cast<String>());
     } on PlatformException catch (e) {
       debugPrint('Failed to get nomination pool id: ${e.details}');

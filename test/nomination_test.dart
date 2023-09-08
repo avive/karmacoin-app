@@ -67,7 +67,7 @@ void main() {
             return;
           }
 
-          debugPrint('1');
+          debugPrint('Pool created.');
 
           // Check if the pool is created
           final pools = await kc2Service.getPools();
@@ -84,10 +84,6 @@ void main() {
           expect(pool.commission.throttleFrom, null);
           expect(pool.memberCounter, 1);
           expect(pool.points, GenesisConfig.kCentsPerCoinBigInt);
-
-          // we already test this when getting the pull from pools
-          // expect(pool.roles.depositor, katya.accountId);
-
           expect(pool.roles.root, katya.accountId);
           expect(pool.roles.nominator, katya.accountId);
           expect(pool.roles.bouncer, katya.accountId);
@@ -100,7 +96,7 @@ void main() {
           expect(poolMember!.id, pool.id);
           expect(poolMember.points, BigInt.from(1000000));
 
-          // verify punch is not a pool member of any pool
+          // verify Punch is not a pool member of any pool
           IdentityInterface punch = Identity();
           await punch.initNoStorage();
           try {
@@ -613,10 +609,6 @@ void main() {
 
           final validators = await kc2Service.getValidators();
 
-          // Roles:
-          // root: stays the same (Katya)
-          // nominator: changed to Punch
-          // bouncer: removed
           txHash = await kc2Service.nominateForPool(
             poolId,
             validators.map((validator) => validator.accountId).toList(),
