@@ -203,6 +203,11 @@ void main() {
           expect(bobPoolMember!.id, tx.poolId);
           expect(bobPoolMember.points, BigInt.from(1000000));
 
+          final poolMembers = await kc2Service.getPoolMembers(tx.poolId);
+          expect(poolMembers.length, 2);
+          expect(poolMembers.contains(katya.accountId), true);
+          expect(poolMembers.contains(punch.accountId), true);
+
           // todo: add a test when user tries to join same pool twice.
 
           // todo: crate a test when user tries to join a pool when he's already a member of another pool.

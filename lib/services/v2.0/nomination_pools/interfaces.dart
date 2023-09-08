@@ -537,6 +537,17 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
     }
   }
 
+  /// Returns pool members for a given pool.
+  Future<List<String>> getPoolMembers(PoolId poolId, {int? fromIndex, int? limit}) async {
+    try {
+      return await callRpc('nominationPools_getPoolMembers', [poolId, fromIndex, limit])
+          .then((v) => v.cast<String>());
+    } on PlatformException catch (e) {
+      debugPrint('Failed to get nomination pool id: ${e.details}');
+      rethrow;
+    }
+  }
+
   // available client txs callbacks
   JoinPoolCallback? joinPoolCallback;
   ClaimPoolPayoutCallback? claimPoolPayoutCallback;
