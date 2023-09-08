@@ -66,6 +66,8 @@ void main() {
             return;
           }
 
+          debugPrint('1');
+
           // Check if the pool is created
           final pools = await kc2Service.getPools();
           expect(pools.isNotEmpty, isTrue);
@@ -654,6 +656,18 @@ void main() {
         expect(await completer.future, equals(true));
         expect(completer.isCompleted, isTrue);
       },
+      timeout: const Timeout(Duration(seconds: 280)),
+    );
+
+    test(
+      'get pools configuration works',
+        () async {
+          KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
+          // Connect to the chain
+          await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+
+          final configuration = await kc2Service.getPoolsConfiguration();
+        },
       timeout: const Timeout(Duration(seconds: 280)),
     );
   });

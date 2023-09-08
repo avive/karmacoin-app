@@ -20,10 +20,8 @@ class NominationPoolsConfiguration {
   /// If `null`, then the count of members is not bound on a per pool basis.
   int? maxPoolMembersPerPool;
 
-  /// The maximum commission that can be charged by a pool.
-  /// @HolyGrease - in what units is this? [0,...,1B]?
-  /// Why BigInt and not int if max is 1B?
-  BigInt globalMaxCommission;
+  /// The maximum commission that can be charged by a pool. [0,...,1B]
+  int? globalMaxCommission;
 
   NominationPoolsConfiguration(
       this.minJoinBond,
@@ -34,12 +32,10 @@ class NominationPoolsConfiguration {
       this.globalMaxCommission);
 
   NominationPoolsConfiguration.fromJson(Map<String, dynamic> json)
-      : minJoinBond = BigInt.parse(json['minJoinBond']),
-        minCreateBond = BigInt.parse(json['minCreateBond']),
-        maxPools = json['maxPools'] ? null : json['maxPools'],
-        maxPoolMembers = json['maxPoolMembers'] ? null : json['maxPoolMembers'],
-        maxPoolMembersPerPool = json['maxPoolMembersPerPool']
-            ? null
-            : json['maxPoolMembersPerPool'],
-        globalMaxCommission = BigInt.parse(json['globalMaxCommission']);
+      : minJoinBond = BigInt.from(json['min_join_bond']),
+        minCreateBond = BigInt.from(json['min_create_bond']),
+        maxPools = json['max_pools'],
+        maxPoolMembers = json['max_pool_members'],
+        maxPoolMembersPerPool = json['max_pool_members_per_pool'],
+        globalMaxCommission = json['global_max_commission'];
 }
