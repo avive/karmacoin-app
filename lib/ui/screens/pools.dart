@@ -221,7 +221,7 @@ class _PoolsScreenState extends State<PoolsScreen> {
       trailing: Text('${pool.commission.currentAsPrercnet.toString()}%'),
     ));
 
-    KC2UserInfo? commisionBeneficiary = pool.commisionBeneficiary;
+    KC2UserInfo? commisionBeneficiary = pool.commissionBeneficiary;
     if (commisionBeneficiary != null) {
       tiles.add(CupertinoListTile.notched(
         title: const Text('Nominator'),

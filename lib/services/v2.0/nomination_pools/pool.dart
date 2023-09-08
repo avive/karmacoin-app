@@ -38,7 +38,7 @@ class Pool {
   KC2UserInfo? get nominator =>
       roles.bouncer != null ? poolsUsers[roles.nominator] : null;
 
-  KC2UserInfo? get commisionBeneficiary => commission.beneficiary != null
+  KC2UserInfo? get commissionBeneficiary => commission.beneficiary != null
       ? poolsUsers[commission.beneficiary]
       : null;
 
