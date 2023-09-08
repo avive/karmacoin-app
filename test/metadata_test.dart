@@ -36,7 +36,6 @@ void main() {
         // Test utils
         String txHash = "";
 
-        // Create pool callback
         kc2Service.setMetadataCallback = (tx) async {
           if (tx.hash != txHash) {
             // allow other tests to run in parallel
@@ -82,7 +81,6 @@ void main() {
         // Test utils
         String txHash = "";
 
-        // Create pool callback
         kc2Service.setMetadataCallback = (tx) async {
           if (tx.hash != txHash) {
             // allow other tests to run in parallel
@@ -135,7 +133,6 @@ void main() {
         // Test utils
         String txHash = "";
 
-        // Create pool callback
         kc2Service.setMetadataCallback = (tx) async {
           if (tx.hash != txHash) {
             // allow other tests to run in parallel
@@ -187,7 +184,7 @@ void main() {
 
     test(
       'user info contains metadata',
-          () async {
+      () async {
         KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
         // Connect to the chain
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
@@ -199,7 +196,6 @@ void main() {
         // Test utils
         String txHash = "";
 
-        // Create pool callback
         kc2Service.setMetadataCallback = (tx) async {
           if (tx.hash != txHash) {
             // allow other tests to run in parallel
@@ -213,15 +209,18 @@ void main() {
           }
 
           // Check if the pool is created
-          final resultByAccountId = await kc2Service.getUserInfoByAccountId(katya.accountId);
+          final resultByAccountId =
+              await kc2Service.getUserInfoByAccountId(katya.accountId);
           expect(resultByAccountId, isNotNull);
           expect(resultByAccountId!.metadata, metadata);
 
-          final resultByUserName = await kc2Service.getUserInfoByUserName(katya.userName);
+          final resultByUserName =
+              await kc2Service.getUserInfoByUserName(katya.userName);
           expect(resultByUserName, isNotNull);
           expect(resultByUserName!.metadata, metadata);
 
-          final resultByPhoneNumberHash = await kc2Service.getUserInfoByPhoneNumberHash(katya.phoneNumberHash);
+          final resultByPhoneNumberHash = await kc2Service
+              .getUserInfoByPhoneNumberHash(katya.phoneNumberHash);
           expect(resultByPhoneNumberHash, isNotNull);
           expect(resultByPhoneNumberHash!.metadata, metadata);
 
@@ -241,47 +240,46 @@ void main() {
 
     test(
       'contact contains metadata',
-        () async {
-          KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
-          // Connect to the chain
-          await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+      () async {
+        KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
+        // Connect to the chain
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
-          // Create a new identity for local user
-          final completer = Completer<bool>();
-          TestUserInfo katya = await createLocalUser(completer: completer);
+        // Create a new identity for local user
+        final completer = Completer<bool>();
+        TestUserInfo katya = await createLocalUser(completer: completer);
 
-          // Test utils
-          String txHash = "";
+        // Test utils
+        String txHash = "";
 
-          // Create pool callback
-          kc2Service.setMetadataCallback = (tx) async {
-            if (tx.hash != txHash) {
-              // allow other tests to run in parallel
-              return;
-            }
+        kc2Service.setMetadataCallback = (tx) async {
+          if (tx.hash != txHash) {
+            // allow other tests to run in parallel
+            return;
+          }
 
-            // Check if the tx failed
-            if (tx.chainError != null) {
-              completer.complete(false);
-              return;
-            }
+          // Check if the tx failed
+          if (tx.chainError != null) {
+            completer.complete(false);
+            return;
+          }
 
-            // Check if the pool is created
-            final result = await kc2Service.getContacts(katya.userName);
-            expect(result, isNotEmpty);
-            expect(result.first.metadata, metadata);
+          // Check if the pool is created
+          final result = await kc2Service.getContacts(katya.userName);
+          expect(result, isNotEmpty);
+          expect(result.first.metadata, metadata);
 
-            completer.complete(true);
-          };
+          completer.complete(true);
+        };
 
-          kc2Service.subscribeToAccountTransactions(katya.userInfo!);
+        kc2Service.subscribeToAccountTransactions(katya.userInfo!);
 
-          txHash = await kc2Service.setMetadata(metadata);
+        txHash = await kc2Service.setMetadata(metadata);
 
-          // Wait for completer and verify test success
-          expect(await completer.future, equals(true));
-          expect(completer.isCompleted, isTrue);
-        },
+        // Wait for completer and verify test success
+        expect(await completer.future, equals(true));
+        expect(completer.isCompleted, isTrue);
+      },
       timeout: const Timeout(Duration(seconds: 280)),
     );
   });

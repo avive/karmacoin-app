@@ -33,7 +33,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool apiOffline = false;
   bool userNotFound = false;
   KC2UserInfo? userInfo;
-  String? socialUrl;
 
   @override
   void initState() {
@@ -63,11 +62,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       try {
         KC2UserInfo? info =
             await kc2Service.getUserInfoByUserName(widget.userName);
-
-        if (info != null) {
-          // TODO: remove this once metadata is part of KC2UserInfo
-          socialUrl = await kc2Service.getMetadata(info.accountId);
-        }
 
         setState(() {
           if (info != null) {
@@ -154,15 +148,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _getSocialProfile(BuildContext context) {
+    String? socialUrl = userInfo?.metadata;
+
     if (socialUrl == null) {
       return Container();
     }
 
     final String url =
-        socialUrl!.startsWith('https://') ? socialUrl! : 'https://$socialUrl!';
+        socialUrl.startsWith('https://') ? socialUrl : 'https://$socialUrl';
 
     return CupertinoButton(
-        child: Text(socialUrl!,
+        child: Text(socialUrl,
             style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                   const TextStyle(color: CupertinoColors.activeBlue),
                 )),

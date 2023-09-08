@@ -53,11 +53,6 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
         local = true;
       }
 
-      if (u != null) {
-        // TODO: remove this once metadata is part of KC2UserInfo
-        socialUrl = await kc2Service.getMetadata(u.accountId);
-      }
-
       setState(() {
         user = u;
         isLocal = local;
@@ -154,9 +149,11 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
       );
     }
 
+    String? socialUrl = user?.metadata;
+
     if (socialUrl != null) {
       final String url =
-          socialUrl!.startsWith('https://') ? socialUrl! : 'https://$socialUrl';
+          socialUrl.startsWith('https://') ? socialUrl : 'https://$socialUrl';
 
       tiles.add(
         CupertinoListTile.notched(

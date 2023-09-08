@@ -28,7 +28,7 @@ class Pool {
   // User infos for the various pool roles
   Map<String, KC2UserInfo> poolsUsers = {};
 
-  String? socialUrl;
+  String? get socialUrl => poolsUsers[roles.depositor]?.metadata;
 
   // only available after call to populateUsers()
   KC2UserInfo? get depositor => poolsUsers[roles.depositor];
@@ -82,8 +82,5 @@ class Pool {
     if (commission.beneficiary != null) {
       await _addPoolUser(commission.beneficiary!);
     }
-
-    // TODO: get rid of this when user info returned from server includes social url (metadata)
-    socialUrl = await kc2Service.getMetadata(roles.depositor);
   }
 }

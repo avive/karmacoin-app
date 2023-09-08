@@ -23,15 +23,8 @@ class _SetMetadataScreenState extends State<SetMetadataScreen> {
   @override
   void initState() {
     super.initState();
-    // TODO: populate text field with current user's metadata
-    // once it is part of kc2User - should be loaded on new app session start from chain...
-
-    kc2Service.getMetadata(kc2User.identity.accountId).then((value) {
-      if (value != null) {
-        onChainMetadata = value;
-        _textController.text = value;
-      }
-    });
+    // populate with existing metadata
+    _textController.text = kc2User.userInfo.value?.metadata ?? '';
   }
 
   @override
