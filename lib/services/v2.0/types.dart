@@ -96,6 +96,7 @@ class Contact {
   String phoneNumberHash;
   List<CommunityMembership> communityMemberships;
   List<TraitScore> traitScores;
+  String? metadata;
 
   Contact(this.userName, this.accountId, this.phoneNumberHash,
       this.communityMemberships, this.traitScores);
@@ -126,7 +127,10 @@ class Contact {
             .toList(),
         traitScores = (c['trait_scores'] as List<dynamic>)
             .map((e) => TraitScore.fromJson(e))
-            .toList();
+            .toList(),
+        metadata = c['metadata'] == null
+            ? null
+            : String.fromCharCodes(c['metadata'].cast<int>());
 
   Map<String, dynamic> toJson() => {
         'username': userName,
