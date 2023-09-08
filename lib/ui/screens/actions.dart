@@ -136,6 +136,12 @@ class _ActionsScreenState extends State<ActionsScreen> {
                   await _earnButtonHandler(context);
                 }),
             CupertinoListTile.notched(
+              title: const Text('Create Mining Pool'),
+              leading: const FaIcon(FontAwesomeIcons.userGroup, size: 20),
+              trailing: const CupertinoListTileChevron(),
+              onTap: () => context.push(ScreenPaths.createPool),
+            ),
+            CupertinoListTile.notched(
                 title: const Text('Learn More'),
                 leading: const FaIcon(FontAwesomeIcons.circleInfo, size: 24),
                 onTap: () async {

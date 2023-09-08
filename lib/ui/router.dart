@@ -3,6 +3,7 @@ import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/ui/screens/about.dart';
 import 'package:karma_coin/ui/screens/backup_account.dart';
 import 'package:karma_coin/ui/screens/community_home.dart';
+import 'package:karma_coin/ui/screens/create_pool.dart';
 import 'package:karma_coin/ui/screens/karmachain.dart';
 import 'package:karma_coin/ui/screens/payment_tx_details.dart';
 import 'package:karma_coin/ui/screens/pools.dart';
@@ -47,6 +48,9 @@ class ScreenPaths {
 
   /// Send KC screen
   static String send = '/send';
+
+  /// Create a mining pool
+  static String createPool = '/create-pool';
 
   /// Security words screen
   static String securityWords = '/security_words';
@@ -112,6 +116,9 @@ class ScreenNames {
 
   /// Send KC screen
   static String send = 'send';
+
+  /// Create pool
+  static String createPool = 'create-pool';
 
   // public profile page / screen
   static String profile = 'profile';
@@ -324,6 +331,12 @@ final GoRouter appRouter = GoRouter(
         path: ScreenPaths.send,
         builder: (BuildContext context, GoRouterState state) {
           return const SendWidget();
+        }),
+    GoRoute(
+        name: ScreenNames.createPool,
+        path: ScreenPaths.createPool,
+        builder: (BuildContext context, GoRouterState state) {
+          return const CreatePool();
         }),
     GoRoute(
         name: ScreenNames.girrafesHomeScreen,

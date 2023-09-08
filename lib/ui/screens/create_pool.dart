@@ -1,8 +1,8 @@
 import 'package:karma_coin/common/platform_info.dart';
+import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/logic/user_interface.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 import 'package:karma_coin/ui/components/amount_input.dart';
-import 'package:karma_coin/ui/components/send_destination.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/app_state.dart';
@@ -56,7 +56,7 @@ class _CreatePoolState extends State<CreatePool> {
       return false;
     }
 
-    if (appState.kCentsAmount.value < config!.minCreateBond) {
+    if (appState.kCentsAmount.value < GenesisConfig.kCentsPerCoinBigInt) {
       if (context.mounted) {
         StatusAlert.show(
           context,
@@ -103,29 +103,39 @@ class _CreatePoolState extends State<CreatePool> {
   }
 
   @override
-  void initState() async {
+  void initState() {
     super.initState();
+
+    // set initial value to 1 KC (todo: take from nomniation pools config)
+    appState.kCentsAmount.value = GenesisConfig.kCentsPerCoinBigInt;
 
     kc2User.createPoolStatus.value = CreatePoolStatus.unknown;
 
-    try {
-      config = await (kc2Service as KC2NominationPoolsInterface)
-          .getPoolsConfiguration();
-    } catch (e) {
-      apiDown = true;
-      debugPrint('Can\'t read pools config');
-      if (context.mounted) {
-        StatusAlert.show(
-          context,
-          duration: const Duration(seconds: 2),
-          title: 'Oops...',
-          subtitle: 'Karma coin server unreachable. Please try later.',
-          configuration: const IconConfiguration(
-              icon: CupertinoIcons.exclamationmark_triangle),
-          maxWidth: statusAlertWidth,
-        );
+    /*
+    Future.delayed(Duration.zero, () async {
+      try {
+        NominationPoolsConfiguration conf =
+            await (kc2Service as KC2NominationPoolsInterface)
+                .getPoolsConfiguration();
+        setState(() {
+          config = conf;
+        });
+      } catch (e) {
+        apiDown = true;
+        debugPrint('Can\'t read pools config: $e');
+        if (context.mounted) {
+          StatusAlert.show(
+            context,
+            duration: const Duration(seconds: 2),
+            title: 'Oops...',
+            subtitle: 'Karma coin server unreachable. Please try later.',
+            configuration: const IconConfiguration(
+                icon: CupertinoIcons.exclamationmark_triangle),
+            maxWidth: statusAlertWidth,
+          );
+        }
       }
-    }
+    });*/
   }
 
   @override
@@ -209,14 +219,14 @@ class _CreatePoolState extends State<CreatePool> {
     return CupertinoPageScaffold(
       child: CustomScrollView(
         slivers: [
-          kcNavBar(context, 'CREATE MINING POOL'),
+          kcNavBar(context, 'CREATE POOL'),
           SliverFillRemaining(
             hasScrollBody: false,
             child: Padding(
               padding: const EdgeInsets.only(
                   left: 16, right: 16, top: 16, bottom: 16),
               child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Column(
@@ -243,7 +253,7 @@ class _CreatePoolState extends State<CreatePool> {
                     ),
                     const SizedBox(height: 16),
                     CupertinoButton.filled(
-                      onPressed: !isSubmitting
+                      onPressed: isSubmitting
                           ? null
                           : () async {
                               if (await _validateData()) {
