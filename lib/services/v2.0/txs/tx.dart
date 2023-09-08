@@ -248,7 +248,7 @@ abstract class KC2Tx {
     }
 
     if (pallet == 'NominationPools' && method == 'create') {
-      return KC2CreatePoolTxV1.createCreatedTx(
+      return KC2CreatePoolTxV1.createPoolCreatedTx(
           hash: hash,
           timestamp: timestamp,
           signer: signer,

@@ -10,7 +10,7 @@ class KC2CreatePoolTxV1 extends KC2Tx {
   String nominator;
   String bouncer;
 
-  static KC2CreatePoolTxV1 createCreatedTx(
+  static KC2CreatePoolTxV1 createPoolCreatedTx(
       {required String hash,
       required int timestamp,
       required String signer,

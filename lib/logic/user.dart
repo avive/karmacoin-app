@@ -359,6 +359,7 @@ class KC2User extends KC2UserInteface {
       required String bouncer}) async {
     createPoolStatus.value = CreatePoolStatus.creating;
 
+    // todo: this is buggy when 2nd call - needs to be cancled every time createPool is called
     Future.delayed(const Duration(seconds: 60), () async {
       if (createPoolStatus.value == CreatePoolStatus.creating) {
         // tx timed out
@@ -508,6 +509,10 @@ class KC2User extends KC2UserInteface {
     tx.chainError != null
         ? createPoolStatus.value = CreatePoolStatus.invalidData
         : createPoolStatus.value = CreatePoolStatus.created;
+
+    if (tx.chainError != null) {
+      debugPrint('Create pool failed with: ${tx.chainError}');
+    }
 
     _createPoolTxHash = '';
   }

@@ -93,6 +93,9 @@ class _CreatePoolState extends State<CreatePool> {
 
   /// Send coins via an apprecaition with no personality trait
   Future<void> _send() async {
+    setState(() {
+      isSubmitting = true;
+    });
     final accountId = kc2User.identity.accountId;
 
     await kc2User.createPool(
