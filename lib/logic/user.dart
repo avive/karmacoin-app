@@ -512,6 +512,9 @@ class KC2User extends KC2UserInteface {
 
     if (tx.chainError != null) {
       debugPrint('Create pool failed with: ${tx.chainError}');
+    } else {
+      // get updated balance
+      await getUserDataFromChain();
     }
 
     _createPoolTxHash = '';
@@ -533,6 +536,13 @@ class KC2User extends KC2UserInteface {
         : setMetadataStatus.value = SetMetadataStatus.updated;
 
     _setMetadataTxHash = '';
+
+    // get updated user info from chain
+    if (tx.chainError == null) {
+      await getUserDataFromChain();
+    } else {
+      debugPrint('Set metadata failed with: ${tx.chainError}');
+    }
   }
 
   Future<void> _signupUserCallback(KC2NewUserTransactionV1 tx) async {
