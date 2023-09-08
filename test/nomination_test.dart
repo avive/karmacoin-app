@@ -269,6 +269,8 @@ void main() {
           // Set commission equal to 2%
           txHash =
               await kc2Service.setPoolCommission(poolId, 0.02, katya.accountId);
+
+          debugPrint('Pool $poolId commision set to 2%');
         };
 
         kc2Service.setPoolCommissionCallback = (tx) async {

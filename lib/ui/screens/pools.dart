@@ -138,12 +138,10 @@ class _PoolsScreenState extends State<PoolsScreen> {
           : "https://${pool.socialUrl}";
 
       tiles.add(CupertinoListTile.notched(
-        title: Text('Profile',
-            style: CupertinoTheme.of(context).textTheme.navTitleTextStyle),
         leading: const Icon(CupertinoIcons.globe, size: 28),
-        subtitle: Text(
+        title: Text(
           pool.socialUrl!,
-          style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+          style: CupertinoTheme.of(context).textTheme.navTitleTextStyle.merge(
                 const TextStyle(color: CupertinoColors.activeBlue),
               ),
         ),
@@ -228,7 +226,7 @@ class _PoolsScreenState extends State<PoolsScreen> {
     }
     final double commision = pool.commission.currentAsPercent ?? 0.0;
     final String commisionString =
-        KarmaCoinAmountFormatter.deicmalFormat.format(commision);
+        KarmaCoinAmountFormatter.deicmalFormat.format(commision * 100.0);
 
     tiles.add(CupertinoListTile.notched(
       title: const Text('Commision'),
@@ -254,7 +252,7 @@ class _PoolsScreenState extends State<PoolsScreen> {
     final double? maxAsPrecent = pool.commission.maxAsPercent;
     if (maxAsPrecent != null) {
       final String maxCommision =
-          KarmaCoinAmountFormatter.deicmalFormat.format(maxAsPrecent);
+          KarmaCoinAmountFormatter.deicmalFormat.format(maxAsPrecent * 100.0);
 
       tiles.add(CupertinoListTile.notched(
         title: const Text('Max Commision'),
