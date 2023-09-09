@@ -230,7 +230,7 @@ class _PoolsScreenState extends State<PoolsScreen> {
 
     tiles.add(CupertinoListTile.notched(
       title: const Text('Commision'),
-      leading: const FaIcon(FontAwesomeIcons.percent, size: 24),
+      leading: const FaIcon(FontAwesomeIcons.moneyBill, size: 24),
       trailing: Text('$commisionString%'),
     ));
 

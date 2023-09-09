@@ -30,6 +30,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
   @override
   void initState() {
     super.initState();
+    user = null;
 
     // Create anonymous function:
     () async {
