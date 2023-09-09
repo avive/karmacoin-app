@@ -1,14 +1,14 @@
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/services/v2.0/nomination_pools/pool_member.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
-import 'package:karma_coin/ui/screens/about_karma_mining.dart';
+import 'package:karma_coin/ui/screens/intros/about_karma_mining.dart';
 import 'package:karma_coin/ui/components/delete_account_tile.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:badges/badges.dart' as badges;
-import 'package:karma_coin/ui/screens/leaderboard.dart';
-import 'package:karma_coin/ui/screens/staking_intro.dart';
-import 'package:karma_coin/ui/screens/user_metadata.dart';
+import 'package:karma_coin/ui/screens/actions/leaderboard.dart';
+import 'package:karma_coin/ui/screens/intros/staking_intro.dart';
+import 'package:karma_coin/ui/screens/actions/user_metadata.dart';
 
 const _privacyUrl = 'https://karmaco.in/docs/privacy';
 const _supportUrl = 'https://karmaco.in/docs/support';
@@ -41,11 +41,14 @@ class _ActionsScreenState extends State<ActionsScreen> {
       PoolMember? membership = await kc2User.getPoolMembership();
 
       if (membership != null) {
-        // TODO: implement me
-        // local user is member of a pool - show pool details screen
+        List<Pool>? pools =
+            await (kc2Service as KC2NominationPoolsInterface).getPools();
+        Pool? pool = pools.firstWhere((p) => p.id == membership.id);
+
         if (context.mounted) {
-          // local user is not a member of a pool - push pool selection screen
-          context.push(ScreenPaths.pools);
+          // local user is member of a pool - show pool details screen
+          context.pushNamed(ScreenNames.pool,
+              params: {'id': pool.id.toString()}, extra: pool);
         }
       } else {
         if (context.mounted) {

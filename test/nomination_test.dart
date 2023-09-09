@@ -175,7 +175,7 @@ void main() {
               kc2Service.subscribeToAccountTransactions(punch.userInfo!);
           // Punch join the pool
           kc2Service.setKeyring(punch.user.keyring);
-          txHash = await kc2Service.join(BigInt.from(1000000), poolId);
+          txHash = await kc2Service.joinPool(amount: BigInt.from(1000000), poolId: poolId);
         };
 
         kc2Service.joinPoolCallback = (tx) async {

@@ -26,6 +26,7 @@ class KC2User extends KC2UserInteface {
   late String _updateUserTxHash = '';
   late String _setMetadataTxHash = '';
   late String _createPoolTxHash = '';
+  late String _joinPoolTxHash = '';
 
   @override
   ValueNotifier<Map<String, KC2Tx>> get incomingAppreciations =>
@@ -79,6 +80,7 @@ class KC2User extends KC2UserInteface {
     kc2Service.updateUserCallback = _updateUserCallback;
     kc2Service.setMetadataCallback = _setMetadataCallback;
     kc2Service.createPoolCallback = _createPoolCallback;
+    kc2Service.joinPoolCallback = _joinPoolCallback;
 
     // subscribe to account transactions if we have user info in this session
     // otherwise we'll subscribe o n signup()
@@ -174,6 +176,7 @@ class KC2User extends KC2UserInteface {
     kc2Service.newUserCallback = null;
     kc2Service.setMetadataCallback = null;
     kc2Service.createPoolCallback = null;
+    kc2Service.joinPoolCallback = null;
 
     // remove the id from local store
     await _identity.removeFromStore();
@@ -345,9 +348,36 @@ class KC2User extends KC2UserInteface {
       // persist latest user info and set signup to signedup
       await userInfo.value?.persistToSecureStorage(_secureStorage);
       signupStatus.value = SignupStatus.signedUp;
+
+      // load pool membership
+      poolMembership.value = await (kc2Service as KC2NominationPoolsInterface)
+          .getMembershipPool(_identity.accountId);
     } catch (e) {
       // api error - don't change signup status
       debugPrint('failed to get userInfo from chain via api: $e');
+    }
+  }
+
+  @override
+  Future<void> joinPool({required BigInt amount, required int poolId}) async {
+    joinPoolStatus.value = JoinPoolStatus.joining;
+
+    // todo: this is buggy when 2nd call - needs to be cancled every time createPool is called
+    Future.delayed(const Duration(seconds: 60), () async {
+      if (joinPoolStatus.value == JoinPoolStatus.joining) {
+        // tx timed out
+        joinPoolStatus.value = JoinPoolStatus.connectionTimeout;
+      }
+    });
+
+    try {
+      _joinPoolTxHash = await (kc2Service as KC2NominationPoolsInterface)
+          .joinPool(amount: amount, poolId: poolId);
+      // status updated via callback
+    } catch (e) {
+      debugPrint('failed to join pool: $e');
+      joinPoolStatus.value = JoinPoolStatus.serverError;
+      return;
     }
   }
 
@@ -376,7 +406,7 @@ class KC2User extends KC2UserInteface {
               bouncer: bouncer);
       // status updated via callback
     } catch (e) {
-      debugPrint('failed to set metadata: $e');
+      debugPrint('failed to create pool: $e');
       createPoolStatus.value = CreatePoolStatus.serverError;
       return;
     }
@@ -523,6 +553,26 @@ class KC2User extends KC2UserInteface {
     }
 
     _createPoolTxHash = '';
+  }
+
+  Future<void> _joinPoolCallback(KC2JoinPoolTxV1 tx) async {
+    if (_joinPoolTxHash != tx.hash) {
+      // not of interest
+      return;
+    }
+
+    tx.chainError != null
+        ? joinPoolStatus.value = JoinPoolStatus.invalidData
+        : joinPoolStatus.value = JoinPoolStatus.joined;
+
+    if (tx.chainError != null) {
+      debugPrint('Joined pool failed with: ${tx.chainError}');
+    } else {
+      // get updated balance and pool membership
+      await getUserDataFromChain();
+    }
+
+    _joinPoolTxHash = '';
   }
 
   Future<void> _setMetadataCallback(KC2SetMetadataTxV1 tx) async {

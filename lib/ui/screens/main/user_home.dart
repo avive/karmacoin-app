@@ -4,19 +4,19 @@ import 'package:intl/intl.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/data/payment_tx_data.dart';
-import 'package:karma_coin/services/v2.0/nomination_pools/pool_member.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
-import 'package:karma_coin/ui/screens/appreciate.dart';
+import 'package:karma_coin/ui/screens/actions/appreciate.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/ui/components/animated_background.dart';
 import 'package:karma_coin/ui/components/animated_wave.dart';
 import 'package:karma_coin/ui/components/animated_wave_right.dart';
 import 'package:karma_coin/ui/components/traits_scores_wheel.dart';
-import 'package:karma_coin/ui/screens/appreciation_intro.dart';
-import 'package:karma_coin/ui/screens/appreciation_progress.dart';
-import 'package:karma_coin/ui/screens/intro.dart';
-import 'package:karma_coin/ui/screens/leaderboard.dart';
-import 'package:karma_coin/ui/screens/staking_intro.dart';
+import 'package:karma_coin/ui/screens/intros/appreciation_intro.dart';
+import 'package:karma_coin/ui/screens/actions/appreciation_progress.dart';
+import 'package:karma_coin/ui/screens/intros/intro.dart';
+import 'package:karma_coin/ui/screens/actions/leaderboard.dart';
+import 'package:karma_coin/ui/screens/intros/staking_intro.dart';
 
 const smallScreenHeight = 1334;
 
@@ -229,13 +229,24 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 // push intro screen here
                 const StakingIntro())))
         .then((completion) async {
-      if (!context.mounted) return;
-
       PoolMember? membership = await kc2User.getPoolMembership();
 
       if (membership != null) {
-        // TODO: implement me
-        // local user is member of a pool - show pool details screen
+        List<Pool>? pools =
+            await (kc2Service as KC2NominationPoolsInterface).getPools();
+
+        try {
+          Pool pool = pools.firstWhere((p) => p.id == membership.id);
+
+          if (context.mounted) {
+            // local user is member of a pool - show pool details screen
+            context.pushNamed(ScreenNames.pool,
+                params: {'id': pool.id.toString()}, extra: pool);
+          }
+        } catch (e) {
+          debugPrint('Pool not found in pools...');
+          // TODO: figure out how to handle - pool was deleted?
+        }
       } else {
         if (context.mounted) {
           // local user is not a member of a pool - push pool selection screen

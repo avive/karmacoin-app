@@ -140,6 +140,7 @@ class KC2UserInfo {
       'nonce': nonce,
       'karma_score': karmaScore,
       'trait_scores': all.map((e) => e.toJson()).toList(),
+      'metadata': metadata != null ? metadata! : '',
       'community_membership':
           communityMemberships.map((e) => e.toJson()).toList(),
     };

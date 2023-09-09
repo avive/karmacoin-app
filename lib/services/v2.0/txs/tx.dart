@@ -192,7 +192,7 @@ abstract class KC2Tx {
     }
 
     if (pallet == 'NominationPools' && method == 'join') {
-      return KC2JoinTxV1.createJoinTx(
+      return KC2JoinPoolTxV1.createJoinTx(
           hash: hash,
           timestamp: timestamp,
           signer: signer,

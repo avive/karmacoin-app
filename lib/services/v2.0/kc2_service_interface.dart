@@ -21,6 +21,7 @@ typedef SetMetadataCallback = Future<void> Function(KC2SetMetadataTxV1 tx);
 typedef AppreciationCallback = Future<void> Function(KC2AppreciationTxV1 tx);
 typedef TransferCallback = Future<void> Function(KC2TransferTxV1 tx);
 typedef CreatePoolCallback = Future<void> Function(KC2CreatePoolTxV1 tx);
+typedef JoinPoolCallback = Future<void> Function(KC2JoinPoolTxV1 tx);
 
 enum FetchAppreciationsStatus { idle, fetching, fetched, error }
 
@@ -536,6 +537,9 @@ mixin K2ServiceInterface implements ChainApiProvider {
 
   /// Callback when pool is created
   CreatePoolCallback? createPoolCallback;
+
+  /// Callback when pool is created
+  JoinPoolCallback? joinPoolCallback;
 
   /// Callback when account remove metadata
   RemoveMetadataCallback? removeMetadataCallback;

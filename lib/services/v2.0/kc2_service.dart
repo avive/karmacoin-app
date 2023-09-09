@@ -400,7 +400,7 @@ class KarmachainService extends ChainApiProvider
       }
 
       if (signer == userInfo.accountId &&
-          transaction is KC2JoinTxV1 &&
+          transaction is KC2JoinPoolTxV1 &&
           joinPoolCallback != null) {
         await joinPoolCallback!(transaction);
         return;
@@ -431,6 +431,13 @@ class KarmachainService extends ChainApiProvider
           transaction is KC2CreatePoolTxV1 &&
           createPoolCallback != null) {
         await createPoolCallback!(transaction);
+        return;
+      }
+
+      if (signer == userInfo.accountId &&
+          transaction is KC2JoinPoolTxV1 &&
+          joinPoolCallback != null) {
+        await joinPoolCallback!(transaction);
         return;
       }
 

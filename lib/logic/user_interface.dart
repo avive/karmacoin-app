@@ -56,6 +56,16 @@ enum CreatePoolStatus {
   connectionTimeout;
 }
 
+enum JoinPoolStatus {
+  unknown,
+  joining,
+  joined,
+  invalidData,
+  invalidSignature,
+  serverError,
+  connectionTimeout;
+}
+
 /// Usage patterns:
 /// 1. Create a new KC2UserInteface object
 /// 2. Check hasLocalIdentity to see if user has a local identity persisted on this device.
@@ -85,6 +95,13 @@ abstract class KC2UserInteface {
   /// Observable create pool status
   final ValueNotifier<CreatePoolStatus> createPoolStatus =
       ValueNotifier(CreatePoolStatus.unknown);
+
+  /// Observable pool membership
+  final ValueNotifier<PoolMember?> poolMembership = ValueNotifier(null);
+
+  /// Observable join pool status
+  final ValueNotifier<JoinPoolStatus> joinPoolStatus =
+      ValueNotifier(JoinPoolStatus.unknown);
 
   /// Observeable txs fetching status
   final ValueNotifier<FetchAppreciationsStatus> fetchAppreciationStatus =
@@ -130,11 +147,15 @@ abstract class KC2UserInteface {
   /// Set user metadata
   Future<void> setMetadata(String metadata);
 
+  /// Create a mining pool
   Future<void> createPool(
       {required BigInt amount,
       required String root,
       required String nominator,
       required String bouncer});
+
+  /// Join a mining pool
+  Future<void> joinPool({required BigInt amount, required int poolId});
 
   /// Delete user from karmachain. This will delete all user's data from the chain and local store and will sign out the user. Don't use this user object after calling this method.
   Future<void> deleteUser();
@@ -145,7 +166,7 @@ abstract class KC2UserInteface {
   /// Update user info from chain via the node's rpc api
   Future<void> getUserDataFromChain();
 
-  /// Get pool membership if user is a pool member
+  /// Get pool membership if user is a pool member. Returns null if user is not member of a pool, otherwise the membership info.
   Future<PoolMember?> getPoolMembership();
 
   /// Fetch all account related appreciations and payment txs - incoming and outgoing

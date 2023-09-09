@@ -4,11 +4,11 @@ import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 
-class KC2JoinTxV1 extends KC2Tx {
+class KC2JoinPoolTxV1 extends KC2Tx {
   BigInt amount;
   PoolId poolId;
 
-  static KC2JoinTxV1 createJoinTx(
+  static KC2JoinPoolTxV1 createJoinTx(
       {required String hash,
       required int timestamp,
       required String signer,
@@ -20,7 +20,7 @@ class KC2JoinTxV1 extends KC2Tx {
       required List<KC2Event> txEvents,
       required int netId}) {
     try {
-      return KC2JoinTxV1(
+      return KC2JoinPoolTxV1(
         amount: args['amount'],
         poolId: args['pool_id'],
         args: args,
@@ -39,7 +39,7 @@ class KC2JoinTxV1 extends KC2Tx {
     }
   }
 
-  KC2JoinTxV1(
+  KC2JoinPoolTxV1(
       {required this.amount,
       required this.poolId,
       required super.args,

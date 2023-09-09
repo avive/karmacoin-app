@@ -7,18 +7,18 @@ import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/data/kc_amounts_formatter.dart';
-import 'package:phone_form_field/phone_form_field.dart';
 import 'package:status_alert/status_alert.dart';
 
-class CreatePool extends StatefulWidget {
-  const CreatePool({super.key});
+class JoinPool extends StatefulWidget {
+  final Pool pool;
+
+  const JoinPool({super.key, required this.pool});
 
   @override
-  State<CreatePool> createState() => _CreatePoolState();
+  State<JoinPool> createState() => _JoinPoolState();
 }
 
-class _CreatePoolState extends State<CreatePool> {
-  late PhoneController phoneController;
+class _JoinPoolState extends State<JoinPool> {
   bool apiDown = false;
   NominationPoolsConfiguration? config;
   bool isSubmitting = false;
@@ -31,7 +31,7 @@ class _CreatePoolState extends State<CreatePool> {
           context,
           duration: const Duration(seconds: 2),
           title: 'Oops...',
-          subtitle: 'Please login to your account.',
+          subtitle: 'Please sing-in',
           configuration: const IconConfiguration(
               icon: CupertinoIcons.exclamationmark_triangle),
           maxWidth: statusAlertWidth,
@@ -72,7 +72,7 @@ class _CreatePoolState extends State<CreatePool> {
       return false;
     }
 
-    if (appState.kCentsAmount.value < config!.minCreateBond) {
+    if (appState.kCentsAmount.value < config!.minJoinBond) {
       if (context.mounted) {
         StatusAlert.show(
           context,
@@ -95,7 +95,7 @@ class _CreatePoolState extends State<CreatePool> {
           context,
           duration: const Duration(seconds: 2),
           title: '',
-          subtitle: 'Insufficient balance. Consider sending less.',
+          subtitle: 'Insufficient balance. Consider bonding less.',
           configuration:
               const IconConfiguration(icon: CupertinoIcons.xmark_circle),
           maxWidth: statusAlertWidth,
@@ -107,33 +107,30 @@ class _CreatePoolState extends State<CreatePool> {
     return true;
   }
 
-  /// Send coins via an apprecaition with no personality trait
+  /// Send the join tx to the chain
   Future<void> _send() async {
     setState(() {
       isSubmitting = true;
     });
-    final accountId = kc2User.identity.accountId;
 
-    await kc2User.createPool(
-        amount: appState.kCentsAmount.value,
-        root: accountId,
-        nominator: accountId,
-        bouncer: accountId);
+    await kc2User.joinPool(
+        amount: appState.kCentsAmount.value, poolId: widget.pool.id);
   }
 
   @override
   void initState() {
     super.initState();
 
-    // set initial value to 1 KC (todo: take from nomniation pools config)
+    // set initial value to 1 KC - update it from pool config later
     appState.kCentsAmount.value = GenesisConfig.kCentsPerCoinBigInt;
-    kc2User.createPoolStatus.value = CreatePoolStatus.unknown;
+    kc2User.joinPoolStatus.value = JoinPoolStatus.unknown;
 
     Future.delayed(Duration.zero, () async {
       try {
         NominationPoolsConfiguration conf =
             await (kc2Service as KC2NominationPoolsInterface)
                 .getPoolsConfiguration();
+        appState.kCentsAmount.value = conf.minJoinBond;
         setState(() {
           config = conf;
         });
@@ -144,7 +141,7 @@ class _CreatePoolState extends State<CreatePool> {
           StatusAlert.show(
             context,
             duration: const Duration(seconds: 2),
-            title: 'Server unreachable',
+            title: 'Server Unreachable',
             subtitle: 'Please try later.',
             configuration: const IconConfiguration(
                 icon: CupertinoIcons.exclamationmark_triangle),
@@ -156,42 +153,42 @@ class _CreatePoolState extends State<CreatePool> {
   }
 
   Widget _getUpdateStatus(BuildContext context) {
-    return ValueListenableBuilder<CreatePoolStatus>(
-        valueListenable: kc2User.createPoolStatus,
+    return ValueListenableBuilder<JoinPoolStatus>(
+        valueListenable: kc2User.joinPoolStatus,
         builder: (context, value, child) {
           String text = '';
           Color? color = CupertinoColors.systemRed;
           isSubmitting = false;
           switch (value) {
-            case CreatePoolStatus.unknown:
+            case JoinPoolStatus.unknown:
               text = '';
               break;
-            case CreatePoolStatus.creating:
+            case JoinPoolStatus.joining:
               isSubmitting = true;
               text = 'Please wait and take 5 deep breaths...';
               color = CupertinoTheme.of(context).textTheme.textStyle.color;
               break;
-            case CreatePoolStatus.created:
+            case JoinPoolStatus.joined:
               text = 'Pool created!';
               color = CupertinoColors.activeGreen;
               kc2User.setMetadataStatus.value = SetMetadataStatus.unknown;
               Future.delayed(Duration.zero, () {
                 if (context.mounted) {
-                  debugPrint('Pool created!');
+                  debugPrint('Pool joined!');
                   Navigator.of(context).pop();
                 }
               });
               break;
-            case CreatePoolStatus.invalidData:
+            case JoinPoolStatus.invalidData:
               text = 'Server error. Please try again later.';
               break;
-            case CreatePoolStatus.invalidSignature:
+            case JoinPoolStatus.invalidSignature:
               text = 'Invalid signature. Please try again later.';
               break;
-            case CreatePoolStatus.serverError:
+            case JoinPoolStatus.serverError:
               text = 'Server error. Please try again later.';
               break;
-            case CreatePoolStatus.connectionTimeout:
+            case JoinPoolStatus.connectionTimeout:
               text = 'Connection timeout. Please try again later.';
               break;
           }
@@ -205,7 +202,7 @@ class _CreatePoolState extends State<CreatePool> {
                 ),
           );
 
-          if (value == CreatePoolStatus.creating) {
+          if (value == JoinPoolStatus.joining) {
             return Column(
               children: [
                 const SizedBox(height: 14),
@@ -232,7 +229,7 @@ class _CreatePoolState extends State<CreatePool> {
     return CupertinoPageScaffold(
       child: CustomScrollView(
         slivers: [
-          kcNavBar(context, 'CREATE POOL'),
+          kcNavBar(context, 'JOIN POOL ${widget.pool.id}'),
           SliverFillRemaining(
             hasScrollBody: false,
             child: Padding(
@@ -273,7 +270,7 @@ class _CreatePoolState extends State<CreatePool> {
                                 await _send();
                               }
                             },
-                      child: const Text('Create Pool'),
+                      child: const Text('Join Pool'),
                     ),
                     const SizedBox(height: 14),
                     _getUpdateStatus(context),

@@ -5,7 +5,7 @@ import 'package:karma_coin/ui/components/animated_background.dart';
 import 'package:karma_coin/ui/components/animated_wave.dart';
 import 'package:karma_coin/ui/components/animated_wave_right.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
-import 'package:karma_coin/ui/screens/leaderboard.dart';
+import 'package:karma_coin/ui/screens/actions/leaderboard.dart';
 import 'package:karma_coin/ui/components/traits_scores_wheel.dart';
 import 'package:karma_coin/ui/components/traits_viewer.dart';
 import 'package:random_avatar/random_avatar.dart';

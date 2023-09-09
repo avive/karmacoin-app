@@ -4,8 +4,8 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
-import 'package:karma_coin/ui/screens/phone_contact_importer.dart';
-import 'package:karma_coin/ui/screens/users_browser.dart';
+import 'package:karma_coin/ui/screens/actions/phone_contact_importer.dart';
+import 'package:karma_coin/ui/screens/actions/users_browser.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:random_avatar/random_avatar.dart';
 

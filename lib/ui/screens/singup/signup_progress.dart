@@ -3,7 +3,7 @@ import 'package:karma_coin/common/platform_info.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/user_interface.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
-import 'package:karma_coin/ui/screens/user_name.dart';
+import 'package:karma_coin/ui/screens/singup/user_name.dart';
 import 'package:status_alert/status_alert.dart';
 
 /// display signup progress...

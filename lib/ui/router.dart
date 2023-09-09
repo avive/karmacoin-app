@@ -1,25 +1,29 @@
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/pool.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
-import 'package:karma_coin/ui/screens/about.dart';
-import 'package:karma_coin/ui/screens/backup_account.dart';
-import 'package:karma_coin/ui/screens/community_home.dart';
-import 'package:karma_coin/ui/screens/create_pool.dart';
-import 'package:karma_coin/ui/screens/karmachain.dart';
-import 'package:karma_coin/ui/screens/payment_tx_details.dart';
-import 'package:karma_coin/ui/screens/pools.dart';
-import 'package:karma_coin/ui/screens/signup_progress.dart';
-import 'package:karma_coin/ui/screens/welcome.dart';
-import 'package:karma_coin/ui/screens/profile.dart';
-import 'package:karma_coin/ui/screens/restore_account.dart';
-import 'package:karma_coin/ui/screens/restore_account_intro.dart';
-import 'package:karma_coin/ui/screens/actions.dart';
-import 'package:karma_coin/ui/screens/appreciations.dart';
-import 'package:karma_coin/ui/screens/phone_number_input.dart';
-import 'package:karma_coin/ui/screens/sms_code_input.dart';
-import 'package:karma_coin/ui/screens/user_details.dart';
-import 'package:karma_coin/ui/screens/user_home.dart';
-import 'package:karma_coin/ui/screens/user_name.dart';
-import 'package:karma_coin/ui/screens/send.dart';
+import 'package:karma_coin/ui/screens/actions/about.dart';
+import 'package:karma_coin/ui/screens/actions/backup_account.dart';
+import 'package:karma_coin/ui/screens/main/community_home.dart';
+import 'package:karma_coin/ui/screens/pools/create_pool.dart';
+import 'package:karma_coin/ui/screens/pools/join_pool.dart';
+import 'package:karma_coin/ui/screens/actions/karmachain.dart';
+import 'package:karma_coin/ui/screens/actions/payment_tx_details.dart';
+import 'package:karma_coin/ui/screens/pools/pool.dart';
+import 'package:karma_coin/ui/screens/pools/pools.dart';
+import 'package:karma_coin/ui/screens/main/welcome.dart';
+import 'package:karma_coin/ui/screens/main/profile.dart';
+import 'package:karma_coin/ui/screens/actions/restore_account.dart';
+import 'package:karma_coin/ui/screens/intros/restore_account_intro.dart';
+import 'package:karma_coin/ui/screens/main/actions.dart';
+import 'package:karma_coin/ui/screens/actions/appreciations.dart';
+import 'package:karma_coin/ui/screens/main/user_details.dart';
+import 'package:karma_coin/ui/screens/main/user_home.dart';
+import 'package:karma_coin/ui/screens/actions/send.dart';
+import 'package:karma_coin/ui/screens/singup/phone_number_input.dart';
+import 'package:karma_coin/ui/screens/singup/signup_progress.dart';
+import 'package:karma_coin/ui/screens/singup/sms_code_input.dart';
+import 'package:karma_coin/ui/screens/singup/user_name.dart' as un;
+import 'package:karma_coin/ui/screens/singup/user_name.dart';
 
 /// Shared paths / urls used across the app
 class ScreenPaths {
@@ -52,6 +56,9 @@ class ScreenPaths {
   /// Create a mining pool
   static String createPool = '/create-pool';
 
+  /// join a mining pool
+  static String joinPool = '/join-pool';
+
   /// Security words screen
   static String securityWords = '/security_words';
 
@@ -78,6 +85,9 @@ class ScreenPaths {
 
   /// an account screen
   static String account = '/account/:accountId';
+
+  /// a pool screen
+  static String pool = '/pools/:poolId';
 
   /// User's appreciation (sent and received)
   static String appreciations = '/appreciations';
@@ -117,8 +127,14 @@ class ScreenNames {
   /// Send KC screen
   static String send = 'send';
 
-  /// Create pool
+  /// Create a pool
   static String createPool = 'create-pool';
+
+  /// a pool screen
+  static String pool = 'pool';
+
+  /// Join a pool
+  static String joinPool = 'join-pool';
 
   // public profile page / screen
   static String profile = 'profile';
@@ -238,8 +254,8 @@ final GoRouter appRouter = GoRouter(
         path: ScreenPaths.newUserName,
         builder: (BuildContext context, GoRouterState state) {
           debugPrint('**** userName route builder called');
-          return const SetUserNameScreen(
-              title: 'YOUR USER NAME', operation: Operation.signUp);
+          return const un.SetUserNameScreen(
+              title: 'YOUR USER NAME', operation: un.Operation.signUp);
         }),
     GoRoute(
         // kc2 signup progress
@@ -333,10 +349,30 @@ final GoRouter appRouter = GoRouter(
           return const SendWidget();
         }),
     GoRoute(
+        name: ScreenNames.pool,
+        path: ScreenPaths.pool,
+        builder: (BuildContext context, GoRouterState state) {
+          Pool? pool = state.extra != null ? state.extra as Pool : null;
+          if (pool == null) {
+            // todo: redirect to home screen
+          }
+          return PoolScreen(pool: pool!);
+        }),
+    GoRoute(
         name: ScreenNames.createPool,
         path: ScreenPaths.createPool,
         builder: (BuildContext context, GoRouterState state) {
           return const CreatePool();
+        }),
+    GoRoute(
+        name: ScreenNames.joinPool,
+        path: ScreenPaths.joinPool,
+        builder: (BuildContext context, GoRouterState state) {
+          final Pool? pool = state.extra != null ? state.extra as Pool : null;
+          if (pool == null) {
+            // TODO: redirect to home
+          }
+          return JoinPool(pool: pool!);
         }),
     GoRoute(
         name: ScreenNames.girrafesHomeScreen,

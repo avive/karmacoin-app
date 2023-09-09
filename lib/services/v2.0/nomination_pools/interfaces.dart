@@ -43,7 +43,7 @@ export 'package:karma_coin/services/v2.0/nomination_pools/pool.dart';
 export 'package:karma_coin/services/v2.0/nomination_pools/types.dart';
 
 /// Client callback types
-typedef JoinPoolCallback = Future<void> Function(KC2JoinTxV1 tx);
+typedef JoinPoolCallback = Future<void> Function(KC2JoinPoolTxV1 tx);
 typedef ClaimPoolPayoutCallback = Future<void> Function(KC2ClaimPayoutTxV1 tx);
 typedef UnbondPoolCallback = Future<void> Function(KC2UnbondTxV1 tx);
 typedef WithdrawUnbondedPoolCallback = Future<void> Function(
@@ -66,12 +66,12 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   /// Stake funds with a pool and join it.
   /// The amount to bond is transferred from the member to the pool's account and immediately increases the pool's bond.
   ///
-  /// * An account can only be a member of a single pool.
-  /// * An account cannot join the same pool multiple times.
-  /// * This call will *not* dust the member account, so the member must have at
-  /// least `existential deposit + amount` in their account.
-  /// * Only a pool with [`PoolState::Open`] can be joined.
-  Future<String> join(BigInt amount, PoolId poolId) async {
+  /// - An account can only be a member of a single pool.
+  /// - An account cannot join the same pool multiple times.
+  /// - This call will *not* dust the member account. so the member must have at least `existential deposit + amount` in their account.
+  /// -  Only a pool with [`PoolState::Open`] can be joined.
+  Future<String> joinPool(
+      {required BigInt amount, required PoolId poolId}) async {
     try {
       final call = MapEntry('NominationPools',
           MapEntry('join', {"amount": amount, "pool_id": poolId}));
