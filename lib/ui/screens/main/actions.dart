@@ -27,6 +27,10 @@ class ActionsScreen extends StatefulWidget {
 }
 
 class _ActionsScreenState extends State<ActionsScreen> {
+  Future<void> _poolsButtonHandler(BuildContext context) async {
+    context.push(ScreenPaths.pools);
+  }
+
   /// Show pools or user's current pool after intro
   Future<void> _earnButtonHandler(BuildContext context) async {
     Navigator.of(context)
@@ -41,14 +45,17 @@ class _ActionsScreenState extends State<ActionsScreen> {
       PoolMember? membership = await kc2User.getPoolMembership();
 
       if (membership != null) {
-        List<Pool>? pools =
-            await (kc2Service as KC2NominationPoolsInterface).getPools();
-        Pool? pool = pools.firstWhere((p) => p.id == membership.id);
+        Pool? pool = await (kc2Service as KC2NominationPoolsInterface)
+            .getPool(poolId: membership.id);
 
-        if (context.mounted) {
-          // local user is member of a pool - show pool details screen
-          context.pushNamed(ScreenNames.pool,
-              params: {'id': pool.id.toString()}, extra: pool);
+        if (pool != null) {
+          if (context.mounted) {
+            // local user is member of a pool - show pool details screen
+            context.pushNamed(ScreenNames.pool,
+                params: {'poolId': pool.id.toString()}, extra: pool);
+          }
+        } else {
+          // TODO: handle this case - pool was deleted
         }
       } else {
         if (context.mounted) {
@@ -141,6 +148,12 @@ class _ActionsScreenState extends State<ActionsScreen> {
                 leading: const FaIcon(FontAwesomeIcons.coins, size: 24),
                 onTap: () async {
                   await _earnButtonHandler(context);
+                }),
+            CupertinoListTile.notched(
+                title: const Text('Browse Pools'),
+                leading: const FaIcon(FontAwesomeIcons.coins, size: 24),
+                onTap: () async {
+                  await _poolsButtonHandler(context);
                 }),
             CupertinoListTile.notched(
               title: const Text('Create Mining Pool'),

@@ -232,20 +232,17 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       PoolMember? membership = await kc2User.getPoolMembership();
 
       if (membership != null) {
-        List<Pool>? pools =
-            await (kc2Service as KC2NominationPoolsInterface).getPools();
-
-        try {
-          Pool pool = pools.firstWhere((p) => p.id == membership.id);
-
+        Pool? pool = await (kc2Service as KC2NominationPoolsInterface)
+            .getPool(poolId: membership.id);
+        if (pool != null) {
           if (context.mounted) {
             // local user is member of a pool - show pool details screen
             context.pushNamed(ScreenNames.pool,
-                params: {'id': pool.id.toString()}, extra: pool);
+                params: {'poolId': pool.id.toString()}, extra: pool);
           }
-        } catch (e) {
-          debugPrint('Pool not found in pools...');
-          // TODO: figure out how to handle - pool was deleted?
+        } else {
+          // pool not found
+          // TODO: figure out how to handle this case
         }
       } else {
         if (context.mounted) {

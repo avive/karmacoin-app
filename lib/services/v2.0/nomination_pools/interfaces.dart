@@ -506,6 +506,21 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
     }
   }
 
+  /// Get pool by id. This method will populate pool's user info
+  Future<Pool?> getPool({required int poolId}) async {
+    try {
+      // Get all pools
+      List<Pool> pools = await getPools();
+      Pool pool = pools.firstWhere((p) => p.id == poolId);
+      await pool.populateUsers();
+      return pool;
+    } catch (e) {
+      debugPrint('Pool not found in pools...');
+      // TODO: figure out how to handle - pool was deleted
+      return null;
+    }
+  }
+
   /// Return nomination pallet configuration.
   Future<NominationPoolsConfiguration> getPoolsConfiguration() async {
     try {

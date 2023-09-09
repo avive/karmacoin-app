@@ -192,7 +192,8 @@ class _PoolWidgetState extends State<PoolWidget> {
                 child: const Text('Leave'),
               ),
             );
-          } else {
+          } else if (value == null) {
+            // Only display join button if local user is not a pool member
             return CupertinoListTile.notched(
               title: CupertinoButton.filled(
                 onPressed: () {
@@ -201,6 +202,9 @@ class _PoolWidgetState extends State<PoolWidget> {
                 child: const Text('Join'),
               ),
             );
+          } else {
+            // Can't join or leave
+            return Container();
           }
         });
   }
