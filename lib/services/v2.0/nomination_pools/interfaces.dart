@@ -99,7 +99,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
 
       return await signAndSendTransaction(call);
     } on PlatformException catch (e) {
-      debugPrint('Failed to join nomination pool: ${e.details}');
+      debugPrint('Failed to claim payout: ${e.details}');
       rethrow;
     }
   }

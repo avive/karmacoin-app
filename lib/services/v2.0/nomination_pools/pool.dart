@@ -25,8 +25,11 @@ class Pool {
   /// Current state.
   PoolState state;
 
-  /// User infos for the various pool roles
+  /// User infos for the various pool roles and members
   Map<String, KC2UserInfo> poolsUsers = {};
+
+  /// AccountId of each pool members
+  List<String> membersAccountIds = [];
 
   /// Pool's social url - must be set by depositor/creator
   String? get socialUrl =>
@@ -83,6 +86,14 @@ class Pool {
 
     if (commission.beneficiary != null) {
       await _addPoolUser(commission.beneficiary!);
+    }
+
+    // Get all members
+    membersAccountIds = await (kc2Service as KC2NominationPoolsInterface)
+        .getPoolMembers(id, fromIndex: 0, limit: 5000);
+
+    for (final String accountId in membersAccountIds) {
+      _addPoolUser(accountId);
     }
   }
 }

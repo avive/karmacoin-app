@@ -4,7 +4,6 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/services/v2.0/event.dart';
 import 'package:karma_coin/services/v2.0/interfaces.dart';
-import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
@@ -20,8 +19,6 @@ typedef RemoveMetadataCallback = Future<void> Function(
 typedef SetMetadataCallback = Future<void> Function(KC2SetMetadataTxV1 tx);
 typedef AppreciationCallback = Future<void> Function(KC2AppreciationTxV1 tx);
 typedef TransferCallback = Future<void> Function(KC2TransferTxV1 tx);
-typedef CreatePoolCallback = Future<void> Function(KC2CreatePoolTxV1 tx);
-typedef JoinPoolCallback = Future<void> Function(KC2JoinPoolTxV1 tx);
 
 enum FetchAppreciationsStatus { idle, fetching, fetched, error }
 
@@ -534,12 +531,6 @@ mixin K2ServiceInterface implements ChainApiProvider {
 
   /// Callback when account set metadata
   SetMetadataCallback? setMetadataCallback;
-
-  /// Callback when pool is created
-  CreatePoolCallback? createPoolCallback;
-
-  /// Callback when pool is created
-  JoinPoolCallback? joinPoolCallback;
 
   /// Callback when account remove metadata
   RemoveMetadataCallback? removeMetadataCallback;

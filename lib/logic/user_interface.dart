@@ -66,6 +66,17 @@ enum JoinPoolStatus {
   connectionTimeout;
 }
 
+// Submitted tx status. e.g. claim pool payout
+enum SubmitTransactionStatus {
+  unknown,
+  submitting,
+  submitted,
+  invalidSignature,
+  invalidData,
+  serverError,
+  connectionTimeout;
+}
+
 /// Usage patterns:
 /// 1. Create a new KC2UserInteface object
 /// 2. Check hasLocalIdentity to see if user has a local identity persisted on this device.
@@ -95,6 +106,9 @@ abstract class KC2UserInteface {
   /// Observable create pool status
   final ValueNotifier<CreatePoolStatus> createPoolStatus =
       ValueNotifier(CreatePoolStatus.unknown);
+
+  final ValueNotifier<SubmitTransactionStatus> claimPayoutStatus =
+      ValueNotifier(SubmitTransactionStatus.unknown);
 
   /// Observable pool membership
   final ValueNotifier<PoolMember?> poolMembership = ValueNotifier(null);
@@ -146,6 +160,9 @@ abstract class KC2UserInteface {
 
   /// Set user metadata
   Future<void> setMetadata(String metadata);
+
+  // Claim earned pool payout
+  Future<void> claimPoolPayout();
 
   /// Create a mining pool
   Future<void> createPool(

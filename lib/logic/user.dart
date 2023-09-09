@@ -27,6 +27,7 @@ class KC2User extends KC2UserInteface {
   late String _setMetadataTxHash = '';
   late String _createPoolTxHash = '';
   late String _joinPoolTxHash = '';
+  late String _claimPayoutTxHash = '';
 
   @override
   ValueNotifier<Map<String, KC2Tx>> get incomingAppreciations =>
@@ -79,8 +80,12 @@ class KC2User extends KC2UserInteface {
     kc2Service.newUserCallback = _signupUserCallback;
     kc2Service.updateUserCallback = _updateUserCallback;
     kc2Service.setMetadataCallback = _setMetadataCallback;
-    kc2Service.createPoolCallback = _createPoolCallback;
-    kc2Service.joinPoolCallback = _joinPoolCallback;
+    (kc2Service as KC2NominationPoolsInterface).createPoolCallback =
+        _createPoolCallback;
+    (kc2Service as KC2NominationPoolsInterface).joinPoolCallback =
+        _joinPoolCallback;
+    (kc2Service as KC2NominationPoolsInterface).claimPoolPayoutCallback =
+        _claimPoolPayoutCallback;
 
     // subscribe to account transactions if we have user info in this session
     // otherwise we'll subscribe o n signup()
@@ -175,8 +180,9 @@ class KC2User extends KC2UserInteface {
     kc2Service.updateUserCallback = null;
     kc2Service.newUserCallback = null;
     kc2Service.setMetadataCallback = null;
-    kc2Service.createPoolCallback = null;
-    kc2Service.joinPoolCallback = null;
+    (kc2Service as KC2NominationPoolsInterface).createPoolCallback = null;
+    (kc2Service as KC2NominationPoolsInterface).joinPoolCallback = null;
+    (kc2Service as KC2NominationPoolsInterface).claimPoolPayoutCallback = null;
 
     // remove the id from local store
     await _identity.removeFromStore();
@@ -355,6 +361,29 @@ class KC2User extends KC2UserInteface {
     } catch (e) {
       // api error - don't change signup status
       debugPrint('failed to get userInfo from chain via api: $e');
+    }
+  }
+
+  @override
+  Future<void> claimPoolPayout() async {
+    claimPayoutStatus.value = SubmitTransactionStatus.submitting;
+
+    // todo: this is buggy when 2nd call - needs to be cancled every time createPool is called
+    Future.delayed(const Duration(seconds: 60), () async {
+      if (claimPayoutStatus.value == SubmitTransactionStatus.submitting) {
+        // tx timed out
+        claimPayoutStatus.value = SubmitTransactionStatus.connectionTimeout;
+      }
+    });
+
+    try {
+      _claimPayoutTxHash =
+          await (kc2Service as KC2NominationPoolsInterface).claimPayout();
+
+      // status updated via callback
+    } catch (e) {
+      debugPrint('failed to join pool: $e');
+      claimPayoutStatus.value = SubmitTransactionStatus.serverError;
     }
   }
 
@@ -553,6 +582,26 @@ class KC2User extends KC2UserInteface {
     }
 
     _createPoolTxHash = '';
+  }
+
+  Future<void> _claimPoolPayoutCallback(KC2ClaimPayoutTxV1 tx) async {
+    if (_claimPayoutTxHash != tx.hash) {
+      // not of interest
+      return;
+    }
+
+    tx.chainError != null
+        ? claimPayoutStatus.value = SubmitTransactionStatus.invalidData
+        : claimPayoutStatus.value = SubmitTransactionStatus.submitted;
+
+    if (tx.chainError != null) {
+      debugPrint('Claim pool payout failed with: ${tx.chainError}');
+    } else {
+      // get updated balance and pool membership
+      await getUserDataFromChain();
+    }
+
+    _claimPayoutTxHash = '';
   }
 
   Future<void> _joinPoolCallback(KC2JoinPoolTxV1 tx) async {
