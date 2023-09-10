@@ -1,36 +1,30 @@
-import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/logic/user_interface.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 
 /// Claim payout screen
-class ClaimPayout extends StatefulWidget {
+class LeavePool extends StatefulWidget {
   final Pool pool;
   final PoolMember membership;
 
-  const ClaimPayout({super.key, required this.pool, required this.membership});
+  const LeavePool({super.key, required this.pool, required this.membership});
 
   @override
-  State<ClaimPayout> createState() => _ClaimPayoutState();
+  State<LeavePool> createState() => _LeavePoolState();
 }
 
-class _ClaimPayoutState extends State<ClaimPayout> {
+class _LeavePoolState extends State<LeavePool> {
   bool isSubmitting = true;
-  late BigInt claimableAmount;
 
   @override
   void initState() {
     super.initState();
 
-    claimableAmount =
-        widget.membership.points - kc2Service.poolsConfiguration.minJoinBond;
-
-    // claim payout - status is comign via state changes
-    kc2User.claimPoolPayout();
+    // todo: leave pool here...
   }
 
-  Widget _getUpdateStatus(BuildContext context) {
+  Widget _getStatus(BuildContext context) {
     return ValueListenableBuilder<SubmitTransactionStatus>(
         valueListenable: kc2User.claimPayoutStatus,
         builder: (context, value, child) {
@@ -47,8 +41,10 @@ class _ClaimPayoutState extends State<ClaimPayout> {
               color = CupertinoTheme.of(context).textTheme.textStyle.color;
               break;
             case SubmitTransactionStatus.submitted:
-              text = 'Funds claimed!';
+              debugPrint('Left pool');
+              text = 'Left pool and claimed bonded funds!';
               color = CupertinoColors.activeGreen;
+              context.pop();
               break;
             case SubmitTransactionStatus.invalidData:
               text = 'Server error. Please try again later.';
@@ -104,9 +100,6 @@ class _ClaimPayoutState extends State<ClaimPayout> {
 
   @override
   build(BuildContext context) {
-    final String claimable =
-        KarmaCoinAmountFormatter.deicmalFormat.format(claimableAmount.toInt());
-
     return CupertinoPageScaffold(
       resizeToAvoidBottomInset: true,
       child: CustomScrollView(
@@ -127,7 +120,7 @@ class _ClaimPayoutState extends State<ClaimPayout> {
                 0),
             largeTitle: Center(
               child:
-                  Text('CLAIM PAYOUT', style: getNavBarTitleTextStyle(context)),
+                  Text('LEAVE POOL', style: getNavBarTitleTextStyle(context)),
             ),
           ),
           SliverFillRemaining(
@@ -136,19 +129,10 @@ class _ClaimPayoutState extends State<ClaimPayout> {
               padding: const EdgeInsets.only(
                   left: 16, right: 16, top: 16, bottom: 16),
               child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Column(
-                      children: [
-                        Text('Claiming $claimable points...',
-                            style: CupertinoTheme.of(context)
-                                .textTheme
-                                .pickerTextStyle),
-                      ],
-                    ),
-                    _getUpdateStatus(context),
-                  ]),
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [_getStatus(context)],
+              ),
             ),
           ),
         ],

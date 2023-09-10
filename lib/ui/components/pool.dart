@@ -4,7 +4,8 @@ import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
-import 'package:karma_coin/ui/screens/pools/payout.dart';
+import 'package:karma_coin/ui/screens/pools/claim_payout.dart';
+import 'package:karma_coin/ui/screens/pools/leave_pool.dart';
 import 'package:random_avatar/random_avatar.dart';
 
 /// Pool widget designed to be used in a ListView
@@ -203,8 +204,8 @@ class _PoolWidgetState extends State<PoolWidget> {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
                         fullscreenDialog: true,
-                        builder: ((context) => ClaimPayout(
-                            pool: pool, membership: value)),
+                        builder: ((context) =>
+                            ClaimPayout(pool: pool, membership: value)),
                       ),
                     );
                   },
@@ -258,8 +259,15 @@ class _PoolWidgetState extends State<PoolWidget> {
         title: CupertinoButton(
           padding: const EdgeInsets.only(left: 0.0),
           onPressed: () {
-            // todo: push leave pool screen
-            // context.pushNamed(ScreenNames.joinPool, extra: pool);
+            // TODO: show standard confirm dialog to prevent accidental leaving
+            if (!context.mounted) return;
+            Navigator.of(context).push(
+              CupertinoPageRoute(
+                fullscreenDialog: true,
+                builder: ((context) =>
+                    LeavePool(pool: widget.pool, membership: membership)),
+              ),
+            );
           },
           child: const Text('Leave Pool'),
         ),
