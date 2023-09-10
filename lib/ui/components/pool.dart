@@ -255,9 +255,9 @@ class _PoolWidgetState extends State<PoolWidget> {
     showCupertinoModalPopup<void>(
       context: context,
       builder: (BuildContext context) => CupertinoAlertDialog(
-        title: const Text('Are you sure?'),
+        title: const Text('Leave Pool?'),
         content: const Text(
-            '\nYou will be credited with any earnings and your bonded coins but will lose future earnings.'),
+            '\nYou will be credited with any earnings and your bonded coins but you will lose any future earnings.'),
         actions: <CupertinoDialogAction>[
           CupertinoDialogAction(
             isDefaultAction: true,

@@ -31,7 +31,7 @@ void main() {
 
         // Create a new identity for local user
         final completer = Completer<bool>();
-        TestUserInfo katya = await createLocalUser(completer: completer);
+        TestUserInfo katya = await createTestUser(completer: completer);
 
         // Test utils
         String txHash = "";
@@ -76,7 +76,7 @@ void main() {
 
         // Create a new identity for local user
         final completer = Completer<bool>();
-        TestUserInfo katya = await createLocalUser(completer: completer);
+        TestUserInfo katya = await createTestUser(completer: completer);
 
         // Test utils
         String txHash = "";
@@ -128,7 +128,7 @@ void main() {
 
         // Create a new identity for local user
         final completer = Completer<bool>();
-        TestUserInfo katya = await createLocalUser(completer: completer);
+        TestUserInfo katya = await createTestUser(completer: completer);
 
         // Test utils
         String txHash = "";
@@ -191,7 +191,7 @@ void main() {
 
         // Create a new identity for local user
         final completer = Completer<bool>();
-        TestUserInfo katya = await createLocalUser(completer: completer);
+        TestUserInfo katya = await createTestUser(completer: completer);
 
         // Test utils
         String txHash = "";
@@ -247,7 +247,7 @@ void main() {
 
         // Create a new identity for local user
         final completer = Completer<bool>();
-        TestUserInfo katya = await createLocalUser(completer: completer);
+        TestUserInfo katya = await createTestUser(completer: completer);
 
         // Test utils
         String txHash = "";

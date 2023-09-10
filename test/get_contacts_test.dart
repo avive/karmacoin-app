@@ -27,13 +27,13 @@ void main() {
           // Allow to run this test multiply times on same chain
           String prefix = randomPhoneNumber.substring(0, 5).toLowerCase();
           final completer = Completer<bool>();
-          TestUserInfo tom = await createLocalUser(
+          TestUserInfo tom = await createTestUser(
               completer: completer, usernamePrefix: "${prefix}Tom");
-          TestUserInfo tomas = await createLocalUser(
+          TestUserInfo tomas = await createTestUser(
               completer: completer, usernamePrefix: "${prefix}Tomas");
-          TestUserInfo tor = await createLocalUser(
+          TestUserInfo tor = await createTestUser(
               completer: completer, usernamePrefix: "${prefix}Tor");
-          TestUserInfo platon = await createLocalUser(
+          TestUserInfo platon = await createTestUser(
               completer: completer, usernamePrefix: "${prefix}Platon");
           // Wait for all users created
           await Future.delayed(const Duration(seconds: 12));
@@ -71,13 +71,13 @@ void main() {
           // Allow to run this test multiply times on same chain
           String prefix = randomPhoneNumber.substring(0, 5);
           final completer = Completer<bool>();
-          await createLocalUser(
+          await createTestUser(
               completer: completer, usernamePrefix: "${prefix}Tom");
-          await createLocalUser(
+          await createTestUser(
               completer: completer, usernamePrefix: "${prefix}Tomas");
-          await createLocalUser(
+          await createTestUser(
               completer: completer, usernamePrefix: "${prefix}Tor");
-          await createLocalUser(
+          await createTestUser(
               completer: completer, usernamePrefix: "${prefix}Platon");
           // Wait for all users created
           await Future.delayed(const Duration(seconds: 12));

@@ -88,7 +88,7 @@ class KC2User extends KC2UserInteface {
         _claimPoolPayoutCallback;
 
     // subscribe to account transactions if we have user info in this session
-    // otherwise we'll subscribe o n signup()
+    // otherwise we'll subscribe on signup()
     if (userInfo.value != null) {
       _cancelSubscriptionTimer();
       _subscribeToAccountTimer =
@@ -277,6 +277,7 @@ class KC2User extends KC2UserInteface {
           kc2Service.subscribeToAccountTransactions(userInfo.value!);
     }
 
+    debugPrint('Sending signup tx...');
     String? err;
     String? txHash;
     (txHash, err) = await kc2Service.newUser(evidence: resp.data!);
@@ -338,6 +339,8 @@ class KC2User extends KC2UserInteface {
   @override
   Future<void> getUserDataFromChain() async {
     try {
+      debugPrint('Getting user info from chain via api...');
+
       KC2UserInfo? info =
           await kc2Service.getUserInfoByAccountId(_identity.accountId);
 
@@ -666,6 +669,8 @@ class KC2User extends KC2UserInteface {
       signupStatus.value = SignupStatus.notSignedUp;
       return;
     }
+
+    debugPrint('Signup callback. Getting updated chain info...');
 
     // get updated user info from chain
     await getUserDataFromChain();

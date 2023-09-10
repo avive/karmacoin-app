@@ -33,7 +33,7 @@ void main() {
 
         // Create a new identity for local user
         final completer = Completer<bool>();
-        TestUserInfo katya = await createLocalUser(completer: completer);
+        TestUserInfo katya = await createTestUser(completer: completer);
         await Future.delayed(const Duration(seconds: 12));
 
         // Test utils

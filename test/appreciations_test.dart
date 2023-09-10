@@ -29,8 +29,8 @@ void main() {
         K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
         final completer = Completer<bool>();
-        TestUserInfo katya = await createLocalUser(completer: completer);
-        TestUserInfo punch = await createLocalUser(completer: completer);
+        TestUserInfo katya = await createTestUser(completer: completer);
+        TestUserInfo punch = await createTestUser(completer: completer);
         await Future.delayed(const Duration(seconds: 12));
 
         // Set katya as signer
@@ -89,8 +89,8 @@ void main() {
         K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
         final completer = Completer<bool>();
-        TestUserInfo katya = await createLocalUser(completer: completer);
-        TestUserInfo punch = await createLocalUser(completer: completer);
+        TestUserInfo katya = await createTestUser(completer: completer);
+        TestUserInfo punch = await createTestUser(completer: completer);
         await Future.delayed(const Duration(seconds: 12));
 
         final BigInt karmaRewardsAmount = BigInt.from(10000000);

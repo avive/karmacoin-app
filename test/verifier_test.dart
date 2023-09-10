@@ -26,7 +26,7 @@ void main() {
       'Verify using bypass code',
       () async {
         final completer = Completer<bool>();
-        TestUserInfo katya = await createLocalUser(completer: completer);
+        TestUserInfo katya = await createTestUser(completer: completer);
         await Future.delayed(const Duration(seconds: 13));
 
         // all 3 methods should return's Katya's account data

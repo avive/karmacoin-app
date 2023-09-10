@@ -34,7 +34,7 @@ void main() {
 
           // Create a new identity for local user
           final completer = Completer<bool>();
-          TestUserInfo katya = await createLocalUser(completer: completer);
+          TestUserInfo katya = await createTestUser(completer: completer);
 
           // Test utils
           Timer? blocksProcessingTimer;
@@ -57,7 +57,7 @@ void main() {
               return;
             }
 
-            TestUserInfo punch = await createLocalUser(completer: completer);
+            TestUserInfo punch = await createTestUser(completer: completer);
 
             // switch local user to punch
             blocksProcessingTimer?.cancel();
@@ -134,7 +134,7 @@ void main() {
 
           // Create a new identity for local user
           final completer = Completer<bool>();
-          TestUserInfo katya = await createLocalUser(completer: completer);
+          TestUserInfo katya = await createTestUser(completer: completer);
 
           // Test utils
           Timer? blockProcessingTimer;
@@ -155,7 +155,7 @@ void main() {
               return;
             }
 
-            TestUserInfo punch = await createLocalUser(completer: completer);
+            TestUserInfo punch = await createTestUser(completer: completer);
 
             // switch local user to punch
             blockProcessingTimer?.cancel();
@@ -239,7 +239,7 @@ void main() {
 
           // Create a new identity for local user
           final completer = Completer<bool>();
-          TestUserInfo katya = await createLocalUser(completer: completer);
+          TestUserInfo katya = await createTestUser(completer: completer);
 
           // Test utils
           Timer? blockProcessingTimer;
@@ -260,7 +260,7 @@ void main() {
               return;
             }
 
-            TestUserInfo punch = await createLocalUser(completer: completer);
+            TestUserInfo punch = await createTestUser(completer: completer);
 
             // switch local user to punch
             blockProcessingTimer?.cancel();

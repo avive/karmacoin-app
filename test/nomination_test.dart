@@ -48,7 +48,7 @@ void main() {
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         final completer = Completer<bool>();
-        TestUserInfo katya = await createLocalUser(completer: completer);
+        TestUserInfo katya = await createTestUser(completer: completer);
         await Future.delayed(const Duration(seconds: 12));
 
         // Test utils
@@ -141,8 +141,8 @@ void main() {
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         final completer = Completer<bool>();
-        TestUserInfo katya = await createLocalUser(completer: completer);
-        TestUserInfo punch = await createLocalUser(completer: completer);
+        TestUserInfo katya = await createTestUser(completer: completer);
+        TestUserInfo punch = await createTestUser(completer: completer);
         await Future.delayed(const Duration(seconds: 12));
 
         // Test utils
@@ -175,7 +175,8 @@ void main() {
               kc2Service.subscribeToAccountTransactions(punch.userInfo!);
           // Punch join the pool
           kc2Service.setKeyring(punch.user.keyring);
-          txHash = await kc2Service.joinPool(amount: BigInt.from(1000000), poolId: poolId);
+          txHash = await kc2Service.joinPool(
+              amount: BigInt.from(1000000), poolId: poolId);
         };
 
         kc2Service.joinPoolCallback = (tx) async {
@@ -242,7 +243,7 @@ void main() {
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         final completer = Completer<bool>();
-        TestUserInfo katya = await createLocalUser(completer: completer);
+        TestUserInfo katya = await createTestUser(completer: completer);
         await Future.delayed(const Duration(seconds: 12));
 
         // Test utils
@@ -325,7 +326,7 @@ void main() {
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         final completer = Completer<bool>();
-        TestUserInfo katya = await createLocalUser(completer: completer);
+        TestUserInfo katya = await createTestUser(completer: completer);
         await Future.delayed(const Duration(seconds: 12));
 
         // Test utils
@@ -407,7 +408,7 @@ void main() {
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         final completer = Completer<bool>();
-        TestUserInfo katya = await createLocalUser(completer: completer);
+        TestUserInfo katya = await createTestUser(completer: completer);
         await Future.delayed(const Duration(seconds: 12));
 
         // Test utils
@@ -493,8 +494,8 @@ void main() {
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         final completer = Completer<bool>();
-        TestUserInfo katya = await createLocalUser(completer: completer);
-        TestUserInfo punch = await createLocalUser(completer: completer);
+        TestUserInfo katya = await createTestUser(completer: completer);
+        TestUserInfo punch = await createTestUser(completer: completer);
 
         // Test utils
         String txHash = "";
@@ -584,8 +585,8 @@ void main() {
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         final completer = Completer<bool>();
-        TestUserInfo katya = await createLocalUser(completer: completer);
-        await createLocalUser(completer: completer);
+        TestUserInfo katya = await createTestUser(completer: completer);
+        await createTestUser(completer: completer);
 
         // Test utils
         String txHash = "";

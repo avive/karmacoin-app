@@ -24,121 +24,70 @@ void main() {
 
   group('kc2 user txs tests', () {
     test(
-      'Get transactions',
+      'Referral tx flow',
       () async {
         // connect before creating a user
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
-        KC2UserInteface katya = KC2User();
-        await katya.init();
-
-        String katyaUserName =
-            "Katya${katya.identity.accountId.substring(0, 5)}";
-        String katyaPhoneNumber = randomPhoneNumber;
-        String katyaPhoneNumberHash =
-            kc2Service.getPhoneNumberHash(katyaPhoneNumber);
-
-        String punchUserName =
-            "Punch${katya.identity.accountId.substring(5, 10)}";
-        String punchPhoneNumber = randomPhoneNumber;
-
-        String punchPhoneNumberHash =
-            kc2Service.getPhoneNumberHash(punchPhoneNumber);
-
-        String katyaAccountId = katya.identity.accountId;
-
         final completer = Completer<bool>();
 
-        // String katyaAccountId = katya.identity.accountId;
+        TestUserInfo katya = await createTestUser(completer: completer);
+        await Future.delayed(const Duration(seconds: 12));
 
-        katya.signupStatus.addListener(() async {
-          switch (katya.signupStatus.value) {
-            case SignupStatus.signingUp:
-              debugPrint('Katya is signing up...');
-              break;
-            case SignupStatus.signedUp:
-              debugPrint('Katya signup callback called');
+        // Set katya as signer
+        kc2Service.setKeyring(katya.user.keyring);
+        debugPrint('Local user katya public address: ${katya.user.accountId}');
 
-              // Send appreciation from katya to punch before punch signed up
-              // so it goes to the pool
-              await kc2Service.sendAppreciation(
-                  punchPhoneNumberHash, BigInt.from(1234), 0, 64);
+        String punchPhoneNumber = randomPhoneNumber;
 
-              await katya.signout();
-              KC2UserInteface punch = KC2User();
-              await punch.init();
+        debugPrint("Sending apprecation from katya to punch's phone number...");
 
-              punch.signupStatus.addListener(() async {
-                switch (punch.signupStatus.value) {
-                  case SignupStatus.signingUp:
-                    debugPrint('Punch is signing up...');
-                    break;
-                  case SignupStatus.signedUp:
-                    debugPrint('Punch signed up');
+        // Send appreciation from katya to punch before punch signed up
+        // so it goes to the pool
+        await kc2Service.sendAppreciation(
+            kc2Service.getPhoneNumberHash(punchPhoneNumber),
+            BigInt.from(1234),
+            0,
+            64);
 
-                    // expected 1 in trait from katya's appreciation
-                    expect(punch.getScore(0, 64), 1);
-                    expect(punch.userInfo.value?.balance,
-                        BigInt.from(10000000 + 1234));
+        await Future.delayed(const Duration(seconds: 12));
 
-                    expect(punch.userInfo.value?.karmaScore, 2);
+        // clear secure storage
+        FlutterSecureStorage.setMockInitialValues({});
 
-                    // get all account txs from chain
-                    await punch.fetchAppreciations();
+        debugPrint('Signing up punch user...');
+        KC2User punch = await createLocalAppUser(punchPhoneNumber);
+        await Future.delayed(const Duration(seconds: 12));
 
-                    // we should get 1 incoming appreciation for punch
-                    expect(punch.incomingAppreciations.value.length, 1);
-                    expect(punch.outgoingAppreciations.value.length, 0);
+        // expected 1 in trait from katya's appreciation
+        expect(punch.getScore(0, 64), 1);
+        expect(punch.userInfo.value!.balance, BigInt.from(10000000 + 1234));
 
-                    await kc2Service.sendAppreciation(
-                        katyaPhoneNumberHash, BigInt.from(54321), 0, 24);
+        expect(punch.userInfo.value!.karmaScore, 2);
 
-                    await kc2Service.sendTransfer(
-                        katyaAccountId, BigInt.from(12345));
+        // we should get 1 incoming appreciation for punch
+        expect(punch.incomingAppreciations.value.length, 1);
+        expect(punch.outgoingAppreciations.value.length, 0);
 
-                    debugPrint('waiting for 14 secs and checking txs...');
-                    Future.delayed(const Duration(seconds: 14), () async {
-                      expect(punch.incomingAppreciations.value.length, 1);
-                      expect(punch.outgoingAppreciations.value.length, 2);
+        await kc2Service.sendAppreciation(
+            katya.phoneNumberHash, BigInt.from(54321), 0, 24);
 
-                      // check karma score and balance
-                      expect(punch.userInfo.value?.balance,
-                          BigInt.from(10000000 + 1234 - 12345 - 54321));
+        await kc2Service.sendTransfer(katya.accountId, BigInt.from(12345));
 
-                      expect(punch.userInfo.value?.karmaScore, 3);
+        debugPrint('waiting for 14 secs and checking txs...');
+        Future.delayed(const Duration(seconds: 14), () async {
+          expect(punch.incomingAppreciations.value.length, 1);
+          expect(punch.outgoingAppreciations.value.length, 2);
 
-                      await punch.signout();
-                      completer.complete(true);
-                    });
+          // check karma score and balance
+          expect(punch.userInfo.value?.balance,
+              BigInt.from(10000000 + 1234 - 12345 - 54321));
 
-                    break;
-                  case SignupStatus.notSignedUp:
-                    debugPrint('failed to signup katya1');
-                    await katya.signout();
-                    completer.complete(false);
-                    break;
-                  default:
-                    break;
-                }
-              });
+          expect(punch.userInfo.value?.karmaScore, 3);
 
-              // signup punch when tx is in the pool
-              await punch.signup(punchUserName, punchPhoneNumber);
-              break;
-            case SignupStatus.notSignedUp:
-              debugPrint('failed to signup katya');
-              await katya.signout();
-              completer.complete(false);
-              break;
-            default:
-              break;
-          }
+          await punch.signout();
+          completer.complete(true);
         });
-
-        debugPrint('Signing up katya. AccountId: ${katya.identity.accountId}');
-
-        // signup katya
-        await katya.signup(katyaUserName, katyaPhoneNumber);
 
         // wait for completer and verify test success
         expect(await completer.future, equals(true));

@@ -4,11 +4,28 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/data/verify_number_request.dart';
 import 'package:karma_coin/logic/identity.dart';
 import 'package:karma_coin/logic/identity_interface.dart';
+import 'package:karma_coin/logic/user.dart';
 import 'package:karma_coin/logic/verifier.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
 final random = Random.secure();
 String get randomPhoneNumber => '+${(random.nextInt(900000) + 100000)}';
+
+/// Signup a new loal app user with optional provided phone number
+/// Wait 1 block until this user is signed up
+Future<KC2User> createLocalAppUser(String? phoneNumber) async {
+  if (!kc2Service.connectedToApi) {
+    await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+  }
+
+  KC2User user = KC2User();
+  await user.init();
+  String userName = user.identity.accountId.substring(0, 10).toLowerCase();
+  debugPrint('User name: $userName');
+  phoneNumber ??= randomPhoneNumber;
+  await user.signup(userName, phoneNumber);
+  return user;
+}
 
 class TestUserInfo {
   IdentityInterface user;
@@ -29,8 +46,11 @@ class TestUserInfo {
 
 /// Create a new test user and sign it up to the chain
 /// Returns usable user info data
-Future<TestUserInfo> createLocalUser(
-    {required Completer<bool> completer, String? usernamePrefix}) async {
+/// Optinal name prefix and phone number
+Future<TestUserInfo> createTestUser(
+    {required Completer<bool> completer,
+    String? usernamePrefix,
+    String? phoneNumber}) async {
   if (!kc2Service.connectedToApi) {
     await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
   }
@@ -41,7 +61,9 @@ Future<TestUserInfo> createLocalUser(
   await user.initNoStorage();
   String userName =
       "$usernamePrefix${user.accountId.substring(0, 5)}".toLowerCase();
-  String phoneNumber = randomPhoneNumber;
+
+  phoneNumber ??= randomPhoneNumber;
+
   user.setPhoneNumber(phoneNumber);
 
   debugPrint(

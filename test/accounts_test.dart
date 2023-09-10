@@ -27,7 +27,7 @@ void main() {
 
         // Create a new identity for local user
         final completer = Completer<bool>();
-        TestUserInfo katya = await createLocalUser(completer: completer);
+        TestUserInfo katya = await createTestUser(completer: completer);
 
         kc2Service.newUserCallback = (tx) async {
           if (tx.hash != katya.newUserTxHash) {
@@ -108,7 +108,7 @@ void main() {
 
         // Create a new identity for local user
         final completer = Completer<bool>();
-        TestUserInfo katya = await createLocalUser(completer: completer);
+        TestUserInfo katya = await createTestUser(completer: completer);
 
         String katyaNewPhoneNumber = randomPhoneNumber;
         String newPhoneNumberHash =
@@ -203,7 +203,7 @@ void main() {
 
         // Create a new identity for local user
         final completer = Completer<bool>();
-        TestUserInfo katya = await createLocalUser(completer: completer);
+        TestUserInfo katya = await createTestUser(completer: completer);
         String katyaNewUserName =
             "Katya${katya.accountId.substring(5, 10)}".toLowerCase();
 
@@ -299,9 +299,9 @@ void main() {
 
         // Create a new identity for local user
         final completer = Completer<bool>();
-        TestUserInfo katya = await createLocalUser(completer: completer);
+        TestUserInfo katya = await createTestUser(completer: completer);
         await Future.delayed(const Duration(seconds: 12));
-        TestUserInfo punch = await createLocalUser(completer: completer);
+        TestUserInfo punch = await createTestUser(completer: completer);
         await Future.delayed(const Duration(seconds: 12));
 
         // remove appreciation callback which is getting called right now in case of appreciation sent with charTrait == 0
