@@ -251,6 +251,39 @@ class _PoolWidgetState extends State<PoolWidget> {
         });
   }
 
+  void _leavePoolTapHandler(BuildContext context, PoolMember membership) {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => CupertinoAlertDialog(
+        title: const Text('Are you sure?'),
+        content: const Text(
+            '\nYou will be credited with any earnings and your bonded coins but will lose future earnings.'),
+        actions: <CupertinoDialogAction>[
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('No'),
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            onPressed: () async {
+              Navigator.of(context).push(
+                CupertinoPageRoute(
+                  fullscreenDialog: true,
+                  builder: ((context) =>
+                      LeavePool(pool: widget.pool, membership: membership)),
+                ),
+              );
+            },
+            child: const Text('Yes'),
+          ),
+        ],
+      ),
+    );
+  }
+
   /// Gets pool action button based on local user membership status
   Widget _getPoolActionButton(BuildContext context, PoolMember? membership) {
     if (membership != null && membership.id == widget.pool.id) {
@@ -259,15 +292,7 @@ class _PoolWidgetState extends State<PoolWidget> {
         title: CupertinoButton(
           padding: const EdgeInsets.only(left: 0.0),
           onPressed: () {
-            // TODO: show standard confirm dialog to prevent accidental leaving
-            if (!context.mounted) return;
-            Navigator.of(context).push(
-              CupertinoPageRoute(
-                fullscreenDialog: true,
-                builder: ((context) =>
-                    LeavePool(pool: widget.pool, membership: membership)),
-              ),
-            );
+            _leavePoolTapHandler(context, membership);
           },
           child: const Text('Leave Pool'),
         ),
