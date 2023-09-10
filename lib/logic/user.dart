@@ -502,7 +502,8 @@ class KC2User extends KC2UserInteface {
 
     VerifyNumberData evidence = await verifier.verifyNumber(req);
     if (evidence.error != null || evidence.data == null) {
-      updateResult.value == UpdateResult.invalidData;
+      updateResult.value = UpdateResult.invalidData;
+      debugPrint('Update result: ${updateResult.value}');
       return;
     }
 
@@ -510,7 +511,7 @@ class KC2User extends KC2UserInteface {
     Future.delayed(const Duration(seconds: 30), () async {
       if (updateResult.value == UpdateResult.updating) {
         // timed out waiting for update transaction
-        updateResult.value == UpdateResult.connectionTimeout;
+        updateResult.value = UpdateResult.connectionTimeout;
       }
     });
 

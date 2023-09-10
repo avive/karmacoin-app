@@ -145,6 +145,9 @@ void main() {
               debugPrint('Updating from $katyaUserName to $katyaUserName1...');
 
               await katya.updateUserInfo(katyaUserName1, null);
+              if (katya.updateResult.value != UpdateResult.updating) {
+                completer.completeError('Failed to update user info');
+              }
 
               break;
             case SignupStatus.notSignedUp:
