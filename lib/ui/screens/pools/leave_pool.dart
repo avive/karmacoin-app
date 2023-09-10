@@ -45,7 +45,9 @@ class _LeavePoolState extends State<LeavePool> {
               text = 'Left pool and claimed bonded funds!';
               color = CupertinoColors.activeGreen;
               Future.delayed(Duration.zero, () {
-                context.pop();
+                if (context.mounted && context.canPop()) {
+                  context.pop();
+                }
               });
               break;
             case SubmitTransactionStatus.invalidData:

@@ -172,7 +172,7 @@ class _JoinPoolState extends State<JoinPool> {
               text = 'Joined pool!';
               color = CupertinoColors.activeGreen;
               Future.delayed(Duration.zero, () {
-                if (context.mounted) {
+                if (context.mounted && Navigator.canPop(context)) {
                   debugPrint('Pool joined!');
                   Navigator.of(context).pop();
                 }

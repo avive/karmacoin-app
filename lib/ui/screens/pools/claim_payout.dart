@@ -50,7 +50,9 @@ class _ClaimPayoutState extends State<ClaimPayout> {
               text = 'Funds claimed!';
               color = CupertinoColors.activeGreen;
               Future.delayed(Duration.zero, () {
-                context.pop();
+                if (context.mounted && context.canPop()) {
+                  context.pop();
+                }
               });
               break;
             case SubmitTransactionStatus.invalidData:

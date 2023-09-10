@@ -269,13 +269,16 @@ class _PoolWidgetState extends State<PoolWidget> {
           CupertinoDialogAction(
             isDestructiveAction: true,
             onPressed: () async {
-              Navigator.of(context).push(
-                CupertinoPageRoute(
-                  fullscreenDialog: true,
-                  builder: ((context) =>
-                      LeavePool(pool: widget.pool, membership: membership)),
-                ),
-              );
+              Navigator.pop(context);
+              Future.delayed(const Duration(milliseconds: 200), () {
+                Navigator.of(context).push(
+                  CupertinoPageRoute(
+                    fullscreenDialog: true,
+                    builder: ((context) =>
+                        LeavePool(pool: widget.pool, membership: membership)),
+                  ),
+                );
+              });
             },
             child: const Text('Yes'),
           ),

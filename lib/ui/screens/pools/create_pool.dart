@@ -174,7 +174,9 @@ class _CreatePoolState extends State<CreatePool> {
               Future.delayed(Duration.zero, () {
                 if (context.mounted) {
                   debugPrint('Pool created!');
-                  context.pop();
+                  if (context.canPop()) {
+                    context.pop();
+                  }
                 }
               });
               break;
