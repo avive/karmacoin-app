@@ -169,9 +169,8 @@ class _JoinPoolState extends State<JoinPool> {
               color = CupertinoTheme.of(context).textTheme.textStyle.color;
               break;
             case JoinPoolStatus.joined:
-              text = 'Pool created!';
+              text = 'Joined pool!';
               color = CupertinoColors.activeGreen;
-              kc2User.setMetadataStatus.value = SetMetadataStatus.unknown;
               Future.delayed(Duration.zero, () {
                 if (context.mounted) {
                   debugPrint('Pool joined!');

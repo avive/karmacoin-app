@@ -44,7 +44,9 @@ class _LeavePoolState extends State<LeavePool> {
               debugPrint('Left pool');
               text = 'Left pool and claimed bonded funds!';
               color = CupertinoColors.activeGreen;
-              context.pop();
+              Future.delayed(Duration.zero, () {
+                context.pop();
+              });
               break;
             case SubmitTransactionStatus.invalidData:
               text = 'Server error. Please try again later.';

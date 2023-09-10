@@ -171,11 +171,10 @@ class _CreatePoolState extends State<CreatePool> {
             case CreatePoolStatus.created:
               text = 'Pool created!';
               color = CupertinoColors.activeGreen;
-              kc2User.setMetadataStatus.value = SetMetadataStatus.unknown;
               Future.delayed(Duration.zero, () {
                 if (context.mounted) {
                   debugPrint('Pool created!');
-                  Navigator.of(context).pop();
+                  context.pop();
                 }
               });
               break;

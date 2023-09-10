@@ -49,7 +49,9 @@ class _ClaimPayoutState extends State<ClaimPayout> {
             case SubmitTransactionStatus.submitted:
               text = 'Funds claimed!';
               color = CupertinoColors.activeGreen;
-              context.pop();
+              Future.delayed(Duration.zero, () {
+                context.pop();
+              });
               break;
             case SubmitTransactionStatus.invalidData:
               text = 'Server error. Please try again later.';
