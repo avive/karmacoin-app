@@ -271,13 +271,15 @@ class _PoolWidgetState extends State<PoolWidget> {
             onPressed: () async {
               Navigator.pop(context);
               Future.delayed(const Duration(milliseconds: 200), () {
-                Navigator.of(context).push(
-                  CupertinoPageRoute(
-                    fullscreenDialog: true,
-                    builder: ((context) =>
-                        LeavePool(pool: widget.pool, membership: membership)),
-                  ),
-                );
+                if (context.mounted) {
+                  Navigator.of(context).push(
+                    CupertinoPageRoute(
+                      fullscreenDialog: true,
+                      builder: ((context) =>
+                          LeavePool(pool: widget.pool, membership: membership)),
+                    ),
+                  );
+                }
               });
             },
             child: const Text('Yes'),
@@ -288,8 +290,11 @@ class _PoolWidgetState extends State<PoolWidget> {
   }
 
   /// Gets pool action button based on local user membership status
+  /// Don't let depositor leave pool - he needs to do it via web ui
   Widget _getPoolActionButton(BuildContext context, PoolMember? membership) {
-    if (membership != null && membership.id == widget.pool.id) {
+    if (membership != null &&
+        membership.id == widget.pool.id &&
+        widget.pool.depositor!.accountId != kc2User.identity.accountId) {
       // local user is member of this pool
       return CupertinoListTile.notched(
         title: CupertinoButton(
