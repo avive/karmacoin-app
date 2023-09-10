@@ -346,9 +346,11 @@ class KC2User extends KC2UserInteface {
 
       if (info == null) {
         // user is not on chain
-        debugPrint('Local user not on chain');
+        debugPrint('Local user not on chain.');
         signupStatus.value = SignupStatus.notSignedUp;
         return;
+      } else {
+        debugPrint('Local user info updated from chain data.');
       }
 
       // update observable value
@@ -480,22 +482,19 @@ class KC2User extends KC2UserInteface {
       return;
     }
 
-    final userName = requestedUserName ?? userInfo.value!.userName;
-    final phoneNumber = requestedPhoneNumber ?? kc2User.identity.phoneNumber!;
-
     // Create a verification request for verifier with a bypass token or with
     // a verification code and session id from app state
     vnr.VerifyNumberRequest req = configLogic.skipWhatsappVerification
         ? await verifier.createVerificationRequest(
             accountId: identity.accountId,
-            userName: userName,
-            phoneNumber: phoneNumber,
+            userName: requestedUserName,
+            phoneNumber: requestedPhoneNumber,
             keyring: identity.keyring,
             useBypassToken: true)
         : await verifier.createVerificationRequest(
             accountId: identity.accountId,
-            userName: userName,
-            phoneNumber: phoneNumber,
+            userName: requestedUserName,
+            phoneNumber: requestedPhoneNumber,
             keyring: identity.keyring,
             useBypassToken: false,
             verificaitonSessionId: appState.twilloVerificationSid,

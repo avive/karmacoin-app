@@ -24,6 +24,10 @@ Future<KC2User> createLocalAppUser(String? phoneNumber) async {
   debugPrint('User name: $userName');
   phoneNumber ??= randomPhoneNumber;
   await user.signup(userName, phoneNumber);
+
+  // this is done from the ui when phone number is set
+  await user.identity.setPhoneNumber(phoneNumber);
+
   return user;
 }
 

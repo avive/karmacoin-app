@@ -73,6 +73,7 @@ class Verifier {
         await verifier.verifierServiceClient.verifyNumber(request.request);
     if (resp.result !=
         verifier_api.VerificationResult.VERIFICATION_RESULT_VERIFIED) {
+      debugPrint('>>> Verifier returned: ${resp.result.name}');
       return (VerifyNumberData(
           data: null,
           error: types.VerificationResult.fromProto(resp.result.name)));
