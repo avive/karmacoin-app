@@ -6,6 +6,7 @@ import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 
 const _aboutPoolsUrl = 'https://karmaco.in/pools/';
 
+/// A simgle pool screen
 class PoolScreen extends StatefulWidget {
   final Pool pool;
   const PoolScreen({super.key, required this.pool});
@@ -44,7 +45,8 @@ class _PoolScreenState extends State<PoolScreen> {
         },
         itemCount: 1,
         itemBuilder: (context, index) {
-          return PoolWidget(pool: widget.pool, showHeader: false);
+          return PoolWidget(
+              pool: widget.pool, showHeader: false);
         },
       ),
     );

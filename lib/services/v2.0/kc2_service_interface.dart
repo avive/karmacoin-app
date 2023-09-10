@@ -4,6 +4,7 @@ import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/services/v2.0/event.dart';
 import 'package:karma_coin/services/v2.0/interfaces.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/nomination_pools_configuration.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
@@ -33,6 +34,9 @@ mixin K2ServiceInterface implements ChainApiProvider {
 
   /// Hasher to use with phone number
   Blake2bHasher hasher = const Blake2bHasher(64);
+
+  /// Chains pool configuration
+  NominationPoolsConfiguration get poolsConfiguration;
 
   /// Connect to a karmachain api service. e.g
   /// Local running node - "ws://127.0.0.1:9944"

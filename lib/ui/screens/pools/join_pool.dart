@@ -23,6 +23,41 @@ class _JoinPoolState extends State<JoinPool> {
   NominationPoolsConfiguration? config;
   bool isSubmitting = false;
 
+  @override
+  void initState() {
+    super.initState();
+
+    // set initial value to 1 KC - update it from pool config later
+    appState.kCentsAmount.value = GenesisConfig.kCentsPerCoinBigInt;
+    kc2User.joinPoolStatus.value = JoinPoolStatus.unknown;
+
+    Future.delayed(Duration.zero, () async {
+      try {
+        NominationPoolsConfiguration conf =
+            await (kc2Service as KC2NominationPoolsInterface)
+                .getPoolsConfiguration();
+        appState.kCentsAmount.value = conf.minJoinBond;
+        setState(() {
+          config = conf;
+        });
+      } catch (e) {
+        apiDown = true;
+        debugPrint('Can\'t read pools config: $e');
+        if (context.mounted) {
+          StatusAlert.show(
+            context,
+            duration: const Duration(seconds: 2),
+            title: 'Server Unreachable',
+            subtitle: 'Please try later.',
+            configuration: const IconConfiguration(
+                icon: CupertinoIcons.exclamationmark_triangle),
+            maxWidth: statusAlertWidth,
+          );
+        }
+      }
+    });
+  }
+
   // validate input data and show alert if invalid
   Future<bool> _validateData() async {
     if (kc2User.userInfo.value == null) {
@@ -115,41 +150,6 @@ class _JoinPoolState extends State<JoinPool> {
 
     await kc2User.joinPool(
         amount: appState.kCentsAmount.value, poolId: widget.pool.id);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    // set initial value to 1 KC - update it from pool config later
-    appState.kCentsAmount.value = GenesisConfig.kCentsPerCoinBigInt;
-    kc2User.joinPoolStatus.value = JoinPoolStatus.unknown;
-
-    Future.delayed(Duration.zero, () async {
-      try {
-        NominationPoolsConfiguration conf =
-            await (kc2Service as KC2NominationPoolsInterface)
-                .getPoolsConfiguration();
-        appState.kCentsAmount.value = conf.minJoinBond;
-        setState(() {
-          config = conf;
-        });
-      } catch (e) {
-        apiDown = true;
-        debugPrint('Can\'t read pools config: $e');
-        if (context.mounted) {
-          StatusAlert.show(
-            context,
-            duration: const Duration(seconds: 2),
-            title: 'Server Unreachable',
-            subtitle: 'Please try later.',
-            configuration: const IconConfiguration(
-                icon: CupertinoIcons.exclamationmark_triangle),
-            maxWidth: statusAlertWidth,
-          );
-        }
-      }
-    });
   }
 
   Widget _getUpdateStatus(BuildContext context) {

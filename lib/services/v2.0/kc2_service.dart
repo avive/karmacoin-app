@@ -21,6 +21,8 @@ import 'package:substrate_metadata_fixed/types/metadata_types.dart';
 class KarmachainService extends ChainApiProvider
     with KC2NominationPoolsInterface, KC2StakingInterface, K2ServiceInterface {
   bool _connectedToApi = false;
+  NominationPoolsConfiguration? _poolsConfiguration;
+
   late String _apiWsUrl;
 
   @override
@@ -73,7 +75,10 @@ class KarmachainService extends ChainApiProvider
       });
       _connectedToApi = true;
       debugPrint('Connected to api: $apiWsUrl');
-    } on PlatformException catch (e) {
+
+      // get pools configuration so it is accesible to the app
+      _poolsConfiguration = await getPoolsConfiguration();
+    } catch (e) {
       debugPrint('Failed to connect to kc2 api: $e');
       _connectedToApi = false;
       rethrow;
@@ -719,4 +724,7 @@ class KarmachainService extends ChainApiProvider
 
     return ChainError.fromSubstrateMetadata(errorMetadata);
   }
+
+  @override
+  NominationPoolsConfiguration get poolsConfiguration => _poolsConfiguration!;
 }

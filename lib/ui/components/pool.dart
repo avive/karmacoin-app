@@ -4,6 +4,7 @@ import 'package:karma_coin/data/kc_amounts_formatter.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
+import 'package:karma_coin/ui/screens/pools/payout.dart';
 import 'package:random_avatar/random_avatar.dart';
 
 /// Pool widget designed to be used in a ListView
@@ -11,7 +12,11 @@ class PoolWidget extends StatefulWidget {
   final Pool pool;
   final bool showHeader;
 
-  const PoolWidget({super.key, required this.pool, required this.showHeader});
+  const PoolWidget({
+    super.key,
+    required this.pool,
+    required this.showHeader,
+  });
 
   @override
   State<PoolWidget> createState() => _PoolWidgetState();
@@ -194,8 +199,14 @@ class _PoolWidgetState extends State<PoolWidget> {
                 trailing: CupertinoButton(
                   padding: const EdgeInsets.only(left: 0.0),
                   onPressed: () {
-                    // todo: push leave pool screen
-                    // context.pushNamed(ScreenNames.joinPool, extra: pool);
+                    if (!context.mounted) return;
+                    Navigator.of(context).push(
+                      CupertinoPageRoute(
+                        fullscreenDialog: true,
+                        builder: ((context) => ClaimPayout(
+                            pool: pool, membership: value)),
+                      ),
+                    );
                   },
                   child: const Text('Withdraw'),
                 ),
@@ -258,7 +269,6 @@ class _PoolWidgetState extends State<PoolWidget> {
       // and the pool is open for joining
       return CupertinoListTile.notched(
         title: CupertinoButton.filled(
-          padding: const EdgeInsets.only(left: 0.0),
           onPressed: () {
             context.pushNamed(ScreenNames.joinPool, extra: widget.pool);
           },

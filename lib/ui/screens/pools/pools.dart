@@ -18,6 +18,7 @@ class PoolsScreen extends StatefulWidget {
 class _PoolsScreenState extends State<PoolsScreen> {
   bool apiOffline = false;
   List<Pool>? entries;
+  NominationPoolsConfiguration? conf;
 
   @override
   initState() {
@@ -26,6 +27,9 @@ class _PoolsScreenState extends State<PoolsScreen> {
 
     Future.delayed(Duration.zero, () async {
       try {
+        conf = await (kc2Service as KC2NominationPoolsInterface)
+            .getPoolsConfiguration();
+
         debugPrint('getting open pools...');
         List<Pool> pools = await (kc2Service as KC2NominationPoolsInterface)
             .getPools(state: PoolState.open);
@@ -122,7 +126,8 @@ class _PoolsScreenState extends State<PoolsScreen> {
         },
         itemCount: entries!.length,
         itemBuilder: (context, index) {
-          return PoolWidget(pool: entries![index], showHeader: true);
+          return PoolWidget(
+              pool: entries![index], showHeader: true);
         },
       ),
     );
