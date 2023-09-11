@@ -101,6 +101,6 @@ class Pool {
 
     // get pool balance
     balance = await (kc2Service as KC2NominationPoolsInterface)
-        .getPoolsPointsToBalance(points);
+        .getPoolsPointsToBalance(id, points);
   }
 }

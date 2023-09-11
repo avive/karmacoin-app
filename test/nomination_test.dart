@@ -108,6 +108,14 @@ void main() {
             return;
           }
 
+          // Verify points-balance ration, default ration 1:1
+          final pointsToBalance = await kc2Service.getPoolsPointsToBalance(
+              pool.id, poolMember.points);
+          final balanceToPoints = await kc2Service.getPoolsBalanceToPoints(
+              pool.id, BigInt.from(1000000));
+          expect(pointsToBalance, BigInt.from(1000000));
+          expect(balanceToPoints, poolMember.points);
+
           completer.complete(true);
         };
 
