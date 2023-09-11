@@ -99,7 +99,7 @@ class Pool {
       _addPoolUser(accountId);
     }
 
-    // get pool balance
+    // get current pool coin balance
     balance = await (kc2Service as KC2NominationPoolsInterface)
         .getPoolsPointsToBalance(id, points);
   }

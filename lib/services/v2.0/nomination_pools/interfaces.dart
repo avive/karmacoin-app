@@ -427,8 +427,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
           }));
 
       return await signAndSendTransaction(call);
-    } on PlatformException catch (e) {
-      debugPrint('Failed to join nomination pool: ${e.details}');
+    } catch (e) {
+      debugPrint('Failed to join nomination pool: $e');
       rethrow;
     }
   }
@@ -445,8 +445,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
           }));
 
       return await signAndSendTransaction(call);
-    } on PlatformException catch (e) {
-      debugPrint('Failed to join nomination pool: ${e.details}');
+    } catch (e) {
+      debugPrint('Failed to join nomination pool: $e');
       rethrow;
     }
   }
@@ -460,8 +460,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
           (payout) => payout != null && payout is String
               ? BigInt.parse(payout)
               : BigInt.zero);
-    } on PlatformException catch (e) {
-      debugPrint('Failed to get pending payouts: ${e.details}');
+    } catch (e) {
+      debugPrint('Failed to get pending payouts: $e');
       rethrow;
     }
   }
@@ -472,8 +472,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
       return await callRpc(
               'nominationPools_pointsToBalance', [poolId, points.toInt()])
           .then((balance) => BigInt.from(balance));
-    } on PlatformException catch (e) {
-      debugPrint('Failed to get balance from points: ${e.details}');
+    } catch (e) {
+      debugPrint('Failed to get balance from points: $e');
       rethrow;
     }
   }
@@ -484,8 +484,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
       return await callRpc(
               'nominationPools_balanceToPoints', [poolId, balance.toInt()])
           .then((points) => BigInt.from(points));
-    } on PlatformException catch (e) {
-      debugPrint('Failed to get points from balance: ${e.details}');
+    } catch (e) {
+      debugPrint('Failed to get points from balance: $e');
       rethrow;
     }
   }
