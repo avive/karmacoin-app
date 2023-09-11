@@ -108,7 +108,7 @@ void main() {
             return;
           }
 
-          // Verify points-balance ration
+          // Verify points-balance ration, default ration 1:1
           final pointsToBalance = await kc2Service.getPoolsPointsToBalance(
               pool.id, poolMember.points);
           final balanceToPoints = await kc2Service.getPoolsBalanceToPoints(
