@@ -41,8 +41,8 @@ class KC2KeyRing {
   Uint8List sign(Uint8List message) {
     try {
       return ed.sign(_privateKey, message);
-    } on PlatformException catch (e) {
-      debugPrint('Failed to sign message: ${e.details}');
+    } catch (e) {
+      debugPrint('Failed to sign message: $e');
       rethrow;
     }
   }

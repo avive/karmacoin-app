@@ -53,8 +53,8 @@ mixin K2ServiceInterface implements ChainApiProvider {
       Map<String, dynamic>? result =
           await callRpc('identity_getUserInfoByAccountId', [accountId]);
       return result == null ? null : KC2UserInfo.fromJson(result);
-    } on PlatformException catch (e) {
-      debugPrint('Failed to get user information by account id: ${e.message}');
+    } catch (e) {
+      debugPrint('Failed to get user information by account id: $e');
       rethrow;
     }
   }
@@ -65,8 +65,8 @@ mixin K2ServiceInterface implements ChainApiProvider {
       Map<String, dynamic>? result =
           await callRpc('identity_getUserInfoByUsername', [username]);
       return result == null ? null : KC2UserInfo.fromJson(result);
-    } on PlatformException catch (e) {
-      debugPrint('Failed to get user information by username: ${e.message}');
+    } catch (e) {
+      debugPrint('Failed to get user information by username: $e');
       rethrow;
     }
   }
@@ -86,9 +86,8 @@ mixin K2ServiceInterface implements ChainApiProvider {
       Map<String, dynamic>? result = await callRpc(
           'identity_getUserInfoByPhoneNumberHash', [phoneNumberHash]);
       return result == null ? null : KC2UserInfo.fromJson(result);
-    } on PlatformException catch (e) {
-      debugPrint(
-          'Failed to get user information by phone number hash: ${e.message}');
+    } catch (e) {
+      debugPrint('Failed to get user information by phone number hash: $e');
       rethrow;
     }
   }
@@ -102,8 +101,8 @@ mixin K2ServiceInterface implements ChainApiProvider {
           'community_getAllUsers', [communityId, fromIndex, limit]);
 
       return result.map((e) => KC2UserInfo.fromJson(e)).toList();
-    } on PlatformException catch (e) {
-      debugPrint('Failed to get community members: ${e.message}');
+    } catch (e) {
+      debugPrint('Failed to get community members: $e');
       rethrow;
     }
   }
@@ -116,8 +115,8 @@ mixin K2ServiceInterface implements ChainApiProvider {
       List<dynamic> result = await callRpc(
           'community_getContacts', [prefix, communityId, fromIndex, limit]);
       return result.map((e) => Contact.fromJson(e)).toList();
-    } on PlatformException catch (e) {
-      debugPrint('Failed to get contacts: ${e.message}');
+    } catch (e) {
+      debugPrint('Failed to get contacts: $e');
       rethrow;
     }
   }
