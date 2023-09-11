@@ -678,5 +678,71 @@ void main() {
       },
       timeout: const Timeout(Duration(seconds: 280)),
     );
+
+    test(
+      'unbond works',
+          () async {
+        KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
+        // Connect to the chain
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+
+        final completer = Completer<bool>();
+        TestUserInfo katya = await createTestUser(completer: completer);
+        await Future.delayed(const Duration(seconds: 12));
+
+        // Test utils
+        String txHash = "";
+
+        // Subscribe to Katya's transactions
+        kc2Service.subscribeToAccountTransactions(katya.userInfo!);
+
+        // Create a pool
+        txHash = await kc2Service.createPool(
+          amount: BigInt.from(2) * GenesisConfig.kCentsPerCoinBigInt,
+          root: katya.accountId,
+          nominator: katya.accountId,
+          bouncer: katya.accountId,
+        );
+
+        // Create pool callback
+        kc2Service.createPoolCallback = (tx) async {
+          if (tx.hash != txHash) {
+            // allow other tests to run in parallel
+            return;
+          }
+
+          // Check if the tx failed
+          if (tx.chainError != null) {
+            completer.complete(false);
+            return;
+          }
+
+          txHash = await kc2Service.unbond(katya.accountId, BigInt.from(1000000));
+
+          completer.complete(true);
+        };
+
+        kc2Service.unbondPoolCallback = (tx) async {
+          if (tx.hash != txHash) {
+            // allow other tests to run in parallel
+            return;
+          }
+
+          // Check if the tx failed
+          if (tx.chainError != null) {
+            completer.complete(false);
+            return;
+          }
+
+          final poolMember = await kc2Service.getMembershipPool(katya.accountId);
+          expect(poolMember!.points, BigInt.from(1000000));
+        };
+
+        // Wait for completer and verify test success
+        expect(await completer.future, equals(true));
+        expect(completer.isCompleted, isTrue);
+      },
+      timeout: const Timeout(Duration(seconds: 280)),
+    );
   });
 }

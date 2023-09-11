@@ -139,7 +139,6 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   ///
   Future<String> unbond(String accountId, BigInt unbondingPoints) async {
     try {
-
       final call = MapEntry(
           'NominationPools',
           MapEntry('unbond', {
