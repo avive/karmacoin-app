@@ -2,6 +2,7 @@ import 'package:karma_coin/services/v2.0/error.dart';
 import 'package:karma_coin/services/v2.0/event.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:ss58/ss58.dart' as ss58;
 
 /// Unbond a portion or all of the staked amount from the pool and leave it.
 ///
@@ -22,8 +23,11 @@ class KC2UnbondTxV1 extends KC2Tx {
       required List<KC2Event> txEvents,
       required int netId}) {
     try {
+      final memberAccount =
+          ss58.Codec(netId).encode(args['member_account'].value.cast<int>());
+
       return KC2UnbondTxV1(
-        memberAccount: args['member_account'],
+        memberAccount: memberAccount,
         unbondingPoints: args['unbonding_points'],
         args: args,
         signer: signer,
