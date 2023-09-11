@@ -77,8 +77,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
           MapEntry('join', {"amount": amount, "pool_id": poolId}));
 
       return await signAndSendTransaction(call);
-    } on PlatformException catch (e) {
-      debugPrint('Failed to join nomination pool: ${e.details}');
+    } catch (e) {
+      debugPrint('Failed to join nomination pool: $e');
       rethrow;
     }
   }
@@ -98,8 +98,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
       const call = MapEntry('NominationPools', MapEntry('claim_payout', {}));
 
       return await signAndSendTransaction(call);
-    } on PlatformException catch (e) {
-      debugPrint('Failed to claim payout: ${e.details}');
+    } catch (e) {
+      debugPrint('Failed to claim payout: $e');
       rethrow;
     }
   }
@@ -149,8 +149,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
           }));
 
       return await signAndSendTransaction(call);
-    } on PlatformException catch (e) {
-      debugPrint('Failed to join nomination pool: ${e.details}');
+    } catch (e) {
+      debugPrint('Failed to join nomination pool: $e');
       rethrow;
     }
   }
@@ -453,11 +453,13 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
 
   // RPC
 
-  /// Returns the pending rewards for the member that the AccountId was given for.
-  Future<BigInt> pendingPoolPayouts(String accountId) async {
+  /// Returns the pending rewards in coins units for the member that the AccountId was given for.
+  Future<BigInt> getPendingPoolPayout(String accountId) async {
     try {
-      return await callRpc('nominationPools_pendingPayouts', [accountId])
-          .then((payout) => BigInt.parse(payout));
+      return await callRpc('nominationPools_pendingPayouts', [accountId]).then(
+          (payout) => payout != null && payout is String
+              ? BigInt.parse(payout)
+              : BigInt.zero);
     } on PlatformException catch (e) {
       debugPrint('Failed to get pending payouts: ${e.details}');
       rethrow;
@@ -512,7 +514,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
       // Get all pools
       List<Pool> pools = await getPools();
       Pool pool = pools.firstWhere((p) => p.id == poolId);
-      await pool.populateUsers();
+      await pool.populateData();
       return pool;
     } catch (e) {
       debugPrint('Pool not found in pools...');

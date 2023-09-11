@@ -195,12 +195,6 @@ class KC2User extends KC2UserInteface {
     return false;
   }
 
-  @override
-  Future<PoolMember?> getPoolMembership() async {
-    return await (kc2Service as KC2NominationPoolsInterface)
-        .getMembershipPool(kc2User.identity.accountId);
-  }
-
   void _cancelSubscriptionTimer() {
     if (_subscribeToAccountTimer != null) {
       if (_subscribeToAccountTimer!.isActive) {
@@ -363,6 +357,11 @@ class KC2User extends KC2UserInteface {
       // load pool membership
       poolMembership.value = await (kc2Service as KC2NominationPoolsInterface)
           .getMembershipPool(_identity.accountId);
+
+      // get current pool claimable amount
+      poolClaimableRewardAmount.value =
+          await (kc2Service as KC2NominationPoolsInterface)
+              .getPendingPoolPayout(_identity.accountId);
     } catch (e) {
       // api error - don't change signup status
       debugPrint('failed to get userInfo from chain via api: $e');

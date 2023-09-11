@@ -122,8 +122,8 @@ class KarmachainService extends ChainApiProvider
       // As we first block time (not genesis block time),
       // we can calculate genesis time
       return (timestamp - blockTime).toInt();
-    } on PlatformException catch (e) {
-      debugPrint('Failed to get genesis time: ${e.message}');
+    } catch (e) {
+      debugPrint('Failed to get genesis time: $e');
       rethrow;
     }
   }

@@ -113,6 +113,10 @@ abstract class KC2UserInteface {
   /// Observable pool membership
   final ValueNotifier<PoolMember?> poolMembership = ValueNotifier(null);
 
+  /// Observable pool claimable amount
+  final ValueNotifier<BigInt> poolClaimableRewardAmount =
+      ValueNotifier(BigInt.zero);
+
   /// Observable join pool status
   final ValueNotifier<JoinPoolStatus> joinPoolStatus =
       ValueNotifier(JoinPoolStatus.unknown);
@@ -182,9 +186,6 @@ abstract class KC2UserInteface {
 
   /// Update user info from chain via the node's rpc api
   Future<void> getUserDataFromChain();
-
-  /// Get pool membership if user is a pool member. Returns null if user is not member of a pool, otherwise the membership info.
-  Future<PoolMember?> getPoolMembership();
 
   /// Fetch all account related appreciations and payment txs - incoming and outgoing
   /// Client should call this before user wants to view his txs as this is an expensive slow operation.
