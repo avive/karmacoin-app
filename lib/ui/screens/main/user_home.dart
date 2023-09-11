@@ -229,11 +229,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 // push intro screen here
                 const StakingIntro())))
         .then((completion) async {
-      PoolMember? membership = await kc2User.getPoolMembership();
-
-      if (membership != null) {
+      if (kc2User.poolMembership.value != null) {
         Pool? pool = await (kc2Service as KC2NominationPoolsInterface)
-            .getPool(poolId: membership.id);
+            .getPool(poolId: kc2User.poolMembership.value!.id);
         if (pool != null) {
           if (context.mounted) {
             // local user is member of a pool - show pool details screen

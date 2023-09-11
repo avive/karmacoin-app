@@ -57,12 +57,11 @@ class _PoolWidgetState extends State<PoolWidget> {
           }
 
           tiles.add(CupertinoListTile.notched(
-            title: const Text('Points'),
+            title: const Text('Stake'),
             leading: const FaIcon(FontAwesomeIcons.coins, size: 24),
             trailing: Text(
               // todo: format it properly
-              KarmaCoinAmountFormatter.deicmalFormat
-                  .format(pool.points.toInt()),
+              pool.points.formatAmount(),
             ),
           ));
 
@@ -171,32 +170,18 @@ class _PoolWidgetState extends State<PoolWidget> {
 
           if (value != null && value.id == widget.pool.id) {
             tiles.add(CupertinoListTile.notched(
-              title: const Text('Your Points'),
+              title: const Text('Your Stake'),
               leading: const FaIcon(FontAwesomeIcons.yinYang, size: 24),
               trailing: Text(
-                KarmaCoinAmountFormatter.deicmalFormat
-                    .format(value.points.toInt()),
+                value.points.formatAmount(),
               ),
             ));
 
-            // free points are withdraable
-            BigInt freePoints = value.points - BigInt.from(1000000);
-            // fake 500,000 withdrawable testing purposes
-            freePoints = BigInt.from(500000);
-
-            if (freePoints > BigInt.zero) {
-              final String freePointString = KarmaCoinAmountFormatter
-                  .deicmalFormat
-                  .format(freePoints.toInt());
-
-              final String disp = freePoints == BigInt.one
-                  ? '1 Point'
-                  : '$freePointString Points';
-
+            if (kc2User.poolClaimableRewardAmount.value > BigInt.zero) {
               tiles.add(CupertinoListTile.notched(
                 title: const Padding(
                     padding: EdgeInsets.only(top: 14.0),
-                    child: Text('Your Earnings')),
+                    child: Text('Your Reward')),
                 trailing: CupertinoButton(
                   padding: const EdgeInsets.only(left: 0.0),
                   onPressed: () {
@@ -213,7 +198,8 @@ class _PoolWidgetState extends State<PoolWidget> {
                 ),
                 leading:
                     const FaIcon(FontAwesomeIcons.moneyBillTrendUp, size: 24),
-                subtitle: Text(disp),
+                subtitle: Text(
+                    kc2User.poolClaimableRewardAmount.value.formatAmount()),
               ));
             } else {
               tiles.add(const CupertinoListTile.notched(
@@ -294,7 +280,7 @@ class _PoolWidgetState extends State<PoolWidget> {
   Widget _getPoolActionButton(BuildContext context, PoolMember? membership) {
     if (membership != null &&
         membership.id == widget.pool.id &&
-        widget.pool.depositor!.accountId != kc2User.identity.accountId) {
+        widget.pool.depositor?.accountId != kc2User.identity.accountId) {
       // local user is member of this pool
       return CupertinoListTile.notched(
         title: CupertinoButton(

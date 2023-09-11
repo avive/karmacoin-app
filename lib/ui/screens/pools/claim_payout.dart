@@ -17,14 +17,10 @@ class ClaimPayout extends StatefulWidget {
 
 class _ClaimPayoutState extends State<ClaimPayout> {
   bool isSubmitting = true;
-  late BigInt claimableAmount;
 
   @override
   void initState() {
     super.initState();
-
-    claimableAmount =
-        widget.membership.points - kc2Service.poolsConfiguration.minJoinBond;
 
     // claim payout - status is comign via state changes
     kc2User.claimPoolPayout();
@@ -110,7 +106,7 @@ class _ClaimPayoutState extends State<ClaimPayout> {
   @override
   build(BuildContext context) {
     final String claimable =
-        KarmaCoinAmountFormatter.deicmalFormat.format(claimableAmount.toInt());
+        kc2User.poolClaimableRewardAmount.value.formatAmount();
 
     return CupertinoPageScaffold(
       resizeToAvoidBottomInset: true,
@@ -146,7 +142,7 @@ class _ClaimPayoutState extends State<ClaimPayout> {
                   children: [
                     Column(
                       children: [
-                        Text('Claiming $claimable points...',
+                        Text('Claiming $claimable...',
                             style: CupertinoTheme.of(context)
                                 .textTheme
                                 .pickerTextStyle),

@@ -31,6 +31,9 @@ class Pool {
   /// AccountId of each pool members
   List<String> membersAccountIds = [];
 
+  /// Current pool balance in coins
+  BigInt? balance;
+
   /// Pool's social url - must be set by depositor/creator
   String? get socialUrl =>
       'https://linktree/pool'; //poolsUsers[roles.depositor]?.metadata;
@@ -70,7 +73,7 @@ class Pool {
   }
 
   /// Populate poolsUsers with info about the pool's roles users
-  Future<void> populateUsers() async {
+  Future<void> populateData() async {
     if (roles.root != null) {
       await _addPoolUser(roles.root!);
     }
@@ -90,10 +93,14 @@ class Pool {
 
     // Get all members
     membersAccountIds = await (kc2Service as KC2NominationPoolsInterface)
-        .getPoolMembers(id, fromIndex: 0, limit: 5000);
+        .getPoolMembers(id, fromIndex: 0, limit: 100);
 
     for (final String accountId in membersAccountIds) {
       _addPoolUser(accountId);
     }
+
+    // get pool balance
+    balance = await (kc2Service as KC2NominationPoolsInterface)
+        .getPoolsPointsToBalance(points);
   }
 }

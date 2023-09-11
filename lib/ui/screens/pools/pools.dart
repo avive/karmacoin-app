@@ -38,7 +38,7 @@ class _PoolsScreenState extends State<PoolsScreen> {
 
         // Populate user infos for all pools roles
         for (final Pool pool in pools) {
-          await pool.populateUsers();
+          await pool.populateData();
         }
 
         setState(() {
@@ -126,8 +126,7 @@ class _PoolsScreenState extends State<PoolsScreen> {
         },
         itemCount: entries!.length,
         itemBuilder: (context, index) {
-          return PoolWidget(
-              pool: entries![index], showHeader: true);
+          return PoolWidget(pool: entries![index], showHeader: true);
         },
       ),
     );
