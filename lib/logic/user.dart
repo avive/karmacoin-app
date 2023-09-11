@@ -28,6 +28,7 @@ class KC2User extends KC2UserInteface {
   late String _createPoolTxHash = '';
   late String _joinPoolTxHash = '';
   late String _claimPayoutTxHash = '';
+  late String _leavePoolTxHash = '';
 
   @override
   ValueNotifier<Map<String, KC2Tx>> get incomingAppreciations =>
@@ -86,6 +87,9 @@ class KC2User extends KC2UserInteface {
         _joinPoolCallback;
     (kc2Service as KC2NominationPoolsInterface).claimPoolPayoutCallback =
         _claimPoolPayoutCallback;
+
+    (kc2Service as KC2NominationPoolsInterface).unbondPoolCallback =
+        _leavePoolCallback;
 
     // subscribe to account transactions if we have user info in this session
     // otherwise we'll subscribe on signup()
@@ -183,6 +187,7 @@ class KC2User extends KC2UserInteface {
     (kc2Service as KC2NominationPoolsInterface).createPoolCallback = null;
     (kc2Service as KC2NominationPoolsInterface).joinPoolCallback = null;
     (kc2Service as KC2NominationPoolsInterface).claimPoolPayoutCallback = null;
+    (kc2Service as KC2NominationPoolsInterface).unbondPoolCallback = null;
 
     // remove the id from local store
     await _identity.removeFromStore();
@@ -390,6 +395,35 @@ class KC2User extends KC2UserInteface {
     } catch (e) {
       debugPrint('failed to claim payout: $e');
       claimPayoutStatus.value = SubmitTransactionStatus.serverError;
+    }
+  }
+
+  @override
+  Future<void> leavePool() async {
+    debugPrint('Leaving pool...');
+    leavePoolStatus.value = SubmitTransactionStatus.submitting;
+
+    if (poolMembership.value == null) {
+      leavePoolStatus.value = SubmitTransactionStatus.invalidData;
+      return;
+    }
+
+    // todo: this is buggy when 2nd call - needs to be cancled every time createPool is called
+    Future.delayed(const Duration(seconds: 60), () async {
+      if (joinPoolStatus.value == JoinPoolStatus.joining) {
+        // tx timed out
+        leavePoolStatus.value = SubmitTransactionStatus.connectionTimeout;
+      }
+    });
+
+    try {
+      _leavePoolTxHash = await (kc2Service as KC2NominationPoolsInterface)
+          .unbond(identity.accountId, poolMembership.value!.points);
+      // status updated via callback
+    } catch (e) {
+      debugPrint('failed to leave pool: $e');
+      leavePoolStatus.value = SubmitTransactionStatus.serverError;
+      return;
     }
   }
 
@@ -606,6 +640,26 @@ class KC2User extends KC2UserInteface {
     }
 
     _claimPayoutTxHash = '';
+  }
+
+  Future<void> _leavePoolCallback(KC2UnbondTxV1 tx) async {
+    if (_leavePoolTxHash != tx.hash) {
+      // not of interest
+      return;
+    }
+
+    tx.chainError != null
+        ? leavePoolStatus.value = SubmitTransactionStatus.invalidData
+        : leavePoolStatus.value = SubmitTransactionStatus.submitted;
+
+    if (tx.chainError != null) {
+      debugPrint('Leave pool failed with: ${tx.chainError}');
+    } else {
+      // get updated balance and pool membership
+      await getUserDataFromChain();
+    }
+
+    _leavePoolTxHash = '';
   }
 
   Future<void> _joinPoolCallback(KC2JoinPoolTxV1 tx) async {

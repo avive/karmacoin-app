@@ -21,7 +21,7 @@ class _LeavePoolState extends State<LeavePool> {
   void initState() {
     super.initState();
 
-    // todo: leave pool here...
+    kc2User.leavePool();
   }
 
   Widget _getStatus(BuildContext context) {

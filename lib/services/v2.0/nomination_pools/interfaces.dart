@@ -139,7 +139,6 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   ///
   Future<String> unbond(String accountId, BigInt unbondingPoints) async {
     try {
-      // todo: use balance as argument and convert it to points inside function
 
       final call = MapEntry(
           'NominationPools',
