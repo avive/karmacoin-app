@@ -61,7 +61,7 @@ class _PoolWidgetState extends State<PoolWidget> {
             leading: const FaIcon(FontAwesomeIcons.coins, size: 24),
             trailing: Text(
               // todo: format it properly
-              pool.points.formatAmount(),
+              pool.balance!.formatAmount(),
             ),
           ));
 

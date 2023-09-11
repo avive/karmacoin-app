@@ -139,7 +139,6 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   ///
   Future<String> unbond(String accountId, BigInt unbondingPoints) async {
     try {
-      // todo: use balance as argument and convert it to points inside function
 
       final call = MapEntry(
           'NominationPools',
@@ -427,8 +426,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
           }));
 
       return await signAndSendTransaction(call);
-    } on PlatformException catch (e) {
-      debugPrint('Failed to join nomination pool: ${e.details}');
+    } catch (e) {
+      debugPrint('Failed to join nomination pool: $e');
       rethrow;
     }
   }
@@ -445,8 +444,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
           }));
 
       return await signAndSendTransaction(call);
-    } on PlatformException catch (e) {
-      debugPrint('Failed to join nomination pool: ${e.details}');
+    } catch (e) {
+      debugPrint('Failed to join nomination pool: $e');
       rethrow;
     }
   }
@@ -470,8 +469,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
       return await callRpc(
               'nominationPools_pointsToBalance', [poolId, points.toInt()])
           .then((balance) => BigInt.from(balance));
-    } on PlatformException catch (e) {
-      debugPrint('Failed to get balance from points: ${e.details}');
+    } catch (e) {
+      debugPrint('Failed to get balance from points: $e');
       rethrow;
     }
   }
@@ -482,8 +481,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
       return await callRpc(
               'nominationPools_balanceToPoints', [poolId, balance.toInt()])
           .then((points) => BigInt.from(points));
-    } on PlatformException catch (e) {
-      debugPrint('Failed to get points from balance: ${e.details}');
+    } catch (e) {
+      debugPrint('Failed to get points from balance: $e');
       rethrow;
     }
   }

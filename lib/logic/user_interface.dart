@@ -110,6 +110,9 @@ abstract class KC2UserInteface {
   final ValueNotifier<SubmitTransactionStatus> claimPayoutStatus =
       ValueNotifier(SubmitTransactionStatus.unknown);
 
+  final ValueNotifier<SubmitTransactionStatus> leavePoolStatus =
+      ValueNotifier(SubmitTransactionStatus.unknown);
+
   /// Observable pool membership
   final ValueNotifier<PoolMember?> poolMembership = ValueNotifier(null);
 
@@ -177,6 +180,9 @@ abstract class KC2UserInteface {
 
   /// Join a mining pool
   Future<void> joinPool({required BigInt amount, required int poolId});
+
+  /// Leave pool local user is member of and withdraw all funds
+  Future<void> leavePool();
 
   /// Delete user from karmachain. This will delete all user's data from the chain and local store and will sign out the user. Don't use this user object after calling this method.
   Future<void> deleteUser();

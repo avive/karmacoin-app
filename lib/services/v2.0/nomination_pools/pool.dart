@@ -25,13 +25,13 @@ class Pool {
   /// Current state.
   PoolState state;
 
-  /// User infos for the various pool roles and members
+  /// User infos for the various pool roles and members. Available after PopulateData() is called.
   Map<String, KC2UserInfo> poolsUsers = {};
 
   /// AccountId of each pool members
   List<String> membersAccountIds = [];
 
-  /// Current pool balance in coins
+  /// Current pool balance in coins. Available aftet PopulateData() is called.
   BigInt? balance;
 
   /// Pool's social url - must be set by depositor/creator
@@ -99,7 +99,7 @@ class Pool {
       _addPoolUser(accountId);
     }
 
-    // get pool balance
+    // get current pool coin balance
     balance = await (kc2Service as KC2NominationPoolsInterface)
         .getPoolsPointsToBalance(id, points);
   }
