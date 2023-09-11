@@ -9,6 +9,7 @@ import 'package:karma_coin/logic/identity_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/logic/verifier.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
+import 'package:karma_coin/services/v2.0/staking/types.dart';
 
 import 'utils.dart';
 
@@ -22,12 +23,6 @@ void main() {
       () => GetIt.I.get<KarmachainService>());
   GetIt.I.registerLazySingleton<Verifier>(() => Verifier());
   GetIt.I.registerLazySingleton<ConfigLogic>(() => ConfigLogic());
-
-  // @HolyGrease - we need the following basic pools integration test:
-  // 1. create a nominator and have nominator nominate the devnet's validator.
-  // 3. create pool and nominate the nominator.
-  // 4. Have 1 user join the pool.
-  // 5. Wait an era and verify nominator & pool gets rewarded and verify user can withdraw their rewards while staying in pool.
 
   group('nomination tests', () {
     // todo: add test when user joins a pool and pools nominates the devnet validator
@@ -279,7 +274,7 @@ void main() {
           txHash =
               await kc2Service.setPoolCommission(poolId, 0.02, katya.accountId);
 
-          debugPrint('Pool $poolId commision set to 2%');
+          debugPrint('Pool $poolId commission set to 2%');
         };
 
         kc2Service.setPoolCommissionCallback = (tx) async {
@@ -677,6 +672,183 @@ void main() {
         await kc2Service.getPoolsConfiguration();
       },
       timeout: const Timeout(Duration(seconds: 280)),
+    );
+
+    // @HolyGrease - we need the following basic pools integration test:
+    // 1. create a nominator and have nominator nominate the dev-net's validator.
+    // 2. create pool and nominate the nominator.
+    // 3. Have 1 user join the pool.
+    // 4. Wait an era and verify nominator & pool gets rewarded and verify user can withdraw their rewards while staying in pool.
+
+    test(
+      'reward works',
+      () async {
+        KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
+        // Connect to the chain
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+
+        final completer = Completer<bool>();
+        TestUserInfo nominator = await createTestUser(completer: completer);
+        TestUserInfo poolOwner = await createTestUser(completer: completer);
+        TestUserInfo poolMember = await createTestUser(completer: completer);
+        await Future.delayed(const Duration(seconds: 12));
+
+        // Test utils
+        Timer? blocksProcessingTimer;
+        String? txHash;
+
+        // Get current set of validators
+        final validators = await kc2Service.getValidators();
+
+        // Set nominator keys
+        kc2Service.setKeyring(nominator.user.keyring);
+
+        // Subscribe to nominator events
+        blocksProcessingTimer =
+            kc2Service.subscribeToAccountTransactions(nominator.userInfo!);
+
+        // Nominator bond his funds
+        txHash = await kc2Service.stakingBond(BigInt.from(1000000), const MapEntry(RewardDestination.stash, null));
+
+        // Check transaction success and nominate validator
+        kc2Service.stakingBondCallback = (tx) async {
+          // Check if the tx hash is the same
+          if (tx.hash != txHash) {
+            return;
+          }
+
+          // Check if the tx failed
+          if (tx.chainError != null) {
+            completer.complete(false);
+            return;
+          }
+
+          // Nominator nominate the dev-net's validator
+          txHash = await kc2Service.stakingNominate([validators.first.accountId]);
+        };
+
+        // Check transaction success and create pool
+        kc2Service.stakingNominateCallback = (tx) async {
+          // Check if the tx hash is the same
+          if (tx.hash != txHash) {
+            return;
+          }
+
+          // Check if the tx failed
+          if (tx.chainError != null) {
+            completer.complete(false);
+            return;
+          }
+
+          final nominations = await kc2Service.getNominations(nominator.accountId);
+          expect(nominations!.targets, contains(validators.first.accountId));
+
+          // Set pool owner keys
+          kc2Service.setKeyring(poolOwner.user.keyring);
+
+          // Cancel nominator subscription
+          blocksProcessingTimer!.cancel();
+
+          // Subscribe to pool owner events
+          blocksProcessingTimer =
+              kc2Service.subscribeToAccountTransactions(poolOwner.userInfo!);
+
+          // Create a pool
+          txHash = await kc2Service.createPool(
+            amount: BigInt.from(1000000),
+            root: poolOwner.accountId,
+            nominator: poolOwner.accountId,
+            bouncer: poolOwner.accountId,
+          );
+        };
+
+        // Check transaction success and nominate
+        kc2Service.createPoolCallback = (tx) async {
+          // Check if the tx hash is the same
+          if (tx.hash != txHash) {
+            return;
+          }
+
+          // Check if the tx failed
+          if (tx.chainError != null) {
+            completer.complete(false);
+            return;
+          }
+
+          final pools = await kc2Service.getPools();
+          final pool = pools.firstWhere(
+                  (pool) => pool.roles.depositor == poolOwner.accountId,
+              orElse: () => fail('pool not found'));
+
+          // Nominate nominator
+          txHash = await kc2Service.nominateForPool(pool.id, [nominator.accountId]);
+        };
+
+        kc2Service.nominatePoolValidatorCallback = (tx) async {
+          // Check if the tx hash is the same
+          if (tx.hash != txHash) {
+            return;
+          }
+
+          // Check if the tx failed
+          if (tx.chainError != null) {
+            completer.complete(false);
+            return;
+          }
+
+          final pool = await kc2Service.getPool(poolId: tx.poolId);
+          final nominations = await kc2Service.getNominations(pool!.bondedAccountId);
+          expect(nominations!.targets, contains(nominator.accountId));
+
+          // Set pool member keys
+          kc2Service.setKeyring(poolMember.user.keyring);
+
+          // Cancel pool owner subscription
+          blocksProcessingTimer!.cancel();
+
+          // Subscribe to pool member events
+          blocksProcessingTimer =
+              kc2Service.subscribeToAccountTransactions(poolMember.userInfo!);
+
+          // Join the pool
+          txHash = await kc2Service.joinPool(
+              amount: BigInt.from(1000000), poolId: pool.id);
+        };
+
+        kc2Service.joinPoolCallback = (tx) async {
+          // Check if the tx hash is the same
+          if (tx.hash != txHash) {
+            return;
+          }
+
+          // Check if the tx failed
+          if (tx.chainError != null) {
+            completer.complete(false);
+            return;
+          }
+
+          // Check that use joined the pool
+          final poolMembership = await kc2Service.getMembershipPool(poolMember.accountId);
+          expect(poolMembership!.id, tx.poolId);
+
+          // Wait for an era to pass
+          await Future.delayed(const Duration(seconds: 120));
+
+          // todo: nominator payout
+          final poolOwnerPendingPayout = await kc2Service.getPendingPoolPayout(poolOwner.accountId);
+          final poolMemberPendingPayout = await kc2Service.getPendingPoolPayout(poolMember.accountId);
+
+          expect(poolOwnerPendingPayout, isNot(BigInt.zero));
+          expect(poolMemberPendingPayout, isNot(BigInt.zero));
+
+          completer.complete(true);
+        };
+
+        // Wait for completer and verify test success
+        expect(await completer.future, equals(true));
+        expect(completer.isCompleted, isTrue);
+      },
+      timeout: const Timeout(Duration(seconds: 10 * 60)),
     );
   });
 }

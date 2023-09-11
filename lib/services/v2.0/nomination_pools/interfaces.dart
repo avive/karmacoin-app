@@ -457,9 +457,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   Future<BigInt> getPendingPoolPayout(String accountId) async {
     try {
       return await callRpc('nominationPools_pendingPayouts', [accountId]).then(
-          (payout) => payout != null && payout is String
-              ? BigInt.parse(payout)
-              : BigInt.zero);
+          (payout) => BigInt.from(payout));
     } on PlatformException catch (e) {
       debugPrint('Failed to get pending payouts: ${e.details}');
       rethrow;

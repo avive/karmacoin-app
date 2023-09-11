@@ -14,6 +14,12 @@ import 'package:karma_coin/services/v2.0/nomination_pools/txs/set_commission_max
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/unbond.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/update_roles.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/withdraw_unbonded.dart';
+import 'package:karma_coin/services/v2.0/staking/tx/bond.dart';
+import 'package:karma_coin/services/v2.0/staking/tx/bond_extra.dart';
+import 'package:karma_coin/services/v2.0/staking/tx/chill.dart';
+import 'package:karma_coin/services/v2.0/staking/tx/nominate.dart';
+import 'package:karma_coin/services/v2.0/staking/tx/unbond.dart';
+import 'package:karma_coin/services/v2.0/staking/tx/withdraw_unbonded.dart';
 import 'package:karma_coin/services/v2.0/txs/appreciation_tx.dart';
 import 'package:karma_coin/services/v2.0/txs/new_user_tx.dart';
 import 'package:karma_coin/services/v2.0/txs/remove_metadata_tx.dart';
@@ -347,6 +353,90 @@ abstract class KC2Tx {
 
     if (pallet == 'NominationPools' && method == 'claim_commission') {
       return KC2ClaimCommissionTxV1.createClaimCommissionTx(
+          hash: hash,
+          timestamp: timestamp,
+          signer: signer,
+          args: args,
+          chainError: chainError,
+          blockNumber: blockNumber,
+          netId: netId,
+          blockIndex: blockIndex,
+          rawData: tx,
+          txEvents: txEvents);
+    }
+
+    if (pallet == 'Staking' && method == 'bond') {
+      return KC2StakingBondTxV1.createStakingBondTx(
+          hash: hash,
+          timestamp: timestamp,
+          signer: signer,
+          args: args,
+          chainError: chainError,
+          blockNumber: blockNumber,
+          netId: netId,
+          blockIndex: blockIndex,
+          rawData: tx,
+          txEvents: txEvents);
+    }
+
+    if (pallet == 'Staking' && method == 'bond_extra') {
+      return KC2StakingBondExtraTxV1.createStakingBondExtraTx(
+          hash: hash,
+          timestamp: timestamp,
+          signer: signer,
+          args: args,
+          chainError: chainError,
+          blockNumber: blockNumber,
+          netId: netId,
+          blockIndex: blockIndex,
+          rawData: tx,
+          txEvents: txEvents);
+    }
+
+    if (pallet == 'Staking' && method == 'unbond') {
+      return KC2StakingUnbondTxV1.createStakingUnbondTx(
+          hash: hash,
+          timestamp: timestamp,
+          signer: signer,
+          args: args,
+          chainError: chainError,
+          blockNumber: blockNumber,
+          netId: netId,
+          blockIndex: blockIndex,
+          rawData: tx,
+          txEvents: txEvents);
+    }
+
+    if (pallet == 'Staking' && method == 'withdraw_unbonded') {
+      return KC2StakingWithdrawUnbondedTxV1.createStakingWithdrawUnbondedTx(
+          hash: hash,
+          timestamp: timestamp,
+          signer: signer,
+          args: args,
+          chainError: chainError,
+          blockNumber: blockNumber,
+          netId: netId,
+          blockIndex: blockIndex,
+          rawData: tx,
+          txEvents: txEvents);
+    }
+
+    if (pallet == 'Staking' && method == 'nominate') {
+      return KC2StakingNominateTxV1.createStakingNominateTx(
+          hash: hash,
+          timestamp: timestamp,
+          signer: signer,
+          args: args,
+          chainError: chainError,
+          blockNumber: blockNumber,
+          netId: netId,
+          blockIndex: blockIndex,
+          rawData: tx,
+          txEvents: txEvents);
+    }
+
+    if (pallet == 'Staking' && method == 'chill') {
+      return KC2StakingChillTxV1.createStakingChillTx(
           hash: hash,
           timestamp: timestamp,
           signer: signer,

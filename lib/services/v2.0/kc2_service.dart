@@ -8,6 +8,12 @@ import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/event.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 import 'package:karma_coin/services/v2.0/staking/interfaces.dart';
+import 'package:karma_coin/services/v2.0/staking/tx/bond.dart';
+import 'package:karma_coin/services/v2.0/staking/tx/bond_extra.dart';
+import 'package:karma_coin/services/v2.0/staking/tx/chill.dart';
+import 'package:karma_coin/services/v2.0/staking/tx/nominate.dart';
+import 'package:karma_coin/services/v2.0/staking/tx/unbond.dart';
+import 'package:karma_coin/services/v2.0/staking/tx/withdraw_unbonded.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:polkadart/polkadart.dart' as polkadart;
@@ -492,6 +498,50 @@ class KarmachainService extends ChainApiProvider
           transaction is KC2ClaimCommissionTxV1 &&
           claimPoolCommissionCallback != null) {
         await claimPoolCommissionCallback!(transaction);
+        return;
+      }
+
+      // Staking pallet
+
+      if (signer == userInfo.accountId &&
+          transaction is KC2StakingBondTxV1 &&
+          stakingBondCallback != null) {
+        await stakingBondCallback!(transaction);
+        return;
+      }
+
+      if (signer == userInfo.accountId &&
+          transaction is KC2StakingBondExtraTxV1 &&
+          stakingBondExtraCallback != null) {
+        await stakingBondExtraCallback!(transaction);
+        return;
+      }
+
+      if (signer == userInfo.accountId &&
+          transaction is KC2StakingUnbondTxV1 &&
+          stakingUnbondCallback != null) {
+        await stakingUnbondCallback!(transaction);
+        return;
+      }
+
+      if (signer == userInfo.accountId &&
+          transaction is KC2StakingWithdrawUnbondedTxV1 &&
+          stakingWithdrawUnbondedCallback != null) {
+        await stakingWithdrawUnbondedCallback!(transaction);
+        return;
+      }
+
+      if (signer == userInfo.accountId &&
+          transaction is KC2StakingNominateTxV1 &&
+          stakingNominateCallback != null) {
+        await stakingNominateCallback!(transaction);
+        return;
+      }
+
+      if (signer == userInfo.accountId &&
+          transaction is KC2StakingChillTxV1 &&
+          stakingChillCallback != null) {
+        await stakingChillCallback!(transaction);
         return;
       }
     } catch (e) {
