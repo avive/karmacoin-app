@@ -408,9 +408,9 @@ class KC2User extends KC2UserInteface {
       return;
     }
 
-    // todo: this is buggy when 2nd call - needs to be cancled every time createPool is called
+    // todo: this is buggy when 2nd call - needs to use time and timer cancled every time createPool is called
     Future.delayed(const Duration(seconds: 60), () async {
-      if (joinPoolStatus.value == JoinPoolStatus.joining) {
+      if (leavePoolStatus.value == SubmitTransactionStatus.submitting) {
         // tx timed out
         leavePoolStatus.value = SubmitTransactionStatus.connectionTimeout;
       }

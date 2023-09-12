@@ -26,7 +26,7 @@ class _LeavePoolState extends State<LeavePool> {
 
   Widget _getStatus(BuildContext context) {
     return ValueListenableBuilder<SubmitTransactionStatus>(
-        valueListenable: kc2User.claimPayoutStatus,
+        valueListenable: kc2User.leavePoolStatus,
         builder: (context, value, child) {
           String text = '';
           Color? color = CupertinoColors.systemRed;
@@ -92,7 +92,9 @@ class _LeavePoolState extends State<LeavePool> {
                 const SizedBox(height: 14),
                 CupertinoButton(
                   onPressed: () {
-                    context.pop();
+                    if (context.mounted && context.canPop()) {
+                      context.pop();
+                    }
                   },
                   child: const Text('Done'),
                 ),

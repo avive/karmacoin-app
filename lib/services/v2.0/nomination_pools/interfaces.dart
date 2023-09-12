@@ -139,7 +139,6 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   ///
   Future<String> unbond(String accountId, BigInt unbondingPoints) async {
     try {
-
       final call = MapEntry(
           'NominationPools',
           MapEntry('unbond', {
@@ -350,7 +349,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   /// - If a `null` is supplied to `commission` and `beneficiary`, existing
   ///   commission will be removed.
   /// - Both `commission` and `beneficiary` must be supplied or be `null`.
-  /// - Commision range [0.0,...,1.0].
+  /// - Commission range [0.0,...,1.0].
   ///
   ///
   Future<String> setPoolCommission(
@@ -383,9 +382,9 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
 
   /// Set the maximum commission of a pool.
   ///
-  /// - Initial max can be set to any percentage up to the chain's global max commision %, and only smaller values thereafter.
+  /// - Initial max can be set to any percentage up to the chain's global max commission %, and only smaller values thereafter.
   /// - Current commission will be lowered in the event it is higher than a new max commission.
-  /// - maxCommision range [0.0,...,1.0]
+  /// - maxCommission range [0.0,...,1.0]
   Future<String> setPoolCommissionMax(
       PoolId poolId, double maxCommission) async {
     if (maxCommission < 0.0 || maxCommission > 1.0) {
@@ -531,7 +530,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
     }
   }
 
-  /// Returns the pool id if accountId is memember of a pool.
+  /// Returns the pool id if accountId is member of a pool.
   Future<PoolMember?> getMembershipPool(String accountId) async {
     try {
       return await callRpc('nominationPools_memberOf', [accountId])
