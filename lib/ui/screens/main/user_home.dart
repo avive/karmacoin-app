@@ -233,10 +233,18 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         Pool? pool = await (kc2Service as KC2NominationPoolsInterface)
             .getPool(poolId: kc2User.poolMembership.value!.id);
         if (pool != null) {
+          int timeStamp, poolId;
+          (timeStamp, poolId) =
+              await kc2User.getLastUnboundAmountCallTimeStamp();
+          String lastCall = '0';
+          if (poolId == pool.id) {
+            lastCall = timeStamp.toString();
+          }
           if (context.mounted) {
             // local user is member of a pool - show pool details screen
             context.pushNamed(ScreenNames.pool,
-                params: {'poolId': pool.id.toString()}, extra: pool);
+                params: {'poolId': pool.id.toString(), 'lastCall': lastCall},
+                extra: pool);
           }
         } else {
           // pool not found

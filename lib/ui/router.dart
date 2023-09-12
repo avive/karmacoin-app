@@ -357,7 +357,9 @@ final GoRouter appRouter = GoRouter(
           if (pool == null) {
             // todo: redirect to home screen
           }
-          return PoolScreen(pool: pool!);
+          int lastCall = int.parse(state.params['lastCall']!);
+
+          return PoolScreen(pool: pool!, lastUnboundCallTimestamp: lastCall);
         }),
     GoRoute(
         name: ScreenNames.createPool,

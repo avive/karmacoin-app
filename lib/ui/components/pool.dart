@@ -12,11 +12,13 @@ import 'package:random_avatar/random_avatar.dart';
 class PoolWidget extends StatefulWidget {
   final Pool pool;
   final bool showHeader;
+  final int lastUnboundCallTimestamp;
 
   const PoolWidget({
     super.key,
     required this.pool,
     required this.showHeader,
+    required this.lastUnboundCallTimestamp,
   });
 
   @override
@@ -238,12 +240,14 @@ class _PoolWidgetState extends State<PoolWidget> {
   }
 
   void _leavePoolTapHandler(BuildContext context, PoolMember membership) {
+    String label = membership.points == BigInt.zero
+        ? 'Are you sure you want to withdraw your stake and leave the pool?'
+        : 'Are you sure you want to leave this pool?';
     showCupertinoModalPopup<void>(
       context: context,
       builder: (BuildContext context) => CupertinoAlertDialog(
         title: const Text('Leave Pool?'),
-        content: const Text(
-            '\nYou will be credited with any earnings and your bonded coins but you will lose any future earnings.'),
+        content: Text(label),
         actions: <CupertinoDialogAction>[
           CupertinoDialogAction(
             isDefaultAction: true,
@@ -281,6 +285,22 @@ class _PoolWidgetState extends State<PoolWidget> {
     if (membership != null &&
         membership.id == widget.pool.id &&
         widget.pool.depositor?.accountId != kc2User.identity.accountId) {
+      if (membership.points == BigInt.zero) {
+        // user unbounded - check if he can leave
+        int now = DateTime.now().millisecondsSinceEpoch;
+        int diff = (now - widget.lastUnboundCallTimestamp).abs();
+        if (diff < 24 * 60 * 60 * 1000) {
+          // user can't leave yet
+          return const CupertinoListTile.notched(
+            title: Text('Can\'t leave yet'),
+            subtitle: Text('Try in XXX from now...'),
+          );
+        }
+      }
+
+      String label =
+          membership.points == BigInt.zero ? 'Withdraw Stake' : 'Leave';
+
       // local user is member of this pool
       return CupertinoListTile.notched(
         title: CupertinoButton(
@@ -288,7 +308,7 @@ class _PoolWidgetState extends State<PoolWidget> {
           onPressed: () {
             _leavePoolTapHandler(context, membership);
           },
-          child: const Text('Leave Pool'),
+          child: Text(label),
         ),
       );
     } else if (membership == null && widget.pool.state == PoolState.open) {

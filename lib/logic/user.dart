@@ -13,6 +13,9 @@ import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:karma_coin/data/verify_number_request.dart' as vnr;
 
+const unboundTimeStampKey = 'unboundFundsTimestamp';
+const unboundPoolIdKey = 'unboundFundsPoolId';
+
 class KC2User extends KC2UserInteface {
   // private members
   Timer? _subscribeToAccountTimer;
@@ -90,6 +93,9 @@ class KC2User extends KC2UserInteface {
 
     (kc2Service as KC2NominationPoolsInterface).unbondPoolCallback =
         _leavePoolCallback;
+
+    (kc2Service as KC2NominationPoolsInterface).withdrawUnbondedPoolCallback =
+        _withdrawUnboundCallback;
 
     // subscribe to account transactions if we have user info in this session
     // otherwise we'll subscribe on signup()
@@ -188,6 +194,8 @@ class KC2User extends KC2UserInteface {
     (kc2Service as KC2NominationPoolsInterface).joinPoolCallback = null;
     (kc2Service as KC2NominationPoolsInterface).claimPoolPayoutCallback = null;
     (kc2Service as KC2NominationPoolsInterface).unbondPoolCallback = null;
+    (kc2Service as KC2NominationPoolsInterface).withdrawUnbondedPoolCallback =
+        null;
 
     // remove the id from local store
     await _identity.removeFromStore();
@@ -399,7 +407,52 @@ class KC2User extends KC2UserInteface {
   }
 
   @override
-  Future<void> leavePool() async {
+  Future<(int, int)> getLastUnboundAmountCallTimeStamp() async {
+    String? timeStamp = await _secureStorage.read(
+        key: unboundTimeStampKey, aOptions: androidOptions);
+
+    timeStamp ??= '0';
+
+    String? poolId = await _secureStorage.read(
+        key: unboundPoolIdKey, aOptions: androidOptions);
+
+    poolId ??= '0';
+
+    return (int.parse(timeStamp), int.parse(poolId));
+  }
+
+  /// Get funds and leave pool
+  @override
+  Future<void> withdrawPoolUnboundedAmount() async {
+    debugPrint('Leaving pool...');
+    leavePoolStatus.value = SubmitTransactionStatus.submitting;
+
+    if (poolMembership.value == null) {
+      leavePoolStatus.value = SubmitTransactionStatus.invalidData;
+      return;
+    }
+
+    // todo: this is buggy when 2nd call - needs to use time and timer cancled every time createPool is called
+    Future.delayed(const Duration(seconds: 60), () async {
+      if (leavePoolStatus.value == SubmitTransactionStatus.submitting) {
+        // tx timed out
+        leavePoolStatus.value = SubmitTransactionStatus.connectionTimeout;
+      }
+    });
+
+    try {
+      _leavePoolTxHash = await (kc2Service as KC2NominationPoolsInterface)
+          .withdrawUnbonded(identity.accountId);
+      // status updated via callback
+    } catch (e) {
+      debugPrint('failed to leave pool: $e');
+      leavePoolStatus.value = SubmitTransactionStatus.serverError;
+      return;
+    }
+  }
+
+  @override
+  Future<void> unboundPoolBondedAmount() async {
     debugPrint('Leaving pool...');
     leavePoolStatus.value = SubmitTransactionStatus.submitting;
 
@@ -420,6 +473,16 @@ class KC2User extends KC2UserInteface {
       _leavePoolTxHash = await (kc2Service as KC2NominationPoolsInterface)
           .unbond(identity.accountId, poolMembership.value!.points);
       // status updated via callback
+
+      // store timesamp of request
+      String timeStamp = DateTime.now().millisecondsSinceEpoch.toString();
+      await _secureStorage.write(
+          key: unboundTimeStampKey, value: timeStamp, aOptions: androidOptions);
+
+      await _secureStorage.write(
+          key: unboundPoolIdKey,
+          value: poolMembership.value!.id.toString(),
+          aOptions: androidOptions);
     } catch (e) {
       debugPrint('failed to leave pool: $e');
       leavePoolStatus.value = SubmitTransactionStatus.serverError;
@@ -642,6 +705,28 @@ class KC2User extends KC2UserInteface {
     _claimPayoutTxHash = '';
   }
 
+  /// Request to leave pool (claim unbounded and leave)
+  Future<void> _withdrawUnboundCallback(KC2WithdrawUnbondedTxV1 tx) async {
+    if (_leavePoolTxHash != tx.hash) {
+      // not of interest
+      return;
+    }
+
+    tx.chainError != null
+        ? leavePoolStatus.value = SubmitTransactionStatus.invalidData
+        : leavePoolStatus.value = SubmitTransactionStatus.submitted;
+
+    if (tx.chainError != null) {
+      debugPrint('Leave pool failed with: ${tx.chainError}');
+    } else {
+      // get updated balance and pool membership
+      await getUserDataFromChain();
+    }
+
+    _leavePoolTxHash = '';
+  }
+
+  /// Request to leave pool (unbound bonded)
   Future<void> _leavePoolCallback(KC2UnbondTxV1 tx) async {
     if (_leavePoolTxHash != tx.hash) {
       // not of interest

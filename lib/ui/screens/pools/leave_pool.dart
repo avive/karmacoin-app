@@ -3,7 +3,9 @@ import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
 
-/// Claim payout screen
+enum Operation { leavePool, unbondPool }
+
+/// Leave pool screen. user needs to unbound pool before he can withdraw and leave
 class LeavePool extends StatefulWidget {
   final Pool pool;
   final PoolMember membership;
@@ -16,12 +18,21 @@ class LeavePool extends StatefulWidget {
 
 class _LeavePoolState extends State<LeavePool> {
   bool isSubmitting = true;
+  Operation operation = Operation.unbondPool;
 
   @override
   void initState() {
     super.initState();
 
-    kc2User.leavePool();
+    if (widget.membership.points == BigInt.zero) {
+      // user already unbound and can leave
+      operation = Operation.leavePool;
+      kc2User.withdrawPoolUnboundedAmount();
+    } else {
+      // request to unbound bonded funds
+      operation = Operation.unbondPool;
+      kc2User.unboundPoolBondedAmount();
+    }
   }
 
   Widget _getStatus(BuildContext context) {
@@ -41,14 +52,22 @@ class _LeavePoolState extends State<LeavePool> {
               color = CupertinoTheme.of(context).textTheme.textStyle.color;
               break;
             case SubmitTransactionStatus.submitted:
-              debugPrint('Left pool');
-              text = 'Left pool and claimed bonded funds!';
+              switch (operation) {
+                case Operation.leavePool:
+                  text = 'Left pool and claimed bonded funds!';
+                  break;
+                case Operation.unbondPool:
+                  text =
+                      'Your stake was unbound. You can widthdraw it in 24 hours.';
+                  break;
+              }
               color = CupertinoColors.activeGreen;
+              /*
               Future.delayed(Duration.zero, () {
                 if (context.mounted && context.canPop()) {
                   context.pop();
                 }
-              });
+              });*/
               break;
             case SubmitTransactionStatus.invalidData:
               text = 'Server error. Please try again later.';
@@ -106,6 +125,9 @@ class _LeavePoolState extends State<LeavePool> {
 
   @override
   build(BuildContext context) {
+    String buttonLabel =
+        operation == Operation.leavePool ? 'Leave pool' : 'Withdraw';
+
     return CupertinoPageScaffold(
       resizeToAvoidBottomInset: true,
       child: CustomScrollView(
@@ -125,8 +147,7 @@ class _LeavePoolState extends State<LeavePool> {
                 0,
                 0),
             largeTitle: Center(
-              child:
-                  Text('LEAVE POOL', style: getNavBarTitleTextStyle(context)),
+              child: Text(buttonLabel, style: getNavBarTitleTextStyle(context)),
             ),
           ),
           SliverFillRemaining(

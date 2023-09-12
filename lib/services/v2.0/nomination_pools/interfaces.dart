@@ -153,8 +153,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
     }
   }
 
-  /// Withdraw unbonded funds from `member_account`. If no bonded funds can be
-  /// unbonded, an error is returned.
+  /// Withdraw unbonded funds from `member_account`.
   ///
   /// Under certain conditions, this call can be dispatched permissionlessly
   /// (i.e. by any account).

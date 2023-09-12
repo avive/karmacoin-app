@@ -181,8 +181,15 @@ abstract class KC2UserInteface {
   /// Join a mining pool
   Future<void> joinPool({required BigInt amount, required int poolId});
 
-  /// Leave pool local user is member of and withdraw all funds
-  Future<void> leavePool();
+  /// Unbound amount and make it withdrawable. User will still be a pool member
+  /// Amount will be withdrawable after the pool's unbonding period using withdrawPoolBondedAmount
+  Future<void> unboundPoolBondedAmount();
+
+  /// After this call completes w/o error user will not be a member of the pool
+  Future<void> withdrawPoolUnboundedAmount();
+
+  /// Returns the timestamp in milliseconds of the last unbound amount call if any. Returns null if no unbound amount call was made.
+  Future<(int, int)> getLastUnboundAmountCallTimeStamp();
 
   /// Delete user from karmachain. This will delete all user's data from the chain and local store and will sign out the user. Don't use this user object after calling this method.
   Future<void> deleteUser();
