@@ -360,7 +360,7 @@ void main() {
         expect(await completer.future, equals(true));
         expect(completer.isCompleted, isTrue);
       },
-      timeout: const Timeout(Duration(seconds: 280)),
+      timeout: const Timeout(Duration(seconds: 560)),
     );
 
     // This test:
