@@ -325,6 +325,7 @@ void main() {
           BigInt balance = punchInfo!.balance;
 
           // step 1 - punch unbounds all pimts
+          debugPrint('Calling unbound...');
           await kc2Service.unbond(punch.accountId, punchPoolMember.points);
           await Future.delayed(const Duration(seconds: 12));
           punchPoolMember = await kc2Service.getMembershipPool(punch.accountId);
@@ -333,8 +334,10 @@ void main() {
 
           // step 2 - wait 1 era and call widthdraw unbound
           await Future.delayed(const Duration(seconds: 12));
+          debugPrint('Calling withdraw unbound...');
           await kc2Service.withdrawUnbonded(punch.accountId);
-          await Future.delayed(const Duration(minutes: 2));
+          debugPrint('waiting 1 era...');
+          await Future.delayed(const Duration(minutes: 3));
           punchPoolMember = await kc2Service.getMembershipPool(punch.accountId);
           expect(punchPoolMember, isNull,
               reason: 'expected punch to be removed from pool');
