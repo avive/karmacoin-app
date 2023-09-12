@@ -421,7 +421,7 @@ class KC2User extends KC2UserInteface {
     return (int.parse(timeStamp), int.parse(poolId));
   }
 
-  /// Get funds and leave pool
+  /// Get funds back   and leave pool
   @override
   Future<void> withdrawPoolUnboundedAmount() async {
     debugPrint('Leaving pool...');
@@ -451,6 +451,7 @@ class KC2User extends KC2UserInteface {
     }
   }
 
+  // First step of leaving a pool - unbound funds
   @override
   Future<void> unboundPoolBondedAmount() async {
     debugPrint('Leaving pool...');

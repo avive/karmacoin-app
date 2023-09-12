@@ -9,6 +9,7 @@ import 'package:karma_coin/logic/identity_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/logic/verifier.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
+import 'package:karma_coin/services/v2.0/user_info.dart';
 
 import 'utils.dart';
 
@@ -224,6 +225,130 @@ void main() {
             kc2Service.subscribeToAccountTransactions(katya.userInfo!);
 
         kc2Service.setKeyring(katya.user.keyring);
+        // Create a pool
+        txHash = await kc2Service.createPool(
+            amount: GenesisConfig.kCentsPerCoinBigInt,
+            root: katya.accountId,
+            nominator: katya.accountId,
+            bouncer: katya.accountId);
+
+        // Wait for completer and verify test success
+        expect(await completer.future, equals(true));
+        expect(completer.isCompleted, isTrue);
+      },
+      timeout: const Timeout(Duration(seconds: 280)),
+    );
+
+    // This test:
+    // 1. Connects to the chain
+    // 2. Create pool using Katya account
+    // 3. Join the pool using Punch account
+    // 4. Check that both Katya and Punch are members of the pool
+    test(
+      'leave pool',
+      () async {
+        KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
+        // Connect to the chain
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+
+        final completer = Completer<bool>();
+        TestUserInfo katya = await createTestUser(completer: completer);
+        TestUserInfo punch = await createTestUser(completer: completer);
+        await Future.delayed(const Duration(seconds: 12));
+
+        // Test utils
+        Timer? blocksProcessingTimer;
+        String txHash = "";
+
+        final bondAmount = BigInt.from(1000000);
+
+        // Create pool callback
+        kc2Service.createPoolCallback = (tx) async {
+          // Check if the tx hash is the same
+          if (tx.hash != txHash) {
+            return;
+          }
+
+          // Check if the tx failed
+          if (tx.chainError != null) {
+            completer.complete(false);
+            return;
+          }
+
+          // Find pool id
+          final pools = await kc2Service.getPools();
+          final pool = pools
+              .firstWhere((pool) => pool.roles.depositor == katya.accountId);
+          final poolId = pool.id;
+
+          // Unsubscribe from Alice's transactions
+          blocksProcessingTimer?.cancel();
+          // Listen to Punch transactions
+          blocksProcessingTimer =
+              kc2Service.subscribeToAccountTransactions(punch.userInfo!);
+          // Punch join the pool
+          kc2Service.setKeyring(punch.user.keyring);
+          txHash =
+              await kc2Service.joinPool(amount: bondAmount, poolId: poolId);
+        };
+
+        kc2Service.joinPoolCallback = (tx) async {
+          if (tx.hash != txHash) {
+            return;
+          }
+
+          // Check if the tx failed
+          if (tx.chainError != null) {
+            completer.complete(false);
+            return;
+          }
+
+          // Check if the pool member is created correctly
+          final katyaPoolMember =
+              await kc2Service.getMembershipPool(katya.accountId);
+          expect(katyaPoolMember!.id, tx.poolId);
+          expect(katyaPoolMember.points, GenesisConfig.kCentsPerCoinBigInt);
+          PoolMember? punchPoolMember =
+              await kc2Service.getMembershipPool(punch.accountId);
+          expect(punchPoolMember, isNotNull);
+          expect(punchPoolMember!.id, tx.poolId);
+          expect(punchPoolMember.points, bondAmount);
+
+          final poolMembers = await kc2Service.getPoolMembers(tx.poolId);
+          expect(poolMembers.length, 2);
+          expect(poolMembers.contains(katya.accountId), true);
+          expect(poolMembers.contains(punch.accountId), true);
+
+          KC2UserInfo? punchInfo =
+              await kc2Service.getUserInfoByAccountId(punch.accountId);
+
+          BigInt balance = punchInfo!.balance;
+
+          // step 1 - punch unbounds all pimts
+          await kc2Service.unbond(punch.accountId, punchPoolMember.points);
+          await Future.delayed(const Duration(seconds: 12));
+          punchPoolMember = await kc2Service.getMembershipPool(punch.accountId);
+          expect(punchPoolMember, isNotNull);
+          expect(punchPoolMember!.points, BigInt.zero);
+
+          // step 2 - wait 1 era and call widthdraw unbound
+          await Future.delayed(const Duration(seconds: 12));
+          await kc2Service.withdrawUnbonded(punch.accountId);
+          await Future.delayed(const Duration(minutes: 2));
+          punchPoolMember = await kc2Service.getMembershipPool(punch.accountId);
+          expect(punchPoolMember, isNull,
+              reason: 'expected punch to be removed from pool');
+          KC2UserInfo? info =
+              await kc2Service.getUserInfoByAccountId(punch.accountId);
+          expect(info!.balance >= balance + bondAmount, isTrue);
+
+          completer.complete(true);
+        };
+
+        blocksProcessingTimer =
+            kc2Service.subscribeToAccountTransactions(katya.userInfo!);
+        kc2Service.setKeyring(katya.user.keyring);
+
         // Create a pool
         txHash = await kc2Service.createPool(
             amount: GenesisConfig.kCentsPerCoinBigInt,
@@ -681,7 +806,7 @@ void main() {
 
     test(
       'unbond works',
-          () async {
+      () async {
         KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
         // Connect to the chain
         await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
@@ -717,7 +842,8 @@ void main() {
             return;
           }
 
-          txHash = await kc2Service.unbond(katya.accountId, BigInt.from(1000000));
+          txHash =
+              await kc2Service.unbond(katya.accountId, BigInt.from(1000000));
 
           completer.complete(true);
         };
@@ -734,7 +860,8 @@ void main() {
             return;
           }
 
-          final poolMember = await kc2Service.getMembershipPool(katya.accountId);
+          final poolMember =
+              await kc2Service.getMembershipPool(katya.accountId);
           expect(poolMember!.points, BigInt.from(1000000));
         };
 
