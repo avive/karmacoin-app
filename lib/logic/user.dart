@@ -33,6 +33,9 @@ class KC2User extends KC2UserInteface {
   late String _claimPayoutTxHash = '';
   late String _leavePoolTxHash = '';
 
+  int _lastUnboundTimeStamp = 0;
+  int _lastUnboundPoolId = 0;
+
   @override
   ValueNotifier<Map<String, KC2Tx>> get incomingAppreciations =>
       _txsBoss.incomingAppreciations;
@@ -340,6 +343,19 @@ class KC2User extends KC2UserInteface {
         signupStatus.value = SignupStatus.signedUp;
       }
     }
+
+    // read last unbound pool timestampe and id
+    String? lastUnboundTimeStamp = await _secureStorage.read(
+        key: unboundTimeStampKey, aOptions: androidOptions);
+    if (lastUnboundTimeStamp != null) {
+      _lastUnboundTimeStamp = int.parse(lastUnboundTimeStamp);
+    }
+
+    String? lastUnboundPoolId = await _secureStorage.read(
+        key: unboundPoolIdKey, aOptions: androidOptions);
+    if (lastUnboundPoolId != null) {
+      _lastUnboundPoolId = int.parse(lastUnboundPoolId);
+    }
   }
 
   /// Update user info from chain via the node's rpc api
@@ -371,7 +387,6 @@ class KC2User extends KC2UserInteface {
       poolMembership.value = await (kc2Service as KC2NominationPoolsInterface)
           .getMembershipPool(_identity.accountId);
 
-     
       // get current pool claimable amount
       poolClaimableRewardAmount.value =
           await (kc2Service as KC2NominationPoolsInterface)
@@ -408,19 +423,8 @@ class KC2User extends KC2UserInteface {
   }
 
   @override
-  Future<(int, int)> getLastUnboundAmountCallTimeStamp() async {
-    String? timeStamp = await _secureStorage.read(
-        key: unboundTimeStampKey, aOptions: androidOptions);
-
-    timeStamp ??= '0';
-
-    String? poolId = await _secureStorage.read(
-        key: unboundPoolIdKey, aOptions: androidOptions);
-
-    poolId ??= '0';
-
-    return (int.parse(timeStamp), int.parse(poolId));
-  }
+  (int, int) get lastUnboundPoolData =>
+      (_lastUnboundTimeStamp, _lastUnboundPoolId);
 
   /// Get funds back   and leave pool
   @override
@@ -477,14 +481,18 @@ class KC2User extends KC2UserInteface {
       // status updated via callback
 
       // store timesamp of request
-      String timeStamp = DateTime.now().millisecondsSinceEpoch.toString();
+      _lastUnboundTimeStamp = DateTime.now().millisecondsSinceEpoch;
       await _secureStorage.write(
-          key: unboundTimeStampKey, value: timeStamp, aOptions: androidOptions);
+          key: unboundTimeStampKey,
+          value: _lastUnboundTimeStamp.toString(),
+          aOptions: androidOptions);
 
       await _secureStorage.write(
           key: unboundPoolIdKey,
           value: poolMembership.value!.id.toString(),
           aOptions: androidOptions);
+
+      _lastUnboundPoolId = poolMembership.value!.id;
     } catch (e) {
       debugPrint('failed to leave pool: $e');
       leavePoolStatus.value = SubmitTransactionStatus.serverError;

@@ -189,7 +189,7 @@ abstract class KC2UserInteface {
   Future<void> withdrawPoolUnboundedAmount();
 
   /// Returns the timestamp in milliseconds of the last unbound amount call if any. Returns null if no unbound amount call was made.
-  Future<(int, int)> getLastUnboundAmountCallTimeStamp();
+  (int, int) get lastUnboundPoolData;
 
   /// Delete user from karmachain. This will delete all user's data from the chain and local store and will sign out the user. Don't use this user object after calling this method.
   Future<void> deleteUser();

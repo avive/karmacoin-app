@@ -12,13 +12,11 @@ import 'package:random_avatar/random_avatar.dart';
 class PoolWidget extends StatefulWidget {
   final Pool pool;
   final bool showHeader;
-  final int lastUnboundCallTimestamp;
 
   const PoolWidget({
     super.key,
     required this.pool,
     required this.showHeader,
-    required this.lastUnboundCallTimestamp,
   });
 
   @override
@@ -285,14 +283,16 @@ class _PoolWidgetState extends State<PoolWidget> {
     if (membership != null &&
         membership.id == widget.pool.id &&
         widget.pool.depositor?.accountId != kc2User.identity.accountId) {
-      if (membership.points == BigInt.zero) {
+      if (membership.points == BigInt.zero &&
+          kc2User.lastUnboundPoolData.$2 == membership.id) {
         // user unbounded - check if he can leave
         int now = DateTime.now().millisecondsSinceEpoch;
-        int diff = (now - widget.lastUnboundCallTimestamp).abs();
+        int diff = (now - kc2User.lastUnboundPoolData.$1).abs();
         if (diff < 24 * 60 * 60 * 1000) {
           // user can't leave yet
           return const CupertinoListTile.notched(
             title: Text('Can\'t leave yet'),
+            // TODO: format time and display properly
             subtitle: Text('Try in XXX from now...'),
           );
         }

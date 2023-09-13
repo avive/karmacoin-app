@@ -9,10 +9,8 @@ const _aboutPoolsUrl = 'https://karmaco.in/pools/';
 /// A simgle pool screen
 class PoolScreen extends StatefulWidget {
   final Pool pool;
-  final int lastUnboundCallTimestamp;
 
-  const PoolScreen(
-      {super.key, required this.pool, this.lastUnboundCallTimestamp = 0});
+  const PoolScreen({super.key, required this.pool});
 
   @override
   State<PoolScreen> createState() => _PoolScreenState();
@@ -51,7 +49,6 @@ class _PoolScreenState extends State<PoolScreen> {
           return PoolWidget(
             pool: widget.pool,
             showHeader: false,
-            lastUnboundCallTimestamp: widget.lastUnboundCallTimestamp,
           );
         },
       ),

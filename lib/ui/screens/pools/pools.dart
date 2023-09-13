@@ -19,8 +19,6 @@ class _PoolsScreenState extends State<PoolsScreen> {
   bool apiOffline = false;
   List<Pool>? entries;
   NominationPoolsConfiguration? conf;
-  int lastUnboundAmountCallTimeStamp = 0;
-  int lastUnboundPoolId = 0;
   @override
   initState() {
     super.initState();
@@ -28,11 +26,6 @@ class _PoolsScreenState extends State<PoolsScreen> {
 
     Future.delayed(Duration.zero, () async {
       try {
-        int timeStamp, poolId;
-        (timeStamp, poolId) = await kc2User.getLastUnboundAmountCallTimeStamp();
-        lastUnboundAmountCallTimeStamp = timeStamp;
-        lastUnboundPoolId = poolId;
-
         conf = await (kc2Service as KC2NominationPoolsInterface)
             .getPoolsConfiguration();
 
@@ -132,15 +125,9 @@ class _PoolsScreenState extends State<PoolsScreen> {
         },
         itemCount: entries!.length,
         itemBuilder: (context, index) {
-          Pool pool = entries![index];
-          int timeStamp = 0;
-          if (pool.id == lastUnboundPoolId) {
-            timeStamp = lastUnboundAmountCallTimeStamp;
-          }
           return PoolWidget(
             pool: entries![index],
             showHeader: true,
-            lastUnboundCallTimestamp: timeStamp,
           );
         },
       ),
