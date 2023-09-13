@@ -289,13 +289,14 @@ class _PoolWidgetState extends State<PoolWidget> {
         int now = DateTime.now().millisecondsSinceEpoch;
         int diff = (now - kc2User.lastUnboundPoolData.$1).abs();
         if (diff < kc2Service.eraTimeSeconds * 1000) {
-          String timeAgo =
-              time_ago.format(DateTime.fromMillisecondsSinceEpoch(now + diff));
+          String timeAhead = time_ago.format(
+              DateTime.now().add(Duration(milliseconds: diff)),
+              enableFromNow: true);
 
           // user can't leave yet
           return CupertinoListTile.notched(
             title: const Text('Can\'t leave yet'),
-            subtitle: Text('Try in $timeAgo.'),
+            subtitle: Text('Try in $timeAhead.'),
           );
         }
       }

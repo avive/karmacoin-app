@@ -2,6 +2,7 @@ import 'package:karma_coin/logic/user_interface.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:time_ago_provider/time_ago_provider.dart' as time_ago;
 
 enum Operation { leavePool, unbondPool }
 
@@ -44,6 +45,11 @@ class _LeavePoolState extends State<LeavePool> {
           String text = '';
           Color? color = CupertinoColors.systemRed;
           isSubmitting = false;
+
+          String timeAhead = time_ago.format(
+              enableFromNow: true,
+              DateTime.now().add(Duration(seconds: kc2Service.eraTimeSeconds)));
+
           switch (value) {
             case SubmitTransactionStatus.unknown:
               text = '';
@@ -60,7 +66,7 @@ class _LeavePoolState extends State<LeavePool> {
                   break;
                 case Operation.unbondPool:
                   text =
-                      'Your stake was unbound.\nYou can widthdraw it in 24 hours.';
+                      'Your stake was unbound.\nYou can widthdraw it in $timeAhead.';
                   break;
               }
               color = CupertinoColors.activeGreen;
@@ -89,8 +95,7 @@ class _LeavePoolState extends State<LeavePool> {
             text,
             textAlign: TextAlign.center,
             style: CupertinoTheme.of(context).textTheme.navTitleTextStyle.merge(
-                  TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w400, color: color),
+                  TextStyle(fontSize: 18, color: color),
                 ),
           );
 
