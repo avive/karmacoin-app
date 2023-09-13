@@ -7,6 +7,7 @@ import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/ui/screens/pools/claim_payout.dart';
 import 'package:karma_coin/ui/screens/pools/leave_pool.dart';
 import 'package:random_avatar/random_avatar.dart';
+import 'package:time_ago_provider/time_ago_provider.dart' as time_ago;
 
 /// Pool widget designed to be used in a ListView
 class PoolWidget extends StatefulWidget {
@@ -204,8 +205,7 @@ class _PoolWidgetState extends State<PoolWidget> {
             } else {
               tiles.add(const CupertinoListTile.notched(
                 title: Padding(
-                    padding: EdgeInsets.only(top: 14.0),
-                    child: Text('Your Earnings')),
+                    padding: EdgeInsets.only(), child: Text('Your Earnings')),
                 leading: FaIcon(FontAwesomeIcons.moneyBillTrendUp, size: 24),
                 subtitle: Text('No earnings yet'),
               ));
@@ -288,18 +288,20 @@ class _PoolWidgetState extends State<PoolWidget> {
         // user unbounded - check if he can leave
         int now = DateTime.now().millisecondsSinceEpoch;
         int diff = (now - kc2User.lastUnboundPoolData.$1).abs();
-        if (diff < 24 * 60 * 60 * 1000) {
+        if (diff < kc2Service.eraTimeSeconds * 1000) {
+          String timeAgo =
+              time_ago.format(DateTime.fromMillisecondsSinceEpoch(now + diff));
+
           // user can't leave yet
-          return const CupertinoListTile.notched(
-            title: Text('Can\'t leave yet'),
-            // TODO: format time and display properly
-            subtitle: Text('Try in XXX from now...'),
+          return CupertinoListTile.notched(
+            title: const Text('Can\'t leave yet'),
+            subtitle: Text('Try in $timeAgo.'),
           );
         }
       }
 
       String label =
-          membership.points == BigInt.zero ? 'Withdraw Your Stake' : 'Leave';
+          membership.points == BigInt.zero ? 'Leave & Withdraw' : 'Leave';
 
       // local user is member of this pool
       return CupertinoListTile.notched(

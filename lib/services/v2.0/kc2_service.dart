@@ -67,11 +67,12 @@ class KarmachainService extends ChainApiProvider
       chainInfo.constants['Balances']!['ExistentialDeposit']!.value;
 
   void _printChainInfo() {
-    debugPrint('Netid: $netId');
-    debugPrint('block time: $expectedBlockTimeSeconds seconds');
-    debugPrint('Era time: $eraTimeSeconds seconds');
-    debugPrint('Epoch time: $epochDurationSeconds seconds');
-    debugPrint('Existential deposit: ${existentialDeposit.toString()}');
+    debugPrint('Net id: $netId');
+    debugPrint('block time: $expectedBlockTimeSeconds secs');
+    debugPrint('Era time: $eraTimeSeconds secs');
+    debugPrint('Epoch time: $epochDurationSeconds secs');
+    debugPrint(
+        'Existential deposit: ${existentialDeposit.toString()} karma cents');
     debugPrint('Epocs per era: $epochsPerEra');
   }
 

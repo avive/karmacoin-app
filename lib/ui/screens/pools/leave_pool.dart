@@ -127,8 +127,7 @@ class _LeavePoolState extends State<LeavePool> {
 
   @override
   build(BuildContext context) {
-    String buttonLabel =
-        operation == Operation.leavePool ? 'Leave pool' : 'Withdraw';
+    String buttonLabel = 'Leave Pool';
 
     return CupertinoPageScaffold(
       resizeToAvoidBottomInset: true,
