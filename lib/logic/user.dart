@@ -337,14 +337,15 @@ class KC2User extends KC2UserInteface {
     // check consistency between identity and userInfo and drop userInfo if needed
     if (userInfo.value != null) {
       if (userInfo.value?.accountId != _identity.accountId) {
-        debugPrint(">>> local user info account id mismatch - droppping it...");
+        debugPrint(
+            ">>> local user info account id mismatch - droppping stored data...");
         await userInfo.value?.deleteFromSecureStorage(_secureStorage);
       } else {
         signupStatus.value = SignupStatus.signedUp;
       }
     }
 
-    // read last unbound pool timestampe and id
+    // read last unbound pool timestampe and id from store
     String? lastUnboundTimeStamp = await _secureStorage.read(
         key: unboundTimeStampKey, aOptions: androidOptions);
     if (lastUnboundTimeStamp != null) {
@@ -387,7 +388,7 @@ class KC2User extends KC2UserInteface {
       poolMembership.value = await (kc2Service as KC2NominationPoolsInterface)
           .getMembershipPool(_identity.accountId);
 
-      // get current pool claimable amount
+      // get current pool claimable pending amount if any
       poolClaimableRewardAmount.value =
           await (kc2Service as KC2NominationPoolsInterface)
               .getPendingPoolPayout(_identity.accountId);

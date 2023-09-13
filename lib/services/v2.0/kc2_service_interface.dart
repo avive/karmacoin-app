@@ -29,6 +29,24 @@ mixin K2ServiceInterface implements ChainApiProvider {
 
   bool get connectedToApi;
 
+  /// Number of blocks in an epoch
+  int get blocksPerEpoch;
+
+  /// Expected block time miliseconds
+  int get expectedBlockTimeMs;
+
+  /// Expected block time in seconds
+  int get expectedBlockTimeSeconds;
+
+  /// Expected epoch duration in seconds
+  int get epochDurationSeconds;
+
+  /// Number of eras in an epoch
+  int get epochsPerEra;
+
+  /// Expected era duraiton in seconds
+  int get eraTimeSeconds;
+
   /// Currently connected API URL
   String? get apiWsUrl;
 

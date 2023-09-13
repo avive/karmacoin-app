@@ -243,7 +243,8 @@ void main() {
     // 1. Connects to the chain
     // 2. Create pool using Katya account
     // 3. Join the pool using Punch account
-    // 4. Check that both Katya and Punch are members of the pool
+    // 4. Punch unbounds bonded funds
+    // 5. After an era, punch withdraws unbounded funds and leaves the pool
     test(
       'leave pool',
       () async {
@@ -254,7 +255,8 @@ void main() {
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
         TestUserInfo punch = await createTestUser(completer: completer);
-        await Future.delayed(const Duration(seconds: 12));
+        await Future.delayed(
+            Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Test utils
         Timer? blocksProcessingTimer;
@@ -327,23 +329,28 @@ void main() {
           // step 1 - punch unbounds all pimts
           debugPrint('Calling unbound...');
           await kc2Service.unbond(punch.accountId, punchPoolMember.points);
-          await Future.delayed(const Duration(seconds: 12));
+          await Future.delayed(
+              Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+
           punchPoolMember = await kc2Service.getMembershipPool(punch.accountId);
           expect(punchPoolMember, isNotNull);
           expect(punchPoolMember!.points, BigInt.zero);
 
           // step 2 - wait 1 era and call withdraw unbound
-          debugPrint('waiting 1 era...');
-          await Future.delayed(const Duration(minutes: 3));
+          debugPrint('Waiting 1 era... ${kc2Service.eraTimeSeconds} seconds');
+          await Future.delayed(Duration(seconds: kc2Service.eraTimeSeconds));
           debugPrint('Calling withdraw unbound...');
           await kc2Service.withdrawUnbonded(punch.accountId);
-          await Future.delayed(const Duration(seconds: 12));
+          await Future.delayed(
+              Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+
           punchPoolMember = await kc2Service.getMembershipPool(punch.accountId);
           expect(punchPoolMember, isNull,
               reason: 'expected punch to be removed from pool');
           KC2UserInfo? info =
               await kc2Service.getUserInfoByAccountId(punch.accountId);
-          expect(info!.balance >= balance + bondAmount, isTrue);
+          expect(info!.balance >= balance + bondAmount, isTrue,
+              reason: 'Expected rfund');
 
           completer.complete(true);
         };
