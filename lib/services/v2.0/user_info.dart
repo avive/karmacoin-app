@@ -104,7 +104,7 @@ class KC2UserInfo {
         karmaScore = u['karma_score'] is int
             ? u['karma_score']
             : int.parse(u['karma_score']),
-        metadata = u['metadata'] == null
+        metadata = u['metadata'] == null || u['metadata'] == ''
             ? null
             : String.fromCharCodes(u['metadata'].cast<int>()) {
     List<dynamic> memberships = u['community_membership'];

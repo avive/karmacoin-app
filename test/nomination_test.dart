@@ -349,7 +349,7 @@ void main() {
               reason: 'expected punch to be removed from pool');
           KC2UserInfo? info =
               await kc2Service.getUserInfoByAccountId(punch.accountId);
-          expect(info!.balance >= balance + bondAmount, isTrue,
+          expect(info!.balance == balance + bondAmount, isTrue,
               reason: 'Expected rfund');
 
           completer.complete(true);

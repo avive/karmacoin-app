@@ -66,6 +66,15 @@ class KarmachainService extends ChainApiProvider
   BigInt get existentialDeposit =>
       chainInfo.constants['Balances']!['ExistentialDeposit']!.value;
 
+  void _printChainInfo() {
+    debugPrint('Netid: $netId');
+    debugPrint('block time: $expectedBlockTimeSeconds seconds');
+    debugPrint('Era time: $eraTimeSeconds seconds');
+    debugPrint('Epoch time: $epochDurationSeconds seconds');
+    debugPrint('Existential deposit: ${existentialDeposit.toString()}');
+    debugPrint('Epocs per era: $epochsPerEra');
+  }
+
   /// Connect to a karmachain api service. e.g.
   /// Local running node - "ws://127.0.0.1:9944"
   /// Testnet - "wss://testnet.karmaco.in/testnet/ws"
@@ -93,7 +102,7 @@ class KarmachainService extends ChainApiProvider
           MetadataDecoder.instance.decode(metadata.result.toString());
       chainInfo = ChainInfo.fromMetadata(decodedMetadata);
 
-      debugPrint('Fetched chainInfo: ${chainInfo.version}');
+      _printChainInfo();
 
       chainInfo.scaleCodec.registry.registerCustomCodec({
         'Extra':
