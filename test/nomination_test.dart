@@ -332,12 +332,12 @@ void main() {
           expect(punchPoolMember, isNotNull);
           expect(punchPoolMember!.points, BigInt.zero);
 
-          // step 2 - wait 1 era and call widthdraw unbound
-          await Future.delayed(const Duration(seconds: 12));
-          debugPrint('Calling withdraw unbound...');
-          await kc2Service.withdrawUnbonded(punch.accountId);
+          // step 2 - wait 1 era and call withdraw unbound
           debugPrint('waiting 1 era...');
           await Future.delayed(const Duration(minutes: 3));
+          debugPrint('Calling withdraw unbound...');
+          await kc2Service.withdrawUnbonded(punch.accountId);
+          await Future.delayed(const Duration(seconds: 12));
           punchPoolMember = await kc2Service.getMembershipPool(punch.accountId);
           expect(punchPoolMember, isNull,
               reason: 'expected punch to be removed from pool');
