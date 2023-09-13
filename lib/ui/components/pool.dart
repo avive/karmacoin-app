@@ -299,7 +299,7 @@ class _PoolWidgetState extends State<PoolWidget> {
       }
 
       String label =
-          membership.points == BigInt.zero ? 'Withdraw Stake' : 'Leave';
+          membership.points == BigInt.zero ? 'Withdraw Your Stake' : 'Leave';
 
       // local user is member of this pool
       return CupertinoListTile.notched(

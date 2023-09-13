@@ -25,11 +25,13 @@ class _LeavePoolState extends State<LeavePool> {
     super.initState();
 
     if (widget.membership.points == BigInt.zero) {
+      debugPrint('User has no points. Leaving pool...');
       // user already unbound and can leave
       operation = Operation.leavePool;
       kc2User.withdrawPoolUnboundedAmount();
     } else {
       // request to unbound bonded funds
+      debugPrint('User has bonded funds. Unbounding...');
       operation = Operation.unbondPool;
       kc2User.unboundPoolBondedAmount();
     }
@@ -58,7 +60,7 @@ class _LeavePoolState extends State<LeavePool> {
                   break;
                 case Operation.unbondPool:
                   text =
-                      'Your stake was unbound. You can widthdraw it in 24 hours.';
+                      'Your stake was unbound.\nYou can widthdraw it in 24 hours.';
                   break;
               }
               color = CupertinoColors.activeGreen;
@@ -86,7 +88,7 @@ class _LeavePoolState extends State<LeavePool> {
           Text textWidget = Text(
             text,
             textAlign: TextAlign.center,
-            style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+            style: CupertinoTheme.of(context).textTheme.navTitleTextStyle.merge(
                   TextStyle(
                       fontSize: 16, fontWeight: FontWeight.w400, color: color),
                 ),

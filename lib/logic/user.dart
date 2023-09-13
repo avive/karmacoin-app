@@ -371,6 +371,7 @@ class KC2User extends KC2UserInteface {
       poolMembership.value = await (kc2Service as KC2NominationPoolsInterface)
           .getMembershipPool(_identity.accountId);
 
+     
       // get current pool claimable amount
       poolClaimableRewardAmount.value =
           await (kc2Service as KC2NominationPoolsInterface)

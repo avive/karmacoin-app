@@ -185,8 +185,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
           }));
 
       return await signAndSendTransaction(call);
-    } on PlatformException catch (e) {
-      debugPrint('Failed to join nomination pool: ${e.details}');
+    } catch (e) {
+      debugPrint('Failed to join nomination pool: $e');
       rethrow;
     }
   }
@@ -224,8 +224,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
           }));
 
       return await signAndSendTransaction(call);
-    } on PlatformException catch (e) {
-      debugPrint('Failed to join nomination pool: ${e.details}');
+    } catch (e) {
+      debugPrint('Failed to join nomination pool: $e');
       rethrow;
     }
   }
@@ -249,8 +249,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
           }));
 
       return await signAndSendTransaction(call);
-    } on PlatformException catch (e) {
-      debugPrint('Failed to join nomination pool: ${e.details}');
+    } catch (e) {
+      debugPrint('Failed to join nomination pool: $e');
       rethrow;
     }
   }
@@ -269,8 +269,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
           }));
 
       return await signAndSendTransaction(call);
-    } on PlatformException catch (e) {
-      debugPrint('Failed to join nomination pool: ${e.details}');
+    } catch (e) {
+      debugPrint('Failed to join nomination pool: $e');
       rethrow;
     }
   }
@@ -337,8 +337,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
           }));
 
       return await signAndSendTransaction(call);
-    } on PlatformException catch (e) {
-      debugPrint('Failed to join nomination pool: ${e.details}');
+    } catch (e) {
+      debugPrint('Failed to join nomination pool: $e');
       rethrow;
     }
   }
@@ -373,8 +373,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
           }));
 
       return await signAndSendTransaction(call);
-    } on PlatformException catch (e) {
-      debugPrint('Failed to join nomination pool: ${e.details}');
+    } catch (e) {
+      debugPrint('Failed to join nomination pool: $e');
       rethrow;
     }
   }
@@ -401,8 +401,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
           }));
 
       return await signAndSendTransaction(call);
-    } on PlatformException catch (e) {
-      debugPrint('Failed to join nomination pool: ${e.details}');
+    } catch (e) {
+      debugPrint('Failed to join nomination pool: $e');
       rethrow;
     }
   }
@@ -499,8 +499,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
         pools = pools.where((pool) => pool.state == state).toList();
       }
       return pools;
-    } on PlatformException catch (e) {
-      debugPrint('Failed to get nomination pools: ${e.details}');
+    } catch (e) {
+      debugPrint('Failed to get nomination pools: $e');
       rethrow;
     }
   }
@@ -525,8 +525,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
     try {
       return await callRpc('nominationPools_getConfiguration', [])
           .then((config) => NominationPoolsConfiguration.fromJson(config));
-    } on PlatformException catch (e) {
-      debugPrint('Failed to get nomination pools configuration: ${e.details}');
+    } catch (e) {
+      debugPrint('Failed to get nomination pools configuration: $e');
       rethrow;
     }
   }
@@ -534,10 +534,18 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   /// Returns the pool id if accountId is member of a pool.
   Future<PoolMember?> getMembershipPool(String accountId) async {
     try {
-      return await callRpc('nominationPools_memberOf', [accountId])
-          .then((v) => v == null ? null : PoolMember.fromJson(v));
-    } on PlatformException catch (e) {
-      debugPrint('Failed to get nomination pool id: ${e.details}');
+      PoolMember? member =
+          await callRpc('nominationPools_memberOf', [accountId])
+              .then((v) => v == null ? null : PoolMember.fromJson(v));
+
+      if (member == null) {
+        debugPrint('User is not member of a pool');
+      } else {
+        debugPrint('User is member of a pool: ${member.id}');
+      }
+      return member;
+    } catch (e) {
+      debugPrint('Failed to get nomination pool id: $e');
       rethrow;
     }
   }
@@ -549,8 +557,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
       return await callRpc(
               'nominationPools_getPoolMembers', [poolId, fromIndex, limit])
           .then((v) => v.cast<String>());
-    } on PlatformException catch (e) {
-      debugPrint('Failed to get nomination pool id: ${e.details}');
+    } catch (e) {
+      debugPrint('Failed to get nomination pool id: $e');
       rethrow;
     }
   }
