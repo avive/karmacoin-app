@@ -178,11 +178,9 @@ class _PoolWidgetState extends State<PoolWidget> {
               ),
             ));
 
-            if (kc2User.poolClaimableRewardAmount.value > BigInt.zero) {
+            if (kc2User.poolClaimableRewardAmount.value == BigInt.zero) {
               tiles.add(CupertinoListTile.notched(
-                title: const Padding(
-                    padding: EdgeInsets.only(top: 14.0),
-                    child: Text('Your Reward')),
+                title: const Text('Your Earning'),
                 trailing: CupertinoButton(
                   padding: const EdgeInsets.only(left: 0.0),
                   onPressed: () {

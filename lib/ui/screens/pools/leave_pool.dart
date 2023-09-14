@@ -56,7 +56,7 @@ class _LeavePoolState extends State<LeavePool> {
               break;
             case SubmitTransactionStatus.submitting:
               isSubmitting = true;
-              text = 'Please wait and take 5 deep breaths...';
+              text = 'Leaving Pool. Please wait and take 5 deep breaths...';
               color = CupertinoTheme.of(context).textTheme.textStyle.color;
               break;
             case SubmitTransactionStatus.submitted:

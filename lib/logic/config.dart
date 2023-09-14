@@ -38,7 +38,7 @@ class ConfigLogic {
 
   /// Skip whatsapp verification for local app testing. kc2Api should use the bypass token
   /// obtain from local config file to bypass whatsapp verification.
-  final bool skipWhatsappVerification = false;
+  final bool skipWhatsappVerification = true;
 
   /// check internet connections and show error messages
   final bool enableInternetConnectionChecking = false;
