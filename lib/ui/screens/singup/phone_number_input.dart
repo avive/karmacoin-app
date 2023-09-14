@@ -175,6 +175,28 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
             .sendVerificationCode(
                 SendVerificationCodeRequest(mobileNumber: number));
 
+        if (resp.result !=
+            SendVerificationCodeResult.SEND_VERIFICATION_CODE_RESULT_SENT) {
+          // failed to send code - handle this case
+          debugPrint(
+              'Failed to send verification code. Result: ${resp.result}');
+          if (context.mounted) {
+            StatusAlert.show(context,
+                duration: const Duration(seconds: 4),
+                title: 'Verification Error',
+                subtitle: 'Please use your WhatsApp number.',
+                configuration: const IconConfiguration(
+                    icon: CupertinoIcons.exclamationmark_triangle),
+                dismissOnBackgroundTap: true,
+                maxWidth: statusAlertWidth);
+          }
+
+          setState(() {
+            isSigninIn = false;
+          });
+          return;
+        }
+
         appState.twilloVerificationSid = resp.sessionId;
 
         setState(() {
