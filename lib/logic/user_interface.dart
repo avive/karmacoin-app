@@ -161,9 +161,9 @@ abstract class KC2UserInteface {
   /// returns true if (account id, phone number, user name) exists on chain
   Future<bool> isAccountOnchain(String userName, String phoneNumber);
 
-  /// Update user name and/or phone number - register on observables iserInfo and updateResult for flow control.
+  /// Update user name and/or phone number - register on observables userInfo and updateResult for flow control.
   Future<void> updateUserInfo(
-      String? requestedUserName, String? requestedPhoneNumber);
+      {String? requestedUserName, String? requestedPhoneNumber});
 
   /// Set user metadata
   Future<void> setMetadata(String metadata);

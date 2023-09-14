@@ -578,7 +578,7 @@ class KC2User extends KC2UserInteface {
 
   @override
   Future<void> updateUserInfo(
-      String? requestedUserName, String? requestedPhoneNumber) async {
+      {String? requestedUserName, String? requestedPhoneNumber}) async {
     String? err;
     String? txHash;
 
@@ -589,29 +589,37 @@ class KC2User extends KC2UserInteface {
       return;
     }
 
-    // Create a verification request for verifier with a bypass token or with
-    // a verification code and session id from app state
-    vnr.VerifyNumberRequest req = configLogic.skipWhatsappVerification
-        ? await verifier.createVerificationRequest(
-            accountId: identity.accountId,
-            userName: requestedUserName,
-            phoneNumber: requestedPhoneNumber,
-            keyring: identity.keyring,
-            useBypassToken: true)
-        : await verifier.createVerificationRequest(
-            accountId: identity.accountId,
-            userName: requestedUserName,
-            phoneNumber: requestedPhoneNumber,
-            keyring: identity.keyring,
-            useBypassToken: false,
-            verificaitonSessionId: appState.twilloVerificationSid,
-            verificationCode: appState.twilloVerificationCode);
+    VerifyNumberData? evidence;
 
-    VerifyNumberData evidence = await verifier.verifyNumber(req);
-    if (evidence.error != null || evidence.data == null) {
-      updateResult.value = UpdateResult.invalidData;
-      debugPrint('Update result: ${updateResult.value}');
-      return;
+    if (requestedPhoneNumber != null) {
+      // We only need evidence in case of phone number change
+      // if a requested user name is not provided, use the current one for the evidence
+      requestedUserName ??= userInfo.value!.userName;
+
+      // Create a verification request for verifier with a bypass token or with
+      // a verification code and session id from app state
+      vnr.VerifyNumberRequest req = configLogic.skipWhatsappVerification
+          ? await verifier.createVerificationRequest(
+              accountId: identity.accountId,
+              userName: requestedUserName,
+              phoneNumber: requestedPhoneNumber,
+              keyring: identity.keyring,
+              useBypassToken: true)
+          : await verifier.createVerificationRequest(
+              accountId: identity.accountId,
+              userName: requestedUserName,
+              phoneNumber: requestedPhoneNumber,
+              keyring: identity.keyring,
+              useBypassToken: false,
+              verificaitonSessionId: appState.twilloVerificationSid,
+              verificationCode: appState.twilloVerificationCode);
+
+      evidence = await verifier.verifyNumber(req);
+      if (evidence.error != null || evidence.data == null) {
+        updateResult.value = UpdateResult.invalidData;
+        debugPrint('Update result: ${updateResult.value}');
+        return;
+      }
     }
 
     // set failure callback for 30 secs
@@ -627,7 +635,7 @@ class KC2User extends KC2UserInteface {
         phoneNumberHash: requestedPhoneNumber == null
             ? null
             : kc2Service.getPhoneNumberHash(requestedPhoneNumber),
-        evidence: evidence.data!);
+        evidence: evidence?.data);
 
     if (err != null) {
       switch (err) {

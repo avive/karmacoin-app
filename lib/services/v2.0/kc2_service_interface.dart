@@ -335,37 +335,46 @@ mixin K2ServiceInterface implements ChainApiProvider {
   Future<(String?, String?)> updateUser(
       {String? username,
       String? phoneNumberHash,
-      required VerificationEvidence evidence}) async {
+      VerificationEvidence? evidence}) async {
     try {
-      Uint8List? verifierPublicKey =
-          decodeAccountId(evidence.verifierAccountId);
-      List<int>? verifierSignature = evidence.signature;
+      Option<Uint8List?> verifierPublicKeyOption = const Option.none();
+      Option<List<int>> verifierSignatureOption = const Option.none();
+      Option<Uint8List> phoneNumberHashOption = const Option.none();
+      Option<String> userNameOption = const Option.none();
 
-      if (username == null && phoneNumberHash == null) {
-        return (null, "UsernameOrPhoneNumberMustBeProvided");
+      if (evidence != null) {
+        Uint8List? verifierPublicKey =
+            decodeAccountId(evidence.verifierAccountId);
+        List<int>? verifierSignature = evidence.signature;
+
+        if (phoneNumberHash == null) {
+          return (null, "UsernameOrPhoneNumberMustBeProvided");
+        }
+
+        verifierPublicKeyOption = Option.some(verifierPublicKey);
+        verifierSignatureOption = Option.some(verifierSignature);
+
+        phoneNumberHashOption =
+            Option.some(Uint8List.fromList(phoneNumberHash.toHex()));
+      } else {
+        if (username == null) {
+          return (null, "UsernameOrPhoneNumberMustBeProvided");
+        }
+        userNameOption = Option.some(username);
       }
-
-      final verifierPublicKeyOption = Option.some(verifierPublicKey);
-      final verifierSignatureOption = Option.some(verifierSignature);
-      final usernameOption = username == null
-          ? const Option.none()
-          : Option.some(evidence.username);
-      final phoneNumberHashOption = phoneNumberHash == null
-          ? const Option.none()
-          : Option.some(Uint8List.fromList(phoneNumberHash.toHex()));
 
       final call = MapEntry(
           'Identity',
           MapEntry('update_user', {
             'verifier_public_key': verifierPublicKeyOption,
             'verifier_signature': verifierSignatureOption,
-            'username': usernameOption,
+            'username': userNameOption,
             'phone_number_hash': phoneNumberHashOption,
           }));
 
       return (await signAndSendTransaction(call), null);
-    } on PlatformException catch (e) {
-      debugPrint('Failed to update user: ${e.details}');
+    } catch (e) {
+      debugPrint('Failed to update user: $e');
       return (null, "FailedToSendTx");
     }
   }
