@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:karma_coin/common_libs.dart';
 import 'package:karma_coin/logic/verifier.dart';
+import 'package:karma_coin/services/api/verifier.pb.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
@@ -22,6 +23,21 @@ void main() {
   K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
   group('verifier tests', () {
+    test(
+      'Test Send Verification Code',
+      () async {
+        SendVerificationCodeResponse resp = await verifier.verifierServiceClient
+            .sendVerificationCode(
+                SendVerificationCodeRequest(mobileNumber: "+972549805380"));
+
+        expect(resp.result,
+            SendVerificationCodeResult.SEND_VERIFICATION_CODE_RESULT_SENT,
+            reason: 'Failed to send verification code');
+
+        expect(resp.sessionId, isNotEmpty, reason: 'Session id is empty');
+      },
+    );
+
     test(
       'Verify using bypass code',
       () async {
