@@ -444,7 +444,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       color: CupertinoColors.black, // This is required
       title: 'Karma Coin - Home',
       child: CupertinoPageScaffold(
-        resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: true,
         child: CustomScrollView(
             physics: const NeverScrollableScrollPhysics(),
             slivers: [
