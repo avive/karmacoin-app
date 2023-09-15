@@ -95,7 +95,8 @@ class _LeavePoolState extends State<LeavePool> {
             text,
             textAlign: TextAlign.center,
             style: CupertinoTheme.of(context).textTheme.navTitleTextStyle.merge(
-                  TextStyle(fontSize: 18, color: color),
+                  TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.w400, color: color),
                 ),
           );
 

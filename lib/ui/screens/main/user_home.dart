@@ -55,8 +55,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     double height = size.height;
     if (height <= smallScreenHeight && !kIsWeb) {
       coinWidth = 120.0;
-      coinLabelFontSize = 11.0;
-      coinNumberFontSize = 40.0;
+      coinLabelFontSize = 8.0;
+      coinNumberFontSize = 32.0;
       coinOutlineWidth = 4.0;
     }
   }

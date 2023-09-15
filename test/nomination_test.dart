@@ -330,15 +330,17 @@ void main() {
           debugPrint('Calling unbound...');
           await kc2Service.unbond(punch.accountId, punchPoolMember.points);
           await Future.delayed(
-              Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+              Duration(seconds: kc2Service.expectedBlockTimeSeconds + 2));
 
           punchPoolMember = await kc2Service.getMembershipPool(punch.accountId);
           expect(punchPoolMember, isNotNull);
           expect(punchPoolMember!.points, BigInt.zero);
 
           // step 2 - wait 1 era and call withdraw unbound
-          debugPrint('Waiting 1 era... ${kc2Service.eraTimeSeconds} seconds');
-          await Future.delayed(Duration(seconds: kc2Service.eraTimeSeconds));
+          debugPrint(
+              'Waiting 1 era... ${kc2Service.eraTimeSeconds + 10} seconds');
+          await Future.delayed(
+              Duration(seconds: kc2Service.eraTimeSeconds + 10));
           debugPrint('Calling withdraw unbound...');
           await kc2Service.withdrawUnbonded(punch.accountId);
           await Future.delayed(
@@ -350,7 +352,7 @@ void main() {
           KC2UserInfo? info =
               await kc2Service.getUserInfoByAccountId(punch.accountId);
           expect(info!.balance == balance + bondAmount, isTrue,
-              reason: 'Expected rfund');
+              reason: 'Expected refund');
 
           completer.complete(true);
         };

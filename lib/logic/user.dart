@@ -234,7 +234,13 @@ class KC2User extends KC2UserInteface {
       return;
     }
 
-    // TODO: verify phone number format
+    //
+    if (!requestedPhoneNumber.startsWith('+') ||
+        requestedPhoneNumber.length < 4) {
+      debugPrint('Phone number must be +prefixed and 4 or more digits');
+      signupFailureReson = SignupFailureReason.invalidData;
+      return;
+    }
 
     // Create a verification request for verifier with a bypass token or with
     // a verification code and session id from app state
@@ -695,6 +701,9 @@ class KC2User extends KC2UserInteface {
         : createPoolStatus.value = CreatePoolStatus.created;
 
     if (tx.chainError != null) {
+      if (tx.chainError!.name == "AccountBelongsToOtherPool") {
+        createPoolStatus.value = CreatePoolStatus.userMemberOfAnotherPool;
+      }
       debugPrint('Create pool failed with: ${tx.chainError}');
     } else {
       // get updated balance

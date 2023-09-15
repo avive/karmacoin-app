@@ -53,7 +53,8 @@ enum CreatePoolStatus {
   invalidData,
   invalidSignature,
   serverError,
-  connectionTimeout;
+  connectionTimeout,
+  userMemberOfAnotherPool,
 }
 
 enum JoinPoolStatus {

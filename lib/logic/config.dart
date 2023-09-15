@@ -101,7 +101,7 @@ class ConfigLogic {
 
   /// Load optional test config
   Future<dynamic> getTestConfig() async {
-    final yamlString = await rootBundle.loadString('assets/test_config.yaml');
+    final yamlString = await rootBundle.loadString('assets/private_config.yaml');
     return loadYaml(yamlString);
   }
 
