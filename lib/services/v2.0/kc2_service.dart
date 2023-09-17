@@ -6,12 +6,14 @@ import 'package:karma_coin/services/v2.0/error.dart';
 import 'package:karma_coin/services/v2.0/interfaces.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/event.dart';
+import 'package:karma_coin/services/v2.0/metadata_preparer.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 import 'package:karma_coin/services/v2.0/staking/interfaces.dart';
 import 'package:karma_coin/services/v2.0/staking/tx/bond.dart';
 import 'package:karma_coin/services/v2.0/staking/tx/bond_extra.dart';
 import 'package:karma_coin/services/v2.0/staking/tx/chill.dart';
 import 'package:karma_coin/services/v2.0/staking/tx/nominate.dart';
+import 'package:karma_coin/services/v2.0/staking/tx/payout_stakers.dart';
 import 'package:karma_coin/services/v2.0/staking/tx/unbond.dart';
 import 'package:karma_coin/services/v2.0/staking/tx/withdraw_unbonded.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
@@ -69,6 +71,9 @@ class KarmachainService extends ChainApiProvider
 
       decodedMetadata =
           MetadataDecoder.instance.decode(metadata.result.toString());
+
+      MetadataPreparer.prepareMetadata(decodedMetadata.metadata);
+
       chainInfo = ChainInfo.fromMetadata(decodedMetadata);
       debugPrint('Fetched chainInfo: ${chainInfo.version}');
 
@@ -82,7 +87,7 @@ class KarmachainService extends ChainApiProvider
       _connectedToApi = true;
       debugPrint('Connected to api: $apiWsUrl');
 
-      // get pools configuration so it is accesible to the app
+      // get pools configuration so it is accessible to the app
       _poolsConfiguration = await getPoolsConfiguration();
     } catch (e) {
       debugPrint('Failed to connect to kc2 api: $e');
@@ -544,6 +549,14 @@ class KarmachainService extends ChainApiProvider
         await stakingChillCallback!(transaction);
         return;
       }
+
+      if (signer == userInfo.accountId &&
+          transaction is KC2StakingPayoutStakersTxV1 &&
+          stakingPayoutStakersCallback != null) {
+        await stakingPayoutStakersCallback!(transaction);
+        return;
+      }
+
     } catch (e) {
       debugPrint('error processing tx: $e');
     }

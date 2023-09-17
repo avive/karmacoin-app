@@ -18,6 +18,7 @@ import 'package:karma_coin/services/v2.0/staking/tx/bond.dart';
 import 'package:karma_coin/services/v2.0/staking/tx/bond_extra.dart';
 import 'package:karma_coin/services/v2.0/staking/tx/chill.dart';
 import 'package:karma_coin/services/v2.0/staking/tx/nominate.dart';
+import 'package:karma_coin/services/v2.0/staking/tx/payout_stakers.dart';
 import 'package:karma_coin/services/v2.0/staking/tx/unbond.dart';
 import 'package:karma_coin/services/v2.0/staking/tx/withdraw_unbonded.dart';
 import 'package:karma_coin/services/v2.0/txs/appreciation_tx.dart';
@@ -437,6 +438,20 @@ abstract class KC2Tx {
 
     if (pallet == 'Staking' && method == 'chill') {
       return KC2StakingChillTxV1.createStakingChillTx(
+          hash: hash,
+          timestamp: timestamp,
+          signer: signer,
+          args: args,
+          chainError: chainError,
+          blockNumber: blockNumber,
+          netId: netId,
+          blockIndex: blockIndex,
+          rawData: tx,
+          txEvents: txEvents);
+    }
+
+    if (pallet == 'Staking' && method == 'payout_stakers') {
+      return KC2StakingPayoutStakersTxV1.createStakingPayoutStakersTx(
           hash: hash,
           timestamp: timestamp,
           signer: signer,
