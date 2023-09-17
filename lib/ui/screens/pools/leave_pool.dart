@@ -2,8 +2,11 @@ import 'package:karma_coin/logic/user_interface.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:time_ago_provider/time_ago_provider.dart' as time_ago;
 
-/// Claim payout screen
+enum Operation { leavePool, unbondPool }
+
+/// Leave pool screen. user needs to unbound pool before he can withdraw and leave
 class LeavePool extends StatefulWidget {
   final Pool pool;
   final PoolMember membership;
@@ -16,12 +19,23 @@ class LeavePool extends StatefulWidget {
 
 class _LeavePoolState extends State<LeavePool> {
   bool isSubmitting = true;
+  Operation operation = Operation.unbondPool;
 
   @override
   void initState() {
     super.initState();
 
-    kc2User.leavePool();
+    if (widget.membership.points == BigInt.zero) {
+      debugPrint('User has no points. Leaving pool...');
+      // user already unbound and can leave
+      operation = Operation.leavePool;
+      kc2User.withdrawPoolUnboundedAmount();
+    } else {
+      // request to unbound bonded funds
+      debugPrint('User has bonded funds. Unbounding...');
+      operation = Operation.unbondPool;
+      kc2User.unboundPoolBondedAmount();
+    }
   }
 
   Widget _getStatus(BuildContext context) {
@@ -31,24 +45,37 @@ class _LeavePoolState extends State<LeavePool> {
           String text = '';
           Color? color = CupertinoColors.systemRed;
           isSubmitting = false;
+
+          String timeAhead = time_ago.format(
+              enableFromNow: true,
+              DateTime.now().add(Duration(seconds: kc2Service.eraTimeSeconds)));
+
           switch (value) {
             case SubmitTransactionStatus.unknown:
               text = '';
               break;
             case SubmitTransactionStatus.submitting:
               isSubmitting = true;
-              text = 'Please wait and take 5 deep breaths...';
+              text = 'Leaving Pool. Please wait and take 5 deep breaths...';
               color = CupertinoTheme.of(context).textTheme.textStyle.color;
               break;
             case SubmitTransactionStatus.submitted:
-              debugPrint('Left pool');
-              text = 'Left pool and claimed bonded funds!';
+              switch (operation) {
+                case Operation.leavePool:
+                  text = 'Left pool and claimed bonded funds!';
+                  break;
+                case Operation.unbondPool:
+                  text =
+                      'Your stake was unbound.\nYou can widthdraw it in $timeAhead.';
+                  break;
+              }
               color = CupertinoColors.activeGreen;
+              /*
               Future.delayed(Duration.zero, () {
                 if (context.mounted && context.canPop()) {
                   context.pop();
                 }
-              });
+              });*/
               break;
             case SubmitTransactionStatus.invalidData:
               text = 'Server error. Please try again later.';
@@ -67,9 +94,9 @@ class _LeavePoolState extends State<LeavePool> {
           Text textWidget = Text(
             text,
             textAlign: TextAlign.center,
-            style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+            style: CupertinoTheme.of(context).textTheme.navTitleTextStyle.merge(
                   TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w400, color: color),
+                      fontSize: 18, fontWeight: FontWeight.w400, color: color),
                 ),
           );
 
@@ -106,6 +133,8 @@ class _LeavePoolState extends State<LeavePool> {
 
   @override
   build(BuildContext context) {
+    String buttonLabel = 'Leave Pool';
+
     return CupertinoPageScaffold(
       resizeToAvoidBottomInset: true,
       child: CustomScrollView(
@@ -125,8 +154,7 @@ class _LeavePoolState extends State<LeavePool> {
                 0,
                 0),
             largeTitle: Center(
-              child:
-                  Text('LEAVE POOL', style: getNavBarTitleTextStyle(context)),
+              child: Text(buttonLabel, style: getNavBarTitleTextStyle(context)),
             ),
           ),
           SliverFillRemaining(

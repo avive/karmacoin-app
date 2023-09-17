@@ -30,6 +30,7 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
   void initState() {
     super.initState();
     isSubmitInProgress = false;
+    kc2User.updateResult.value = UpdateResult.unknown;
     WidgetsBinding.instance
         .addPostFrameCallback((_) => _postFrameCallback(context));
   }
@@ -163,29 +164,35 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
               color = CupertinoColors.activeGreen;
               kc2User.updateResult.value = UpdateResult.unknown;
               Future.delayed(Duration.zero, () {
-                if (context.mounted) {
+                if (context.mounted && context.canPop()) {
                   Navigator.of(context).pop();
                 }
               });
               break;
             case UpdateResult.usernameTaken:
               text = 'User name taken. Please try another one';
+              isSubmitInProgress = false;
               break;
             case UpdateResult.invalidData:
               text = 'Server error. Please try again later.';
+              isSubmitInProgress = false;
               break;
             case UpdateResult.invalidSignature:
               text = 'Invalid signature. Please try again later.';
+              isSubmitInProgress = false;
               break;
             case UpdateResult.serverError:
               text = 'Server error. Please try again later.';
+              isSubmitInProgress = false;
 
               break;
             case UpdateResult.accountMismatch:
               text = 'Account mismatch error.';
+              isSubmitInProgress = false;
               break;
             case UpdateResult.connectionTimeout:
               text = 'Connection timeout. Please try again later.';
+              isSubmitInProgress = false;
               break;
           }
 
@@ -286,7 +293,9 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
         }
         break;
       case Operation.updateUserName:
-        await kc2User.updateUserInfo(appState.requestedUserName, null);
+        await kc2User.updateUserInfo(
+            requestedUserName: appState.requestedUserName,
+            requestedPhoneNumber: null);
         break;
     }
   }
@@ -319,6 +328,8 @@ class _SetUserNameScreenState extends State<SetUserNameScreen> {
               ),
             ),
             onChanged: (value) async {
+              // reset update result when text changes
+              kc2User.updateResult.value = UpdateResult.unknown;
               // check availability on text change
               await userNameAvailabilityLogic.check(value);
             },

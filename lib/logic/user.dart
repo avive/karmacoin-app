@@ -13,6 +13,9 @@ import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:karma_coin/data/verify_number_request.dart' as vnr;
 
+const unboundTimeStampKey = 'unboundFundsTimestamp';
+const unboundPoolIdKey = 'unboundFundsPoolId';
+
 class KC2User extends KC2UserInteface {
   // private members
   Timer? _subscribeToAccountTimer;
@@ -29,6 +32,9 @@ class KC2User extends KC2UserInteface {
   late String _joinPoolTxHash = '';
   late String _claimPayoutTxHash = '';
   late String _leavePoolTxHash = '';
+
+  int _lastUnboundTimeStamp = 0;
+  int _lastUnboundPoolId = 0;
 
   @override
   ValueNotifier<Map<String, KC2Tx>> get incomingAppreciations =>
@@ -90,6 +96,9 @@ class KC2User extends KC2UserInteface {
 
     (kc2Service as KC2NominationPoolsInterface).unbondPoolCallback =
         _leavePoolCallback;
+
+    (kc2Service as KC2NominationPoolsInterface).withdrawUnbondedPoolCallback =
+        _withdrawUnboundCallback;
 
     // subscribe to account transactions if we have user info in this session
     // otherwise we'll subscribe on signup()
@@ -188,6 +197,8 @@ class KC2User extends KC2UserInteface {
     (kc2Service as KC2NominationPoolsInterface).joinPoolCallback = null;
     (kc2Service as KC2NominationPoolsInterface).claimPoolPayoutCallback = null;
     (kc2Service as KC2NominationPoolsInterface).unbondPoolCallback = null;
+    (kc2Service as KC2NominationPoolsInterface).withdrawUnbondedPoolCallback =
+        null;
 
     // remove the id from local store
     await _identity.removeFromStore();
@@ -223,7 +234,13 @@ class KC2User extends KC2UserInteface {
       return;
     }
 
-    // TODO: verify phone number format
+    //
+    if (!requestedPhoneNumber.startsWith('+') ||
+        requestedPhoneNumber.length < 4) {
+      debugPrint('Phone number must be +prefixed and 4 or more digits');
+      signupFailureReson = SignupFailureReason.invalidData;
+      return;
+    }
 
     // Create a verification request for verifier with a bypass token or with
     // a verification code and session id from app state
@@ -326,11 +343,25 @@ class KC2User extends KC2UserInteface {
     // check consistency between identity and userInfo and drop userInfo if needed
     if (userInfo.value != null) {
       if (userInfo.value?.accountId != _identity.accountId) {
-        debugPrint(">>> local user info account id mismatch - droppping it...");
+        debugPrint(
+            ">>> local user info account id mismatch - droppping stored data...");
         await userInfo.value?.deleteFromSecureStorage(_secureStorage);
       } else {
         signupStatus.value = SignupStatus.signedUp;
       }
+    }
+
+    // read last unbound pool timestampe and id from store
+    String? lastUnboundTimeStamp = await _secureStorage.read(
+        key: unboundTimeStampKey, aOptions: androidOptions);
+    if (lastUnboundTimeStamp != null) {
+      _lastUnboundTimeStamp = int.parse(lastUnboundTimeStamp);
+    }
+
+    String? lastUnboundPoolId = await _secureStorage.read(
+        key: unboundPoolIdKey, aOptions: androidOptions);
+    if (lastUnboundPoolId != null) {
+      _lastUnboundPoolId = int.parse(lastUnboundPoolId);
     }
   }
 
@@ -363,7 +394,7 @@ class KC2User extends KC2UserInteface {
       poolMembership.value = await (kc2Service as KC2NominationPoolsInterface)
           .getMembershipPool(_identity.accountId);
 
-      // get current pool claimable amount
+      // get current pool claimable pending amount if any
       poolClaimableRewardAmount.value =
           await (kc2Service as KC2NominationPoolsInterface)
               .getPendingPoolPayout(_identity.accountId);
@@ -399,7 +430,42 @@ class KC2User extends KC2UserInteface {
   }
 
   @override
-  Future<void> leavePool() async {
+  (int, int) get lastUnboundPoolData =>
+      (_lastUnboundTimeStamp, _lastUnboundPoolId);
+
+  /// Get funds back   and leave pool
+  @override
+  Future<void> withdrawPoolUnboundedAmount() async {
+    debugPrint('Leaving pool...');
+    leavePoolStatus.value = SubmitTransactionStatus.submitting;
+
+    if (poolMembership.value == null) {
+      leavePoolStatus.value = SubmitTransactionStatus.invalidData;
+      return;
+    }
+
+    // todo: this is buggy when 2nd call - needs to use time and timer cancled every time createPool is called
+    Future.delayed(const Duration(seconds: 60), () async {
+      if (leavePoolStatus.value == SubmitTransactionStatus.submitting) {
+        // tx timed out
+        leavePoolStatus.value = SubmitTransactionStatus.connectionTimeout;
+      }
+    });
+
+    try {
+      _leavePoolTxHash = await (kc2Service as KC2NominationPoolsInterface)
+          .withdrawUnbonded(identity.accountId);
+      // status updated via callback
+    } catch (e) {
+      debugPrint('failed to leave pool: $e');
+      leavePoolStatus.value = SubmitTransactionStatus.serverError;
+      return;
+    }
+  }
+
+  // First step of leaving a pool - unbound funds
+  @override
+  Future<void> unboundPoolBondedAmount() async {
     debugPrint('Leaving pool...');
     leavePoolStatus.value = SubmitTransactionStatus.submitting;
 
@@ -420,6 +486,20 @@ class KC2User extends KC2UserInteface {
       _leavePoolTxHash = await (kc2Service as KC2NominationPoolsInterface)
           .unbond(identity.accountId, poolMembership.value!.points);
       // status updated via callback
+
+      // store timesamp of request
+      _lastUnboundTimeStamp = DateTime.now().millisecondsSinceEpoch;
+      await _secureStorage.write(
+          key: unboundTimeStampKey,
+          value: _lastUnboundTimeStamp.toString(),
+          aOptions: androidOptions);
+
+      await _secureStorage.write(
+          key: unboundPoolIdKey,
+          value: poolMembership.value!.id.toString(),
+          aOptions: androidOptions);
+
+      _lastUnboundPoolId = poolMembership.value!.id;
     } catch (e) {
       debugPrint('failed to leave pool: $e');
       leavePoolStatus.value = SubmitTransactionStatus.serverError;
@@ -504,7 +584,7 @@ class KC2User extends KC2UserInteface {
 
   @override
   Future<void> updateUserInfo(
-      String? requestedUserName, String? requestedPhoneNumber) async {
+      {String? requestedUserName, String? requestedPhoneNumber}) async {
     String? err;
     String? txHash;
 
@@ -515,29 +595,37 @@ class KC2User extends KC2UserInteface {
       return;
     }
 
-    // Create a verification request for verifier with a bypass token or with
-    // a verification code and session id from app state
-    vnr.VerifyNumberRequest req = configLogic.skipWhatsappVerification
-        ? await verifier.createVerificationRequest(
-            accountId: identity.accountId,
-            userName: requestedUserName,
-            phoneNumber: requestedPhoneNumber,
-            keyring: identity.keyring,
-            useBypassToken: true)
-        : await verifier.createVerificationRequest(
-            accountId: identity.accountId,
-            userName: requestedUserName,
-            phoneNumber: requestedPhoneNumber,
-            keyring: identity.keyring,
-            useBypassToken: false,
-            verificaitonSessionId: appState.twilloVerificationSid,
-            verificationCode: appState.twilloVerificationCode);
+    VerifyNumberData? evidence;
 
-    VerifyNumberData evidence = await verifier.verifyNumber(req);
-    if (evidence.error != null || evidence.data == null) {
-      updateResult.value = UpdateResult.invalidData;
-      debugPrint('Update result: ${updateResult.value}');
-      return;
+    if (requestedPhoneNumber != null) {
+      // We only need evidence in case of phone number change
+      // if a requested user name is not provided, use the current one for the evidence
+      requestedUserName ??= userInfo.value!.userName;
+
+      // Create a verification request for verifier with a bypass token or with
+      // a verification code and session id from app state
+      vnr.VerifyNumberRequest req = configLogic.skipWhatsappVerification
+          ? await verifier.createVerificationRequest(
+              accountId: identity.accountId,
+              userName: requestedUserName,
+              phoneNumber: requestedPhoneNumber,
+              keyring: identity.keyring,
+              useBypassToken: true)
+          : await verifier.createVerificationRequest(
+              accountId: identity.accountId,
+              userName: requestedUserName,
+              phoneNumber: requestedPhoneNumber,
+              keyring: identity.keyring,
+              useBypassToken: false,
+              verificaitonSessionId: appState.twilloVerificationSid,
+              verificationCode: appState.twilloVerificationCode);
+
+      evidence = await verifier.verifyNumber(req);
+      if (evidence.error != null || evidence.data == null) {
+        updateResult.value = UpdateResult.invalidData;
+        debugPrint('Update result: ${updateResult.value}');
+        return;
+      }
     }
 
     // set failure callback for 30 secs
@@ -553,7 +641,7 @@ class KC2User extends KC2UserInteface {
         phoneNumberHash: requestedPhoneNumber == null
             ? null
             : kc2Service.getPhoneNumberHash(requestedPhoneNumber),
-        evidence: evidence.data!);
+        evidence: evidence?.data);
 
     if (err != null) {
       switch (err) {
@@ -613,6 +701,9 @@ class KC2User extends KC2UserInteface {
         : createPoolStatus.value = CreatePoolStatus.created;
 
     if (tx.chainError != null) {
+      if (tx.chainError!.name == "AccountBelongsToOtherPool") {
+        createPoolStatus.value = CreatePoolStatus.userMemberOfAnotherPool;
+      }
       debugPrint('Create pool failed with: ${tx.chainError}');
     } else {
       // get updated balance
@@ -642,6 +733,28 @@ class KC2User extends KC2UserInteface {
     _claimPayoutTxHash = '';
   }
 
+  /// Request to leave pool (claim unbounded and leave)
+  Future<void> _withdrawUnboundCallback(KC2WithdrawUnbondedTxV1 tx) async {
+    if (_leavePoolTxHash != tx.hash) {
+      // not of interest
+      return;
+    }
+
+    tx.chainError != null
+        ? leavePoolStatus.value = SubmitTransactionStatus.invalidData
+        : leavePoolStatus.value = SubmitTransactionStatus.submitted;
+
+    if (tx.chainError != null) {
+      debugPrint('Leave pool failed with: ${tx.chainError}');
+    } else {
+      // get updated balance and pool membership
+      await getUserDataFromChain();
+    }
+
+    _leavePoolTxHash = '';
+  }
+
+  /// Request to leave pool (unbound bonded)
   Future<void> _leavePoolCallback(KC2UnbondTxV1 tx) async {
     if (_leavePoolTxHash != tx.hash) {
       // not of interest

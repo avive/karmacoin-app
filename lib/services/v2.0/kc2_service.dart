@@ -34,6 +34,34 @@ class KarmachainService extends ChainApiProvider
   late String _apiWsUrl;
 
   @override
+
+  /// Number of blocks in an epoch
+  int get blocksPerEpoch =>
+      chainInfo.constants["Babe"]!["EpochDuration"]!.value.toInt();
+
+  /// Expected block time miliseconds
+  @override
+  int get expectedBlockTimeMs =>
+      chainInfo.constants["Babe"]!["ExpectedBlockTime"]!.value.toInt();
+
+  /// Expected block time in seconds
+  @override
+  int get expectedBlockTimeSeconds => expectedBlockTimeMs ~/ 1000;
+
+  /// Expected epoch duration in seconds
+  @override
+  int get epochDurationSeconds => blocksPerEpoch * expectedBlockTimeMs ~/ 1000;
+
+  /// Number of eras in an epoch
+  @override
+  int get epochsPerEra =>
+      chainInfo.constants["Staking"]!["SessionsPerEra"]!.value.toInt();
+
+  /// Expected era duraiton in seconds
+  @override
+  int get eraTimeSeconds => epochsPerEra * epochDurationSeconds;
+
+  @override
   bool get connectedToApi => _connectedToApi;
 
   @override
@@ -45,6 +73,16 @@ class KarmachainService extends ChainApiProvider
   @override
   BigInt get existentialDeposit =>
       chainInfo.constants['Balances']!['ExistentialDeposit']!.value;
+
+  void _printChainInfo() {
+    debugPrint('Net id: $netId');
+    debugPrint('block time: $expectedBlockTimeSeconds secs');
+    debugPrint('Era time: $eraTimeSeconds secs');
+    debugPrint('Epoch time: $epochDurationSeconds secs');
+    debugPrint(
+        'Existential deposit: ${existentialDeposit.toString()} karma cents');
+    debugPrint('Epocs per era: $epochsPerEra');
+  }
 
   /// Connect to a karmachain api service. e.g.
   /// Local running node - "ws://127.0.0.1:9944"
@@ -75,7 +113,8 @@ class KarmachainService extends ChainApiProvider
       MetadataPreparer.prepareMetadata(decodedMetadata.metadata);
 
       chainInfo = ChainInfo.fromMetadata(decodedMetadata);
-      debugPrint('Fetched chainInfo: ${chainInfo.version}');
+
+      _printChainInfo();
 
       chainInfo.scaleCodec.registry.registerCustomCodec({
         'Extra':

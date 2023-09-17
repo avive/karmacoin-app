@@ -18,8 +18,8 @@ class Identity implements IdentityInterface {
 
   /// Check if the identity exists in local store
   @override
-  Future<bool> get existsInLocalStore =>
-      _secureStorage.containsKey(key: _mnemonicStoreKey);
+  Future<bool> get existsInLocalStore => _secureStorage.containsKey(
+      key: _mnemonicStoreKey, aOptions: _sercureStorageOptions);
 
   /// Initialize the identity. If mnenomic is provided, it will be used to create the
   /// identity and will be persisted to secure storage. Otherwise, identity is loaded from local store if exists. If not, a new one is created and persisted to local store

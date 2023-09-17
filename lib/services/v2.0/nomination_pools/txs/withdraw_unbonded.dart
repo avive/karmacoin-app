@@ -2,6 +2,7 @@ import 'package:karma_coin/services/v2.0/error.dart';
 import 'package:karma_coin/services/v2.0/event.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:ss58/ss58.dart' as ss58;
 
 // Withdraw all unbonded amount from the pool and leave it.
 // Can only be called once the unbound period has finished.
@@ -20,8 +21,10 @@ class KC2WithdrawUnbondedTxV1 extends KC2Tx {
       required List<KC2Event> txEvents,
       required int netId}) {
     try {
+      final memberAccount =
+          ss58.Codec(netId).encode(args['member_account'].value.cast<int>());
       return KC2WithdrawUnbondedTxV1(
-        memberAccount: args['member_account'],
+        memberAccount: memberAccount,
         args: args,
         signer: signer,
         chainError: chainError,

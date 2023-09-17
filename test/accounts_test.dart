@@ -321,7 +321,7 @@ void main() {
           completer.complete(true);
         };
 
-        updateLocalUser(
+        await updateLocalUser(
             completer: completer,
             userInfo: punch,
             requestedUserName: katya.userName);

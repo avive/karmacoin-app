@@ -53,7 +53,8 @@ enum CreatePoolStatus {
   invalidData,
   invalidSignature,
   serverError,
-  connectionTimeout;
+  connectionTimeout,
+  userMemberOfAnotherPool,
 }
 
 enum JoinPoolStatus {
@@ -161,9 +162,9 @@ abstract class KC2UserInteface {
   /// returns true if (account id, phone number, user name) exists on chain
   Future<bool> isAccountOnchain(String userName, String phoneNumber);
 
-  /// Update user name and/or phone number - register on observables iserInfo and updateResult for flow control.
+  /// Update user name and/or phone number - register on observables userInfo and updateResult for flow control.
   Future<void> updateUserInfo(
-      String? requestedUserName, String? requestedPhoneNumber);
+      {String? requestedUserName, String? requestedPhoneNumber});
 
   /// Set user metadata
   Future<void> setMetadata(String metadata);
@@ -181,8 +182,16 @@ abstract class KC2UserInteface {
   /// Join a mining pool
   Future<void> joinPool({required BigInt amount, required int poolId});
 
-  /// Leave pool local user is member of and withdraw all funds
-  Future<void> leavePool();
+  /// Unbound amount and make it withdrawable. User will still be a pool member
+  /// Amount will be withdrawable after the pool's unbonding period using withdrawPoolBondedAmount
+  Future<void> unboundPoolBondedAmount();
+
+  /// After this call completes w/o error user will not be a member of the pool
+  Future<void> withdrawPoolUnboundedAmount();
+
+  /// Returns the timestamp in milliseconds of the last unbound amount call if any. Returns null if no unbound amount call was made.
+  /// (timeStamp, poolId)
+  (int, int) get lastUnboundPoolData;
 
   /// Delete user from karmachain. This will delete all user's data from the chain and local store and will sign out the user. Don't use this user object after calling this method.
   Future<void> deleteUser();

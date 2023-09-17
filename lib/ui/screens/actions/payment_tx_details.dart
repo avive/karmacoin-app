@@ -30,14 +30,16 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
   late bool txNotFound = false;
 
   @override
-  void initState() async {
+  void initState() {
     super.initState();
     // todo: if tx is null - fetch it from kc2 api once it is available
     // we need kc2Service.getTransactionByHash() to return typed txs
-    if (widget.tx == null) {
-      tx = await kc2Service.getTransactionByHash(widget.txId);
-      txNotFound = tx == null;
-    }
+    Future.delayed(Duration.zero, () async {
+      if (widget.tx == null) {
+        tx = await kc2Service.getTransactionByHash(widget.txId);
+        txNotFound = tx == null;
+      }
+    });
   }
 
   CupertinoListTile _getAmountTile(BuildContext context, BigInt amount) {

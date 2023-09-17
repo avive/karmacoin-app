@@ -144,7 +144,9 @@ void main() {
 
               debugPrint('Updating from $katyaUserName to $katyaUserName1...');
 
-              await katya.updateUserInfo(katyaUserName1, null);
+              await katya.updateUserInfo(
+                  requestedUserName: katyaUserName1,
+                  requestedPhoneNumber: null);
               if (katya.updateResult.value != UpdateResult.updating) {
                 completer.completeError('Failed to update user info');
               }
@@ -218,7 +220,8 @@ void main() {
 
               debugPrint('Updating phone number...');
 
-              await katya.updateUserInfo(null, phoneNumber1);
+              await katya.updateUserInfo(
+                  requestedUserName: null, requestedPhoneNumber: phoneNumber1);
 
               break;
             case SignupStatus.notSignedUp:

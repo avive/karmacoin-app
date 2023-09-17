@@ -240,7 +240,7 @@ class _JoinPoolState extends State<JoinPool> {
                   children: [
                     Column(
                       children: [
-                        Text('Amount to bond',
+                        Text('Your Stake Amount',
                             style: CupertinoTheme.of(context)
                                 .textTheme
                                 .pickerTextStyle),

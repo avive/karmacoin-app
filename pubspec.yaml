@@ -119,7 +119,7 @@ flutter:
     - assets/images/giraffes_tile.png
     - assets/images/giraffes_banner.png
     - assets/ca/lets-encrypt-r3.pem
-    - assets/test_config.yaml
+    - assets/private_config.yaml
     
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

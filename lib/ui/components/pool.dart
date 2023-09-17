@@ -7,6 +7,7 @@ import 'package:karma_coin/ui/helpers/widget_utils.dart';
 import 'package:karma_coin/ui/screens/pools/claim_payout.dart';
 import 'package:karma_coin/ui/screens/pools/leave_pool.dart';
 import 'package:random_avatar/random_avatar.dart';
+import 'package:time_ago_provider/time_ago_provider.dart' as time_ago;
 
 /// Pool widget designed to be used in a ListView
 class PoolWidget extends StatefulWidget {
@@ -179,9 +180,7 @@ class _PoolWidgetState extends State<PoolWidget> {
 
             if (kc2User.poolClaimableRewardAmount.value > BigInt.zero) {
               tiles.add(CupertinoListTile.notched(
-                title: const Padding(
-                    padding: EdgeInsets.only(top: 14.0),
-                    child: Text('Your Reward')),
+                title: const Text('Your Earnings'),
                 trailing: CupertinoButton(
                   padding: const EdgeInsets.only(left: 0.0),
                   onPressed: () {
@@ -204,8 +203,7 @@ class _PoolWidgetState extends State<PoolWidget> {
             } else {
               tiles.add(const CupertinoListTile.notched(
                 title: Padding(
-                    padding: EdgeInsets.only(top: 14.0),
-                    child: Text('Your Earnings')),
+                    padding: EdgeInsets.only(), child: Text('Your Earnings')),
                 leading: FaIcon(FontAwesomeIcons.moneyBillTrendUp, size: 24),
                 subtitle: Text('No earnings yet'),
               ));
@@ -238,12 +236,14 @@ class _PoolWidgetState extends State<PoolWidget> {
   }
 
   void _leavePoolTapHandler(BuildContext context, PoolMember membership) {
+    String label = membership.points == BigInt.zero
+        ? 'Are you sure you want to withdraw your stake and leave the pool?'
+        : 'Are you sure you want to leave this pool?';
     showCupertinoModalPopup<void>(
       context: context,
       builder: (BuildContext context) => CupertinoAlertDialog(
         title: const Text('Leave Pool?'),
-        content: const Text(
-            '\nYou will be credited with any earnings and your bonded coins but you will lose any future earnings.'),
+        content: Text(label),
         actions: <CupertinoDialogAction>[
           CupertinoDialogAction(
             isDefaultAction: true,
@@ -281,6 +281,27 @@ class _PoolWidgetState extends State<PoolWidget> {
     if (membership != null &&
         membership.id == widget.pool.id &&
         widget.pool.depositor?.accountId != kc2User.identity.accountId) {
+      if (membership.points == BigInt.zero &&
+          kc2User.lastUnboundPoolData.$2 == membership.id) {
+        // user unbounded - check if he can leave
+        int now = DateTime.now().millisecondsSinceEpoch;
+        int diff = (now - kc2User.lastUnboundPoolData.$1).abs();
+        if (diff < kc2Service.eraTimeSeconds * 1000) {
+          String timeAhead = time_ago.format(
+              DateTime.now().add(Duration(milliseconds: diff)),
+              enableFromNow: true);
+
+          // user can't leave yet
+          return CupertinoListTile.notched(
+            title: const Text('Can\'t leave yet'),
+            subtitle: Text('Try in $timeAhead.'),
+          );
+        }
+      }
+
+      String label =
+          membership.points == BigInt.zero ? 'Leave & Withdraw' : 'Leave';
+
       // local user is member of this pool
       return CupertinoListTile.notched(
         title: CupertinoButton(
@@ -288,7 +309,7 @@ class _PoolWidgetState extends State<PoolWidget> {
           onPressed: () {
             _leavePoolTapHandler(context, membership);
           },
-          child: const Text('Leave Pool'),
+          child: Text(label),
         ),
       );
     } else if (membership == null && widget.pool.state == PoolState.open) {

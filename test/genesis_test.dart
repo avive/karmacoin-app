@@ -67,13 +67,13 @@ void main() {
           greaterThanOrEqualTo(BigInt.from(0)));
       expect(blockchainStats.referralRewardsCount, greaterThanOrEqualTo(0));
       expect(blockchainStats.referralRewardsCurrentRewardAmount,
-          BigInt.from(10000000));
+          BigInt.from(100000000));
 
       expect(blockchainStats.validatorRewardsTotalIssuedAmount,
           greaterThanOrEqualTo(BigInt.from(0)));
       expect(blockchainStats.validatorRewardsCount, greaterThanOrEqualTo(0));
       expect(blockchainStats.validatorRewardsCurrentRewardAmount,
-          BigInt.from(83333333333));
+          BigInt.from(333333333333));
 
       // Causes reward currently not implemented, skip them
     });

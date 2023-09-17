@@ -36,7 +36,7 @@ class ConfigLogic {
   /// Defaults to testnet. Change this if user specifies to change between testnet and mainnet. and call init() again to configure connection to mainnet and vice versa when moving from mainnet to testnet... In production app once mainnent is live, the default should be mainnet
   KCNetworkType networkId = KCNetworkType.testnet;
 
-  /// Skip whatsapp verification for local testing. kc2Api should use the bypass token
+  /// Skip whatsapp verification for local app testing. kc2Api should use the bypass token
   /// obtain from local config file to bypass whatsapp verification.
   final bool skipWhatsappVerification = true;
 
@@ -101,7 +101,7 @@ class ConfigLogic {
 
   /// Load optional test config
   Future<dynamic> getTestConfig() async {
-    final yamlString = await rootBundle.loadString('assets/test_config.yaml');
+    final yamlString = await rootBundle.loadString('assets/private_config.yaml');
     return loadYaml(yamlString);
   }
 

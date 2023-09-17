@@ -70,7 +70,8 @@ abstract class KC2Tx {
   });
 
   String get timeAgo =>
-      time_ago.format(DateTime.fromMillisecondsSinceEpoch(timestamp));
+      time_ago.format(DateTime.fromMillisecondsSinceEpoch(timestamp),
+          enableFromNow: true);
 
   /// Returns transaction's signer address. Return null if the transaction is unsigned.
   static String? _getTransactionSigner(

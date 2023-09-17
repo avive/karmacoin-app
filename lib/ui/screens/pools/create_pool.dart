@@ -183,6 +183,10 @@ class _CreatePoolState extends State<CreatePool> {
             case CreatePoolStatus.invalidData:
               text = 'Server error. Please try again later.';
               break;
+            case CreatePoolStatus.userMemberOfAnotherPool:
+              text =
+                  'You are already a member of another pool. To create a pool, leave it first.';
+              break;
             case CreatePoolStatus.invalidSignature:
               text = 'Invalid signature. Please try again later.';
               break;
@@ -197,9 +201,9 @@ class _CreatePoolState extends State<CreatePool> {
           Text textWidget = Text(
             text,
             textAlign: TextAlign.center,
-            style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+            style: CupertinoTheme.of(context).textTheme.navTitleTextStyle.merge(
                   TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w400, color: color),
+                      fontSize: 18, fontWeight: FontWeight.w400, color: color),
                 ),
           );
 

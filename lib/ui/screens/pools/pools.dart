@@ -19,7 +19,6 @@ class _PoolsScreenState extends State<PoolsScreen> {
   bool apiOffline = false;
   List<Pool>? entries;
   NominationPoolsConfiguration? conf;
-
   @override
   initState() {
     super.initState();
@@ -126,7 +125,10 @@ class _PoolsScreenState extends State<PoolsScreen> {
         },
         itemCount: entries!.length,
         itemBuilder: (context, index) {
-          return PoolWidget(pool: entries![index], showHeader: true);
+          return PoolWidget(
+            pool: entries![index],
+            showHeader: true,
+          );
         },
       ),
     );

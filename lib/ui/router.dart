@@ -357,6 +357,7 @@ final GoRouter appRouter = GoRouter(
           if (pool == null) {
             // todo: redirect to home screen
           }
+        
           return PoolScreen(pool: pool!);
         }),
     GoRoute(
