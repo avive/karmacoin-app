@@ -125,36 +125,40 @@ Future<TestUserInfo> updateLocalUser(
   final phoneNumber = requestedPhoneNumber ?? userInfo.phoneNumber;
 
   TestUserInfo updatedUserInfo = userInfo.copy();
-  updatedUserInfo.userInfo!.userName = userName;
-  updatedUserInfo.userInfo!.phoneNumberHash =
-      kc2Service.getPhoneNumberHash(phoneNumber);
-  updatedUserInfo.user.setPhoneNumber(phoneNumber);
+  VerifyNumberData? vd;
 
-  // Set user as signer - required for updateUser() tx
-  kc2Service.setKeyring(userInfo.user.keyring);
+  if (requestedPhoneNumber != null) {
+    updatedUserInfo.userInfo!.userName = userName;
+    updatedUserInfo.userInfo!.phoneNumberHash =
+        kc2Service.getPhoneNumberHash(phoneNumber);
+    updatedUserInfo.user.setPhoneNumber(phoneNumber);
 
-  // Create a verification request for verifier with a bypass token or with
-  // a verification code and session id from app state
-  VerifyNumberRequest req = await verifier.createVerificationRequest(
-      accountId: updatedUserInfo.user.accountId,
-      userName: userName,
-      phoneNumber: phoneNumber,
-      keyring: updatedUserInfo.user.keyring,
-      useBypassToken: true);
+    // Set user as signer - required for updateUser() tx
+    kc2Service.setKeyring(userInfo.user.keyring);
 
-  debugPrint('Calling verifier...');
+    // Create a verification request for verifier with a bypass token or with
+    // a verification code and session id from app state
+    VerifyNumberRequest req = await verifier.createVerificationRequest(
+        accountId: updatedUserInfo.user.accountId,
+        userName: userName,
+        phoneNumber: phoneNumber,
+        keyring: updatedUserInfo.user.keyring,
+        useBypassToken: true);
 
-  VerifyNumberData vd = await verifier.verifyNumber(req);
-  if (vd.data == null || vd.error != null) {
-    debugPrint('UpdateUser verification error: ${vd.error}');
-    completer.complete(false);
-    return TestUserInfo(updatedUserInfo.user, null, null);
+    debugPrint('Calling verifier...');
+
+    vd = await verifier.verifyNumber(req);
+    if (vd.data == null || vd.error != null) {
+      debugPrint('UpdateUser verification error: ${vd.error}');
+      completer.complete(false);
+      return TestUserInfo(updatedUserInfo.user, null, null);
+    }
   }
 
   String? err;
 
   (_, err) = await kc2Service.updateUser(
-      evidence: vd.data!,
+      evidence: vd?.data,
       username: requestedUserName,
       phoneNumberHash: requestedPhoneNumber == null
           ? null
