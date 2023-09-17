@@ -217,7 +217,7 @@ void main() {
           // it is currently empty in case user name updated
           //expect(tx.phoneNumberHash, phoneNumberHash);
 
-          expect(tx.username, katya.userName);
+          expect(tx.username, katyaNewUserName);
           expect(tx.signer, katya.accountId);
 
           // all 3 methods should return's Katya's account data
@@ -232,7 +232,7 @@ void main() {
 
           expect(userInfo.accountId, katya.accountId);
           expect(userInfo.phoneNumberHash, katya.phoneNumberHash);
-          expect(userInfo.userName, katya.userName);
+          expect(userInfo.userName, katyaNewUserName);
 
           // get the user by updated phone number
           userInfo = await kc2Service
@@ -246,9 +246,9 @@ void main() {
 
           expect(userInfo.accountId, katya.accountId);
           expect(userInfo.phoneNumberHash, katya.phoneNumberHash);
-          expect(userInfo.userName, katya.userName);
+          expect(userInfo.userName, katyaNewUserName);
 
-          userInfo = await kc2Service.getUserInfoByUserName(katya.userName);
+          userInfo = await kc2Service.getUserInfoByUserName(katyaNewUserName);
           if (userInfo == null) {
             debugPrint('Failed to get user info by updated user name');
             completer.complete(false);
@@ -257,7 +257,7 @@ void main() {
 
           expect(userInfo.accountId, katya.accountId);
           expect(userInfo.phoneNumberHash, katya.phoneNumberHash);
-          expect(userInfo.userName, katya.userName);
+          expect(userInfo.userName, katyaNewUserName);
 
           completer.complete(true);
         };

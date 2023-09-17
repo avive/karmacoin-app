@@ -126,42 +126,39 @@ Future<TestUserInfo> updateLocalUser(
   final phoneNumber = requestedPhoneNumber ?? userInfo.phoneNumber;
 
   TestUserInfo updatedUserInfo = userInfo.copy();
-  updatedUserInfo.userInfo!.userName = userName;
-  updatedUserInfo.userInfo!.phoneNumberHash =
-      kc2Service.getPhoneNumberHash(phoneNumber);
-  updatedUserInfo.user.setPhoneNumber(phoneNumber);
-
-  // Set user as signer - required for updateUser() tx
-  kc2Service.setKeyring(userInfo.user.keyring);
-
-  VerificationEvidence? evidence;
+  VerifyNumberData? vd;
 
   if (requestedPhoneNumber != null) {
+    updatedUserInfo.userInfo!.userName = userName;
+    updatedUserInfo.userInfo!.phoneNumberHash =
+        kc2Service.getPhoneNumberHash(phoneNumber);
+    updatedUserInfo.user.setPhoneNumber(phoneNumber);
+
+    // Set user as signer - required for updateUser() tx
+    kc2Service.setKeyring(userInfo.user.keyring);
     // Create a verification request for verifier with a bypass token or with
     // a verification code and session id from app state
     VerifyNumberRequest req = await verifier.createVerificationRequest(
         accountId: updatedUserInfo.user.accountId,
-        // @HolyGrease - notice verifier requires user-name to be set for phone verificaiton update
         userName: userName,
-        phoneNumber: requestedPhoneNumber,
+        phoneNumber: phoneNumber,
         keyring: updatedUserInfo.user.keyring,
         useBypassToken: true);
 
     debugPrint('Calling verifier...');
 
-    VerifyNumberData vd = await verifier.verifyNumber(req);
+    vd = await verifier.verifyNumber(req);
     if (vd.data == null || vd.error != null) {
       debugPrint('UpdateUser verification error: ${vd.error}');
       completer.complete(false);
       return TestUserInfo(updatedUserInfo.user, null, null);
     }
-    evidence = vd.data;
   }
 
   String? err;
 
   (_, err) = await kc2Service.updateUser(
-      evidence: evidence,
+      evidence: vd?.data,
       username: requestedUserName,
       phoneNumberHash: requestedPhoneNumber == null
           ? null

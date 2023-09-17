@@ -405,7 +405,7 @@ void main() {
                         await kc2Service.getUserInfoByAccountId(katyaAccountId);
 
                     // check balance and referral trait and score here
-                    expect(katyaInfo!.balance, BigInt.from(20000000 - 1234));
+                    expect(katyaInfo!.balance, BigInt.from(110000000 - 1234));
                     // score = signup + app sent/received (spender) + (ambassador) referral trait
                     expect(katyaInfo.karmaScore, 3);
 

@@ -40,7 +40,7 @@ void main() {
 
         String punchPhoneNumber = randomPhoneNumber;
 
-        debugPrint("Sending apprecation from katya to punch's phone number...");
+        debugPrint("Sending appreciation from katya to punch's phone number...");
 
         // Send appreciation from katya to punch before punch signed up
         // so it goes to the pool
@@ -59,9 +59,10 @@ void main() {
         KC2User punch = await createLocalAppUser(punchPhoneNumber);
         await Future.delayed(const Duration(seconds: 13));
 
+        await punch.getUserDataFromChain();
+
         // expected 1 in trait from katya's appreciation
 
-        //@HolyGrease - this fails with 0 instead of 1
         expect(punch.getScore(0, 64), 1);
         expect(punch.userInfo.value!.balance, BigInt.from(10000000 + 1234));
 
