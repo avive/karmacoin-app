@@ -24,12 +24,6 @@ void main() {
   GetIt.I.registerLazySingleton<Verifier>(() => Verifier());
   GetIt.I.registerLazySingleton<ConfigLogic>(() => ConfigLogic());
 
-  // @HolyGrease - we need the following basic pools integration test:
-  // 1. create a nominator and have nominator nominate the devnet's validator.
-  // 3. create pool and nominate the nominator.
-  // 4. Have 1 user join the pool.
-  // 5. Wait an era and verify nominator & pool gets rewarded and verify user can withdraw their rewards while staying in pool.
-
   group('nomination tests', () {
     // todo: add test when user joins a pool and pools nominates the devnet validator
     // wait an era and verify pool gets rewarded and verify user can withdraw their reward

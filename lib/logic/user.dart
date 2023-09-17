@@ -417,8 +417,6 @@ class KC2User extends KC2UserInteface {
     });
 
     try {
-      /// @HolyGrease this causes following error: lutter: Failed to submit tx: type '_ConstMap<dynamic, dynamic>' is not a subtype of type 'Map<String, dynamic>' of 'value'
-      ///
       _claimPayoutTxHash =
           await (kc2Service as KC2NominationPoolsInterface).claimPayout();
 

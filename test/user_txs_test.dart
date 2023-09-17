@@ -63,7 +63,6 @@ void main() {
 
         // expected 1 in trait from katya's appreciation
 
-        //@HolyGrease - this fails with 0 instead of 1
         expect(punch.getScore(0, 64), 1);
         expect(punch.userInfo.value!.balance, BigInt.from(10000000 + 1234));
 
