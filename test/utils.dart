@@ -6,6 +6,7 @@ import 'package:karma_coin/logic/identity.dart';
 import 'package:karma_coin/logic/identity_interface.dart';
 import 'package:karma_coin/logic/user.dart';
 import 'package:karma_coin/logic/verifier.dart';
+import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
 final random = Random.secure();
@@ -135,7 +136,6 @@ Future<TestUserInfo> updateLocalUser(
 
     // Set user as signer - required for updateUser() tx
     kc2Service.setKeyring(userInfo.user.keyring);
-
     // Create a verification request for verifier with a bypass token or with
     // a verification code and session id from app state
     VerifyNumberRequest req = await verifier.createVerificationRequest(

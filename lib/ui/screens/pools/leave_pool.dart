@@ -62,7 +62,8 @@ class _LeavePoolState extends State<LeavePool> {
             case SubmitTransactionStatus.submitted:
               switch (operation) {
                 case Operation.leavePool:
-                  text = 'Left pool and claimed bonded funds!';
+                  text =
+                      'You left the pool.\n\nYour bonded funds and any earnings were withdrawn from the pool back to your account.';
                   break;
                 case Operation.unbondPool:
                   text =

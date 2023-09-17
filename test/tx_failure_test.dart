@@ -83,7 +83,7 @@ void main() {
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
         TestUserInfo punch = await createTestUser(completer: completer);
-        await Future.delayed(const Duration(seconds: 12));
+        await Future.delayed(const Duration(seconds: 13));
 
         // Test utils
         String appreciationTxHash = "";
@@ -110,7 +110,9 @@ void main() {
         KC2UserInfo? info =
             await kc2Service.getUserInfoByUserName(punch.userName);
 
-        // amount greater than balance
+        expect(info, isNotNull);
+
+        // set amount greater than punch's balance
         BigInt txAmount = info!.balance + BigInt.one;
 
         // Set katya as signer

@@ -143,6 +143,7 @@ class _KarmachainState extends State<Karmachain> {
     tiles.add(
       CupertinoListTile.notched(
           title: const Text('Network'),
+          subtitle: Text('Net id: ${kc2Service.netId.toString()}'),
           leading: const Icon(
             CupertinoIcons.circle_fill,
             color: CupertinoColors.activeGreen,
@@ -169,6 +170,35 @@ class _KarmachainState extends State<Karmachain> {
         title: const Text('Blocks'),
         leading: const FaIcon(FontAwesomeIcons.link, size: 20),
         trailing: Text(blocks, style: textStyle),
+      ),
+    );
+
+    final String blockTime = kc2Service.expectedBlockTimeSeconds.format();
+
+    tiles.add(
+      CupertinoListTile.notched(
+        title: const Text('Block time'),
+        leading: const FaIcon(FontAwesomeIcons.clock, size: 20),
+        trailing: Text('$blockTime seconds', style: textStyle),
+      ),
+    );
+
+    final String eraTime = kc2Service.eraTimeSeconds.format();
+
+    final String epochTime = kc2Service.epochDurationSeconds.format();
+    tiles.add(
+      CupertinoListTile.notched(
+        title: const Text('Epoch time'),
+        leading: const FaIcon(FontAwesomeIcons.clock, size: 20),
+        trailing: Text('$epochTime seconds', style: textStyle),
+      ),
+    );
+
+    tiles.add(
+      CupertinoListTile.notched(
+        title: const Text('Era time'),
+        leading: const FaIcon(FontAwesomeIcons.clock, size: 20),
+        trailing: Text('$eraTime seconds', style: textStyle),
       ),
     );
 

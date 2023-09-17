@@ -7,8 +7,8 @@ class DeleteDataTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoListTile.notched(
-      title: const Text('Delete Local App Data'),
-      leading: const Icon(CupertinoIcons.trash, size: 28),
+      title: const Text('Sign Out'),
+      leading: const FaIcon(FontAwesomeIcons.arrowRightFromBracket, size: 24),
       onTap: () {
         _displayDeleteDataWarning(context);
       },
@@ -35,8 +35,9 @@ void _displayDeleteDataWarning(BuildContext context) {
   showCupertinoModalPopup<void>(
     context: context,
     builder: (BuildContext context) => CupertinoAlertDialog(
-      title: const Text('Delete App Data'),
-      content: const Text('\nDelete all local account data and sign out?'),
+      title: const Text('Sign Out'),
+      content: const Text(
+          '\nSign out and delete all account data on your device? You will be able to sign-in later from this or another device.'),
       actions: <CupertinoDialogAction>[
         CupertinoDialogAction(
           isDefaultAction: true,
