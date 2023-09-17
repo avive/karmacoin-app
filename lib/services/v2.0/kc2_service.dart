@@ -6,8 +6,16 @@ import 'package:karma_coin/services/v2.0/error.dart';
 import 'package:karma_coin/services/v2.0/interfaces.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/event.dart';
+import 'package:karma_coin/services/v2.0/metadata_preparer.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 import 'package:karma_coin/services/v2.0/staking/interfaces.dart';
+import 'package:karma_coin/services/v2.0/staking/tx/bond.dart';
+import 'package:karma_coin/services/v2.0/staking/tx/bond_extra.dart';
+import 'package:karma_coin/services/v2.0/staking/tx/chill.dart';
+import 'package:karma_coin/services/v2.0/staking/tx/nominate.dart';
+import 'package:karma_coin/services/v2.0/staking/tx/payout_stakers.dart';
+import 'package:karma_coin/services/v2.0/staking/tx/unbond.dart';
+import 'package:karma_coin/services/v2.0/staking/tx/withdraw_unbonded.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 import 'package:polkadart/polkadart.dart' as polkadart;
@@ -101,6 +109,9 @@ class KarmachainService extends ChainApiProvider
 
       decodedMetadata =
           MetadataDecoder.instance.decode(metadata.result.toString());
+
+      MetadataPreparer.prepareMetadata(decodedMetadata.metadata);
+
       chainInfo = ChainInfo.fromMetadata(decodedMetadata);
 
       _printChainInfo();
@@ -115,7 +126,7 @@ class KarmachainService extends ChainApiProvider
       _connectedToApi = true;
       debugPrint('Connected to api: $apiWsUrl');
 
-      // get pools configuration so it is accesible to the app
+      // get pools configuration so it is accessible to the app
       _poolsConfiguration = await getPoolsConfiguration();
     } catch (e) {
       debugPrint('Failed to connect to kc2 api: $e');
@@ -533,6 +544,58 @@ class KarmachainService extends ChainApiProvider
         await claimPoolCommissionCallback!(transaction);
         return;
       }
+
+      // Staking pallet
+
+      if (signer == userInfo.accountId &&
+          transaction is KC2StakingBondTxV1 &&
+          stakingBondCallback != null) {
+        await stakingBondCallback!(transaction);
+        return;
+      }
+
+      if (signer == userInfo.accountId &&
+          transaction is KC2StakingBondExtraTxV1 &&
+          stakingBondExtraCallback != null) {
+        await stakingBondExtraCallback!(transaction);
+        return;
+      }
+
+      if (signer == userInfo.accountId &&
+          transaction is KC2StakingUnbondTxV1 &&
+          stakingUnbondCallback != null) {
+        await stakingUnbondCallback!(transaction);
+        return;
+      }
+
+      if (signer == userInfo.accountId &&
+          transaction is KC2StakingWithdrawUnbondedTxV1 &&
+          stakingWithdrawUnbondedCallback != null) {
+        await stakingWithdrawUnbondedCallback!(transaction);
+        return;
+      }
+
+      if (signer == userInfo.accountId &&
+          transaction is KC2StakingNominateTxV1 &&
+          stakingNominateCallback != null) {
+        await stakingNominateCallback!(transaction);
+        return;
+      }
+
+      if (signer == userInfo.accountId &&
+          transaction is KC2StakingChillTxV1 &&
+          stakingChillCallback != null) {
+        await stakingChillCallback!(transaction);
+        return;
+      }
+
+      if (signer == userInfo.accountId &&
+          transaction is KC2StakingPayoutStakersTxV1 &&
+          stakingPayoutStakersCallback != null) {
+        await stakingPayoutStakersCallback!(transaction);
+        return;
+      }
+
     } catch (e) {
       debugPrint('error processing tx: $e');
     }

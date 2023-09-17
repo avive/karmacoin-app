@@ -42,3 +42,21 @@ class ValidatorPrefs {
         commission = json['commission'],
         blocked = json['blocked'];
 }
+
+/// A destination account for payment.
+enum RewardDestination {
+  /// Pay into the stash account, increasing the amount at stake accordingly.
+  staked,
+
+  /// Pay into the stash account, not increasing the amount at stake.
+  stash,
+
+  /// Pay into the controller account.
+  controller,
+
+  /// Pay into a specified account.
+  account,
+
+  /// Receive no reward.
+  none,
+}

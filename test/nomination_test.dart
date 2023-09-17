@@ -410,7 +410,7 @@ void main() {
           txHash =
               await kc2Service.setPoolCommission(poolId, 0.02, katya.accountId);
 
-          debugPrint('Pool $poolId commision set to 2%');
+          debugPrint('Pool $poolId commission set to 2%');
         };
 
         kc2Service.setPoolCommissionCallback = (tx) async {
@@ -876,6 +876,183 @@ void main() {
         expect(completer.isCompleted, isTrue);
       },
       timeout: const Timeout(Duration(seconds: 280)),
+    );
+
+    // @HolyGrease - we need the following basic pools integration test:
+    // 2. create pool and nominate the devnet validator.
+    // 3. Have 1 user join the pool.
+    // 4. Wait an era and pool gets rewarded and verify user can withdraw their rewards while staying in pool.
+
+    test(
+      'reward works',
+      () async {
+        KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
+        // Connect to the chain
+        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+
+        final completer = Completer<bool>();
+        TestUserInfo poolOwner = await createTestUser(completer: completer);
+        TestUserInfo poolMember = await createTestUser(completer: completer);
+        await Future.delayed(const Duration(seconds: 12));
+
+        // Test utils
+        Timer? blocksProcessingTimer;
+        String? txHash;
+
+        // Get current set of validators
+        final validators = await kc2Service.getValidators();
+        // Find exactly dev net validator
+        final alice = validators.firstWhere((prefs) =>
+            prefs.accountId ==
+            '5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY');
+
+        // Set pool owner keys
+        kc2Service.setKeyring(poolOwner.user.keyring);
+
+        // Subscribe to pool owner events
+        blocksProcessingTimer =
+            kc2Service.subscribeToAccountTransactions(poolOwner.userInfo!);
+
+        // Create a pool
+        txHash = await kc2Service.createPool(
+          amount: BigInt.from(1000000),
+          root: poolOwner.accountId,
+          nominator: poolOwner.accountId,
+          bouncer: poolOwner.accountId,
+        );
+
+        // Check transaction success and nominate
+        kc2Service.createPoolCallback = (tx) async {
+          // Check if the tx hash is the same
+          if (tx.hash != txHash) {
+            return;
+          }
+
+          // Check if the tx failed
+          if (tx.chainError != null) {
+            completer.complete(false);
+            return;
+          }
+
+          final pools = await kc2Service.getPools();
+          final pool = pools.firstWhere(
+              (pool) => pool.roles.depositor == poolOwner.accountId,
+              orElse: () => fail('pool not found'));
+
+          // Nominate nominator
+          txHash =
+              await kc2Service.nominateForPool(pool.id, [alice.accountId]);
+        };
+
+        kc2Service.nominatePoolValidatorCallback = (tx) async {
+          // Check if the tx hash is the same
+          if (tx.hash != txHash) {
+            return;
+          }
+
+          // Check if the tx failed
+          if (tx.chainError != null) {
+            completer.complete(false);
+            return;
+          }
+
+          final pool = await kc2Service.getPool(poolId: tx.poolId);
+          final nominations =
+              await kc2Service.getNominations(pool!.bondedAccountId);
+          expect(nominations!.targets, contains(alice.accountId));
+
+          // Wait for an 2 eras to pool became active nominator
+          // first era to be elected by election system
+          // second era to became active nominator
+          await Future.delayed(const Duration(minutes: 4));
+
+          // Set pool member keys
+          kc2Service.setKeyring(poolMember.user.keyring);
+
+          // Cancel pool owner subscription
+          blocksProcessingTimer!.cancel();
+
+          // Subscribe to pool member events
+          blocksProcessingTimer =
+              kc2Service.subscribeToAccountTransactions(poolMember.userInfo!);
+
+          // Join the pool
+          txHash = await kc2Service.joinPool(
+              amount: BigInt.from(1000000), poolId: pool.id);
+        };
+
+        kc2Service.joinPoolCallback = (tx) async {
+          // Check if the tx hash is the same
+          if (tx.hash != txHash) {
+            return;
+          }
+
+          // Check if the tx failed
+          if (tx.chainError != null) {
+            completer.complete(false);
+            return;
+          }
+
+          // Check that use joined the pool
+          final poolMembership =
+              await kc2Service.getMembershipPool(poolMember.accountId);
+          expect(poolMembership!.id, tx.poolId);
+
+          // Wait for an era to pass
+          await Future.delayed(const Duration(minutes: 2));
+
+          // Now validator should claim rewards
+          final blockchainStats = await kc2Service.getBlockchainStats();
+          // In devnet one era is 10 blocks
+          final currentEra = blockchainStats.tipHeight / 10;
+          // Pay out rewards for the previous era
+          txHash = await kc2Service.stakingPayoutStakers(alice.accountId, currentEra.toInt() - 1);
+        };
+
+        kc2Service.stakingPayoutStakersCallback = (tx) async {
+          // Check if the tx hash is the same
+          if (tx.hash != txHash) {
+            return;
+          }
+
+          // Check if the tx failed
+          if (tx.chainError != null) {
+            completer.complete(false);
+            return;
+          }
+
+          final poolOwnerPendingPayout = await kc2Service.getPendingPoolPayout(poolOwner.accountId);
+          final poolMemberPendingPayout = await kc2Service.getPendingPoolPayout(poolMember.accountId);
+
+          expect(poolOwnerPendingPayout, isNot(BigInt.zero));
+          expect(poolMemberPendingPayout, isNot(BigInt.zero));
+
+          txHash = await kc2Service.claimPayout();
+        };
+
+        kc2Service.claimPoolPayoutCallback = (tx) async {
+          // Check if the tx hash is the same
+          if (tx.hash != txHash) {
+            return;
+          }
+
+          // Check if the tx failed
+          if (tx.chainError != null) {
+            completer.complete(false);
+            return;
+          }
+
+          final userInfo = await kc2Service.getUserInfoByAccountId(poolMember.accountId);
+          expect(poolMember.userInfo!.balance <  userInfo!.balance, isTrue);
+
+          completer.complete(true);
+        };
+
+        // Wait for completer and verify test success
+        expect(await completer.future, equals(true));
+        expect(completer.isCompleted, isTrue);
+      },
+      timeout: const Timeout(Duration(seconds: 10 * 60)),
     );
   });
 }
