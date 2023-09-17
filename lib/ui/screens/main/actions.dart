@@ -9,6 +9,7 @@ import 'package:badges/badges.dart' as badges;
 import 'package:karma_coin/ui/screens/actions/leaderboard.dart';
 import 'package:karma_coin/ui/screens/intros/staking_intro.dart';
 import 'package:karma_coin/ui/screens/actions/user_metadata.dart';
+import 'package:random_avatar/random_avatar.dart';
 
 const _privacyUrl = 'https://karmaco.in/docs/privacy';
 const _supportUrl = 'https://karmaco.in/docs/support';
@@ -188,20 +189,21 @@ class _ActionsScreenState extends State<ActionsScreen> {
         ),
         children: <CupertinoListTile>[
           CupertinoListTile.notched(
-              title: const Text('Social Profile'),
-              leading: const Icon(CupertinoIcons.person_circle, size: 28),
+              title: const Text('Set Profile Social Link'),
+              leading: const Icon(CupertinoIcons.link, size: 28),
               onTap: () {
                 if (!context.mounted) return;
                 Navigator.of(context).push(
                   CupertinoPageRoute(
                     fullscreenDialog: true,
-                    builder: ((context) => const SetMetadataScreen()),
+                    builder: ((context) => const SetMetadataScreen()), 
                   ),
                 );
               }),
           CupertinoListTile.notched(
-            title: const Text('Account Details'),
-            leading: const Icon(CupertinoIcons.info, size: 28),
+            title: const Text('Account'),
+            leading: RandomAvatar(kc2User.userInfo.value!.userName,
+                height: 30, width: 30),
             trailing: const CupertinoListTileChevron(),
             onTap: () => context.pushNamed(ScreenNames.account,
                 params: {'accountId': kc2User.identity.accountId}),
@@ -224,7 +226,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
           ),
           CupertinoListTile.notched(
             title: const Text('Change User Name'),
-            leading: const Icon(CupertinoIcons.text_append, size: 28),
+            leading: const FaIcon(FontAwesomeIcons.penToSquare, size: 24),
             trailing: const CupertinoListTileChevron(),
             onTap: () => context.push(ScreenPaths.updateUserName),
           ),
@@ -300,21 +302,23 @@ class _ActionsScreenState extends State<ActionsScreen> {
             leading: const FaIcon(FontAwesomeIcons.telegram, size: 24),
             onTap: () async => {await openUrl(_tgramUrl)},
           ),
+          /*
           CupertinoListTile.notched(
             title: const Text('TikTok'),
             leading: const FaIcon(FontAwesomeIcons.tiktok, size: 24),
             onTap: () async => {await openUrl(_tikTokUrl)},
-          ),
+          ),*/
           CupertinoListTile.notched(
             title: const Text('Twitter'),
             leading: const FaIcon(FontAwesomeIcons.twitter, size: 24),
             onTap: () async => {await openUrl(_twitterUrl)},
           ),
+          /*
           CupertinoListTile.notched(
             title: const Text('Discord'),
             leading: const FaIcon(FontAwesomeIcons.discord, size: 24),
             onTap: () async => {await openUrl(_discordUrl)},
-          ),
+          ),*/
           CupertinoListTile.notched(
             title: const Text('Blog'),
             leading: const FaIcon(FontAwesomeIcons.blog, size: 24),

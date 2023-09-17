@@ -6,6 +6,7 @@ import 'package:karma_coin/logic/identity.dart';
 import 'package:karma_coin/logic/identity_interface.dart';
 import 'package:karma_coin/logic/user.dart';
 import 'package:karma_coin/logic/verifier.dart';
+import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
 final random = Random.secure();
@@ -133,28 +134,33 @@ Future<TestUserInfo> updateLocalUser(
   // Set user as signer - required for updateUser() tx
   kc2Service.setKeyring(userInfo.user.keyring);
 
-  // Create a verification request for verifier with a bypass token or with
-  // a verification code and session id from app state
-  VerifyNumberRequest req = await verifier.createVerificationRequest(
-      accountId: updatedUserInfo.user.accountId,
-      userName: userName,
-      phoneNumber: phoneNumber,
-      keyring: updatedUserInfo.user.keyring,
-      useBypassToken: true);
+  VerificationEvidence? evidence;
 
-  debugPrint('Calling verifier...');
+  if (requestedPhoneNumber != null) {
+    // Create a verification request for verifier with a bypass token or with
+    // a verification code and session id from app state
+    VerifyNumberRequest req = await verifier.createVerificationRequest(
+        accountId: updatedUserInfo.user.accountId,
+        userName: userName,
+        phoneNumber: requestedPhoneNumber,
+        keyring: updatedUserInfo.user.keyring,
+        useBypassToken: true);
 
-  VerifyNumberData vd = await verifier.verifyNumber(req);
-  if (vd.data == null || vd.error != null) {
-    debugPrint('UpdateUser verification error: ${vd.error}');
-    completer.complete(false);
-    return TestUserInfo(updatedUserInfo.user, null, null);
+    debugPrint('Calling verifier...');
+
+    VerifyNumberData vd = await verifier.verifyNumber(req);
+    if (vd.data == null || vd.error != null) {
+      debugPrint('UpdateUser verification error: ${vd.error}');
+      completer.complete(false);
+      return TestUserInfo(updatedUserInfo.user, null, null);
+    }
+    evidence = vd.data;
   }
 
   String? err;
 
   (_, err) = await kc2Service.updateUser(
-      evidence: vd.data!,
+      evidence: evidence,
       username: requestedUserName,
       phoneNumberHash: requestedPhoneNumber == null
           ? null
