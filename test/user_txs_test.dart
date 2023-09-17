@@ -40,7 +40,7 @@ void main() {
 
         String punchPhoneNumber = randomPhoneNumber;
 
-        debugPrint("Sending apprecation from katya to punch's phone number...");
+        debugPrint("Sending appreciation from katya to punch's phone number...");
 
         // Send appreciation from katya to punch before punch signed up
         // so it goes to the pool
