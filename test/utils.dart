@@ -141,6 +141,7 @@ Future<TestUserInfo> updateLocalUser(
     // a verification code and session id from app state
     VerifyNumberRequest req = await verifier.createVerificationRequest(
         accountId: updatedUserInfo.user.accountId,
+        // @HolyGrease - notice verifier requires user-name to be set for phone verificaiton update
         userName: userName,
         phoneNumber: requestedPhoneNumber,
         keyring: updatedUserInfo.user.keyring,

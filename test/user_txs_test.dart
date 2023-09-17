@@ -57,9 +57,11 @@ void main() {
 
         debugPrint('Signing up punch user...');
         KC2User punch = await createLocalAppUser(punchPhoneNumber);
-        await Future.delayed(const Duration(seconds: 12));
+        await Future.delayed(const Duration(seconds: 13));
 
         // expected 1 in trait from katya's appreciation
+
+        //@HolyGrease - this fails with 0 instead of 1
         expect(punch.getScore(0, 64), 1);
         expect(punch.userInfo.value!.balance, BigInt.from(10000000 + 1234));
 

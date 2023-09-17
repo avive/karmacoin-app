@@ -17,8 +17,8 @@ const _twitterUrl = 'https://twitter.com/TeamKarmaCoin';
 const _tgramUrl = 'https://t.me/karmacoinapp/13';
 const _linkedInUrl = 'https://www.linkedin.com/company/karmacoin';
 const _blogUrl = 'https://connect.karmaco.in';
-const _discordUrl = 'http://bit.ly/3z9fvNe';
-const _tikTokUrl = 'https://www.tiktok.com/@karmadivaaa';
+// const _discordUrl = 'http://bit.ly/3z9fvNe';
+// const _tikTokUrl = 'https://www.tiktok.com/@karmadivaaa';
 
 class ActionsScreen extends StatefulWidget {
   const ActionsScreen({super.key});
@@ -196,7 +196,7 @@ class _ActionsScreenState extends State<ActionsScreen> {
                 Navigator.of(context).push(
                   CupertinoPageRoute(
                     fullscreenDialog: true,
-                    builder: ((context) => const SetMetadataScreen()), 
+                    builder: ((context) => const SetMetadataScreen()),
                   ),
                 );
               }),
