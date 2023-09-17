@@ -255,6 +255,7 @@ void main() {
         // Test utils
         Timer? blocksProcessingTimer;
         String txHash = "";
+        BigInt? balance;
 
         final bondAmount = BigInt.from(1000000);
 
@@ -318,34 +319,53 @@ void main() {
           KC2UserInfo? punchInfo =
               await kc2Service.getUserInfoByAccountId(punch.accountId);
 
-          BigInt balance = punchInfo!.balance;
+          balance = punchInfo!.balance;
 
           // step 1 - punch unbounds all pimts
           debugPrint('Calling unbound...');
-          await kc2Service.unbond(punch.accountId, punchPoolMember.points);
-          await Future.delayed(
-              Duration(seconds: kc2Service.expectedBlockTimeSeconds + 2));
+          txHash = await kc2Service.unbond(punch.accountId, punchPoolMember.points);
+        };
 
-          punchPoolMember = await kc2Service.getMembershipPool(punch.accountId);
+        kc2Service.unbondPoolCallback = (tx) async {
+          if (tx.hash != txHash) {
+            return;
+          }
+          // Check if the tx failed
+          if (tx.chainError != null) {
+            completer.complete(false);
+            return;
+          }
+
+          PoolMember? punchPoolMember = await kc2Service.getMembershipPool(punch.accountId);
           expect(punchPoolMember, isNotNull);
           expect(punchPoolMember!.points, BigInt.zero);
 
           // step 2 - wait 1 era and call withdraw unbound
           debugPrint(
-              'Waiting 1 era... ${kc2Service.eraTimeSeconds + 10} seconds');
+              'Waiting 1 era... ${kc2Service.eraTimeSeconds} seconds');
           await Future.delayed(
-              Duration(seconds: kc2Service.eraTimeSeconds + 10));
+              Duration(seconds: kc2Service.eraTimeSeconds));
           debugPrint('Calling withdraw unbound...');
-          await kc2Service.withdrawUnbonded(punch.accountId);
-          await Future.delayed(
-              Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+          txHash = await kc2Service.withdrawUnbonded(punch.accountId);
+        };
 
-          punchPoolMember = await kc2Service.getMembershipPool(punch.accountId);
+        kc2Service.withdrawUnbondedPoolCallback = (tx) async {
+          if (tx.hash != txHash) {
+            return;
+          }
+          // Check if the tx failed
+          if (tx.chainError != null) {
+            completer.complete(false);
+            return;
+          }
+
+          PoolMember? punchPoolMember = await kc2Service.getMembershipPool(punch.accountId);
           expect(punchPoolMember, isNull,
               reason: 'expected punch to be removed from pool');
           KC2UserInfo? info =
-              await kc2Service.getUserInfoByAccountId(punch.accountId);
-          expect(info!.balance == balance + bondAmount, isTrue,
+          await kc2Service.getUserInfoByAccountId(punch.accountId);
+          expect(balance, isNotNull);
+          expect(info!.balance == balance! + bondAmount, isTrue,
               reason: 'Expected refund');
 
           completer.complete(true);
