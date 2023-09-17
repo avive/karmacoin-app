@@ -4,6 +4,7 @@ import 'package:karma_coin/services/v2.0/staking/tx/bond.dart';
 import 'package:karma_coin/services/v2.0/staking/tx/bond_extra.dart';
 import 'package:karma_coin/services/v2.0/staking/tx/chill.dart';
 import 'package:karma_coin/services/v2.0/staking/tx/nominate.dart';
+import 'package:karma_coin/services/v2.0/staking/tx/payout_stakers.dart';
 import 'package:karma_coin/services/v2.0/staking/tx/unbond.dart';
 import 'package:karma_coin/services/v2.0/staking/tx/withdraw_unbonded.dart';
 import 'package:karma_coin/services/v2.0/staking/types.dart';
@@ -16,6 +17,7 @@ typedef StakingWithdrawUnbondedCallback = Future<void> Function(
     KC2StakingWithdrawUnbondedTxV1);
 typedef StakingNominateCallback = Future<void> Function(KC2StakingNominateTxV1);
 typedef StakingChillCallback = Future<void> Function(KC2StakingChillTxV1);
+typedef StakingPayoutStakersCallback = Future<void> Function(KC2StakingPayoutStakersTxV1);
 
 mixin KC2StakingInterface on ChainApiProvider {
   /// Take the origin account as a stash and lock up `value` of its balance. `controller` will
@@ -191,6 +193,28 @@ mixin KC2StakingInterface on ChainApiProvider {
     }
   }
 
+  /// Pay out all the stakers behind a single validator for a single era.
+  ///
+  /// - `validator_stash` is the stash account of the validator. Their nominators, up to
+  ///   `T::MaxNominatorRewardedPerValidator`, will also receive their rewards.
+  /// - `era` may be any era between `[current_era - history_depth; current_era]`.
+  ///
+  /// The origin of this call must be _Signed_. Any account can call this function, even if
+  /// it is not one of the stakers.
+  Future<String> stakingPayoutStakers(String staker, int era) async {
+    try {
+      final call = MapEntry('Staking', MapEntry('payout_stakers', {
+        'validator_stash': decodeAccountId(staker),
+        'era': era,
+      }));
+
+      return await signAndSendTransaction(call);
+    } catch (e) {
+      debugPrint('Failed to chill: $e');
+      rethrow;
+    }
+  }
+
   /// Returns the nominations of the specified validator account.
   Future<Nominations?> getNominations(String accountId) async {
     try {
@@ -224,4 +248,5 @@ mixin KC2StakingInterface on ChainApiProvider {
   StakingWithdrawUnbondedCallback? stakingWithdrawUnbondedCallback;
   StakingNominateCallback? stakingNominateCallback;
   StakingChillCallback? stakingChillCallback;
+  StakingPayoutStakersCallback? stakingPayoutStakersCallback;
 }
