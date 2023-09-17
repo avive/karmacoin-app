@@ -44,7 +44,7 @@ void main() {
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
-        await Future.delayed(const Duration(seconds: 12));
+        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Test utils
         String txHash = "";
@@ -146,7 +146,7 @@ void main() {
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
         TestUserInfo punch = await createTestUser(completer: completer);
-        await Future.delayed(const Duration(seconds: 12));
+        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Test utils
         Timer? blocksProcessingTimer;
@@ -383,7 +383,7 @@ void main() {
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
-        await Future.delayed(const Duration(seconds: 12));
+        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Test utils
         String txHash = "";
@@ -466,7 +466,7 @@ void main() {
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
-        await Future.delayed(const Duration(seconds: 12));
+        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Test utils
         String txHash = "";
@@ -548,7 +548,7 @@ void main() {
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
-        await Future.delayed(const Duration(seconds: 12));
+        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Test utils
         String txHash = "";
@@ -819,7 +819,7 @@ void main() {
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
-        await Future.delayed(const Duration(seconds: 12));
+        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Test utils
         String txHash = "";
@@ -893,7 +893,7 @@ void main() {
         final completer = Completer<bool>();
         TestUserInfo poolOwner = await createTestUser(completer: completer);
         TestUserInfo poolMember = await createTestUser(completer: completer);
-        await Future.delayed(const Duration(seconds: 12));
+        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Test utils
         Timer? blocksProcessingTimer;
@@ -964,7 +964,7 @@ void main() {
           // Wait for an 2 eras to pool became active nominator
           // first era to be elected by election system
           // second era to became active nominator
-          await Future.delayed(const Duration(minutes: 4));
+          await Future.delayed(Duration(seconds: 2 * kc2Service.eraTimeSeconds));
 
           // Set pool member keys
           kc2Service.setKeyring(poolMember.user.keyring);
@@ -999,7 +999,7 @@ void main() {
           expect(poolMembership!.id, tx.poolId);
 
           // Wait for an era to pass
-          await Future.delayed(const Duration(minutes: 2));
+          await Future.delayed(Duration(seconds: 2 * kc2Service.eraTimeSeconds));
 
           // Now validator should claim rewards
           final blockchainStats = await kc2Service.getBlockchainStats();
