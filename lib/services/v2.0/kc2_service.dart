@@ -90,7 +90,7 @@ class KarmachainService extends ChainApiProvider
   @override
   Future<void> connectToApi({required String apiWsUrl}) async {
     try {
-      debugPrint('Connecting to kc2 api...');
+      debugPrint('Connecting to kc2 api at $apiWsUrl...');
       _apiWsUrl = apiWsUrl;
       karmachain = polkadart.Provider(Uri.parse(apiWsUrl));
       api = polkadart.StateApi(karmachain);
@@ -595,7 +595,6 @@ class KarmachainService extends ChainApiProvider
         await stakingPayoutStakersCallback!(transaction);
         return;
       }
-
     } catch (e) {
       debugPrint('error processing tx: $e');
     }

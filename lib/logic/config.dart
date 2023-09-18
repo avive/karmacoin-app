@@ -25,7 +25,7 @@ enum KCNetworkType {
 /// App config logic
 class ConfigLogic {
   /// Set to true to work against localhost servers. Otherwise production servers are used
-  final bool apiLocalMode = true;
+  final bool apiLocalMode = false;
 
   /// dev mode has some text field input shortcuts to save time in dev
   final bool devMode = true;
@@ -101,7 +101,8 @@ class ConfigLogic {
 
   /// Load optional test config
   Future<dynamic> getTestConfig() async {
-    final yamlString = await rootBundle.loadString('assets/private_config.yaml');
+    final yamlString =
+        await rootBundle.loadString('assets/private_config.yaml');
     return loadYaml(yamlString);
   }
 
@@ -126,8 +127,8 @@ class ConfigLogic {
       switch (networkId) {
         case KCNetworkType.testnet:
           debugPrint('Working against a remote kc2 testnet api provider');
-          apiHostName.value = 'testnet.karmaco.in/testnet/ws';
-          apiHostPort.value = 80;
+          apiHostName.value = 'api3.karmaco.in';
+          apiHostPort.value = 443;
           apiProtocol.value = 'wss';
           //
           // verifier info for testnet
