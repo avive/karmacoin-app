@@ -43,7 +43,7 @@ void main() {
       () async {
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
-        await Future.delayed(const Duration(seconds: 13));
+        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // all 3 methods should return's Katya's account data
         KC2UserInfo? userInfo =

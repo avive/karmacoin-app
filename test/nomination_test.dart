@@ -44,7 +44,7 @@ void main() {
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
-        await Future.delayed(const Duration(seconds: 12));
+        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Test utils
         String txHash = "";
@@ -146,7 +146,7 @@ void main() {
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
         TestUserInfo punch = await createTestUser(completer: completer);
-        await Future.delayed(const Duration(seconds: 12));
+        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Test utils
         Timer? blocksProcessingTimer;
@@ -255,6 +255,7 @@ void main() {
         // Test utils
         Timer? blocksProcessingTimer;
         String txHash = "";
+        BigInt? balance;
 
         final bondAmount = BigInt.from(1000000);
 
@@ -318,34 +319,53 @@ void main() {
           KC2UserInfo? punchInfo =
               await kc2Service.getUserInfoByAccountId(punch.accountId);
 
-          BigInt balance = punchInfo!.balance;
+          balance = punchInfo!.balance;
 
           // step 1 - punch unbounds all pimts
           debugPrint('Calling unbound...');
-          await kc2Service.unbond(punch.accountId, punchPoolMember.points);
-          await Future.delayed(
-              Duration(seconds: kc2Service.expectedBlockTimeSeconds + 2));
+          txHash = await kc2Service.unbond(punch.accountId, punchPoolMember.points);
+        };
 
-          punchPoolMember = await kc2Service.getMembershipPool(punch.accountId);
+        kc2Service.unbondPoolCallback = (tx) async {
+          if (tx.hash != txHash) {
+            return;
+          }
+          // Check if the tx failed
+          if (tx.chainError != null) {
+            completer.complete(false);
+            return;
+          }
+
+          PoolMember? punchPoolMember = await kc2Service.getMembershipPool(punch.accountId);
           expect(punchPoolMember, isNotNull);
           expect(punchPoolMember!.points, BigInt.zero);
 
           // step 2 - wait 1 era and call withdraw unbound
           debugPrint(
-              'Waiting 1 era... ${kc2Service.eraTimeSeconds + 10} seconds');
+              'Waiting 1 era... ${kc2Service.eraTimeSeconds} seconds');
           await Future.delayed(
-              Duration(seconds: kc2Service.eraTimeSeconds + 10));
+              Duration(seconds: kc2Service.eraTimeSeconds));
           debugPrint('Calling withdraw unbound...');
-          await kc2Service.withdrawUnbonded(punch.accountId);
-          await Future.delayed(
-              Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+          txHash = await kc2Service.withdrawUnbonded(punch.accountId);
+        };
 
-          punchPoolMember = await kc2Service.getMembershipPool(punch.accountId);
+        kc2Service.withdrawUnbondedPoolCallback = (tx) async {
+          if (tx.hash != txHash) {
+            return;
+          }
+          // Check if the tx failed
+          if (tx.chainError != null) {
+            completer.complete(false);
+            return;
+          }
+
+          PoolMember? punchPoolMember = await kc2Service.getMembershipPool(punch.accountId);
           expect(punchPoolMember, isNull,
               reason: 'expected punch to be removed from pool');
           KC2UserInfo? info =
-              await kc2Service.getUserInfoByAccountId(punch.accountId);
-          expect(info!.balance == balance + bondAmount, isTrue,
+          await kc2Service.getUserInfoByAccountId(punch.accountId);
+          expect(balance, isNotNull);
+          expect(info!.balance == balance! + bondAmount, isTrue,
               reason: 'Expected refund');
 
           completer.complete(true);
@@ -383,7 +403,7 @@ void main() {
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
-        await Future.delayed(const Duration(seconds: 12));
+        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Test utils
         String txHash = "";
@@ -466,7 +486,7 @@ void main() {
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
-        await Future.delayed(const Duration(seconds: 12));
+        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Test utils
         String txHash = "";
@@ -548,7 +568,7 @@ void main() {
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
-        await Future.delayed(const Duration(seconds: 12));
+        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Test utils
         String txHash = "";
@@ -819,7 +839,7 @@ void main() {
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
-        await Future.delayed(const Duration(seconds: 12));
+        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Test utils
         String txHash = "";
@@ -893,7 +913,7 @@ void main() {
         final completer = Completer<bool>();
         TestUserInfo poolOwner = await createTestUser(completer: completer);
         TestUserInfo poolMember = await createTestUser(completer: completer);
-        await Future.delayed(const Duration(seconds: 12));
+        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Test utils
         Timer? blocksProcessingTimer;
@@ -964,7 +984,7 @@ void main() {
           // Wait for an 2 eras to pool became active nominator
           // first era to be elected by election system
           // second era to became active nominator
-          await Future.delayed(const Duration(minutes: 4));
+          await Future.delayed(Duration(seconds: 2 * kc2Service.eraTimeSeconds));
 
           // Set pool member keys
           kc2Service.setKeyring(poolMember.user.keyring);
@@ -999,7 +1019,7 @@ void main() {
           expect(poolMembership!.id, tx.poolId);
 
           // Wait for an era to pass
-          await Future.delayed(const Duration(minutes: 2));
+          await Future.delayed(Duration(seconds: 2 * kc2Service.eraTimeSeconds));
 
           // Now validator should claim rewards
           final blockchainStats = await kc2Service.getBlockchainStats();

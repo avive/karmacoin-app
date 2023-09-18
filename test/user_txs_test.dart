@@ -32,7 +32,7 @@ void main() {
         final completer = Completer<bool>();
 
         TestUserInfo katya = await createTestUser(completer: completer);
-        await Future.delayed(const Duration(seconds: 12));
+        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Set katya as signer
         kc2Service.setKeyring(katya.user.keyring);
@@ -50,14 +50,14 @@ void main() {
             0,
             64);
 
-        await Future.delayed(const Duration(seconds: 12));
+        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // clear secure storage
         FlutterSecureStorage.setMockInitialValues({});
 
         debugPrint('Signing up punch user...');
         KC2User punch = await createLocalAppUser(punchPhoneNumber);
-        await Future.delayed(const Duration(seconds: 13));
+        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         await punch.getUserDataFromChain();
 
@@ -77,8 +77,8 @@ void main() {
 
         await kc2Service.sendTransfer(katya.accountId, BigInt.from(12345));
 
-        debugPrint('waiting for 14 secs and checking txs...');
-        Future.delayed(const Duration(seconds: 14), () async {
+        debugPrint('waiting for 1 block and checking txs...');
+        Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds), () async {
           expect(punch.incomingAppreciations.value.length, 1);
           expect(punch.outgoingAppreciations.value.length, 2);
 

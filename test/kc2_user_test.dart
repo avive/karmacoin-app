@@ -486,7 +486,7 @@ void main() {
               debugPrint('Deleting katya user and waiting for 1 block...');
               await kc2Service.deleteUser();
 
-              Future.delayed(const Duration(seconds: 14), () async {
+              Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds), () async {
                 // check there's no user info for katya
                 KC2UserInfo? info = await kc2Service
                     .getUserInfoByAccountId(katyaInfo!.accountId);

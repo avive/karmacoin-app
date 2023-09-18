@@ -300,9 +300,9 @@ void main() {
         // Create a new identity for local user
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
-        await Future.delayed(const Duration(seconds: 12));
+        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
         TestUserInfo punch = await createTestUser(completer: completer);
-        await Future.delayed(const Duration(seconds: 12));
+        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // remove appreciation callback which is getting called right now in case of appreciation sent with charTrait == 0
         kc2Service.appreciationCallback = null;

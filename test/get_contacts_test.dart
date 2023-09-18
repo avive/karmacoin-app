@@ -36,7 +36,7 @@ void main() {
           TestUserInfo platon = await createTestUser(
               completer: completer, usernamePrefix: "${prefix}Platon");
           // Wait for all users created
-          await Future.delayed(const Duration(seconds: 12));
+          await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
           debugPrint('Getting contacts...');
           List<Contact> contacts = await kc2Service.getContacts('${prefix}to');
@@ -80,7 +80,7 @@ void main() {
           await createTestUser(
               completer: completer, usernamePrefix: "${prefix}Platon");
           // Wait for all users created
-          await Future.delayed(const Duration(seconds: 12));
+          await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
           final contacts =
               await kc2Service.getContacts(prefix, fromIndex: 1, limit: 1);
