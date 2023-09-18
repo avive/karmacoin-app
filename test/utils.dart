@@ -6,7 +6,6 @@ import 'package:karma_coin/logic/identity.dart';
 import 'package:karma_coin/logic/identity_interface.dart';
 import 'package:karma_coin/logic/user.dart';
 import 'package:karma_coin/logic/verifier.dart';
-import 'package:karma_coin/services/v2.0/types.dart';
 import 'package:karma_coin/services/v2.0/user_info.dart';
 
 final random = Random.secure();
@@ -65,7 +64,7 @@ Future<TestUserInfo> createTestUser(
   IdentityInterface user = Identity();
   await user.initNoStorage();
   String userName =
-      "$usernamePrefix${user.accountId.substring(0, 5)}".toLowerCase();
+      "$usernamePrefix${user.accountId.substring(0, 10)}".toLowerCase();
 
   phoneNumber ??= randomPhoneNumber;
 
