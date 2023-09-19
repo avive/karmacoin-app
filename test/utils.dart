@@ -15,7 +15,8 @@ String get randomPhoneNumber => '+${(random.nextInt(900000) + 100000)}';
 /// Wait 1 block until this user is signed up
 Future<KC2User> createLocalAppUser(String? phoneNumber) async {
   if (!kc2Service.connectedToApi) {
-    await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+    await configLogic.init();
+    await kc2Service.connectToApi(apiWsUrl: configLogic.kc2ApiUrl);
   }
 
   KC2User user = KC2User();
@@ -56,7 +57,8 @@ Future<TestUserInfo> createTestUser(
     String? usernamePrefix,
     String? phoneNumber}) async {
   if (!kc2Service.connectedToApi) {
-    await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+    await configLogic.init();
+    await kc2Service.connectToApi(apiWsUrl: configLogic.kc2ApiUrl);
   }
 
   usernamePrefix ??= 'katya';

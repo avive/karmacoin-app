@@ -31,7 +31,8 @@ void main() {
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
         TestUserInfo punch = await createTestUser(completer: completer);
-        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+        await Future.delayed(
+            Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Set katya as signer
         kc2Service.setKeyring(katya.user.keyring);
@@ -84,14 +85,15 @@ void main() {
     );
 
     test(
-      'Karma Reward for 2 received appreciations',
+      'Karma for appreciations',
       () async {
         K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
         TestUserInfo punch = await createTestUser(completer: completer);
-        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+        await Future.delayed(
+            Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         final BigInt karmaRewardsAmount = BigInt.from(10000000);
 
@@ -120,7 +122,9 @@ void main() {
             BigInt balance = info!.balance;
 
             debugPrint('>> waiting for 6 blocks for karma reward...');
-            Future.delayed(Duration(seconds: 6 * kc2Service.expectedBlockTimeSeconds), () async {
+            Future.delayed(
+                Duration(seconds: 6 * kc2Service.expectedBlockTimeSeconds),
+                () async {
               KC2UserInfo? info = await kc2Service
                   .getUserInfoByUserName(punch.userInfo!.userName);
               if (info!.balance == balance + karmaRewardsAmount) {

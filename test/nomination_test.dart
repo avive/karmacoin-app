@@ -39,12 +39,11 @@ void main() {
         // todo: delete all pools so a pool can be created w/o an error on any chain, and add a test for creating a pool when pools are maxed out and verify create fails
 
         KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
-        // Connect to the chain
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
-        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+        await Future.delayed(
+            Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Test utils
         String txHash = "";
@@ -140,13 +139,12 @@ void main() {
       'join pool',
       () async {
         KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
-        // Connect to the chain
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
         TestUserInfo punch = await createTestUser(completer: completer);
-        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+        await Future.delayed(
+            Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Test utils
         Timer? blocksProcessingTimer;
@@ -243,8 +241,6 @@ void main() {
       'leave pool',
       () async {
         KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
-        // Connect to the chain
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
@@ -323,7 +319,8 @@ void main() {
 
           // step 1 - punch unbounds all pimts
           debugPrint('Calling unbound...');
-          txHash = await kc2Service.unbond(punch.accountId, punchPoolMember.points);
+          txHash =
+              await kc2Service.unbond(punch.accountId, punchPoolMember.points);
         };
 
         kc2Service.unbondPoolCallback = (tx) async {
@@ -336,15 +333,14 @@ void main() {
             return;
           }
 
-          PoolMember? punchPoolMember = await kc2Service.getMembershipPool(punch.accountId);
+          PoolMember? punchPoolMember =
+              await kc2Service.getMembershipPool(punch.accountId);
           expect(punchPoolMember, isNotNull);
           expect(punchPoolMember!.points, BigInt.zero);
 
           // step 2 - wait 1 era and call withdraw unbound
-          debugPrint(
-              'Waiting 1 era... ${kc2Service.eraTimeSeconds} seconds');
-          await Future.delayed(
-              Duration(seconds: kc2Service.eraTimeSeconds));
+          debugPrint('Waiting 1 era... ${kc2Service.eraTimeSeconds} seconds');
+          await Future.delayed(Duration(seconds: kc2Service.eraTimeSeconds));
           debugPrint('Calling withdraw unbound...');
           txHash = await kc2Service.withdrawUnbonded(punch.accountId);
         };
@@ -359,11 +355,12 @@ void main() {
             return;
           }
 
-          PoolMember? punchPoolMember = await kc2Service.getMembershipPool(punch.accountId);
+          PoolMember? punchPoolMember =
+              await kc2Service.getMembershipPool(punch.accountId);
           expect(punchPoolMember, isNull,
               reason: 'expected punch to be removed from pool');
           KC2UserInfo? info =
-          await kc2Service.getUserInfoByAccountId(punch.accountId);
+              await kc2Service.getUserInfoByAccountId(punch.accountId);
           expect(balance, isNotNull);
           expect(info!.balance == balance! + bondAmount, isTrue,
               reason: 'Expected refund');
@@ -398,12 +395,11 @@ void main() {
       'set pool commission',
       () async {
         KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
-        // Connect to the chain
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
-        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+        await Future.delayed(
+            Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Test utils
         String txHash = "";
@@ -481,12 +477,11 @@ void main() {
       'set pool max commission',
       () async {
         KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
-        // Connect to the chain
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
-        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+        await Future.delayed(
+            Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Test utils
         String txHash = "";
@@ -563,12 +558,11 @@ void main() {
       'set commission change rate',
       () async {
         KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
-        // Connect to the chain
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
-        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+        await Future.delayed(
+            Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Test utils
         String txHash = "";
@@ -649,8 +643,6 @@ void main() {
       'update roles',
       () async {
         KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
-        // Connect to the chain
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
@@ -740,8 +732,6 @@ void main() {
       'nomination',
       () async {
         KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
-        // Connect to the chain
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
@@ -824,7 +814,8 @@ void main() {
       () async {
         KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
         // Connect to the chain
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+        await configLogic.init();
+        await kc2Service.connectToApi(apiWsUrl: configLogic.kc2ApiUrl);
         await kc2Service.getPoolsConfiguration();
       },
       timeout: const Timeout(Duration(seconds: 280)),
@@ -834,12 +825,11 @@ void main() {
       'unbond works',
       () async {
         KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
-        // Connect to the chain
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
-        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+        await Future.delayed(
+            Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Test utils
         String txHash = "";
@@ -907,13 +897,12 @@ void main() {
       'reward works',
       () async {
         KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
-        // Connect to the chain
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         final completer = Completer<bool>();
         TestUserInfo poolOwner = await createTestUser(completer: completer);
         TestUserInfo poolMember = await createTestUser(completer: completer);
-        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+        await Future.delayed(
+            Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Test utils
         Timer? blocksProcessingTimer;
@@ -960,8 +949,7 @@ void main() {
               orElse: () => fail('pool not found'));
 
           // Nominate nominator
-          txHash =
-              await kc2Service.nominateForPool(pool.id, [alice.accountId]);
+          txHash = await kc2Service.nominateForPool(pool.id, [alice.accountId]);
         };
 
         kc2Service.nominatePoolValidatorCallback = (tx) async {
@@ -984,7 +972,8 @@ void main() {
           // Wait for an 2 eras to pool became active nominator
           // first era to be elected by election system
           // second era to became active nominator
-          await Future.delayed(Duration(seconds: 2 * kc2Service.eraTimeSeconds));
+          await Future.delayed(
+              Duration(seconds: 2 * kc2Service.eraTimeSeconds));
 
           // Set pool member keys
           kc2Service.setKeyring(poolMember.user.keyring);
@@ -1019,14 +1008,16 @@ void main() {
           expect(poolMembership!.id, tx.poolId);
 
           // Wait for an era to pass
-          await Future.delayed(Duration(seconds: 2 * kc2Service.eraTimeSeconds));
+          await Future.delayed(
+              Duration(seconds: 2 * kc2Service.eraTimeSeconds));
 
           // Now validator should claim rewards
           final blockchainStats = await kc2Service.getBlockchainStats();
           // In devnet one era is 10 blocks
           final currentEra = blockchainStats.tipHeight / 10;
           // Pay out rewards for the previous era
-          txHash = await kc2Service.stakingPayoutStakers(alice.accountId, currentEra.toInt() - 1);
+          txHash = await kc2Service.stakingPayoutStakers(
+              alice.accountId, currentEra.toInt() - 1);
         };
 
         kc2Service.stakingPayoutStakersCallback = (tx) async {
@@ -1041,8 +1032,10 @@ void main() {
             return;
           }
 
-          final poolOwnerPendingPayout = await kc2Service.getPendingPoolPayout(poolOwner.accountId);
-          final poolMemberPendingPayout = await kc2Service.getPendingPoolPayout(poolMember.accountId);
+          final poolOwnerPendingPayout =
+              await kc2Service.getPendingPoolPayout(poolOwner.accountId);
+          final poolMemberPendingPayout =
+              await kc2Service.getPendingPoolPayout(poolMember.accountId);
 
           expect(poolOwnerPendingPayout, isNot(BigInt.zero));
           expect(poolMemberPendingPayout, isNot(BigInt.zero));
@@ -1062,8 +1055,9 @@ void main() {
             return;
           }
 
-          final userInfo = await kc2Service.getUserInfoByAccountId(poolMember.accountId);
-          expect(poolMember.userInfo!.balance <  userInfo!.balance, isTrue);
+          final userInfo =
+              await kc2Service.getUserInfoByAccountId(poolMember.accountId);
+          expect(poolMember.userInfo!.balance < userInfo!.balance, isTrue);
 
           completer.complete(true);
         };

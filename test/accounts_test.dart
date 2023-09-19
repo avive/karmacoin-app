@@ -23,7 +23,8 @@ void main() {
       'Signup new user',
       () async {
         K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+        await configLogic.init();
+        await kc2Service.connectToApi(apiWsUrl: configLogic.kc2ApiUrl);
 
         // Create a new identity for local user
         final completer = Completer<bool>();
@@ -104,7 +105,6 @@ void main() {
       'Update user phone number',
       () async {
         K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         // Create a new identity for local user
         final completer = Completer<bool>();
@@ -199,7 +199,6 @@ void main() {
       'Update user name',
       () async {
         K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         // Create a new identity for local user
         final completer = Completer<bool>();
@@ -295,14 +294,15 @@ void main() {
       'Signup with a used user name',
       () async {
         K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         // Create a new identity for local user
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
-        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+        await Future.delayed(
+            Duration(seconds: kc2Service.expectedBlockTimeSeconds));
         TestUserInfo punch = await createTestUser(completer: completer);
-        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+        await Future.delayed(
+            Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // remove appreciation callback which is getting called right now in case of appreciation sent with charTrait == 0
         kc2Service.appreciationCallback = null;

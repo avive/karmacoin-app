@@ -42,7 +42,7 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
   final _localUserName = kc2User.userInfo.value?.userName;
   final _localUserPhoneNumberHash = kc2User.userInfo.value?.phoneNumberHash;
   String _searchTerm = '';
-  PagingStatus _pagingStatus = PagingStatus.loadingFirstPage;
+  // PagingStatus _pagingStatus = PagingStatus.loadingFirstPage;
 
   Future<void> _fetchPage(int pageKey) async {
     try {
@@ -97,7 +97,7 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
 
     _pagingController.addStatusListener((status) {
       setState(() {
-        _pagingStatus = status;
+        // _pagingStatus = status;
       });
 
       if (status == PagingStatus.subsequentPageError) {

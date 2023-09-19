@@ -30,7 +30,6 @@ void main() {
         'Transfer via appreciation api',
         () async {
           K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
-          await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
           // Create a new identity for local user
           final completer = Completer<bool>();
@@ -220,8 +219,6 @@ void main() {
             expect(err, isNull);
           };
 
-          await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
-
           // subscribe to new account txs
           blockProcessingTimer =
               kc2Service.subscribeToAccountTransactions(katya.userInfo!);
@@ -325,8 +322,6 @@ void main() {
             expect(punch.newUserTxHash, isNotNull);
             expect(err, isNull);
           };
-
-          await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
           // subscribe to new account txs
           blockProcessingTimer =

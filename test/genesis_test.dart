@@ -20,7 +20,8 @@ void main() {
       () async {
         K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
         // Connect to the chain
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+        await configLogic.init();
+        await kc2Service.connectToApi(apiWsUrl: configLogic.kc2ApiUrl);
 
         String netId = await kc2Service.getNetName();
 
@@ -32,7 +33,8 @@ void main() {
     test('char traits exists on genesis', () async {
       K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
       // Connect to the chain
-      await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+      await configLogic.init();
+      await kc2Service.connectToApi(apiWsUrl: configLogic.kc2ApiUrl);
 
       List<CharTrait> traits = await kc2Service.getCharTraits();
 
@@ -46,7 +48,8 @@ void main() {
     test('rewards exists on genesis', () async {
       K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
       // Connect to the chain
-      await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+      await configLogic.init();
+      await kc2Service.connectToApi(apiWsUrl: configLogic.kc2ApiUrl);
 
       BlockchainStats blockchainStats = await kc2Service.getBlockchainStats();
 

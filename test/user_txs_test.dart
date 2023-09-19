@@ -26,13 +26,10 @@ void main() {
     test(
       'Referral tx flow',
       () async {
-        // connect before creating a user
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
-
         final completer = Completer<bool>();
-
         TestUserInfo katya = await createTestUser(completer: completer);
-        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+        await Future.delayed(
+            Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Set katya as signer
         kc2Service.setKeyring(katya.user.keyring);
@@ -40,7 +37,8 @@ void main() {
 
         String punchPhoneNumber = randomPhoneNumber;
 
-        debugPrint("Sending appreciation from katya to punch's phone number...");
+        debugPrint(
+            "Sending appreciation from katya to punch's phone number...");
 
         // Send appreciation from katya to punch before punch signed up
         // so it goes to the pool
@@ -50,14 +48,16 @@ void main() {
             0,
             64);
 
-        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+        await Future.delayed(
+            Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // clear secure storage
         FlutterSecureStorage.setMockInitialValues({});
 
         debugPrint('Signing up punch user...');
         KC2User punch = await createLocalAppUser(punchPhoneNumber);
-        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+        await Future.delayed(
+            Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         await punch.getUserDataFromChain();
 
@@ -78,7 +78,8 @@ void main() {
         await kc2Service.sendTransfer(katya.accountId, BigInt.from(12345));
 
         debugPrint('waiting for 1 block and checking txs...');
-        Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds), () async {
+        Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds),
+            () async {
           expect(punch.incomingAppreciations.value.length, 1);
           expect(punch.outgoingAppreciations.value.length, 2);
 

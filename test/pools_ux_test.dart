@@ -28,8 +28,6 @@ void main() {
         // create several pools to test ui listing
 
         KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
-        // Connect to the chain
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
 
         // Create a new identity for local user
         final completer = Completer<bool>();

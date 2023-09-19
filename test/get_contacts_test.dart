@@ -22,8 +22,6 @@ void main() {
       test(
         'get contacts',
         () async {
-          await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
-
           // Allow to run this test multiply times on same chain
           String prefix = randomPhoneNumber.substring(0, 5).toLowerCase();
           final completer = Completer<bool>();
@@ -36,7 +34,8 @@ void main() {
           TestUserInfo platon = await createTestUser(
               completer: completer, usernamePrefix: "${prefix}Platon");
           // Wait for all users created
-          await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+          await Future.delayed(
+              Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
           debugPrint('Getting contacts...');
           List<Contact> contacts = await kc2Service.getContacts('${prefix}to');
@@ -66,8 +65,6 @@ void main() {
       test(
         'pagination',
         () async {
-          await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
-
           // Allow to run this test multiply times on same chain
           String prefix = randomPhoneNumber.substring(0, 5);
           final completer = Completer<bool>();
@@ -80,7 +77,8 @@ void main() {
           await createTestUser(
               completer: completer, usernamePrefix: "${prefix}Platon");
           // Wait for all users created
-          await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+          await Future.delayed(
+              Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
           final contacts =
               await kc2Service.getContacts(prefix, fromIndex: 1, limit: 1);

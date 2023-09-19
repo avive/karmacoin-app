@@ -31,7 +31,8 @@ void main() {
       'Signup user',
       () async {
         // connect before creating a user
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+        await configLogic.init();
+        await kc2Service.connectToApi(apiWsUrl: configLogic.kc2ApiUrl);
 
         KC2UserInteface katya = KC2User();
         await katya.init();
@@ -101,7 +102,8 @@ void main() {
       'Update user name',
       () async {
         // connect before creating a user
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+        await configLogic.init();
+        await kc2Service.connectToApi(apiWsUrl: configLogic.kc2ApiUrl);
 
         KC2UserInteface katya = KC2User();
         await katya.init();
@@ -178,7 +180,8 @@ void main() {
       'Update phone number',
       () async {
         // connect before creating a user
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+        await configLogic.init();
+        await kc2Service.connectToApi(apiWsUrl: configLogic.kc2ApiUrl);
 
         KC2UserInteface katya = KC2User();
         await katya.init();
@@ -250,7 +253,8 @@ void main() {
       'Migrate user',
       () async {
         // connect before creating a user
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+        await configLogic.init();
+        await kc2Service.connectToApi(apiWsUrl: configLogic.kc2ApiUrl);
 
         KC2UserInteface katya = KC2User();
         await katya.init();
@@ -352,7 +356,8 @@ void main() {
       'Referral reward',
       () async {
         // connect before creating a user
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+        await configLogic.init();
+        await kc2Service.connectToApi(apiWsUrl: configLogic.kc2ApiUrl);
 
         KC2UserInteface katya = KC2User();
         await katya.init();
@@ -451,7 +456,8 @@ void main() {
       'Delete user',
       () async {
         // connect before creating a user
-        await kc2Service.connectToApi(apiWsUrl: 'ws://127.0.0.1:9944');
+        await configLogic.init();
+        await kc2Service.connectToApi(apiWsUrl: configLogic.kc2ApiUrl);
 
         KC2UserInteface katya = KC2User();
         await katya.init();
@@ -486,7 +492,9 @@ void main() {
               debugPrint('Deleting katya user and waiting for 1 block...');
               await kc2Service.deleteUser();
 
-              Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds), () async {
+              Future.delayed(
+                  Duration(seconds: kc2Service.expectedBlockTimeSeconds),
+                  () async {
                 // check there's no user info for katya
                 KC2UserInfo? info = await kc2Service
                     .getUserInfoByAccountId(katyaInfo!.accountId);
