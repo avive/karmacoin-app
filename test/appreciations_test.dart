@@ -25,9 +25,7 @@ void main() {
       'Basic appreciation',
       () async {
         debugPrint('Appreciation test');
-
         K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
-
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
         TestUserInfo punch = await createTestUser(completer: completer);
@@ -40,7 +38,6 @@ void main() {
 
         // subscribe to new account txs
         kc2Service.subscribeToAccountTransactions(katya.userInfo!);
-
         String appreciationTxHash = "";
 
         kc2Service.subscribeToAccountTransactions(punch.userInfo!);
@@ -88,12 +85,11 @@ void main() {
       'Karma for appreciations',
       () async {
         K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
-
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
         TestUserInfo punch = await createTestUser(completer: completer);
         await Future.delayed(
-            Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+            Duration(seconds: kc2Service.expectedBlockTimeSeconds + 1));
 
         final BigInt karmaRewardsAmount = BigInt.from(10000000);
 
@@ -123,15 +119,13 @@ void main() {
 
             debugPrint('>> waiting for 6 blocks for karma reward...');
             Future.delayed(
-                Duration(seconds: 6 * kc2Service.expectedBlockTimeSeconds),
+                Duration(seconds: 6 * kc2Service.expectedBlockTimeSeconds + 2),
                 () async {
               KC2UserInfo? info = await kc2Service
                   .getUserInfoByUserName(punch.userInfo!.userName);
-              if (info!.balance == balance + karmaRewardsAmount) {
-                completer.complete(true);
-              } else {
-                completer.complete(false);
-              }
+              expect(info!.balance, balance + karmaRewardsAmount,
+                  reason: 'Unexpectged balance');
+              completer.complete(true);
             });
           }
         };
