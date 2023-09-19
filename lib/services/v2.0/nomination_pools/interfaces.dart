@@ -95,7 +95,8 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   ///
   Future<String> claimPayout() async {
     try {
-      const call = MapEntry('NominationPools', MapEntry('claim_payout', <String, dynamic>{}));
+      const call = MapEntry(
+          'NominationPools', MapEntry('claim_payout', <String, dynamic>{}));
 
       return await signAndSendTransaction(call);
     } catch (e) {
@@ -453,10 +454,10 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   /// Returns the pending rewards in coins units for the member that the AccountId was given for.
   Future<BigInt> getPendingPoolPayout(String accountId) async {
     try {
-      return await callRpc('nominationPools_pendingRewards', [accountId]).then(
-          (payout) => BigInt.from(payout));
-    } on PlatformException catch (e) {
-      debugPrint('Failed to get pending payouts: ${e.details}');
+      return await callRpc('nominationPools_pendingRewards', [accountId])
+          .then((payout) => payout is num ? BigInt.from(payout) : BigInt.zero);
+    } catch (e) {
+      debugPrint('Failed to get pending payouts: $e');
       rethrow;
     }
   }
