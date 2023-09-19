@@ -59,7 +59,9 @@ void main() {
 
           // Check if the tx failed
           if (tx.chainError != null) {
-            completer.complete(false);
+            completer.completeError(
+                'create pool tx error ${tx.chainError!.description}');
+
             return;
           }
 
@@ -165,7 +167,9 @@ void main() {
 
           // Check if the tx failed
           if (tx.chainError != null) {
-            completer.complete(false);
+            completer.completeError(
+                'create pool tx error ${tx.chainError!.description}');
+
             return;
           }
 
@@ -193,7 +197,9 @@ void main() {
 
           // Check if the tx failed
           if (tx.chainError != null) {
-            completer.complete(false);
+            completer.completeError(
+                'join pool tx error ${tx.chainError!.description}');
+
             return;
           }
 
@@ -272,8 +278,8 @@ void main() {
 
           // Check if the tx failed
           if (tx.chainError != null) {
-            completer.complete(false);
-            return;
+            completer.completeError(
+                'create pool tx error ${tx.chainError!.description}');
           }
 
           // Find pool id
@@ -300,7 +306,8 @@ void main() {
 
           // Check if the tx failed
           if (tx.chainError != null) {
-            completer.complete(false);
+            completer.completeError(
+                'join pool tx error ${tx.chainError!.description}');
             return;
           }
 
@@ -337,7 +344,9 @@ void main() {
           }
           // Check if the tx failed
           if (tx.chainError != null) {
-            completer.complete(false);
+            completer.completeError(
+                'join pool tx error ${tx.chainError!.description}');
+
             return;
           }
 
@@ -359,7 +368,8 @@ void main() {
           }
           // Check if the tx failed
           if (tx.chainError != null) {
-            completer.complete(false);
+            completer.completeError(
+                'join pool tx error ${tx.chainError!.description}');
             return;
           }
 
@@ -424,7 +434,9 @@ void main() {
 
           // Check if the tx failed
           if (tx.chainError != null) {
-            completer.complete(false);
+            completer.completeError(
+                'create pool tx error ${tx.chainError!.description}');
+
             return;
           }
 
@@ -448,7 +460,9 @@ void main() {
 
           // Check if the tx failed
           if (tx.chainError != null) {
-            completer.complete(false);
+            completer.completeError(
+                'set pool commision tx error ${tx.chainError!.description}');
+
             return;
           }
 
@@ -509,7 +523,8 @@ void main() {
           }
 
           if (tx.chainError != null) {
-            completer.complete(false);
+            completer.completeError(
+                'create pool tx error ${tx.chainError!.description}');
             return;
           }
 
@@ -593,7 +608,8 @@ void main() {
 
           // Check if the tx failed
           if (tx.chainError != null) {
-            completer.complete(false);
+            completer.completeError(
+                'create pool tx error ${tx.chainError!.description}');
             return;
           }
 
@@ -619,7 +635,8 @@ void main() {
 
           // Check if the tx failed
           if (tx.chainError != null) {
-            completer.complete(false);
+            completer.completeError(
+                'set pool commision tx error ${tx.chainError!.description}');
             return;
           }
 
@@ -680,7 +697,8 @@ void main() {
 
           // Check if the tx failed
           if (tx.chainError != null) {
-            completer.complete(false);
+            completer.completeError(
+                'create pool tx error ${tx.chainError!.description}');
             return;
           }
 
@@ -710,7 +728,9 @@ void main() {
 
           // Check if the tx failed
           if (tx.chainError != null) {
-            completer.complete(false);
+            completer.completeError(
+                'update roles tx error ${tx.chainError!.description}');
+
             return;
           }
 
@@ -774,7 +794,8 @@ void main() {
 
           // Check if the tx failed
           if (tx.chainError != null) {
-            completer.complete(false);
+            completer.completeError(
+                'create pool tx error ${tx.chainError!.description}');
             return;
           }
 
@@ -800,7 +821,9 @@ void main() {
 
           // Check if the tx failed
           if (tx.chainError != null) {
-            completer.complete(false);
+            completer.completeError(
+                'mominate pool validator tx error ${tx.chainError!.description}');
+
             return;
           }
 
@@ -882,7 +905,8 @@ void main() {
 
           // Check if the tx failed
           if (tx.chainError != null) {
-            completer.complete(false);
+            completer.completeError(
+                'create pool tx error ${tx.chainError!.description}');
             return;
           }
 
@@ -900,7 +924,8 @@ void main() {
 
           // Check if the tx failed
           if (tx.chainError != null) {
-            completer.complete(false);
+            completer.completeError(
+                'unbound pool tx error ${tx.chainError!.description}');
             return;
           }
 
@@ -970,7 +995,8 @@ void main() {
 
           // Check if the tx failed
           if (tx.chainError != null) {
-            completer.complete(false);
+            completer.completeError(
+                'create pool tx error ${tx.chainError!.description}');
             return;
           }
 
@@ -991,7 +1017,8 @@ void main() {
 
           // Check if the tx failed
           if (tx.chainError != null) {
-            completer.complete(false);
+            completer.completeError(
+                'nominate validator tx error ${tx.chainError!.description}');
             return;
           }
 
@@ -1029,7 +1056,8 @@ void main() {
 
           // Check if the tx failed
           if (tx.chainError != null) {
-            completer.complete(false);
+            completer.completeError(
+                'join pool tx error ${tx.chainError!.description}');
             return;
           }
 
@@ -1059,7 +1087,9 @@ void main() {
 
           // Check if the tx failed
           if (tx.chainError != null) {
-            completer.complete(false);
+            completer.completeError(
+                'staking payout tx error ${tx.chainError!.description}');
+
             return;
           }
 
@@ -1082,7 +1112,8 @@ void main() {
 
           // Check if the tx failed
           if (tx.chainError != null) {
-            completer.complete(false);
+            completer.completeError(
+                'claim payout tx error ${tx.chainError!.description}');
             return;
           }
 
