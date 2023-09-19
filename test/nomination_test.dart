@@ -1072,6 +1072,7 @@ void main() {
 
           // Now validator should claim rewards
           final blockchainStats = await kc2Service.getBlockchainStats();
+
           // In devnet one era is 10 blocks
           final currentEra = blockchainStats.tipHeight / 10;
           // Pay out rewards for the previous era

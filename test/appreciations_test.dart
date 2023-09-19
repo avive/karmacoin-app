@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:karma_coin/common_libs.dart';
+import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/logic/app_state.dart';
 import 'package:karma_coin/logic/verifier.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
@@ -88,10 +89,21 @@ void main() {
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
         TestUserInfo punch = await createTestUser(completer: completer);
+
+        final blockchainStats = await kc2Service.getBlockchainStats();
+
         await Future.delayed(
             Duration(seconds: kc2Service.expectedBlockTimeSeconds + 1));
 
-        final BigInt karmaRewardsAmount = BigInt.from(10000000);
+        final BigInt karmaRewardsAmount =
+            blockchainStats.karmaRewardsCurrentRewardAmount;
+
+        expect(
+            karmaRewardsAmount, BigInt.from(100 * GenesisConfig.kCentsPerCoin),
+            reason: 'Unexpected karma rewards amount');
+
+        debugPrint(
+            'exepcted karma rewards amount: ${karmaRewardsAmount.toString()}');
 
         int txsCount = 0;
         String appreciation1TxHash = "";
@@ -104,7 +116,8 @@ void main() {
           }
 
           if (tx.chainError != null) {
-            completer.complete(false);
+            completer.completeError(
+                'appreciation failed ${tx.chainError!.description}');
             return;
           }
 
