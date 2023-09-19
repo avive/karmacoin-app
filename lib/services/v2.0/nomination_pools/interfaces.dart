@@ -465,9 +465,10 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   /// Returns the equivalent balance of `points` for pools.
   Future<BigInt> getPoolsPointsToBalance(PoolId poolId, BigInt points) async {
     try {
-      return await callRpc(
-              'nominationPools_pointsToBalance', [poolId, points.toInt()])
-          .then((balance) => BigInt.from(balance));
+      return await callRpc('nominationPools_pointsToBalance', [
+        poolId,
+        points.toInt()
+      ]).then((balance) => balance is num ? BigInt.from(balance) : BigInt.zero);
     } catch (e) {
       debugPrint('Failed to get balance from points: $e');
       rethrow;
@@ -479,7 +480,7 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
     try {
       return await callRpc(
               'nominationPools_balanceToPoints', [poolId, balance.toInt()])
-          .then((points) => BigInt.from(points));
+          .then((points) => points is num ? BigInt.from(points) : BigInt.zero);
     } catch (e) {
       debugPrint('Failed to get points from balance: $e');
       rethrow;

@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/logic/identity.dart';
 import 'package:karma_coin/logic/identity_interface.dart';
 import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
@@ -42,6 +41,9 @@ void main() {
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
+        NominationPoolsConfiguration conf =
+            await (kc2Service).getPoolsConfiguration();
+
         await Future.delayed(
             Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
@@ -77,7 +79,7 @@ void main() {
           expect(pool.commission.changeRate, null);
           expect(pool.commission.throttleFrom, null);
           expect(pool.memberCounter, 1);
-          expect(pool.points, GenesisConfig.kCentsPerCoinBigInt);
+          expect(pool.points, conf.minCreateBond);
           expect(pool.roles.root, katya.accountId);
           expect(pool.roles.nominator, katya.accountId);
           expect(pool.roles.bouncer, katya.accountId);
@@ -88,7 +90,7 @@ void main() {
               await kc2Service.getMembershipPool(katya.accountId);
           expect(poolMember, isNotNull);
           expect(poolMember!.id, pool.id);
-          expect(poolMember.points, BigInt.from(1000000));
+          expect(poolMember.points, conf.minCreateBond);
 
           // verify Punch is not a pool member of any pool
           IdentityInterface punch = Identity();
@@ -106,8 +108,8 @@ void main() {
           final pointsToBalance = await kc2Service.getPoolsPointsToBalance(
               pool.id, poolMember.points);
           final balanceToPoints = await kc2Service.getPoolsBalanceToPoints(
-              pool.id, BigInt.from(1000000));
-          expect(pointsToBalance, BigInt.from(1000000));
+              pool.id, conf.minCreateBond);
+          expect(pointsToBalance, conf.minCreateBond);
           expect(balanceToPoints, poolMember.points);
 
           completer.complete(true);
@@ -117,7 +119,7 @@ void main() {
 
         // Create a pool
         txHash = await kc2Service.createPool(
-          amount: GenesisConfig.kCentsPerCoinBigInt,
+          amount: conf.minCreateBond,
           root: katya.accountId,
           nominator: katya.accountId,
           bouncer: katya.accountId,
@@ -143,6 +145,10 @@ void main() {
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
         TestUserInfo punch = await createTestUser(completer: completer);
+
+        NominationPoolsConfiguration conf =
+            await (kc2Service).getPoolsConfiguration();
+
         await Future.delayed(
             Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
@@ -177,7 +183,7 @@ void main() {
           // Punch join the pool
           kc2Service.setKeyring(punch.user.keyring);
           txHash = await kc2Service.joinPool(
-              amount: BigInt.from(1000000), poolId: poolId);
+              amount: conf.minJoinBond, poolId: poolId);
         };
 
         kc2Service.joinPoolCallback = (tx) async {
@@ -195,11 +201,11 @@ void main() {
           final alicePoolMember =
               await kc2Service.getMembershipPool(katya.accountId);
           expect(alicePoolMember!.id, tx.poolId);
-          expect(alicePoolMember.points, GenesisConfig.kCentsPerCoinBigInt);
+          expect(alicePoolMember.points, conf.minCreateBond);
           final bobPoolMember =
               await kc2Service.getMembershipPool(punch.accountId);
           expect(bobPoolMember!.id, tx.poolId);
-          expect(bobPoolMember.points, BigInt.from(1000000));
+          expect(bobPoolMember.points, conf.minJoinBond);
 
           final poolMembers = await kc2Service.getPoolMembers(tx.poolId);
           expect(poolMembers.length, 2);
@@ -219,7 +225,7 @@ void main() {
         kc2Service.setKeyring(katya.user.keyring);
         // Create a pool
         txHash = await kc2Service.createPool(
-            amount: GenesisConfig.kCentsPerCoinBigInt,
+            amount: conf.minCreateBond,
             root: katya.accountId,
             nominator: katya.accountId,
             bouncer: katya.accountId);
@@ -245,6 +251,10 @@ void main() {
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
         TestUserInfo punch = await createTestUser(completer: completer);
+
+        NominationPoolsConfiguration conf =
+            await (kc2Service).getPoolsConfiguration();
+
         await Future.delayed(
             Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
@@ -252,8 +262,6 @@ void main() {
         Timer? blocksProcessingTimer;
         String txHash = "";
         BigInt? balance;
-
-        final bondAmount = BigInt.from(1000000);
 
         // Create pool callback
         kc2Service.createPoolCallback = (tx) async {
@@ -281,8 +289,8 @@ void main() {
               kc2Service.subscribeToAccountTransactions(punch.userInfo!);
           // Punch join the pool
           kc2Service.setKeyring(punch.user.keyring);
-          txHash =
-              await kc2Service.joinPool(amount: bondAmount, poolId: poolId);
+          txHash = await kc2Service.joinPool(
+              amount: conf.minJoinBond, poolId: poolId);
         };
 
         kc2Service.joinPoolCallback = (tx) async {
@@ -300,12 +308,12 @@ void main() {
           final katyaPoolMember =
               await kc2Service.getMembershipPool(katya.accountId);
           expect(katyaPoolMember!.id, tx.poolId);
-          expect(katyaPoolMember.points, GenesisConfig.kCentsPerCoinBigInt);
+          expect(katyaPoolMember.points, conf.minCreateBond);
           PoolMember? punchPoolMember =
               await kc2Service.getMembershipPool(punch.accountId);
           expect(punchPoolMember, isNotNull);
           expect(punchPoolMember!.id, tx.poolId);
-          expect(punchPoolMember.points, bondAmount);
+          expect(punchPoolMember.points, conf.minJoinBond);
 
           final poolMembers = await kc2Service.getPoolMembers(tx.poolId);
           expect(poolMembers.length, 2);
@@ -336,7 +344,7 @@ void main() {
           PoolMember? punchPoolMember =
               await kc2Service.getMembershipPool(punch.accountId);
           expect(punchPoolMember, isNotNull);
-          expect(punchPoolMember!.points, BigInt.zero);
+          expect(punchPoolMember!.points, conf.minJoinBond);
 
           // step 2 - wait 1 era and call withdraw unbound
           debugPrint('Waiting 1 era... ${kc2Service.eraTimeSeconds} seconds');
@@ -362,7 +370,7 @@ void main() {
           KC2UserInfo? info =
               await kc2Service.getUserInfoByAccountId(punch.accountId);
           expect(balance, isNotNull);
-          expect(info!.balance == balance! + bondAmount, isTrue,
+          expect(info!.balance == balance! + conf.minJoinBond, isTrue,
               reason: 'Expected refund');
 
           completer.complete(true);
@@ -374,7 +382,7 @@ void main() {
 
         // Create a pool
         txHash = await kc2Service.createPool(
-            amount: GenesisConfig.kCentsPerCoinBigInt,
+            amount: conf.minCreateBond,
             root: katya.accountId,
             nominator: katya.accountId,
             bouncer: katya.accountId);
@@ -398,6 +406,10 @@ void main() {
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
+
+        NominationPoolsConfiguration conf =
+            await (kc2Service).getPoolsConfiguration();
+
         await Future.delayed(
             Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
@@ -455,7 +467,7 @@ void main() {
 
         // Create a pool
         txHash = await kc2Service.createPool(
-          amount: GenesisConfig.kCentsPerCoinBigInt,
+          amount: conf.minCreateBond,
           root: katya.accountId,
           nominator: katya.accountId,
           bouncer: katya.accountId,
@@ -480,6 +492,9 @@ void main() {
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
+        NominationPoolsConfiguration conf =
+            await (kc2Service).getPoolsConfiguration();
+
         await Future.delayed(
             Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
@@ -536,7 +551,7 @@ void main() {
 
         // Create a pool
         txHash = await kc2Service.createPool(
-          amount: GenesisConfig.kCentsPerCoinBigInt,
+          amount: conf.minCreateBond,
           root: katya.accountId,
           nominator: katya.accountId,
           bouncer: katya.accountId,
@@ -561,6 +576,9 @@ void main() {
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
+        NominationPoolsConfiguration conf =
+            await (kc2Service).getPoolsConfiguration();
+
         await Future.delayed(
             Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
@@ -620,7 +638,7 @@ void main() {
 
         // Create a pool
         txHash = await kc2Service.createPool(
-          amount: GenesisConfig.kCentsPerCoinBigInt,
+          amount: conf.minCreateBond,
           root: katya.accountId,
           nominator: katya.accountId,
           bouncer: katya.accountId,
@@ -647,6 +665,9 @@ void main() {
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
         TestUserInfo punch = await createTestUser(completer: completer);
+
+        NominationPoolsConfiguration conf =
+            await (kc2Service).getPoolsConfiguration();
 
         // Test utils
         String txHash = "";
@@ -711,7 +732,7 @@ void main() {
         kc2Service.setKeyring(katya.user.keyring);
         // Create a pool
         txHash = await kc2Service.createPool(
-          amount: GenesisConfig.kCentsPerCoinBigInt,
+          amount: conf.minCreateBond,
           root: katya.accountId,
           nominator: katya.accountId,
           bouncer: katya.accountId,
@@ -735,6 +756,10 @@ void main() {
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
+
+        NominationPoolsConfiguration conf =
+            await (kc2Service).getPoolsConfiguration();
+
         await createTestUser(completer: completer);
 
         // Test utils
@@ -796,7 +821,7 @@ void main() {
         kc2Service.setKeyring(katya.user.keyring);
         // Create a pool
         txHash = await kc2Service.createPool(
-          amount: BigInt.from(1000000),
+          amount: conf.minCreateBond,
           root: katya.accountId,
           nominator: katya.accountId,
           bouncer: katya.accountId,
@@ -828,6 +853,9 @@ void main() {
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
+        NominationPoolsConfiguration conf =
+            await (kc2Service).getPoolsConfiguration();
+
         await Future.delayed(
             Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
@@ -839,7 +867,7 @@ void main() {
 
         // Create a pool
         txHash = await kc2Service.createPool(
-          amount: BigInt.from(2) * GenesisConfig.kCentsPerCoinBigInt,
+          amount: conf.minCreateBond,
           root: katya.accountId,
           nominator: katya.accountId,
           bouncer: katya.accountId,
@@ -878,7 +906,7 @@ void main() {
 
           final poolMember =
               await kc2Service.getMembershipPool(katya.accountId);
-          expect(poolMember!.points, BigInt.from(1000000));
+          expect(poolMember!.points, conf.minCreateBond);
         };
 
         // Wait for completer and verify test success
@@ -901,6 +929,9 @@ void main() {
         final completer = Completer<bool>();
         TestUserInfo poolOwner = await createTestUser(completer: completer);
         TestUserInfo poolMember = await createTestUser(completer: completer);
+        NominationPoolsConfiguration conf =
+            await (kc2Service).getPoolsConfiguration();
+
         await Future.delayed(
             Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
@@ -924,7 +955,7 @@ void main() {
 
         // Create a pool
         txHash = await kc2Service.createPool(
-          amount: BigInt.from(1000000),
+          amount: conf.minCreateBond,
           root: poolOwner.accountId,
           nominator: poolOwner.accountId,
           bouncer: poolOwner.accountId,
@@ -987,7 +1018,7 @@ void main() {
 
           // Join the pool
           txHash = await kc2Service.joinPool(
-              amount: BigInt.from(1000000), poolId: pool.id);
+              amount: conf.minJoinBond, poolId: pool.id);
         };
 
         kc2Service.joinPoolCallback = (tx) async {
