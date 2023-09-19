@@ -111,20 +111,6 @@ class _KarmaCoinUserSelectorState extends State<KarmaCoinUserSelector> {
     _pagingController.refresh();
   }
 
-  Widget _getBodyContent(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        _getSearchBar(context),
-        CustomScrollView(
-          slivers: <Widget>[
-            _getContactsList(context),
-          ],
-        )
-      ],
-    );
-  }
-
   Widget _getSearchBar(BuildContext context) {
     return SliverToBoxAdapter(
         child: Padding(

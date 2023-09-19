@@ -181,7 +181,6 @@ class _SendWidgetState extends State<SendWidget> {
           kCentsAmount: appState.kCentsAmount.value,
           personalityTrait: GenesisConfig.personalityTraits[0],
           communityId: 0,
-          //destAccountId: appState.sendDestinationAddress.value,
           destPhoneNumberHash: appState.sendDestinationPhoneNumberHash.value,
         );
         break;
