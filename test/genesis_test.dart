@@ -58,13 +58,19 @@ void main() {
       expect(blockchainStats.feeSubsTotalIssuedAmount,
           greaterThanOrEqualTo(BigInt.from(0)));
       expect(blockchainStats.feeSubsCount, greaterThanOrEqualTo(0));
-      expect(blockchainStats.feeSubsCurrentRewardAmount, BigInt.from(1000));
+      expect(blockchainStats.feeSubsCurrentRewardAmount, BigInt.from(10));
 
       expect(blockchainStats.signupRewardsTotalIssuedAmount,
           greaterThanOrEqualTo(BigInt.from(0)));
       expect(blockchainStats.signupRewardsCount, greaterThanOrEqualTo(0));
       expect(blockchainStats.signupRewardsCurrentRewardAmount,
           BigInt.from(10000000));
+
+      expect(blockchainStats.karmaRewardsTotalIssuedAmount,
+          greaterThanOrEqualTo(BigInt.from(0)));
+      expect(blockchainStats.karmaRewardsCount, greaterThanOrEqualTo(0));
+      expect(blockchainStats.karmaRewardsCurrentRewardAmount,
+          BigInt.from(100000000));
 
       expect(blockchainStats.referralRewardsTotalIssuedAmount,
           greaterThanOrEqualTo(BigInt.from(0)));
