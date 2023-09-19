@@ -231,6 +231,10 @@ class _SendWidgetState extends State<SendWidget> {
       appState.sendDestinationPhoneNumberHash.value =
           kc2Service.getPhoneNumberHash('+972$defaultNumber');
     }
+
+    // reset personality trait to no-trait
+    appState.selectedPersonalityTrait.value =
+        GenesisConfig.personalityTraits[0];
   }
 
   @override
