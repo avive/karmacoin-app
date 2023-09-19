@@ -333,7 +333,7 @@ void main() {
           balance = punchInfo!.balance;
 
           // step 1 - punch unbounds all pimts
-          debugPrint('Calling unbound...');
+          debugPrint('Calling unbound... ${punchPoolMember.points}');
           txHash =
               await kc2Service.unbond(punch.accountId, punchPoolMember.points);
         };
@@ -345,7 +345,7 @@ void main() {
           // Check if the tx failed
           if (tx.chainError != null) {
             completer.completeError(
-                'join pool tx error ${tx.chainError!.description}');
+                'unboundd pool tx error ${tx.chainError!.description}');
 
             return;
           }
@@ -353,7 +353,7 @@ void main() {
           PoolMember? punchPoolMember =
               await kc2Service.getMembershipPool(punch.accountId);
           expect(punchPoolMember, isNotNull);
-          expect(punchPoolMember!.points, conf.minJoinBond);
+          expect(punchPoolMember!.points, BigInt.zero);
 
           // step 2 - wait 1 era and call withdraw unbound
           debugPrint('Waiting 1 era... ${kc2Service.eraTimeSeconds} seconds');
@@ -369,7 +369,7 @@ void main() {
           // Check if the tx failed
           if (tx.chainError != null) {
             completer.completeError(
-                'join pool tx error ${tx.chainError!.description}');
+                'withdraw unbound tx error ${tx.chainError!.description}');
             return;
           }
 
@@ -823,7 +823,6 @@ void main() {
           if (tx.chainError != null) {
             completer.completeError(
                 'mominate pool validator tx error ${tx.chainError!.description}');
-
             return;
           }
 
@@ -910,10 +909,8 @@ void main() {
             return;
           }
 
-          txHash =
-              await kc2Service.unbond(katya.accountId, BigInt.from(1000000));
-
-          completer.complete(true);
+          debugPrint('Calling unbound...');
+          txHash = await kc2Service.unbond(katya.accountId, conf.minCreateBond);
         };
 
         kc2Service.unbondPoolCallback = (tx) async {
@@ -931,7 +928,8 @@ void main() {
 
           final poolMember =
               await kc2Service.getMembershipPool(katya.accountId);
-          expect(poolMember!.points, conf.minCreateBond);
+          expect(poolMember!.points, BigInt.zero);
+          completer.complete(true);
         };
 
         // Wait for completer and verify test success
