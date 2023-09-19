@@ -887,6 +887,8 @@ void main() {
         // Subscribe to Katya's transactions
         kc2Service.subscribeToAccountTransactions(katya.userInfo!);
 
+        debugPrint('Creating pool...');
+
         // Create a pool
         txHash = await kc2Service.createPool(
           amount: conf.minCreateBond,

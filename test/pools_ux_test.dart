@@ -32,7 +32,11 @@ void main() {
         // Create a new identity for local user
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
-        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+        NominationPoolsConfiguration conf =
+            await (kc2Service).getPoolsConfiguration();
+
+        await Future.delayed(
+            Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Test utils
         String txHash = "";
@@ -46,7 +50,7 @@ void main() {
 
           // Check if the tx failed
           if (tx.chainError != null) {
-            completer.complete(false);
+            completer.completeError('failed to create pool');
             return;
           }
 
@@ -64,7 +68,7 @@ void main() {
           expect(pool.commission.changeRate, null);
           expect(pool.commission.throttleFrom, null);
           expect(pool.memberCounter, 1);
-          expect(pool.points, GenesisConfig.kCentsPerCoinBigInt);
+          expect(pool.points, conf.minCreateBond);
 
           // we already test this when getting the pull from pools
           // expect(pool.roles.depositor, katya.accountId);
@@ -79,16 +83,17 @@ void main() {
               await kc2Service.getMembershipPool(katya.accountId);
           expect(poolMember, isNotNull);
           expect(poolMember!.id, pool.id);
-          expect(poolMember.points, BigInt.from(1000000));
+          expect(poolMember.points, conf.minCreateBond);
 
           completer.complete(true);
         };
 
         kc2Service.subscribeToAccountTransactions(katya.userInfo!);
 
+        debugPrint('Creating pool...');
         // Create a pool
         txHash = await kc2Service.createPool(
-          amount: GenesisConfig.kCentsPerCoinBigInt,
+          amount: conf.minCreateBond,
           root: katya.accountId,
           nominator: katya.accountId,
           bouncer: katya.accountId,
