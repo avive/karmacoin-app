@@ -122,8 +122,6 @@ class _CreatePoolState extends State<CreatePool> {
   void initState() {
     super.initState();
 
-    // set initial value to 1 KC (todo: take from nomniation pools config)
-    appState.kCentsAmount.value = GenesisConfig.kCentsPerCoinBigInt;
     kc2User.createPoolStatus.value = CreatePoolStatus.unknown;
 
     Future.delayed(Duration.zero, () async {
@@ -131,6 +129,9 @@ class _CreatePoolState extends State<CreatePool> {
         NominationPoolsConfiguration conf =
             await (kc2Service as KC2NominationPoolsInterface)
                 .getPoolsConfiguration();
+
+        appState.kCentsAmount.value = conf.minCreateBond;
+
         setState(() {
           config = conf;
         });

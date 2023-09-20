@@ -15,20 +15,20 @@ void main() {
   GetIt.I.registerLazySingleton<ConfigLogic>(() => ConfigLogic());
 
   group('genesis tests', () {
-    test(
-      'get net id works',
-      () async {
-        K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
-        // Connect to the chain
-        await configLogic.init();
-        await kc2Service.connectToApi(apiWsUrl: configLogic.kc2ApiUrl);
+      test(
+        'get net id works',
+        () async {
+          K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
+          // Connect to the chain
+          await configLogic.init();
+          await kc2Service.connectToApi(apiWsUrl: configLogic.kc2ApiUrl);
 
-        String netId = await kc2Service.getNetName();
+          String netId = await kc2Service.getNetName();
 
-        expect(netId, 'dev');
-      },
-      timeout: const Timeout(Duration(seconds: 280)),
-    );
+          expect(netId, 'dev');
+        },
+        timeout: const Timeout(Duration(seconds: 280)),
+      );
 
     test('char traits exists on genesis', () async {
       K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();

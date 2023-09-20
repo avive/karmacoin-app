@@ -78,18 +78,20 @@ class _PoolWidgetState extends State<PoolWidget> {
                 : Container(),
           ));
 
-          KC2UserInfo creator = pool.depositor!;
+          KC2UserInfo? creator = pool.depositor;
 
-          tiles.add(CupertinoListTile.notched(
-            title: const Text('Creator'),
-            leading: RandomAvatar(creator.userName, height: 50, width: 50),
-            subtitle: Text(
-                // todo: format this properly
-                creator.userName),
-            trailing: const CupertinoListTileChevron(),
-            onTap: () => context.pushNamed(ScreenNames.account,
-                params: {'accountId': creator.accountId}),
-          ));
+          if (creator != null) {
+            tiles.add(CupertinoListTile.notched(
+              title: const Text('Creator'),
+              leading: RandomAvatar(creator.userName, height: 50, width: 50),
+              subtitle: Text(
+                  // todo: format this properly
+                  creator.userName),
+              trailing: const CupertinoListTileChevron(),
+              onTap: () => context.pushNamed(ScreenNames.account,
+                  params: {'accountId': creator.accountId}),
+            ));
+          }
 
           KC2UserInfo? root = pool.root;
           if (root != null) {

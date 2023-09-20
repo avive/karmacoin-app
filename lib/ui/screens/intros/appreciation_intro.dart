@@ -10,8 +10,6 @@ class AppreciationIntro extends StatefulWidget {
 }
 
 class _AppreciationIntroState extends State<AppreciationIntro> {
-  
-
   Widget _getBodyContent(BuildContext context) {
     const double sepHeight = 24.0;
     const double fontSize = 20.0;
@@ -72,7 +70,7 @@ class _AppreciationIntroState extends State<AppreciationIntro> {
               const SizedBox(width: 14),
               Expanded(
                 child: Text(
-                  'You get a 100 Karma Coins referral reward when it signs up.',
+                  'You get 10 Karma Coins referral reward when it signs up.',
                   style: CupertinoTheme.of(context).textTheme.textStyle.merge(
                         const TextStyle(fontSize: fontSize),
                       ),
