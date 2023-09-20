@@ -35,8 +35,7 @@ class Pool {
   BigInt? balance;
 
   /// Pool's social url - must be set by depositor/creator
-  String? get socialUrl =>
-      'https://linktree/pool'; //poolsUsers[roles.depositor]?.metadata;
+  String? get socialUrl => poolsUsers[roles.depositor]?.metadata;
 
   // only available after call to populateUsers()
   KC2UserInfo? get depositor => poolsUsers[roles.depositor];

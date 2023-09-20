@@ -1,5 +1,4 @@
 import 'package:karma_coin/common/platform_info.dart';
-import 'package:karma_coin/data/genesis_config.dart';
 import 'package:karma_coin/logic/user_interface.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 import 'package:karma_coin/ui/components/amount_input.dart';
