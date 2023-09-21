@@ -27,14 +27,11 @@ class KC2KeyRing {
   /// Gets the keyring mnemonic
   String get mnemonic => _mnemonic;
 
-  /// Gets the keyring's public signing ed key
-  List<int> getPublicKey() {
-    return ed.public(_privateKey).bytes;
-  }
+  List<int> get publicKey => ed.public(_privateKey).bytes;
 
   /// Gets the user's public ss58 address based on its keypair. The address is the public key encoded in ss58 and specific to karmachain netid
   String getAccountId() {
-    return ss58.Codec(42).encode(getPublicKey());
+    return ss58.Codec(kc2Service.netId).encode(publicKey);
   }
 
   /// Sign a message using the keyring's private signing key

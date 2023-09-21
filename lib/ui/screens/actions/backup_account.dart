@@ -70,7 +70,7 @@ class _BackupAccountScreenState extends State<BackupAccountScreen> {
               style: CupertinoTheme.of(context)
                   .textTheme
                   .navTitleTextStyle
-                  .merge(const TextStyle(fontSize: 18))),
+                  .merge(const TextStyle(fontSize: 20))),
           leading: Text((index + 1).toString(),
               style: CupertinoTheme.of(context)
                   .textTheme

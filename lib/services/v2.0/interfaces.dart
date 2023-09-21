@@ -123,7 +123,7 @@ abstract class ChainApiProvider {
   /// Returns the tx's hash.
   Future<String> signAndSendTransaction(MapEntry<String, dynamic> call) async {
     try {
-      final signer = encodeAccountId(keyring.getPublicKey());
+      final signer = encodeAccountId(keyring.publicKey);
       final encodedHex = await _signTransaction(signer, call);
       // debugPrint('Encoded extrinsic: $encodedHex');
 

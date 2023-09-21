@@ -97,7 +97,7 @@ class Identity implements IdentityInterface {
   String get mnemonic => _keyring.mnemonic;
 
   @override
-  List<int> get publicKey => _keyring.getPublicKey();
+  List<int> get publicKey => _keyring.publicKey;
 
   @override
   KC2KeyRing get keyring => _keyring;

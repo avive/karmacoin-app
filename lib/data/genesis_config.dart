@@ -13,8 +13,8 @@ class GenesisConfig {
 
   static final kCentsPerCoinBigInt = BigInt.from(kCentsPerCoin);
 
-  /// Karmachain netId. 1 is testnet 1
-  static const netId = 1;
+  /// Karmachain netId. 42 is for testnet
+  static const netId = 42;
 
   static const netName = "Karmachain 2.0 Testnet 3";
 
