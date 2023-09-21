@@ -227,14 +227,13 @@ class KC2User extends KC2UserInteface {
     signupFailureReson = SignupFailureReason.unknown;
 
     requestedPhoneNumber = requestedPhoneNumber.trim();
-    requestedUserName = requestedUserName.trim();
+    requestedUserName = requestedUserName.trim().toLowerCase();
     if (requestedUserName.isEmpty || requestedPhoneNumber.isEmpty) {
       signupStatus.value = SignupStatus.notSignedUp;
       signupFailureReson = SignupFailureReason.invalidData;
       return;
     }
 
-    
     if (!requestedPhoneNumber.startsWith('+') ||
         requestedPhoneNumber.length < 4) {
       debugPrint('Phone number must be +prefixed and 4 or more digits');
