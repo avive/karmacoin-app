@@ -50,7 +50,12 @@ class _BackupAccountScreenState extends State<BackupAccountScreen> {
             ],
           ),
         ),
-        leading: const Icon(CupertinoIcons.archivebox, size: 28),
+        trailing: const Icon(CupertinoIcons.share, size: 28),
+        onTap: () async {
+          // todo: implement me and copy
+          await Clipboard.setData(
+              ClipboardData(text: kc2User.identity.mnemonic));
+        },
       ),
     );
 

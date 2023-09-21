@@ -32,6 +32,7 @@ class _SmsCodeInputScreenState extends State<SmsCodeInputScreen> {
 
   Future<void> _submitCode(BuildContext context, String currCode) async {
     // store for later
+    debugPrint('Storing code from client in app state: $currCode');
     appState.twilloVerificationCode = currCode;
     pinController.clear();
     context.push(ScreenPaths.newUserName);

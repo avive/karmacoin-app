@@ -234,7 +234,7 @@ class KC2User extends KC2UserInteface {
       return;
     }
 
-    //
+    
     if (!requestedPhoneNumber.startsWith('+') ||
         requestedPhoneNumber.length < 4) {
       debugPrint('Phone number must be +prefixed and 4 or more digits');

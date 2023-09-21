@@ -38,7 +38,7 @@ void main() {
         await katya.init();
 
         String katyaUserName =
-            "Katya${katya.identity.accountId.substring(0, 5)}".toLowerCase();
+            "Katya${katya.identity.accountId.substring(0, 10)}".toLowerCase();
 
         String katyaPhoneNumber = randomPhoneNumber;
 

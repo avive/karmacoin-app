@@ -171,6 +171,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
         debugPrint(
             'Phone number canonical string: $number. Calling verificaiton api...');
 
+        // use verifier service to send verification code
         SendVerificationCodeResponse resp = await verifier.verifierServiceClient
             .sendVerificationCode(
                 SendVerificationCodeRequest(mobileNumber: number));
@@ -197,6 +198,8 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
           return;
         }
 
+        debugPrint(
+            'Storing verificaiton session id in app state ${resp.sessionId}...');
         appState.twilloVerificationSid = resp.sessionId;
 
         setState(() {
