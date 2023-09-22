@@ -401,7 +401,8 @@ void main() {
         expect(await completer.future, equals(true));
         expect(completer.isCompleted, isTrue);
       },
-      timeout: const Timeout(Duration(seconds: 560)),
+      timeout: const Timeout(
+          Duration(seconds: eraDurationInSeconds + 5 * blockDurationInSeconds)),
     );
 
     // This test:
@@ -770,7 +771,7 @@ void main() {
     // 2. Create pool using Katya account
     // 3. Nominate validators using pool
     test(
-      'nomination',
+      'nomination works',
       () async {
         KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
 
@@ -784,6 +785,8 @@ void main() {
 
         // Test utils
         String txHash = "";
+
+        final validators = await kc2Service.getValidators();
 
         // Create pool callback
         kc2Service.createPoolCallback = (tx) async {
@@ -804,8 +807,6 @@ void main() {
           final pool = pools
               .firstWhere((pool) => pool.roles.depositor == katya.accountId);
           final poolId = pool.id;
-
-          final validators = await kc2Service.getValidators();
 
           txHash = await kc2Service.nominateForPool(
             poolId,
@@ -833,7 +834,7 @@ void main() {
           final nominations =
               await kc2Service.getNominations(pool.bondedAccountId);
           // For dev network Alice is only validator
-          expect(nominations!.targets.length, 1);
+          expect(nominations!.targets.length, validators.length);
 
           completer.complete(true);
         };
@@ -875,6 +876,7 @@ void main() {
 
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
+        TestUserInfo punch = await createTestUser(completer: completer);
         NominationPoolsConfiguration conf =
             await (kc2Service).getPoolsConfiguration();
 
@@ -882,10 +884,14 @@ void main() {
             Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Test utils
+        Timer? blocksProcessingTimer;
         String txHash = "";
 
+        // Set katya keys
+        kc2Service.setKeyring(katya.user.keyring);
         // Subscribe to Katya's transactions
-        kc2Service.subscribeToAccountTransactions(katya.userInfo!);
+        blocksProcessingTimer =
+            kc2Service.subscribeToAccountTransactions(katya.userInfo!);
 
         debugPrint('Creating pool...');
 
@@ -911,8 +917,39 @@ void main() {
             return;
           }
 
+          // Find pool id
+          final pools = await kc2Service.getPools();
+          final pool = pools.firstWhere(
+              (pool) => pool.roles.depositor == katya.accountId,
+              orElse: () => fail('pool not found'));
+
+          // Set punch keys
+          kc2Service.setKeyring(punch.user.keyring);
+          // Unsubscribe from Katya's transactions
+          blocksProcessingTimer!.cancel();
+          // Subscribe to Punch's transactions
+          blocksProcessingTimer =
+              kc2Service.subscribeToAccountTransactions(punch.userInfo!);
+
+          txHash = await kc2Service.joinPool(
+              amount: conf.minCreateBond, poolId: pool.id);
+        };
+
+        kc2Service.joinPoolCallback = (tx) async {
+          if (tx.hash != txHash) {
+            // allow other tests to run in parallel
+            return;
+          }
+
+          // Check if the tx failed
+          if (tx.chainError != null) {
+            completer.completeError(
+                'create pool tx error ${tx.chainError!.description}');
+            return;
+          }
+
           debugPrint('Calling unbound...');
-          txHash = await kc2Service.unbond(katya.accountId, conf.minCreateBond);
+          txHash = await kc2Service.unbond(punch.accountId, conf.minCreateBond);
         };
 
         kc2Service.unbondPoolCallback = (tx) async {
@@ -929,7 +966,7 @@ void main() {
           }
 
           final poolMember =
-              await kc2Service.getMembershipPool(katya.accountId);
+              await kc2Service.getMembershipPool(punch.accountId);
           expect(poolMember!.points, BigInt.zero);
           completer.complete(true);
         };
@@ -941,11 +978,9 @@ void main() {
       timeout: const Timeout(Duration(seconds: 280)),
     );
 
-    // @HolyGrease - we need the following basic pools integration test:
-    // 2. create pool and nominate the devnet validator.
-    // 3. Have 1 user join the pool.
-    // 4. Wait an era and pool gets rewarded and verify user can withdraw their rewards while staying in pool.
-
+    // 1. create pool and nominate the devnet validator.
+    // 2. Have 1 user join the pool.
+    // 3. Wait an era and pool gets rewarded and verify user can withdraw their rewards while staying in pool.
     test(
       'reward works',
       () async {
@@ -967,9 +1002,7 @@ void main() {
         // Get current set of validators
         final validators = await kc2Service.getValidators();
         // Find exactly dev net validator
-        final alice = validators.firstWhere((prefs) =>
-            prefs.accountId ==
-            '5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY');
+        final alice = validators.first;
 
         // Set pool owner keys
         kc2Service.setKeyring(poolOwner.user.keyring);
@@ -1129,7 +1162,8 @@ void main() {
         expect(await completer.future, equals(true));
         expect(completer.isCompleted, isTrue);
       },
-      timeout: const Timeout(Duration(seconds: 10 * 60)),
+      timeout: const Timeout(Duration(
+          seconds: 3 * eraDurationInSeconds + 6 * blockDurationInSeconds)),
     );
 
     test(
