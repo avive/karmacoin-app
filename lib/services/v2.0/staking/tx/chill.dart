@@ -6,15 +6,15 @@ import 'package:karma_coin/common_libs.dart';
 class KC2StakingChillTxV1 extends KC2Tx {
   static KC2StakingChillTxV1 createStakingChillTx(
       {required String hash,
-        required int timestamp,
-        required String signer,
-        required Map<String, dynamic> args,
-        required ChainError? chainError,
-        required BigInt blockNumber,
-        required int blockIndex,
-        required Map<String, dynamic> rawData,
-        required List<KC2Event> txEvents,
-        required int netId}) {
+      required int timestamp,
+      required String signer,
+      required Map<String, dynamic> args,
+      required ChainError? chainError,
+      required BigInt blockNumber,
+      required int blockIndex,
+      required Map<String, dynamic> rawData,
+      required List<KC2Event> txEvents,
+      required int netId}) {
     try {
       return KC2StakingChillTxV1(
         args: args,
@@ -35,12 +35,12 @@ class KC2StakingChillTxV1 extends KC2Tx {
 
   KC2StakingChillTxV1(
       {required super.args,
-        required super.chainError,
-        required super.timestamp,
-        required super.hash,
-        required super.blockNumber,
-        required super.blockIndex,
-        required super.transactionEvents,
-        required super.rawData,
-        required super.signer});
+      required super.chainError,
+      required super.timestamp,
+      required super.hash,
+      required super.blockNumber,
+      required super.blockIndex,
+      required super.transactionEvents,
+      required super.rawData,
+      required super.signer});
 }

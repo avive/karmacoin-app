@@ -23,8 +23,7 @@ class Commission {
   CommissionChangeRate? changeRate;
 
   /// Get current commission as a percentage
-  double? get currentAsPercent =>
-      current != null ? current! / 1000000000 : 0.0;
+  double? get currentAsPercent => current != null ? current! / 1000000000 : 0.0;
 
   /// Get max commission as a percentage
   double? get maxAsPercent => max != null ? max! / 1000000000 : null;
@@ -46,4 +45,3 @@ class Commission {
             : CommissionChangeRate.fromJson(json['change_rate']),
         throttleFrom = json['throttle_from'];
 }
-

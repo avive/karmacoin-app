@@ -11,6 +11,8 @@ import 'package:karma_coin/services/v2.0/user_info.dart';
 final random = Random.secure();
 String get randomPhoneNumber => '+${(random.nextInt(900000) + 100000)}';
 
+const String metadata = "https://linktr.ee/karmaco.in";
+
 /// Signup a new loal app user with optional provided phone number
 /// Wait 1 block until this user is signed up
 Future<KC2User> createLocalAppUser(String? phoneNumber) async {

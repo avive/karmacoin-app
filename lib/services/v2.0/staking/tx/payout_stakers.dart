@@ -10,17 +10,18 @@ class KC2StakingPayoutStakersTxV1 extends KC2Tx {
 
   static KC2StakingPayoutStakersTxV1 createStakingPayoutStakersTx(
       {required String hash,
-        required int timestamp,
-        required String signer,
-        required Map<String, dynamic> args,
-        required ChainError? chainError,
-        required BigInt blockNumber,
-        required int blockIndex,
-        required Map<String, dynamic> rawData,
-        required List<KC2Event> txEvents,
-        required int netId}) {
+      required int timestamp,
+      required String signer,
+      required Map<String, dynamic> args,
+      required ChainError? chainError,
+      required BigInt blockNumber,
+      required int blockIndex,
+      required Map<String, dynamic> rawData,
+      required List<KC2Event> txEvents,
+      required int netId}) {
     try {
-      final staker = ss58.Codec(netId).encode(args['validator_stash'].cast<int>());
+      final staker =
+          ss58.Codec(netId).encode(args['validator_stash'].cast<int>());
       final era = args['era'];
 
       return KC2StakingPayoutStakersTxV1(
@@ -44,14 +45,14 @@ class KC2StakingPayoutStakersTxV1 extends KC2Tx {
 
   KC2StakingPayoutStakersTxV1(
       {required this.staker,
-        required this.era,
-        required super.args,
-        required super.chainError,
-        required super.timestamp,
-        required super.hash,
-        required super.blockNumber,
-        required super.blockIndex,
-        required super.transactionEvents,
-        required super.rawData,
-        required super.signer});
+      required this.era,
+      required super.args,
+      required super.chainError,
+      required super.timestamp,
+      required super.hash,
+      required super.blockNumber,
+      required super.blockIndex,
+      required super.transactionEvents,
+      required super.rawData,
+      required super.signer});
 }

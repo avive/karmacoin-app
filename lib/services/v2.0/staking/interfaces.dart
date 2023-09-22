@@ -17,7 +17,8 @@ typedef StakingWithdrawUnbondedCallback = Future<void> Function(
     KC2StakingWithdrawUnbondedTxV1);
 typedef StakingNominateCallback = Future<void> Function(KC2StakingNominateTxV1);
 typedef StakingChillCallback = Future<void> Function(KC2StakingChillTxV1);
-typedef StakingPayoutStakersCallback = Future<void> Function(KC2StakingPayoutStakersTxV1);
+typedef StakingPayoutStakersCallback = Future<void> Function(
+    KC2StakingPayoutStakersTxV1);
 
 mixin KC2StakingInterface on ChainApiProvider {
   /// Take the origin account as a stash and lock up `value` of its balance. `controller` will
@@ -167,7 +168,8 @@ mixin KC2StakingInterface on ChainApiProvider {
       final call = MapEntry(
           'Staking',
           MapEntry('nominate', {
-            'targets': targets.map((e) => MapEntry('Id', decodeAccountId(e))).toList(),
+            'targets':
+                targets.map((e) => MapEntry('Id', decodeAccountId(e))).toList(),
           }));
 
       return await signAndSendTransaction(call);
@@ -203,10 +205,12 @@ mixin KC2StakingInterface on ChainApiProvider {
   /// it is not one of the stakers.
   Future<String> stakingPayoutStakers(String staker, int era) async {
     try {
-      final call = MapEntry('Staking', MapEntry('payout_stakers', {
-        'validator_stash': decodeAccountId(staker),
-        'era': era,
-      }));
+      final call = MapEntry(
+          'Staking',
+          MapEntry('payout_stakers', {
+            'validator_stash': decodeAccountId(staker),
+            'era': era,
+          }));
 
       return await signAndSendTransaction(call);
     } catch (e) {
