@@ -83,7 +83,8 @@ void main() {
         final completer = Completer<bool>();
         TestUserInfo katya = await createTestUser(completer: completer);
         TestUserInfo punch = await createTestUser(completer: completer);
-        await Future.delayed(Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+        await Future.delayed(
+            Duration(seconds: kc2Service.expectedBlockTimeSeconds));
 
         // Test utils
         String appreciationTxHash = "";
