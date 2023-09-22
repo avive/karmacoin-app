@@ -978,11 +978,9 @@ void main() {
       timeout: const Timeout(Duration(seconds: 280)),
     );
 
-    // @HolyGrease - we need the following basic pools integration test:
-    // 2. create pool and nominate the devnet validator.
-    // 3. Have 1 user join the pool.
-    // 4. Wait an era and pool gets rewarded and verify user can withdraw their rewards while staying in pool.
-
+    // 1. create pool and nominate the devnet validator.
+    // 2. Have 1 user join the pool.
+    // 3. Wait an era and pool gets rewarded and verify user can withdraw their rewards while staying in pool.
     test(
       'reward works',
       () async {
