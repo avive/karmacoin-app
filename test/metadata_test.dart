@@ -19,8 +19,6 @@ void main() {
   GetIt.I.registerLazySingleton<Verifier>(() => Verifier());
   GetIt.I.registerLazySingleton<ConfigLogic>(() => ConfigLogic());
 
-  const String metadata = "https://linktr.ee/karmaco.in";
-
   group('Metadata tests', () {
     test(
       'set metadata for account',

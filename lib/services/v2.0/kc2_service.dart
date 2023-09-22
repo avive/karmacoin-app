@@ -8,6 +8,7 @@ import 'package:karma_coin/services/v2.0/kc2_service_interface.dart';
 import 'package:karma_coin/services/v2.0/event.dart';
 import 'package:karma_coin/services/v2.0/metadata_preparer.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/set_metadata.dart';
 import 'package:karma_coin/services/v2.0/staking/interfaces.dart';
 import 'package:karma_coin/services/v2.0/staking/tx/bond.dart';
 import 'package:karma_coin/services/v2.0/staking/tx/bond_extra.dart';
@@ -543,6 +544,12 @@ class KarmachainService extends ChainApiProvider
           claimPoolCommissionCallback != null) {
         await claimPoolCommissionCallback!(transaction);
         return;
+      }
+
+      if (signer == userInfo.accountId &&
+          transaction is KC2SetPoolMetadataTxV1 &&
+          setPoolMetadataCallback != null) {
+        await setPoolMetadataCallback!(transaction);
       }
 
       // Staking pallet

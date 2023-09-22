@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:karma_coin/services/v2.0/interfaces.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/commission_change_rate.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/nomination_pools_configuration.dart';
@@ -13,6 +15,7 @@ import 'package:karma_coin/services/v2.0/nomination_pools/txs/nominate.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/set_commission.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/set_commission_change_rate.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/set_commission_max.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/set_metadata.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/unbond.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/update_roles.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/withdraw_unbonded.dart';
@@ -61,6 +64,8 @@ typedef SetPoolCommissionChangeRateCallback = Future<void> Function(
     KC2SetCommissionChangeRateTxV1 tx);
 typedef ClaimPoolCommissionCallback = Future<void> Function(
     KC2ClaimCommissionTxV1 tx);
+typedef SetPoolMetadataCallback = Future<void> Function(
+    KC2SetPoolMetadataTxV1 tx);
 
 mixin KC2NominationPoolsInterface on ChainApiProvider {
   /// Stake funds with a pool and join it.
@@ -449,6 +454,28 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
     }
   }
 
+  /// Set a new metadata for the pool.
+  ///
+  /// The dispatch origin of this call must be signed by the bouncer, or the root role of the
+  /// pool.
+  Future<String> setPoolMetadata(PoolId poolId, String metadata) async {
+    try {
+      final bytes = utf8.encode(metadata);
+
+      final call = MapEntry(
+          'NominationPools',
+          MapEntry('set_metadata', {
+            'pool_id': poolId,
+            'metadata': bytes,
+          }));
+
+      return await signAndSendTransaction(call);
+    } catch (e) {
+      debugPrint('Failed to set pool metadata: $e');
+      rethrow;
+    }
+  }
+
   // RPC
 
   /// Returns the pending rewards in coins units for the member that the AccountId was given for.
@@ -576,4 +603,5 @@ mixin KC2NominationPoolsInterface on ChainApiProvider {
   SetPoolCommissionMaxCallback? setPoolCommissionMaxCallback;
   SetPoolCommissionChangeRateCallback? setPoolCommissionChangeRateCallback;
   ClaimPoolCommissionCallback? claimPoolCommissionCallback;
+  SetPoolMetadataCallback? setPoolMetadataCallback;
 }

@@ -25,6 +25,9 @@ class Pool {
   /// Current state.
   PoolState state;
 
+  /// Pool metadata.
+  String? metadata;
+
   /// User infos for the various pool roles and members. Available after PopulateData() is called.
   Map<String, KC2UserInfo> poolsUsers = {};
 
@@ -60,7 +63,10 @@ class Pool {
         points = BigInt.from(json['points']),
         roles = PoolRoles.fromJson(json['roles']),
         state = PoolState.values.firstWhere(
-            (e) => e.toString() == 'PoolState.${json['state'].toLowerCase()}');
+            (e) => e.toString() == 'PoolState.${json['state'].toLowerCase()}'),
+        metadata = json['metadata'] == null
+            ? null
+            : String.fromCharCodes(json['metadata'].cast<int>());
 
   Future<void> _addPoolUser(String accountId) async {
     if (!poolsUsers.containsKey(accountId)) {

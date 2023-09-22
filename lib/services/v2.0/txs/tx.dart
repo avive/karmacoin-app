@@ -11,6 +11,7 @@ import 'package:karma_coin/services/v2.0/nomination_pools/txs/nominate.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/set_commission.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/set_commission_change_rate.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/set_commission_max.dart';
+import 'package:karma_coin/services/v2.0/nomination_pools/txs/set_metadata.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/unbond.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/update_roles.dart';
 import 'package:karma_coin/services/v2.0/nomination_pools/txs/withdraw_unbonded.dart';
@@ -355,6 +356,20 @@ abstract class KC2Tx {
 
     if (pallet == 'NominationPools' && method == 'claim_commission') {
       return KC2ClaimCommissionTxV1.createClaimCommissionTx(
+          hash: hash,
+          timestamp: timestamp,
+          signer: signer,
+          args: args,
+          chainError: chainError,
+          blockNumber: blockNumber,
+          netId: netId,
+          blockIndex: blockIndex,
+          rawData: tx,
+          txEvents: txEvents);
+    }
+
+    if (pallet == 'NominationPools' && method == 'set_metadata') {
+      return KC2SetPoolMetadataTxV1.createSetPoolMetadataTx(
           hash: hash,
           timestamp: timestamp,
           signer: signer,

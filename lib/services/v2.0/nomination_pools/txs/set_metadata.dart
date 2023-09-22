@@ -1,14 +1,20 @@
+import 'dart:convert';
+
 import 'package:karma_coin/services/v2.0/error.dart';
 import 'package:karma_coin/services/v2.0/event.dart';
 import 'package:karma_coin/services/v2.0/txs/tx.dart';
 import 'package:karma_coin/common_libs.dart';
-import 'package:ss58/ss58.dart' as ss58;
+import 'package:karma_coin/services/v2.0/nomination_pools/interfaces.dart';
 
-class KC2StakingPayoutStakersTxV1 extends KC2Tx {
-  String staker;
-  int era;
+/// Set the commission of a pool. Pool as a validator can set its own commission.
+///
+/// The commission is a percentage of the reward that will be taken by the pool.
+/// The beneficiary is the account that will receive the commission.
+class KC2SetPoolMetadataTxV1 extends KC2Tx {
+  PoolId poolId;
+  String metadata;
 
-  static KC2StakingPayoutStakersTxV1 createStakingPayoutStakersTx(
+  static KC2SetPoolMetadataTxV1 createSetPoolMetadataTx(
       {required String hash,
       required int timestamp,
       required String signer,
@@ -20,13 +26,12 @@ class KC2StakingPayoutStakersTxV1 extends KC2Tx {
       required List<KC2Event> txEvents,
       required int netId}) {
     try {
-      final staker =
-          ss58.Codec(netId).encode(args['validator_stash'].cast<int>());
-      final era = args['era'];
+      final poolId = args['pool_id'];
+      final metadata = utf8.decode(args['metadata'].cast<int>());
 
-      return KC2StakingPayoutStakersTxV1(
-        staker: staker,
-        era: era,
+      return KC2SetPoolMetadataTxV1(
+        poolId: poolId,
+        metadata: metadata,
         args: args,
         signer: signer,
         chainError: chainError,
@@ -38,14 +43,14 @@ class KC2StakingPayoutStakersTxV1 extends KC2Tx {
         rawData: rawData,
       );
     } catch (e) {
-      debugPrint("Error processing unbond tx: $e");
+      debugPrint("Error processing set commission tx: $e");
       rethrow;
     }
   }
 
-  KC2StakingPayoutStakersTxV1(
-      {required this.staker,
-      required this.era,
+  KC2SetPoolMetadataTxV1(
+      {required this.poolId,
+      required this.metadata,
       required super.args,
       required super.chainError,
       required super.timestamp,

@@ -1165,5 +1165,83 @@ void main() {
       timeout: const Timeout(Duration(
           seconds: 3 * eraDurationInSeconds + 6 * blockDurationInSeconds)),
     );
+
+    test(
+      'pool metadata works',
+      () async {
+        KarmachainService kc2Service = GetIt.I.get<KarmachainService>();
+
+        final completer = Completer<bool>();
+        TestUserInfo katya = await createTestUser(completer: completer);
+        NominationPoolsConfiguration conf =
+            await (kc2Service).getPoolsConfiguration();
+
+        await Future.delayed(
+            Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+
+        // Test utils
+        String txHash = "";
+
+        // Create a pool
+        txHash = await kc2Service.createPool(
+          amount: conf.minCreateBond,
+          root: katya.accountId,
+          nominator: katya.accountId,
+          bouncer: katya.accountId,
+        );
+
+        kc2Service.subscribeToAccountTransactions(katya.userInfo!);
+
+        // Create pool callback
+        kc2Service.createPoolCallback = (tx) async {
+          if (tx.hash != txHash) {
+            // allow other tests to run in parallel
+            return;
+          }
+
+          // Check if the tx failed
+          if (tx.chainError != null) {
+            completer.completeError(
+                'create pool tx error ${tx.chainError!.description}');
+
+            return;
+          }
+
+          // Check if the pool is created
+          final pools = await kc2Service.getPools();
+          final pool = pools.firstWhere(
+              (pool) => pool.roles.depositor == katya.accountId,
+              orElse: () => fail('pool not found'));
+
+          txHash = await kc2Service.setPoolMetadata(pool.id, metadata);
+        };
+
+        kc2Service.setPoolMetadataCallback = (tx) async {
+          if (tx.hash != txHash) {
+            // allow other tests to run in parallel
+            return;
+          }
+
+          // Check if the tx failed
+          if (tx.chainError != null) {
+            completer.complete(false);
+            return;
+          }
+
+          final pools = await kc2Service.getPools();
+          final pool = pools.firstWhere(
+              (pool) => pool.roles.depositor == katya.accountId,
+              orElse: () => fail('pool not found'));
+
+          expect(pool.metadata, metadata);
+          completer.complete(true);
+        };
+
+        // Wait for completer and verify test success
+        expect(await completer.future, equals(true));
+        expect(completer.isCompleted, isTrue);
+      },
+      timeout: const Timeout(Duration(seconds: 280)),
+    );
   });
 }

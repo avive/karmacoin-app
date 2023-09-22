@@ -71,12 +71,12 @@ class MetadataPreparer {
     for (var variant in variant['variants']) {
       // Tuple variant
       if (variant['type'] != null) {
-          if (variant['type'] == i) {
-            variant['type'] = j;
-          } else if (variant['type'] == j) {
-            variant['type'] = i;
-          }
-          continue;
+        if (variant['type'] == i) {
+          variant['type'] = j;
+        } else if (variant['type'] == j) {
+          variant['type'] = i;
+        }
+        continue;
       }
 
       // Composite variant
