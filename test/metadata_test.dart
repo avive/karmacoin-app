@@ -47,14 +47,14 @@ void main() {
           // Check if the pool is created
           final result = await kc2Service.getMetadata(katya.accountId);
           expect(result, isNotNull);
-          expect(result, metadata);
+          expect(result, poolUrl);
 
           completer.complete(true);
         };
 
         kc2Service.subscribeToAccountTransactions(katya.userInfo!);
 
-        txHash = await kc2Service.setMetadata(metadata);
+        txHash = await kc2Service.setMetadata(poolUrl);
 
         // Wait for completer and verify test success
         expect(await completer.future, equals(true));
@@ -202,24 +202,24 @@ void main() {
           final resultByAccountId =
               await kc2Service.getUserInfoByAccountId(katya.accountId);
           expect(resultByAccountId, isNotNull);
-          expect(resultByAccountId!.metadata, metadata);
+          expect(resultByAccountId!.metadata, poolUrl);
 
           final resultByUserName =
               await kc2Service.getUserInfoByUserName(katya.userName);
           expect(resultByUserName, isNotNull);
-          expect(resultByUserName!.metadata, metadata);
+          expect(resultByUserName!.metadata, poolUrl);
 
           final resultByPhoneNumberHash = await kc2Service
               .getUserInfoByPhoneNumberHash(katya.phoneNumberHash);
           expect(resultByPhoneNumberHash, isNotNull);
-          expect(resultByPhoneNumberHash!.metadata, metadata);
+          expect(resultByPhoneNumberHash!.metadata, poolUrl);
 
           completer.complete(true);
         };
 
         kc2Service.subscribeToAccountTransactions(katya.userInfo!);
 
-        txHash = await kc2Service.setMetadata(metadata);
+        txHash = await kc2Service.setMetadata(poolUrl);
 
         // Wait for completer and verify test success
         expect(await completer.future, equals(true));
@@ -255,14 +255,14 @@ void main() {
           // Check if the pool is created
           final result = await kc2Service.getContacts(katya.userName);
           expect(result, isNotEmpty);
-          expect(result.first.metadata, metadata);
+          expect(result.first.metadata, poolUrl);
 
           completer.complete(true);
         };
 
         kc2Service.subscribeToAccountTransactions(katya.userInfo!);
 
-        txHash = await kc2Service.setMetadata(metadata);
+        txHash = await kc2Service.setMetadata(poolUrl);
 
         // Wait for completer and verify test success
         expect(await completer.future, equals(true));

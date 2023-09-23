@@ -27,6 +27,9 @@ class ConfigLogic {
   /// Set to true to work against localhost servers. Otherwise production servers are used
   final bool apiLocalMode = false;
 
+  /// Set to true to run against local verifier. Otherwise production verifier is used
+  final bool verifierLocalMode = false;
+
   /// dev mode has some text field input shortcuts to save time in dev
   final bool devMode = true;
 
@@ -38,7 +41,7 @@ class ConfigLogic {
 
   /// Skip whatsapp verification for local app testing. kc2Api should use the bypass token
   /// obtain from local config file to bypass whatsapp verification.
-  final bool skipWhatsappVerification = true;
+  final bool skipWhatsappVerification = false;
 
   /// check internet connections and show error messages
   final bool enableInternetConnectionChecking = false;
@@ -130,11 +133,6 @@ class ConfigLogic {
           apiHostName.value = 'api3.karmaco.in';
           apiHostPort.value = 443;
           apiProtocol.value = 'wss';
-          //
-          // verifier info for testnet
-          verifierHostName.value = 'verifier1.karmaco.in';
-          verifierHostPort.value = 443;
-          verifierSecureConnection.value = true;
           break;
         case KCNetworkType.mainnet:
           debugPrint('Working against a remote kc2 mainnet api provider');
@@ -142,12 +140,20 @@ class ConfigLogic {
           apiHostName.value = '[add mainnent public api node here]';
           apiHostPort.value = 80;
           apiProtocol.value = 'wss';
-          //
-          // verifier info for mainnet
-          verifierHostName.value = 'verifier1.karmaco.in';
-          verifierHostPort.value = 443;
-          verifierSecureConnection.value = true;
+
           break;
+      }
+
+      if (verifierLocalMode) {
+        // local dev verifier
+        verifierHostName.value = '127.0.01';
+        verifierHostPort.value = 9080;
+        verifierSecureConnection.value = false;
+      } else {
+        // production verifier
+        verifierHostName.value = 'verifier1.karmaco.in';
+        verifierHostPort.value = 443;
+        verifierSecureConnection.value = true;
       }
     }
 

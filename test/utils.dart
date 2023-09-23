@@ -11,7 +11,7 @@ import 'package:karma_coin/services/v2.0/user_info.dart';
 final random = Random.secure();
 String get randomPhoneNumber => '+${(random.nextInt(900000) + 100000)}';
 
-const String metadata = "https://linktr.ee/karmaco.in";
+const String poolUrl = "https://linktr.ee/karmaco.in";
 
 // TN3 time constants
 const eraDurationInSeconds = 24 * 60 * 60;

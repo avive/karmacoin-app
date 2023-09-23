@@ -1213,7 +1213,7 @@ void main() {
               (pool) => pool.roles.depositor == katya.accountId,
               orElse: () => fail('pool not found'));
 
-          txHash = await kc2Service.setPoolMetadata(pool.id, metadata);
+          txHash = await kc2Service.setPoolMetadata(pool.id, poolUrl);
         };
 
         kc2Service.setPoolMetadataCallback = (tx) async {
@@ -1233,7 +1233,7 @@ void main() {
               (pool) => pool.roles.depositor == katya.accountId,
               orElse: () => fail('pool not found'));
 
-          expect(pool.metadata, metadata);
+          expect(pool.metadata, poolUrl);
           completer.complete(true);
         };
 
