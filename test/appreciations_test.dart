@@ -73,7 +73,7 @@ void main() {
 
         // punch appreciates katya
         appreciationTxHash = await kc2Service.sendAppreciation(
-            katya.userInfo!.phoneNumberHash, BigInt.from(1000), 0, 35);
+            phoneNumberHash: katya.userInfo!.phoneNumberHash, BigInt.from(1000), 0, 35);
 
         // wait for completer and verify test success
         expect(await completer.future, equals(true));
@@ -151,9 +151,9 @@ void main() {
         debugPrint('Local user punch public address: ${punch.user.accountId}');
         // Send 2 appreciations from punch to katya
         appreciation1TxHash = await kc2Service.sendAppreciation(
-            katya.userInfo!.phoneNumberHash, BigInt.from(1000), 0, 35);
+            phoneNumberHash: katya.userInfo!.phoneNumberHash, BigInt.from(1000), 0, 35);
         appreciation2TxHash = await kc2Service.sendAppreciation(
-            katya.userInfo!.phoneNumberHash, BigInt.from(1000), 0, 35);
+            phoneNumberHash: katya.userInfo!.phoneNumberHash, BigInt.from(1000), 0, 35);
 
         // wait for completer and verify test success
         expect(await completer.future, equals(true));

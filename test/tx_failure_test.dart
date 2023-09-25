@@ -120,7 +120,7 @@ void main() {
         kc2Service.setKeyring(punch.user.keyring);
         // send appreciation w/o sufficient funds from punch to katya
         appreciationTxHash = await kc2Service.sendAppreciation(
-            kc2Service.getPhoneNumberHash(katya.phoneNumber), txAmount, 0, 35);
+            phoneNumberHash: kc2Service.getPhoneNumberHash(katya.phoneNumber), txAmount, 0, 35);
 
         // subscribe to new account txs
         kc2Service.subscribeToAccountTransactions(katya.userInfo!);

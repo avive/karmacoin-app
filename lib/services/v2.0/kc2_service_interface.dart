@@ -469,13 +469,30 @@ mixin K2ServiceInterface implements ChainApiProvider {
   /// Send a new appreciation with optional charTraitId
   /// phoneNumberHash - canonical hex string of phone number hash using blake32.
   /// Use getPhoneNumberHash() to get hash of a number
+  /// One of optional parameters (phoneNumberHash, username, accountId) must be provided
+  ///
   /// Returns submitted transaction hash
-
-  Future<String> sendAppreciation(String phoneNumberHash, BigInt amount,
-      int communityId, int charTraitId) async {
-    if (phoneNumberHash.startsWith('0x')) {
-      phoneNumberHash = phoneNumberHash.substring(2);
+  Future<String> sendAppreciation(BigInt amount,
+      int communityId, int charTraitId, {String? phoneNumberHash, String? username, String? accountId}) async {
+    if (phoneNumberHash == null && username == null && accountId == null) {
+      throw ArgumentError(
+          'One of optional parameters (phoneNumberHash, username, accountId) must be provided');
     }
+
+    MapEntry<String, dynamic>? to;
+
+    if (phoneNumberHash != null) {
+      if (phoneNumberHash.startsWith('0x')) {
+        phoneNumberHash = phoneNumberHash.substring(2);
+      }
+
+      to = MapEntry('PhoneNumberHash', hex.decode(phoneNumberHash));
+    } else if (username != null) {
+      to = MapEntry('Username', username);
+    } else if (accountId != null) {
+      to = MapEntry('AccountId', decodeAccountId(accountId));
+    }
+
     appState.txSubmissionStatus.value = TxSubmissionStatus.submitting;
 
     try {
@@ -484,7 +501,7 @@ mixin K2ServiceInterface implements ChainApiProvider {
         MapEntry(
           'appreciation',
           {
-            'to': MapEntry('PhoneNumberHash', hex.decode(phoneNumberHash)),
+            'to': to,
             'amount': amount,
             'community_id': Option.some(communityId),
             'char_trait_id': Option.some(charTraitId),

@@ -43,7 +43,7 @@ void main() {
         // Send appreciation from katya to punch before punch signed up
         // so it goes to the pool
         await kc2Service.sendAppreciation(
-            kc2Service.getPhoneNumberHash(punchPhoneNumber),
+            phoneNumberHash: kc2Service.getPhoneNumberHash(punchPhoneNumber),
             BigInt.from(1234),
             0,
             64);
@@ -73,7 +73,7 @@ void main() {
         expect(punch.outgoingAppreciations.value.length, 0);
 
         await kc2Service.sendAppreciation(
-            katya.phoneNumberHash, BigInt.from(54321), 0, 24);
+            phoneNumberHash: katya.phoneNumberHash, BigInt.from(54321), 0, 24);
 
         await kc2Service.sendTransfer(katya.accountId, BigInt.from(12345));
 

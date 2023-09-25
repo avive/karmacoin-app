@@ -39,7 +39,7 @@ class _AppreciationProgressState extends State<AppreciationProgress> {
         } else {
           // appreciation
           txHash = await kc2Service.sendAppreciation(
-              widget.data.destPhoneNumberHash!,
+              phoneNumberHash: widget.data.destPhoneNumberHash!,
               appState.kCentsAmount.value,
               widget.data.communityId,
               appState.selectedPersonalityTrait.value.index);
