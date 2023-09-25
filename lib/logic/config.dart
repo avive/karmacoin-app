@@ -27,23 +27,22 @@ class ConfigLogic {
   /// Set to true to work against localhost servers. Otherwise production servers are used
   final bool apiLocalMode = false;
 
-  /// Set to true to run against local verifier. Otherwise production verifier is used
-  final bool verifierLocalMode = false;
+  /// Set to true to run against local verifier. Otherwise production verifier is used.
+  final bool verifierLocalMode = true;
 
-  /// dev mode has some text field input shortcuts to save time in dev
+  /// dev mode has some text field input shortcuts to save time in dev.
   final bool devMode = true;
 
-  /// in dash mode app displayes public chain data and doesn't require user to sign-in
+  /// in dash mode app displayes public chain data and doesn't require user to sign-in.
   final bool dashMode = false;
 
-  /// Defaults to testnet. Change this if user specifies to change between testnet and mainnet. and call init() again to configure connection to mainnet and vice versa when moving from mainnet to testnet... In production app once mainnent is live, the default should be mainnet
+  /// Defaults to testnet. Change this if user specifies to change between testnet and mainnet. and call init() again to configure connection to mainnet and vice versa when moving from mainnet to testnet... In production app once mainnent is live, the default should be mainnet.
   KCNetworkType networkId = KCNetworkType.testnet;
 
-  /// Skip whatsapp verification for local app testing. kc2Api should use the bypass token
-  /// obtain from local config file to bypass whatsapp verification.
-  final bool skipWhatsappVerification = false;
+  /// Skip whatsapp verification for local app testing. kc2Api should use the bypass token obtained from local config file to bypass whatsapp verification.
+  final bool skipWhatsappVerification = true;
 
-  /// check internet connections and show error messages
+  /// check internet connections and show error messages.
   final bool enableInternetConnectionChecking = false;
 
   final secureStorage = const FlutterSecureStorage();

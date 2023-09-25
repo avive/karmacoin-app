@@ -459,9 +459,9 @@ mixin K2ServiceInterface implements ChainApiProvider {
       String txHash = await signAndSendTransaction(call);
       appState.txSubmissionStatus.value = TxSubmissionStatus.submitted;
       return txHash;
-    } on PlatformException catch (e) {
+    } catch (e) {
       appState.txSubmissionStatus.value = TxSubmissionStatus.error;
-      debugPrint('Failed to send transfer: ${e.details}');
+      debugPrint('Failed to send transfer: $e');
       rethrow;
     }
   }
@@ -470,7 +470,7 @@ mixin K2ServiceInterface implements ChainApiProvider {
   /// phoneNumberHash - canonical hex string of phone number hash using blake32.
   /// Use getPhoneNumberHash() to get hash of a number
   /// Returns submitted transaction hash
-  /// todo: add support for sending a appreciation to a user name. To, implement, get the phone number hash from the chain for user name or id via the RPC api and send appreciation to it. No need to appreciate by accountId.
+
   Future<String> sendAppreciation(String phoneNumberHash, BigInt amount,
       int communityId, int charTraitId) async {
     if (phoneNumberHash.startsWith('0x')) {
@@ -495,8 +495,8 @@ mixin K2ServiceInterface implements ChainApiProvider {
       String txHash = await signAndSendTransaction(call);
       appState.txSubmissionStatus.value = TxSubmissionStatus.submitted;
       return txHash;
-    } on PlatformException catch (e) {
-      debugPrint('Failed to send appreciation: ${e.details}');
+    } catch (e) {
+      debugPrint('Failed to send appreciation: $e');
       appState.txSubmissionStatus.value = TxSubmissionStatus.error;
       rethrow;
     }

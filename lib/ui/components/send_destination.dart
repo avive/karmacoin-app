@@ -165,6 +165,15 @@ class _SendDestinationState extends State<SendDestination> {
       return;
     }
 
+    if (value.length >= 20) {
+      // assume its an address
+      // todo: verify ss58 valid string here
+      debugPrint('Setting send address to: $value');
+      appState.sendDestination.value = Destination.address;
+      appState.sendDestinationAddress.value = value;
+      return;
+    }
+
     value = value.toLowerCase();
 
     if (appState.sendDestinationContact.value != null &&
@@ -245,6 +254,9 @@ class _SendDestinationState extends State<SendDestination> {
     return ValueListenableBuilder<TextEditingValue>(
         valueListenable: _accountTextController,
         builder: ((context, value, child) {
+          if (appState.sendDestination.value == Destination.address) {
+            return _getTextWidget(context, 'Sending to an account address.');
+          }
           if (value.text.isEmpty) {
             return _getTextWidget(
                 context, 'Enter reciever\'s user name or account address.');

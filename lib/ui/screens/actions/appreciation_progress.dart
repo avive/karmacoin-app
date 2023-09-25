@@ -30,11 +30,20 @@ class _AppreciationProgressState extends State<AppreciationProgress> {
   void _postFrameCallback(BuildContext context) {
     Future.delayed(Duration.zero, () async {
       try {
-        String txHash = await kc2Service.sendAppreciation(
-            widget.data.destPhoneNumberHash!,
-            appState.kCentsAmount.value,
-            widget.data.communityId,
-            appState.selectedPersonalityTrait.value.index);
+        String txHash = '';
+
+        if (widget.data.destAccountId != null) {
+          // simple transfer to an account...
+          txHash = await kc2Service.sendTransfer(
+              widget.data.destAccountId!, appState.kCentsAmount.value);
+        } else {
+          // appreciation
+          txHash = await kc2Service.sendAppreciation(
+              widget.data.destPhoneNumberHash!,
+              appState.kCentsAmount.value,
+              widget.data.communityId,
+              appState.selectedPersonalityTrait.value.index);
+        }
         setState(() {
           this.txHash = txHash;
         });

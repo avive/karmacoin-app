@@ -193,7 +193,12 @@ class _SendWidgetState extends State<SendWidget> {
         );
         break;
       case Destination.address:
-        throw 'not yet implemented';
+        appState.paymentTransactionData.value = PaymentTransactionData(
+          kCentsAmount: appState.kCentsAmount.value,
+          personalityTrait: GenesisConfig.personalityTraits[0],
+          communityId: 0,
+          destAccountId: appState.sendDestinationAddress.value,
+        );
     }
 
     if (context.mounted) {
