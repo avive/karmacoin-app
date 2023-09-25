@@ -23,7 +23,7 @@ void main() {
 
   group('appreciations tests', () {
     test(
-      'Basic appreciation',
+      'Appreciation by phone number hash',
       () async {
         debugPrint('Appreciation test');
         K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
@@ -74,6 +74,126 @@ void main() {
         // punch appreciates katya
         appreciationTxHash = await kc2Service.sendAppreciation(
             phoneNumberHash: katya.userInfo!.phoneNumberHash, BigInt.from(1000), 0, 35);
+
+        // wait for completer and verify test success
+        expect(await completer.future, equals(true));
+        expect(completer.isCompleted, isTrue);
+      },
+      timeout: const Timeout(Duration(seconds: 120)),
+    );
+
+    test(
+      'Appreciation by username',
+          () async {
+        debugPrint('Appreciation test');
+        K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
+        final completer = Completer<bool>();
+        TestUserInfo katya = await createTestUser(completer: completer);
+        TestUserInfo punch = await createTestUser(completer: completer);
+        await Future.delayed(
+            Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+
+        // Set katya as signer
+        kc2Service.setKeyring(katya.user.keyring);
+        debugPrint('Local user katya public address: ${katya.user.accountId}');
+
+        // subscribe to new account txs
+        kc2Service.subscribeToAccountTransactions(katya.userInfo!);
+        String appreciationTxHash = "";
+
+        kc2Service.subscribeToAccountTransactions(punch.userInfo!);
+        kc2Service.setKeyring(punch.user.keyring);
+
+        kc2Service.appreciationCallback = (tx) async {
+          if (tx.hash != appreciationTxHash) {
+            return;
+          }
+
+          if (tx.chainError != null) {
+            completer.complete(false);
+            return;
+          }
+
+          expect(tx.chainError, isNull);
+          expect(tx.amount, BigInt.from(1000));
+          expect(tx.charTraitId, 35);
+          expect(tx.fromAddress, punch.user.accountId);
+          expect(tx.fromUserName, punch.userInfo!.userName);
+
+          // all 3 fields should be filled post enrichment
+          expect(tx.toAccountId, katya.user.accountId);
+          expect(tx.toPhoneNumberHash, katya.userInfo!.phoneNumberHash);
+          expect(tx.toUserName, katya.userInfo!.userName);
+          expect(tx.signer, punch.user.accountId);
+
+          if (!completer.isCompleted) {
+            completer.complete(true);
+          }
+        };
+
+        // punch appreciates katya
+        appreciationTxHash = await kc2Service.sendAppreciation(
+            username: katya.userInfo!.userName, BigInt.from(1000), 0, 35);
+
+        // wait for completer and verify test success
+        expect(await completer.future, equals(true));
+        expect(completer.isCompleted, isTrue);
+      },
+      timeout: const Timeout(Duration(seconds: 120)),
+    );
+
+    test(
+      'Appreciation by account id',
+          () async {
+        debugPrint('Appreciation test');
+        K2ServiceInterface kc2Service = GetIt.I.get<K2ServiceInterface>();
+        final completer = Completer<bool>();
+        TestUserInfo katya = await createTestUser(completer: completer);
+        TestUserInfo punch = await createTestUser(completer: completer);
+        await Future.delayed(
+            Duration(seconds: kc2Service.expectedBlockTimeSeconds));
+
+        // Set katya as signer
+        kc2Service.setKeyring(katya.user.keyring);
+        debugPrint('Local user katya public address: ${katya.user.accountId}');
+
+        // subscribe to new account txs
+        kc2Service.subscribeToAccountTransactions(katya.userInfo!);
+        String appreciationTxHash = "";
+
+        kc2Service.subscribeToAccountTransactions(punch.userInfo!);
+        kc2Service.setKeyring(punch.user.keyring);
+
+        kc2Service.appreciationCallback = (tx) async {
+          if (tx.hash != appreciationTxHash) {
+            return;
+          }
+
+          if (tx.chainError != null) {
+            completer.complete(false);
+            return;
+          }
+
+          expect(tx.chainError, isNull);
+          expect(tx.amount, BigInt.from(1000));
+          expect(tx.charTraitId, 35);
+          expect(tx.fromAddress, punch.user.accountId);
+          expect(tx.fromUserName, punch.userInfo!.userName);
+
+          // all 3 fields should be filled post enrichment
+          expect(tx.toAccountId, katya.user.accountId);
+          expect(tx.toPhoneNumberHash, katya.userInfo!.phoneNumberHash);
+          expect(tx.toUserName, katya.userInfo!.userName);
+          expect(tx.signer, punch.user.accountId);
+
+          if (!completer.isCompleted) {
+            completer.complete(true);
+          }
+        };
+
+        // punch appreciates katya
+        appreciationTxHash = await kc2Service.sendAppreciation(
+            accountId: katya.userInfo!.accountId, BigInt.from(1000), 0, 35);
 
         // wait for completer and verify test success
         expect(await completer.future, equals(true));
