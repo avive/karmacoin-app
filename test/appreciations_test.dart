@@ -223,7 +223,7 @@ void main() {
             reason: 'Unexpected karma rewards amount');
 
         debugPrint(
-            'exepcted karma rewards amount: ${karmaRewardsAmount.toString()}');
+            'expected karma rewards amount: ${karmaRewardsAmount.toString()}');
 
         int txsCount = 0;
         String appreciation1TxHash = "";
@@ -257,7 +257,7 @@ void main() {
               KC2UserInfo? info = await kc2Service
                   .getUserInfoByUserName(punch.userInfo!.userName);
               expect(info!.balance, balance + karmaRewardsAmount,
-                  reason: 'Unexpectged balance');
+                  reason: 'Unexpected balance');
               completer.complete(true);
             });
           }

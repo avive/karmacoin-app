@@ -17,7 +17,7 @@ const String poolUrl = "https://linktr.ee/karmaco.in";
 const eraDurationInSeconds = 24 * 60 * 60;
 const blockDurationInSeconds = 12;
 
-/// Signup a new loal app user with optional provided phone number
+/// Signup a new local app user with optional provided phone number
 /// Wait 1 block until this user is signed up
 Future<KC2User> createLocalAppUser(String? phoneNumber) async {
   if (!kc2Service.connectedToApi) {
@@ -57,7 +57,7 @@ class TestUserInfo {
 
 /// Create a new test user and sign it up to the chain
 /// Returns usable user info data
-/// Optinal name prefix and phone number
+/// Optional name prefix and phone number
 Future<TestUserInfo> createTestUser(
     {required Completer<bool> completer,
     String? usernamePrefix,
