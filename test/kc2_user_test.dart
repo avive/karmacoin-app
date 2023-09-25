@@ -388,7 +388,7 @@ void main() {
               // Send appreciation from katya to punch before punch signed up
               // so it goes to the pool
               await kc2Service.sendAppreciation(
-                  punchPhoneNumberHash, BigInt.from(1234), 0, 64);
+                  phoneNumberHash: punchPhoneNumberHash, BigInt.from(1234), 0, 64);
 
               await katya.signout();
               KC2UserInteface punch = KC2User();

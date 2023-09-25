@@ -332,7 +332,7 @@ void main() {
 
           balance = punchInfo!.balance;
 
-          // step 1 - punch unbounds all pimts
+          // step 1 - punch unbounds all points
           debugPrint('Calling unbound... ${punchPoolMember.points}');
           txHash =
               await kc2Service.unbond(punch.accountId, punchPoolMember.points);
@@ -345,7 +345,7 @@ void main() {
           // Check if the tx failed
           if (tx.chainError != null) {
             completer.completeError(
-                'unboundd pool tx error ${tx.chainError!.description}');
+                'unbound pool tx error ${tx.chainError!.description}');
 
             return;
           }
@@ -462,7 +462,7 @@ void main() {
           // Check if the tx failed
           if (tx.chainError != null) {
             completer.completeError(
-                'set pool commision tx error ${tx.chainError!.description}');
+                'set pool commission tx error ${tx.chainError!.description}');
 
             return;
           }
@@ -637,7 +637,7 @@ void main() {
           // Check if the tx failed
           if (tx.chainError != null) {
             completer.completeError(
-                'set pool commision tx error ${tx.chainError!.description}');
+                'set pool commission tx error ${tx.chainError!.description}');
             return;
           }
 
@@ -823,7 +823,7 @@ void main() {
           // Check if the tx failed
           if (tx.chainError != null) {
             completer.completeError(
-                'mominate pool validator tx error ${tx.chainError!.description}');
+                'nominate pool validator tx error ${tx.chainError!.description}');
             return;
           }
 
