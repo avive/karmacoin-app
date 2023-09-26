@@ -301,7 +301,8 @@ class _PoolWidgetState extends State<PoolWidget> {
         int diff = (now - kc2User.lastUnboundPoolData.$1).abs();
         if (diff < kc2Service.eraTimeSeconds * 1000) {
           String timeAhead = time_ago.format(
-              DateTime.now().add(Duration(milliseconds: diff)),
+              DateTime.now().add(Duration(
+                  milliseconds: kc2Service.eraTimeSeconds * 1000 - diff)),
               enableFromNow: true);
 
           // user can't leave yet
