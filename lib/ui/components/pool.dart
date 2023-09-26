@@ -306,7 +306,7 @@ class _PoolWidgetState extends State<PoolWidget> {
 
           // user can't leave yet
           return CupertinoListTile.notched(
-            title: const Text('Can\'t leave yet'),
+            title: const Text('Withdraw Funds'),
             subtitle: Text('Try in $timeAhead.'),
           );
         }

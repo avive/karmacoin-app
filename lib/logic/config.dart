@@ -28,9 +28,9 @@ class ConfigLogic {
   final bool apiLocalMode = false;
 
   /// Set to true to run against local verifier. Otherwise production verifier is used.
-  final bool verifierLocalMode = true;
+  final bool verifierLocalMode = false;
 
-  /// dev mode has some text field input shortcuts to save time in dev.
+  /// dev mode has some text field input shortcuts to save time entering data in dev mode.
   final bool devMode = true;
 
   /// in dash mode app displayes public chain data and doesn't require user to sign-in.
@@ -40,7 +40,7 @@ class ConfigLogic {
   KCNetworkType networkId = KCNetworkType.testnet;
 
   /// Skip whatsapp verification for local app testing. kc2Api should use the bypass token obtained from local config file to bypass whatsapp verification.
-  final bool skipWhatsappVerification = true;
+  final bool skipWhatsappVerification = false;
 
   /// check internet connections and show error messages.
   final bool enableInternetConnectionChecking = false;
